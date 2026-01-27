@@ -1,0 +1,2112 @@
+flutter create ogrenci_intelligence_app --org com.ogrenciintelligence
+cd ogrenci_intelligence_app
+
+=============================================================================================
+
+=============================================================================================
+ogrenci_intelligence/
+
+
+# --------- FOLDERS ----------
+$dirs = @(
+"lib/src/app",
+"lib/src/core/config",
+"lib/src/core/constants",
+"lib/src/core/error",
+"lib/src/core/logging",
+"lib/src/core/routing",
+"lib/src/core/supabase",
+"lib/src/core/theme",
+"lib/src/shared/utils",
+"lib/src/shared/widgets",
+"lib/src/features/auth/data",
+"lib/src/features/auth/domain",
+"lib/src/features/auth/presentation/controllers",
+"lib/src/features/auth/presentation/screens",
+"lib/src/features/user/data",
+"lib/src/features/user/domain",
+"lib/src/features/user/presentation/controllers",
+"lib/src/features/user/presentation/screens",
+"lib/src/features/company/data",
+"lib/src/features/company/domain",
+"lib/src/features/company/presentation/controllers",
+"lib/src/features/company/presentation/screens",
+"lib/src/features/admin/data",
+"lib/src/features/admin/domain",
+"lib/src/features/admin/presentation/controllers",
+"lib/src/features/admin/presentation/screens",
+".github/workflows",
+"docs"
+)
+
+$dirs | ForEach-Object { New-Item -ItemType Directory -Force -Path $_ | Out-Null }
+
+# --------- FILES ----------
+$files = @(
+"lib/src/app/app.dart",
+"lib/src/app/bootstrap.dart",
+"lib/src/core/config/env.dart",
+"lib/src/core/constants/app_constants.dart",
+"lib/src/core/error/app_exception.dart",
+"lib/src/core/error/failure.dart",
+"lib/src/core/logging/logger.dart",
+"lib/src/core/routing/app_router.dart",
+"lib/src/core/routing/routes.dart",
+"lib/src/core/routing/route_guards.dart",
+"lib/src/core/supabase/supabase_service.dart",
+"lib/src/core/theme/app_theme.dart",
+"lib/src/core/theme/app_colors.dart",
+"lib/src/core/theme/app_typography.dart",
+"lib/src/shared/utils/validators.dart",
+"lib/src/shared/utils/formatters.dart",
+"lib/src/shared/widgets/app_button.dart",
+"lib/src/shared/widgets/app_text_field.dart",
+"lib/src/shared/widgets/loading_view.dart",
+"lib/src/shared/widgets/empty_state.dart",
+
+"lib/src/features/auth/data/auth_repository.dart",
+"lib/src/features/auth/domain/auth_models.dart",
+"lib/src/features/auth/presentation/controllers/auth_controller.dart",
+"lib/src/features/auth/presentation/screens/login_screen.dart",
+"lib/src/features/auth/presentation/screens/register_screen.dart",
+"lib/src/features/auth/presentation/screens/forgot_password_screen.dart",
+"lib/src/features/auth/presentation/screens/email_verification_screen.dart",
+
+"lib/src/features/user/data/user_repository.dart",
+"lib/src/features/user/domain/user_models.dart",
+"lib/src/features/user/presentation/controllers/user_controller.dart",
+"lib/src/features/user/presentation/screens/user_dashboard_screen.dart",
+"lib/src/features/user/presentation/screens/user_profile_screen.dart",
+"lib/src/features/user/presentation/screens/user_settings_screen.dart",
+
+"lib/src/features/company/data/company_repository.dart",
+"lib/src/features/company/domain/company_models.dart",
+"lib/src/features/company/presentation/controllers/company_controller.dart",
+"lib/src/features/company/presentation/screens/company_auth_screen.dart",
+"lib/src/features/company/presentation/screens/company_dashboard_screen.dart",
+
+"lib/src/features/admin/data/admin_repository.dart",
+"lib/src/features/admin/domain/admin_models.dart",
+"lib/src/features/admin/presentation/controllers/admin_controller.dart",
+"lib/src/features/admin/presentation/screens/admin_login_screen.dart",
+"lib/src/features/admin/presentation/screens/admin_dashboard_screen.dart",
+
+".github/workflows/flutter-ci.yml",
+"docs/architecture.md",
+"docs/api-contracts.md",
+".env.example",
+"README.md"
+)
+
+$files | ForEach-Object { New-Item -ItemType File -Force -Path $_ | Out-Null }
+
+Write-Host "Scaffold created."
+
+=============================================================================================
+
+git init
+git add .
+git commit -m "Initial Flutter scaffold"
+
+=============================================================================================
+
+echo "" >> .gitignore
+echo "# Local environment files" >> .gitignore
+echo ".env" >> .gitignore
+echo "*.keystore" >> .gitignore
+
+=============================================================================================
+
+git branch -M main
+git remote add origin https://github.com/<YOUR_USERNAME>/ogrenci_intelligence.git
+git push -u origin main
+
+=============================================================================================
+.github/workflows/flutter-ci.yml
+
+name: Flutter CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version-file: pubspec.yaml
+          cache: true
+
+      - name: Flutter doctor
+        run: flutter doctor -v
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Verify formatting
+        run: dart format --set-exit-if-changed .
+
+      - name: Static analysis
+        run: flutter analyze
+
+      - name: Run tests
+        run: flutter test --coverage
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-lcov
+          path: coverage/lcov.info
+          if-no-files-found: ignore
+
+=============================================================================================
+
+.github/dependabot.yml
+
+version: 2
+enable-beta-ecosystems: true
+
+updates:
+  - package-ecosystem: "pub"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    groups:
+      pub-deps:
+        patterns:
+          - "*"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    groups:
+      gha:
+        patterns:
+          - "*"
+
+=============================================================================================
+
+.github/pull_request_template.md
+
+## Summary
+- What does this PR change?
+
+## Screenshots / Video (if UI)
+- Attach evidence for UI changes
+
+## Checklist
+- [ ] I ran `flutter analyze`
+- [ ] I ran `flutter test`
+- [ ] I ran `dart format .`
+- [ ] No secrets committed (.env, keys, credentials)
+- [ ] Relevant docs updated (README / docs/)
+
+=============================================================================================
+
+SECURITY.md
+
+# Security Policy
+
+## Supported Versions
+We support the latest version on the `main` branch.
+
+## Reporting a Vulnerability
+Please do not open a public issue.
+Instead, email the maintainer with:
+- vulnerability description
+- reproduction steps
+- impact assessment
+- suggested fix (if available)
+
+We will respond as soon as possible and coordinate a responsible disclosure.
+
+=============================================================================================
+D:\Dev\ogrenci_intelligence\pubspec.yaml
+
+name: ogrenci_intelligence
+description: "A new Flutter project."
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+# The following defines the version and build number for your application.
+# A version number is three numbers separated by dots, like 1.2.43
+# followed by an optional build number separated by a +.
+# Both the version and the builder number may be overridden in flutter
+# build by specifying --build-name and --build-number, respectively.
+# In Android, build-name is used as versionName while build-number used as versionCode.
+# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
+# In iOS, build-name is used as CFBundleShortVersionString while build-number is used as CFBundleVersion.
+# Read more about iOS versioning at
+# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
+# In Windows, build-name is used as the major, minor, and patch parts
+# of the product and file versions while build-number is used as the build suffix.
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.10.0 <4.0.0"
+  flutter: 3.38.5
+
+# Dependencies specify other packages that your package needs in order to work.
+# To automatically upgrade your package dependencies to the latest versions
+# consider running `flutter pub upgrade --major-versions`. Alternatively,
+# dependencies can be manually updated by changing the version numbers below to
+# the latest version available on pub.dev. To see which dependencies have newer
+# versions available, run `flutter pub outdated`.
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # UI/Icons
+  cupertino_icons: ^1.0.8
+
+  # Core packages (MOVED HERE from the 'flutter:' section)
+  go_router: ^16.0.0
+  flutter_riverpod: ^2.6.1
+  supabase_flutter: ^2.9.0
+  flutter_dotenv: ^5.2.0
+
+  # UI/UX helpers
+  flutter_svg: ^2.0.10+1
+  cached_network_image: ^3.4.1
+  intl: ^0.20.0
+
+  # Logging
+  logger: ^2.6.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # Code generation & development tools (MOVED HERE)
+  build_runner: ^2.4.12
+  freezed: ^3.2.0
+  freezed_annotation: ^3.1.0
+  json_serializable: ^6.8.0
+  json_annotation: ^4.9.0
+
+  # Linting (Note: 'flutter_lints' is a DEV dependency)
+  flutter_lints: ^6.0.0
+
+flutter:
+  # Only Flutter-specific configurations belong here:
+  uses-material-design: true
+
+  # assets:
+  #   - images/
+  # fonts:
+  #   - family: ...
+=============================================================================================
+
+D:\Dev\ogrenci_intelligence\analysis_options.yaml
+
+# This file configures the analyzer, which statically analyzes Dart code to
+# check for errors, warnings, and lints.
+#
+# The issues identified by the analyzer are surfaced in the UI of Dart-enabled
+# IDEs (https://dart.dev/tools#ides-and-editors). The analyzer can also be
+# invoked from the command line by running `flutter analyze`.
+
+# The following line activates a set of recommended lints for Flutter apps,
+# packages, and plugins designed to encourage good coding practices.
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  errors:
+    invalid_annotation_target: ignore
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+
+linter:
+  # The lint rules applied to this project can be customized in the
+  # section below to disable rules from the `package:flutter_lints/flutter.yaml`
+  # included above or to enable additional rules. A list of all available lints
+  # and their documentation is published at https://dart.dev/lints.
+  #
+  # Instead of disabling a lint rule for the entire project in the
+  # section below, it can also be suppressed for a single line of code
+  # or a specific dart file by using the `// ignore: name_of_lint` and
+  # `// ignore_for_file: name_of_lint` syntax on the line or in the file
+  # producing the lint.
+  rules:
+# Safety / correctness
+    always_declare_return_types: true
+    avoid_dynamic_calls: true
+    avoid_print: true
+    cancel_subscriptions: true
+    close_sinks: true
+    prefer_final_locals: true
+    require_trailing_commas: true
+    unawaited_futures: true
+
+    # Style / maintainability
+    directives_ordering: true
+    sort_pub_dependencies: false
+
+    # avoid_print: false  # Uncomment to disable the `avoid_print` rule
+    # prefer_single_quotes: true  # Uncomment to enable the `prefer_single_quotes` rule
+
+# Additional information about this file can be found at
+# https://dart.dev/guides/language/analysis-options
+
+=============================================================================================
+
+lib/main.dart
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'src/app/bootstrap.dart';
+import 'src/app/app.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await bootstrap(); // loads env + initializes Supabase
+
+  runApp(const ProviderScope(child: App()));
+}
+
+=============================================================================================
+lib/src/app/bootstrap.dart
+
+import '../core/config/env.dart';
+import '../core/supabase/supabase_service.dart';
+
+Future<void> bootstrap() async {
+  await Env.load();
+
+  await SupabaseService.initialize(
+    supabaseUrl: Env.supabaseUrl,
+    supabaseAnonKey: Env.supabaseAnonKey,
+  );
+}
+
+=============================================================================================
+
+lib/src/core/config/env.dart
+
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+class Env {
+  static Future<void> load() async {
+    await dotenv.load(fileName: '.env');
+  }
+
+  static String _must(String key) {
+    final v = dotenv.env[key];
+    if (v == null || v.trim().isEmpty) {
+      throw StateError('Missing env var: $key');
+    }
+    return v.trim();
+  }
+
+  static String get supabaseUrl => _must('SUPABASE_URL');
+  static String get supabaseAnonKey => _must('SUPABASE_ANON_KEY');
+
+  // We'll use these later for deep links (safe defaults)
+  static String get deepLinkScheme =>
+      (dotenv.env['DEEPLINK_SCHEME'] ?? 'ogrenci-intelligence').trim();
+
+  static Uri get deepLinkResetPassword => Uri.parse(
+  (dotenv.env['DEEPLINK_RESET_PASSWORD'] ??
+          '$deepLinkScheme://reset-password')
+      .trim(),
+  );
+
+}
+=============================================================================================
+lib/src/core/supabase/supabase_service.dart
+
+
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+class SupabaseService {
+  static Future<void> initialize({
+    required String supabaseUrl,
+    required String supabaseAnonKey,
+  }) async {
+    if (supabaseUrl.isEmpty || supabaseAnonKey.isEmpty) {
+      throw Exception('Missing SUPABASE_URL or SUPABASE_ANON_KEY in .env');
+    }
+
+    await Supabase.initialize(
+      url: supabaseUrl,
+      anonKey: supabaseAnonKey,
+      authOptions: const FlutterAuthClientOptions(
+        authFlowType: AuthFlowType.pkce,
+      ),
+    );
+  }
+
+  static SupabaseClient get client => Supabase.instance.client;
+}
+
+=============================================================================================
+lib/src/core/routing/routes.dart
+
+
+class Routes {
+  // Public
+  static const home = '/';
+  static const login = '/login';
+  static const register = '/register';
+  static const forgotPassword = '/forgot-password';
+  static const emailVerification = '/email-verification';
+  static const resetPassword = '/reset-password';
+
+  static const companyAuth = '/company/auth';
+
+  static const adminLogin = '/admin/login';
+  static const adminSetup = '/admin/setup';
+
+  // Student (protected)
+  static const dashboard = '/dashboard';
+  static const profile = '/profile';
+  static const settings = '/settings';
+  static const courses = '/courses';
+  static const courseDetail = '/courses/:id';
+  static const jobs = '/jobs';
+  static const jobDetail = '/jobs/:id';
+  static const internships = '/internships';
+  static const internshipDetail = '/internships/:id';
+  static const applications = '/applications';
+  static const favorites = '/favorites';
+  static const notifications = '/notifications';
+  static const leaderboard = '/leaderboard';
+  static const pointsSystem = '/points-system';
+  static const debug = '/debug';
+
+  // Footer pages (public)
+  static const howItWorks = '/how-it-works';
+  static const about = '/about';
+  static const contact = '/contact';
+  static const privacy = '/privacy-policy';
+  static const terms = '/terms-of-service';
+
+  // Company (protected)
+  static const companyDashboard = '/company/dashboard';
+  static const companyRegister = '/company/register';
+  static const companyJobs = '/company/jobs';
+  static const companyJobsCreate = '/company/jobs/create';
+  static const companyJobsEdit = '/company/jobs/:id/edit';
+  static const companyJobApplications = '/company/jobs/:id/applications';
+
+  static const companyInternships = '/company/internships';
+  static const companyInternshipsCreate = '/company/internships/create';
+  static const companyInternshipsEdit = '/company/internships/:id/edit';
+  static const companyInternshipApplications = '/company/internships/:id/applications';
+
+  static const companyProfile = '/company/profile';
+  static const companyReports = '/company/reports';
+  static const companyApplications = '/company/applications';
+  static const companyPricing = '/company/pricing';
+
+  // Admin (protected)
+  static const adminDashboard = '/admin/dashboard';
+  static const adminCompanies = '/admin/companies';
+  static const adminUsers = '/admin/users';
+  static const adminJobs = '/admin/jobs';
+  static const adminSubscriptions = '/admin/subscriptions';
+  static const adminReports = '/admin/reports';
+  static const adminSettings = '/admin/settings';
+  static const adminLogs = '/admin/logs';
+  static const adminProfile = '/admin/profile';
+}
+
+=============================================================================================
+lib/src/core/routing/route_guards.dart
+
+
+import '../../features/auth/domain/auth_models.dart';
+import 'routes.dart';
+
+class RouteGuards {
+  // Mirrors React's studentOnlyPaths (including detail pages)
+  static const List<String> _studentRoots = [
+    Routes.courses,
+    Routes.jobs,
+    Routes.internships,
+    Routes.applications,
+    Routes.favorites,
+    Routes.notifications,
+    Routes.leaderboard,
+    Routes.profile,
+    Routes.dashboard,
+    Routes.settings,
+    Routes.debug,
+  ];
+
+  // Mirrors adminPaths (including subroutes)
+  static const List<String> _adminRoots = [
+    Routes.adminDashboard,
+    Routes.adminCompanies,
+    Routes.adminUsers,
+    Routes.adminJobs,
+    Routes.adminSubscriptions,
+    Routes.adminReports,
+    Routes.adminSettings,
+    Routes.adminLogs,
+    Routes.adminProfile,
+  ];
+
+  static bool isStudentPath(String location) {
+    return _studentRoots.any(
+      (root) => location == root || location.startsWith('$root/'),
+    );
+  }
+
+  static bool isCompanyPath(String location) => location.startsWith('/company/');
+
+  static bool isAdminPath(String location) {
+    return _adminRoots.any(
+      (root) => location == root || location.startsWith('$root/'),
+    );
+  }
+
+  static bool isPublicPath(String location) {
+    const publicExact = <String>{
+      Routes.home,
+      Routes.login,
+      Routes.register,
+      Routes.forgotPassword,
+      Routes.emailVerification,
+      Routes.resetPassword, // ✅ important for deep link reset flow
+
+      Routes.companyAuth,
+
+      Routes.adminLogin,
+      Routes.adminSetup,
+
+      Routes.howItWorks,
+      Routes.about,
+      Routes.contact,
+      Routes.privacy,
+      Routes.terms,
+
+      // In your React app, this route is NOT protected
+      Routes.pointsSystem,
+    };
+    return publicExact.contains(location);
+  }
+
+  /// Role-based redirects (mirrors GlobalRouteControl + ProtectedRoute behavior)
+  static String? redirectForRole({
+    required UserType userType,
+    required String location,
+  }) {
+    // Company account trying to access student routes
+    if (userType == UserType.company && isStudentPath(location)) {
+      return Routes.companyDashboard;
+    }
+
+    // Student trying to access company routes
+    if (userType == UserType.student && isCompanyPath(location)) {
+      return Routes.dashboard;
+    }
+
+    // Non-admin trying to access admin routes (except setup/login)
+    if (userType != UserType.admin &&
+        isAdminPath(location) &&
+        location != Routes.adminSetup &&
+        location != Routes.adminLogin) {
+      return userType == UserType.company
+          ? Routes.companyDashboard
+          : Routes.dashboard;
+    }
+
+    return null;
+  }
+}
+=============================================================================================
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../features/auth/domain/auth_models.dart';
+import '../../features/auth/presentation/controllers/auth_controller.dart';
+import '../../features/auth/presentation/screens/reset_password_screen.dart';
+import '../../shared/widgets/empty_state.dart';
+import 'route_guards.dart';
+import 'routes.dart';
+
+final goRouterProvider = Provider<GoRouter>((ref) {
+  final authStream = ref.watch(authViewStateProvider.stream);
+
+  return GoRouter(
+    initialLocation: Routes.home,
+    refreshListenable: GoRouterRefreshStream(authStream),
+    redirect: (context, state) {
+      final location = state.uri.path;
+
+      final authAsync = ref.read(authViewStateProvider);
+      if (authAsync.isLoading) return null;
+
+      final auth = authAsync.value;
+      if (auth == null) return null;
+
+      final isAuthorized = auth.isAuthenticated;
+
+      // 1) Not authorized: allow only public routes
+      if (!isAuthorized) {
+        return RouteGuards.isPublicPath(location) ? null : Routes.login;
+      }
+
+      // 2) Authorized: role-based route protection
+      final roleRedirect = RouteGuards.redirectForRole(
+        userType: auth.userType,
+        location: location,
+      );
+      if (roleRedirect != null) return roleRedirect;
+
+      // 3) Keep authenticated users out of auth pages (but allow reset-password)
+      const authPages = <String>{
+        Routes.login,
+        Routes.register,
+        Routes.forgotPassword,
+        Routes.emailVerification,
+        Routes.companyAuth,
+        Routes.adminLogin,
+      };
+      if (authPages.contains(location)) {
+        if (auth.userType == UserType.admin) return Routes.adminDashboard;
+        if (auth.userType == UserType.company) return Routes.companyDashboard;
+        return Routes.dashboard;
+      }
+
+      // 4) Optional: redirect "/" depending on role
+      if (location == Routes.home) {
+        if (auth.userType == UserType.admin) return Routes.adminDashboard;
+        if (auth.userType == UserType.company) return Routes.companyDashboard;
+      }
+
+      return null;
+    },
+    routes: [
+      // Admin auth routes (standalone)
+      GoRoute(
+        path: Routes.adminLogin,
+        builder: (_, __) =>
+            const PlaceholderScreen(title: 'Admin Login', showAppBar: true),
+      ),
+      GoRoute(
+        path: Routes.adminSetup,
+        builder: (_, __) =>
+            const PlaceholderScreen(title: 'Admin Setup', showAppBar: true),
+      ),
+
+      // Admin area shell
+      ShellRoute(
+        builder: (context, state, child) => AdminShell(child: child),
+        routes: [
+          GoRoute(
+            path: Routes.adminDashboard,
+            builder: (_, __) => const PlaceholderView(title: 'Admin Dashboard'),
+          ),
+          GoRoute(
+            path: Routes.adminCompanies,
+            builder: (_, __) => const PlaceholderView(title: 'Admin Companies'),
+          ),
+          GoRoute(
+            path: Routes.adminUsers,
+            builder: (_, __) => const PlaceholderView(title: 'Admin Users'),
+          ),
+          GoRoute(
+            path: Routes.adminJobs,
+            builder: (_, __) => const PlaceholderView(title: 'Admin Jobs'),
+          ),
+          GoRoute(
+            path: Routes.adminSubscriptions,
+            builder: (_, __) =>
+                const PlaceholderView(title: 'Admin Subscriptions'),
+          ),
+          GoRoute(
+            path: Routes.adminReports,
+            builder: (_, __) => const PlaceholderView(title: 'Admin Reports'),
+          ),
+          GoRoute(
+            path: Routes.adminSettings,
+            builder: (_, __) => const PlaceholderView(title: 'Admin Settings'),
+          ),
+          GoRoute(
+            path: Routes.adminLogs,
+            builder: (_, __) => const PlaceholderView(title: 'Admin Logs'),
+          ),
+          GoRoute(
+            path: Routes.adminProfile,
+            builder: (_, __) => const PlaceholderView(title: 'Admin Profile'),
+          ),
+        ],
+      ),
+
+      // Main shell (public + student + company)
+      ShellRoute(
+        builder: (context, state, child) => MainShell(child: child),
+        routes: [
+          // Public
+          GoRoute(
+            path: Routes.home,
+            builder: (_, __) => const PlaceholderView(title: 'Home'),
+          ),
+          GoRoute(
+            path: Routes.login,
+            builder: (_, __) => const PlaceholderView(title: 'Login'),
+          ),
+          GoRoute(
+            path: Routes.register,
+            builder: (_, __) => const PlaceholderView(title: 'Register'),
+          ),
+          GoRoute(
+            path: Routes.forgotPassword,
+            builder: (_, __) => const PlaceholderView(title: 'Forgot Password'),
+          ),
+          GoRoute(
+            path: Routes.emailVerification,
+            builder: (_, __) =>
+                const PlaceholderView(title: 'Email Verification'),
+          ),
+          GoRoute(
+            path: Routes.resetPassword,
+            builder: (_, __) => const ResetPasswordScreen(),
+          ),
+          GoRoute(
+            path: Routes.companyAuth,
+            builder: (_, __) => const PlaceholderView(title: 'Company Auth'),
+          ),
+
+          // Footer pages (public)
+          GoRoute(
+            path: Routes.howItWorks,
+            builder: (_, __) => const PlaceholderView(title: 'How It Works'),
+          ),
+          GoRoute(
+            path: Routes.about,
+            builder: (_, __) => const PlaceholderView(title: 'About'),
+          ),
+          GoRoute(
+            path: Routes.contact,
+            builder: (_, __) => const PlaceholderView(title: 'Contact'),
+          ),
+          GoRoute(
+            path: Routes.privacy,
+            builder: (_, __) => const PlaceholderView(title: 'Privacy Policy'),
+          ),
+          GoRoute(
+            path: Routes.terms,
+            builder: (_, __) => const PlaceholderView(title: 'Terms of Service'),
+          ),
+          GoRoute(
+            path: Routes.pointsSystem,
+            builder: (_, __) => const PlaceholderView(title: 'Points System'),
+          ),
+
+          // Student protected
+          GoRoute(
+            path: Routes.dashboard,
+            builder: (_, __) => const PlaceholderView(title: 'Dashboard'),
+          ),
+          GoRoute(
+            path: Routes.profile,
+            builder: (_, __) => const PlaceholderView(title: 'Profile'),
+          ),
+          GoRoute(
+            path: Routes.settings,
+            builder: (_, __) => const PlaceholderView(title: 'Settings'),
+          ),
+          GoRoute(
+            path: Routes.courses,
+            builder: (_, __) => const PlaceholderView(title: 'Courses'),
+          ),
+          GoRoute(
+            path: Routes.courseDetail,
+            builder: (_, s) => PlaceholderView(
+              title: 'Course Detail',
+              subtitle: 'id=${s.pathParameters['id']}',
+            ),
+          ),
+          GoRoute(
+            path: Routes.jobs,
+            builder: (_, __) => const PlaceholderView(title: 'Jobs'),
+          ),
+          GoRoute(
+            path: Routes.jobDetail,
+            builder: (_, s) => PlaceholderView(
+              title: 'Job Detail',
+              subtitle: 'id=${s.pathParameters['id']}',
+            ),
+          ),
+          GoRoute(
+            path: Routes.internships,
+            builder: (_, __) => const PlaceholderView(title: 'Internships'),
+          ),
+          GoRoute(
+            path: Routes.internshipDetail,
+            builder: (_, s) => PlaceholderView(
+              title: 'Internship Detail',
+              subtitle: 'id=${s.pathParameters['id']}',
+            ),
+          ),
+          GoRoute(
+            path: Routes.applications,
+            builder: (_, __) => const PlaceholderView(title: 'Applications'),
+          ),
+          GoRoute(
+            path: Routes.favorites,
+            builder: (_, __) => const PlaceholderView(title: 'Favorites'),
+          ),
+          GoRoute(
+            path: Routes.notifications,
+            builder: (_, __) => const PlaceholderView(title: 'Notifications'),
+          ),
+          GoRoute(
+            path: Routes.leaderboard,
+            builder: (_, __) => const PlaceholderView(title: 'Leaderboard'),
+          ),
+          GoRoute(
+            path: Routes.debug,
+            builder: (_, __) => const PlaceholderView(title: 'Database Debug'),
+          ),
+
+          // Company protected
+          GoRoute(
+            path: Routes.companyDashboard,
+            builder: (_, __) => const PlaceholderView(title: 'Company Dashboard'),
+          ),
+          GoRoute(
+            path: Routes.companyRegister,
+            builder: (_, __) => const PlaceholderView(title: 'Register Company'),
+          ),
+          GoRoute(
+            path: Routes.companyJobs,
+            builder: (_, __) => const PlaceholderView(title: 'Company Jobs'),
+          ),
+          GoRoute(
+            path: Routes.companyJobsCreate,
+            builder: (_, __) => const PlaceholderView(title: 'Create Job'),
+          ),
+          GoRoute(
+            path: Routes.companyJobsEdit,
+            builder: (_, s) => PlaceholderView(
+              title: 'Edit Job',
+              subtitle: 'id=${s.pathParameters['id']}',
+            ),
+          ),
+          GoRoute(
+            path: Routes.companyJobApplications,
+            builder: (_, s) => PlaceholderView(
+              title: 'Job Applications',
+              subtitle: 'id=${s.pathParameters['id']}',
+            ),
+          ),
+          GoRoute(
+            path: Routes.companyInternships,
+            builder: (_, __) =>
+                const PlaceholderView(title: 'Internship Management'),
+          ),
+          GoRoute(
+            path: Routes.companyInternshipsCreate,
+            builder: (_, __) => const PlaceholderView(title: 'Create Internship'),
+          ),
+          GoRoute(
+            path: Routes.companyInternshipsEdit,
+            builder: (_, s) => PlaceholderView(
+              title: 'Edit Internship',
+              subtitle: 'id=${s.pathParameters['id']}',
+            ),
+          ),
+          GoRoute(
+            path: Routes.companyInternshipApplications,
+            builder: (_, s) => PlaceholderView(
+              title: 'Internship Applications',
+              subtitle: 'id=${s.pathParameters['id']}',
+            ),
+          ),
+          GoRoute(
+            path: Routes.companyProfile,
+            builder: (_, __) => const PlaceholderView(title: 'Company Profile'),
+          ),
+          GoRoute(
+            path: Routes.companyReports,
+            builder: (_, __) => const PlaceholderView(title: 'Reports'),
+          ),
+          GoRoute(
+            path: Routes.companyApplications,
+            builder: (_, __) =>
+                const PlaceholderView(title: 'Company Applications'),
+          ),
+          GoRoute(
+            path: Routes.companyPricing,
+            builder: (_, __) => const PlaceholderView(title: 'Pricing'),
+          ),
+        ],
+      ),
+    ],
+    errorBuilder: (_, state) => PlaceholderScreen(
+      title: '404',
+      subtitle: state.error?.toString(),
+      showAppBar: true,
+    ),
+  );
+});
+
+class GoRouterRefreshStream extends ChangeNotifier {
+  GoRouterRefreshStream(Stream<dynamic> stream) {
+    _sub = stream.listen((_) => notifyListeners());
+  }
+
+  late final StreamSubscription _sub;
+
+  @override
+  void dispose() {
+    _sub.cancel();
+    super.dispose();
+  }
+}
+
+/// Main Shell (temporary)
+class MainShell extends StatelessWidget {
+  const MainShell({super.key, required this.child});
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Öğrenci Intelligence')),
+      body: Column(
+        children: [
+          Expanded(child: child),
+          const _Footer(),
+        ],
+      ),
+    );
+  }
+}
+
+/// Admin Shell (temporary)
+class AdminShell extends StatelessWidget {
+  const AdminShell({super.key, required this.child});
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Admin')),
+      body: child,
+    );
+  }
+}
+
+class _Footer extends StatelessWidget {
+  const _Footer();
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Text(
+          '© ${DateTime.now().year} Öğrenci Intelligence',
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
+      ),
+    );
+  }
+}
+
+
+=============================================================================================
+lib/src/app/app.dart
+
+
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../core/deeplink/deep_link_service.dart';
+import '../core/routing/app_router.dart';
+import '../core/routing/routes.dart';
+import '../core/supabase/supabase_service.dart';
+
+class App extends ConsumerStatefulWidget {
+  const App({super.key});
+
+  @override
+  ConsumerState<App> createState() => _AppState();
+}
+
+class _AppState extends ConsumerState<App> {
+  DeepLinkService? _deepLinks;
+  StreamSubscription<AuthState>? _authSub;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _deepLinks = DeepLinkService(SupabaseService.client);
+    unawaited(_deepLinks!.start());
+
+    _authSub = SupabaseService.client.auth.onAuthStateChange.listen((evt) {
+      if (evt.event == AuthChangeEvent.passwordRecovery) {
+        ref.read(goRouterProvider).go(Routes.resetPassword);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _authSub?.cancel();
+    _deepLinks?.stop();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final router = ref.watch(goRouterProvider);
+
+    return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
+      title: 'Öğrenci Intelligence',
+      routerConfig: router,
+    );
+  }
+}
+
+=============================================================================================
+lib/src/shared/widgets/empty_state.dart
+
+
+import 'package:flutter/material.dart';
+
+class PlaceholderScreen extends StatelessWidget {
+  const PlaceholderScreen({super.key, required this.title, this.subtitle});
+
+  final String title;
+  final String? subtitle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 520),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(title, style: Theme.of(context).textTheme.headlineSmall),
+                if (subtitle != null) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    subtitle!,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+=============================================================================================
+lib/src/features/auth/domain/auth_models.dart
+
+
+class CompanyMembership {
+  const CompanyMembership({
+    required this.companyId,
+    required this.role,
+  });
+
+  final String companyId;
+  final String role;
+
+  factory CompanyMembership.fromJson(Map<String, dynamic> json) {
+    return CompanyMembership(
+      companyId: json['company_id'].toString(),
+      role: (json['role'] ?? '').toString(),
+    );
+  }
+}
+
+enum AppRole { guest, student, company, admin }
+
+=============================================================================================
+lib/src/features/auth/data/auth_repository.dart
+
+
+import 'package:supabase_flutter/supabase_flutter.dart';
+import '../domain/auth_models.dart';
+
+class AuthRepository {
+  AuthRepository(this._client);
+
+  final SupabaseClient _client;
+
+  User? get currentUser => _client.auth.currentUser;
+  Session? get currentSession => _client.auth.currentSession;
+
+  Stream<AuthState> authStateChanges() => _client.auth.onAuthStateChange;
+
+  Future<User> signIn({
+    required String email,
+    required String password,
+  }) async {
+    final res = await _client.auth.signInWithPassword(
+      email: email,
+      password: password,
+    );
+
+    final user = res.user;
+    if (user == null) {
+      throw const AuthException('Sign-in failed: user is null.');
+    }
+
+    // React behavior: block if email not confirmed + sign out
+    if (user.emailConfirmedAt == null) {
+      await _client.auth.signOut();
+      throw const AuthException('Please verify your email address.');
+    }
+
+    return user;
+  }
+
+  Future<User> signUp({
+    required String email,
+    required String password,
+    required String fullName,
+  }) async {
+    final res = await _client.auth.signUp(
+      email: email,
+      password: password,
+      data: {'full_name': fullName},
+    );
+
+    final user = res.user;
+    if (user == null) {
+      throw const AuthException('Sign-up failed: user is null.');
+    }
+    return user;
+  }
+
+  Future<void> signOut() => _client.auth.signOut();
+
+  Future<void> resetPassword({
+    required String email,
+    String? redirectTo,
+  }) async {
+    await _client.auth.resetPasswordForEmail(email, redirectTo: redirectTo);
+  }
+
+  Future<void> updatePassword(String newPassword) async {
+    await _client.auth.updateUser(UserAttributes(password: newPassword));
+  }
+
+  Future<void> updateProfile(Map<String, dynamic> updates) async {
+    await _client.auth.updateUser(UserAttributes(data: updates));
+  }
+
+  Future<Session?> refreshSession() async {
+    final res = await _client.auth.refreshSession();
+    return res.session;
+  }
+
+  /// Mirrors AuthContext.jsx: if a row exists in company_users, userType = company.
+  Future<CompanyMembership?> fetchCompanyMembership(String userId) async {
+    final row = await _client
+        .from('company_users')
+        .select('company_id, role')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+    if (row == null) return null;
+    return CompanyMembership.fromJson(row);
+  }
+}
+
+=============================================================================================
+lib/src/features/auth/presentation/controllers/auth_controller.dart
+
+
+import 'dart:async';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../../../..//core/supabase/supabase_service.dart';
+import '../../data/auth_repository.dart';
+import '../../domain/auth_models.dart';
+
+final authRepositoryProvider = Provider<AuthRepository>((ref) {
+  return AuthRepository(SupabaseService.client);
+});
+
+/// Session stream (source of truth)
+final sessionProvider = StreamProvider<Session?>((ref) {
+  final repo = ref.watch(authRepositoryProvider);
+  final controller = StreamController<Session?>();
+
+  controller.add(repo.currentSession);
+
+  final sub = repo.authStateChanges().listen((evt) {
+    controller.add(evt.session);
+  });
+
+ref.onDispose(() async {
+  await sub.cancel();
+  await controller.close();
+});
+
+  return controller.stream;
+});
+
+final currentUserProvider = Provider<User?>((ref) {
+  final session = ref.watch(sessionProvider).value;
+  return session?.user;
+});
+
+/// Company membership (company_id + role) like in AuthContext.jsx
+final companyMembershipProvider = FutureProvider<CompanyMembership?>((ref) async {
+  final user = ref.watch(currentUserProvider);
+  if (user == null) return null;
+
+  final repo = ref.watch(authRepositoryProvider);
+  return repo.fetchCompanyMembership(user.id);
+});
+
+/// App role (admin > company > student)
+final appRoleProvider = FutureProvider<AppRole>((ref) async {
+  final user = ref.watch(currentUserProvider);
+  if (user == null) return AppRole.guest;
+
+  // Email verification gate (same philosophy as ProtectedRoute + signIn)
+  if (user.emailConfirmedAt == null) return AppRole.guest;
+
+  final repo = ref.watch(authRepositoryProvider);
+
+  if (await repo.isAdmin(user)) return AppRole.admin;
+
+  final membership = await ref.watch(companyMembershipProvider.future);
+  if (membership != null) return AppRole.company;
+
+  return AppRole.student;
+});
+
+/// Simple controller for auth actions + loading flag
+final authControllerProvider =
+    StateNotifierProvider<AuthController, bool>((ref) {
+  return AuthController(ref.watch(authRepositoryProvider));
+});
+
+class AuthController extends StateNotifier<bool> {
+  AuthController(this._repo) : super(false);
+
+  final AuthRepository _repo;
+
+  Future<String?> signIn(String email, String password) async {
+    try {
+      state = true;
+      await _repo.signIn(email: email, password: password);
+      return null;
+    } on AuthException catch (e) {
+      return e.message;
+    } catch (e) {
+      return e.toString();
+    } finally {
+      state = false;
+    }
+  }
+
+  Future<String?> signUp(String email, String password, String fullName) async {
+    try {
+      state = true;
+      await _repo.signUp(email: email, password: password, fullName: fullName);
+      return null;
+    } on AuthException catch (e) {
+      return e.message;
+    } catch (e) {
+      return e.toString();
+    } finally {
+      state = false;
+    }
+  }
+
+  Future<String?> signOut() async {
+    try {
+      state = true;
+      await _repo.signOut();
+      return null;
+    } catch (e) {
+      return e.toString();
+    } finally {
+      state = false;
+    }
+  }
+
+  Future<String?> resetPassword(String email, {String? redirectTo}) async {
+    try {
+      state = true;
+      await _repo.resetPassword(email: email, redirectTo: redirectTo);
+      return null;
+    } catch (e) {
+      return e.toString();
+    } finally {
+      state = false;
+    }
+  }
+
+  Future<String?> updatePassword(String newPassword) async {
+    try {
+      state = true;
+      await _repo.updatePassword(newPassword);
+      return null;
+    } catch (e) {
+      return e.toString();
+    } finally {
+      state = false;
+    }
+  }
+
+  Future<String?> updateProfile(Map<String, dynamic> updates) async {
+    try {
+      state = true;
+      await _repo.updateProfile(updates);
+      return null;
+    } catch (e) {
+      return e.toString();
+    } finally {
+      state = false;
+    }
+  }
+
+  Future<String?> refreshSession() async {
+    try {
+      await _repo.refreshSession();
+      return null;
+    } catch (e) {
+      return e.toString();
+    }
+  }
+}
+
+=============================================================================================
+android/app/src/main/AndroidManifest.xml
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application
+        android:label="ogrenci_intelligence"
+        android:name="${applicationName}"
+        android:icon="@mipmap/ic_launcher">
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:taskAffinity=""
+            android:theme="@style/LaunchTheme"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+            android:hardwareAccelerated="true"
+            android:windowSoftInputMode="adjustResize">
+            <!-- Specifies an Android theme to apply to this Activity as soon as
+                 the Android process has started. This theme is visible to the user
+                 while the Flutter UI initializes. After that, this theme continues
+                 to determine the Window background behind the Flutter UI. -->
+            <meta-data
+              android:name="io.flutter.embedding.android.NormalTheme"
+              android:resource="@style/NormalTheme"
+              />
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+            
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="com.ogrenciintelligence"
+                    android:host="login-callback" />
+                <data 
+                    android:scheme="com.ogrenciintelligence" 
+                    android:host="reset-password" />
+            </intent-filter>
+
+        </activity>
+        <!-- Don't delete the meta-data below.
+             This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
+        <meta-data
+            android:name="flutterEmbedding"
+            android:value="2" />
+    </application>
+    <!-- Required to query activities that can process text, see:
+         https://developer.android.com/training/package-visibility and
+         https://developer.android.com/reference/android/content/Intent#ACTION_PROCESS_TEXT.
+
+         In particular, this is used by the Flutter engine in io.flutter.plugin.text.ProcessTextPlugin. -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.PROCESS_TEXT"/>
+            <data android:mimeType="text/plain"/>
+        </intent>
+    </queries>
+</manifest>
+=============================================================================================
+ios/Runner/Info.plist
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleDisplayName</key>
+	<string>Ogrenci Intelligence</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>ogrenci_intelligence</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(FLUTTER_BUILD_NAME)</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
+	<key>UIMainStoryboardFile</key>
+	<string>Main</string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
+	<key>CFBundleURLTypes</key>
+	<array>
+	<dict>
+		<key>CFBundleURLSchemes</key>
+		<array>
+		<string>com.ogrenciintelligence</string>
+		</array>
+	</dict>
+	</array>
+</dict>
+</plist>
+
+=============================================================================================
+lib/src/features/admin/data/admin_repository.dart
+
+
+import 'package:supabase_flutter/supabase_flutter.dart';
+import '../domain/admin_models.dart';
+
+class AdminRepository {
+  AdminRepository(this._client);
+
+  final SupabaseClient _client;
+
+  Future<AdminData?> getActiveAdminByUserId(String userId) async {
+    final row = await _client
+        .from('admins')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('is_active', true)
+        .maybeSingle();
+
+    if (row == null) return null;
+    return AdminData.fromJson(row);
+  }
+
+  Future<void> logAdminAction({
+    required String adminId,
+    required String actionType,
+    required String targetType,
+    String? targetId,
+    Map<String, dynamic> details = const {},
+  }) async {
+    await _client.from('admin_logs').insert({
+      'admin_id': adminId,
+      'action_type': actionType,
+      'target_type': targetType,
+      'target_id': targetId,
+      'details': details,
+      // On mobile, don't pretend we have the public IP.
+      'ip_address': null,
+    });
+  }
+}
+=============================================================================================
+import 'dart:async';
+
+import 'package:app_links/app_links.dart';
+import 'package:flutter/foundation.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+class DeepLinkService {
+  DeepLinkService(this._client);
+
+  final SupabaseClient _client;
+  final AppLinks _appLinks = AppLinks();
+  StreamSubscription<Uri>? _sub;
+
+  Future<void> start() async {
+    final initial = await _appLinks.getInitialLink(); // app_links 6.x
+    if (initial != null) {
+      await _handle(initial);
+    }
+
+    _sub = _appLinks.uriLinkStream.listen((uri) {
+      unawaited(_handle(uri));
+    }, onError: (e) {
+      if (kDebugMode) {
+        // print('Deep link stream error: $e');
+      }
+    });
+  }
+
+  Future<void> stop() async {
+    await _sub?.cancel();
+    _sub = null;
+  }
+
+  Future<void> _handle(Uri uri) async {
+    try {
+      final s = uri.toString();
+
+      // Only process auth-related links
+      final looksAuth = s.contains('access_token=') ||
+          s.contains('refresh_token=') ||
+          s.contains('type=recovery') ||
+          s.contains('code=');
+
+      if (!looksAuth) return;
+
+      await _client.auth.getSessionFromUrl(uri);
+    } catch (e) {
+      if (kDebugMode) {
+        // print('Deep link parse failed: $e');
+      }
+    }
+  }
+}
+
+=============================================================================================
+lib/src/features/admin/domain/admin_models.dart
+
+
+class AdminData {
+  const AdminData({
+    required this.id,
+    required this.userId,
+    required this.role,
+    required this.isActive,
+    required this.permissions,
+    required this.raw,
+  });
+
+  final String id;
+  final String userId;
+  final String role;
+  final bool isActive;
+  final Map<String, dynamic> permissions;
+  final Map<String, dynamic> raw;
+
+  bool get isSuperAdmin => role == 'super_admin';
+
+  factory AdminData.fromJson(Map<String, dynamic> json) {
+    return AdminData(
+      id: (json['id'] ?? '').toString(),
+      userId: (json['user_id'] ?? '').toString(),
+      role: (json['role'] ?? '').toString(),
+      isActive: json['is_active'] == true,
+      permissions: (json['permissions'] as Map?)?.cast<String, dynamic>() ?? const {},
+      raw: json,
+    );
+  }
+}
+=============================================================================================
+lib/src/features/admin/presentation/controllers/admin_controller.dart
+
+
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../../../../core/supabase/supabase_service.dart';
+import '../../data/admin_repository.dart';
+import '../../domain/admin_models.dart';
+
+final adminRepositoryProvider = Provider<AdminRepository>((ref) {
+  return AdminRepository(SupabaseService.client);
+});
+
+final activeAdminProvider = FutureProvider<AdminData?>((ref) async {
+  final User? user = SupabaseService.client.auth.currentUser;
+  if (user == null) return null;
+  final repo = ref.watch(adminRepositoryProvider);
+  return repo.getActiveAdminByUserId(user.id);
+});
+
+final isAdminProvider = Provider<bool>((ref) {
+  return ref.watch(activeAdminProvider).valueOrNull != null;
+});
+
+final isSuperAdminProvider = Provider<bool>((ref) {
+  final admin = ref.watch(activeAdminProvider).valueOrNull;
+  return admin?.isSuperAdmin ?? false;
+});
+
+final adminActionControllerProvider =
+    StateNotifierProvider<AdminActionController, bool>((ref) {
+  return AdminActionController(ref.watch(adminRepositoryProvider), ref);
+});
+
+class AdminActionController extends StateNotifier<bool> {
+  AdminActionController(this._repo, this._ref) : super(false);
+
+  final AdminRepository _repo;
+  final Ref _ref;
+
+  Future<String?> logAction({
+  required String actionType,
+  required String targetType,
+  String? targetId,
+  Map<String, dynamic> details = const {},
+}) async {
+  try {
+    state = true;
+
+    final admin = await _ref.read(activeAdminProvider.future);
+    if (admin == null) return 'Not an admin';
+
+    await _repo.logAdminAction(
+      adminId: admin.id,
+      actionType: actionType,
+      targetType: targetType,
+      targetId: targetId,
+      details: details,
+    );
+    return null;
+  } catch (e) {
+    return e.toString();
+  } finally {
+    state = false;
+  }
+}
+}
+
+=============================================================================================
+lib/src/features/auth/domain/auth_models.dart
+
+
+enum UserType { guest, student, company, admin }
+
+class CompanyMembership {
+  const CompanyMembership({
+    required this.companyId,
+    required this.role,
+  });
+
+  final String companyId;
+  final String role;
+
+  factory CompanyMembership.fromJson(Map<String, dynamic> json) {
+    return CompanyMembership(
+      companyId: json['company_id'].toString(),
+      role: (json['role'] ?? '').toString(),
+    );
+  }
+}
+=============================================================================================
+lib/src/features/auth/presentation/controllers/auth_controller.dart
+
+
+import 'dart:async';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../../../../core/config/env.dart';
+import '../../../../core/supabase/supabase_service.dart';
+import '../../../admin/presentation/controllers/admin_controller.dart';
+import '../../data/auth_repository.dart';
+import '../../domain/auth_models.dart';
+
+class AuthViewState {
+  const AuthViewState({
+    required this.user,
+    required this.session,
+    required this.loading,
+    required this.userType,
+    this.companyId,
+    this.companyRole,
+  });
+
+  final User? user;
+  final Session? session;
+  final bool loading;
+
+  final UserType userType;
+  final String? companyId;
+  final String? companyRole;
+
+  bool get isAuthenticated => user != null && user!.emailConfirmedAt != null;
+}
+
+final authRepositoryProvider = Provider<AuthRepository>((ref) {
+  return AuthRepository(SupabaseService.client);
+});
+
+final authViewStateProvider = StreamProvider<AuthViewState>((ref) {
+  final repo = ref.watch(authRepositoryProvider);
+  final controller = StreamController<AuthViewState>.broadcast();
+
+  Future<void> emit(Session? session, {required bool loading}) async {
+    final user = session?.user;
+
+    UserType userType = UserType.guest;
+    String? companyId;
+    String? companyRole;
+
+    if (user != null && user.emailConfirmedAt != null) {
+      // Admin has priority (admins table)
+      final admin = await ref.read(activeAdminProvider.future);
+      if (admin != null) {
+        userType = UserType.admin;
+      } else {
+        // Company membership (company_users table)
+        final membership = await repo.fetchCompanyMembership(user.id);
+        if (membership != null) {
+          userType = UserType.company;
+          companyId = membership.companyId;
+          companyRole = membership.role;
+        } else {
+          userType = UserType.student;
+        }
+      }
+    }
+
+    controller.add(
+      AuthViewState(
+        user: user,
+        session: session,
+        loading: loading,
+        userType: userType,
+        companyId: companyId,
+        companyRole: companyRole,
+      ),
+    );
+  }
+
+  // Initial state (non-blocking)
+unawaited(() async {
+  controller.add(const AuthViewState(
+    user: null,
+    session: null,
+    loading: true,
+    userType: UserType.guest,
+  ));
+  await emit(repo.currentSession, loading: false);
+}());
+
+
+  final sub = repo.authStateChanges().listen((evt) async {
+    // Admin status depends on DB; invalidate it on auth change
+    ref.invalidate(activeAdminProvider);
+    await emit(evt.session, loading: false);
+  });
+
+ref.onDispose(() async {
+  await sub.cancel();
+  await controller.close();
+});
+
+  return controller.stream;
+});
+
+final authActionLoadingProvider =
+    StateNotifierProvider<AuthActionController, bool>((ref) {
+  return AuthActionController(ref.watch(authRepositoryProvider));
+});
+
+class AuthActionController extends StateNotifier<bool> {
+  AuthActionController(this._repo) : super(false);
+  final AuthRepository _repo;
+
+  Future<String?> signIn(String email, String password) async {
+    try {
+      state = true;
+      await _repo.signIn(email: email, password: password);
+      return null;
+    } on AuthException catch (e) {
+      return e.message;
+    } catch (e) {
+      return e.toString();
+    } finally {
+      state = false;
+    }
+  }
+
+  Future<String?> signUp(String email, String password, String fullName) async {
+    try {
+      state = true;
+      await _repo.signUp(email: email, password: password, fullName: fullName);
+      return null;
+    } on AuthException catch (e) {
+      return e.message;
+    } catch (e) {
+      return e.toString();
+    } finally {
+      state = false;
+    }
+  }
+
+  Future<String?> signOut() async {
+    try {
+      state = true;
+      await _repo.signOut();
+      return null;
+    } catch (e) {
+      return e.toString();
+    } finally {
+      state = false;
+    }
+  }
+
+  Future<String?> resetPassword(String email) async {
+    try {
+      state = true;
+      await _repo.resetPassword(
+        email: email,
+        redirectTo: Env.deepLinkResetPassword.toString(),
+      );
+      return null;
+    } catch (e) {
+      return e.toString();
+    } finally {
+      state = false;
+    }
+  }
+
+  Future<String?> updatePassword(String newPassword) async {
+    try {
+      state = true;
+      await _repo.updatePassword(newPassword);
+      return null;
+    } catch (e) {
+      return e.toString();
+    } finally {
+      state = false;
+    }
+  }
+
+  Future<String?> updateProfile(Map<String, dynamic> updates) async {
+    try {
+      state = true;
+      await _repo.updateProfile(updates);
+      return null;
+    } catch (e) {
+      return e.toString();
+    } finally {
+      state = false;
+    }
+  }
+}
+
+=============================================================================================
+lib/src/features/auth/presentation/screens/reset_password_screen.dart
+
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../controllers/auth_controller.dart';
+
+class ResetPasswordScreen extends ConsumerStatefulWidget {
+  const ResetPasswordScreen({super.key});
+
+  @override
+  ConsumerState<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
+}
+
+class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
+  final _password = TextEditingController();
+
+  @override
+  void dispose() {
+    _password.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final busy = ref.watch(authActionLoadingProvider);
+
+    return Scaffold(
+      appBar: AppBar(title: const Text('Reset Password')),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            TextField(
+              controller: _password,
+              obscureText: true,
+              decoration: const InputDecoration(
+                labelText: 'New password',
+              ),
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              onPressed: busy
+                  ? null
+                  : () async {
+                      final err = await ref
+                          .read(authActionLoadingProvider.notifier)
+                          .updatePassword(_password.text.trim());
+                      if (!context.mounted) return;
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(err ?? 'Password updated')),
+                      );
+                    },
+              child: busy
+                  ? const SizedBox(
+                      height: 18,
+                      width: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Text('Update'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+=============================================================================================
+lib/src/features/company/data/company_repository.dart
+
+
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+class CompanyRepository {
+  CompanyRepository(this._client);
+
+  final SupabaseClient _client;
+
+  /// Returns membership if the current user belongs to a company.
+  /// Mirrors React: supabase.from("company_users").select("company_id, role").eq("user_id", user.id).maybeSingle()
+  Future<({String companyId, String role})?> getMembershipByUserId(String userId) async {
+    final row = await _client
+        .from('company_users')
+        .select('company_id, role')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+    if (row == null) return null;
+
+    return (
+      companyId: row['company_id'].toString(),
+      role: (row['role'] ?? '').toString(),
+    );
+  }
+
+  /// Optional: get company basic profile (we'll expand later based on your DB schema).
+  Future<Map<String, dynamic>?> getCompanyById(String companyId) async {
+    final row = await _client
+        .from('companies')
+        .select('*')
+        .eq('id', companyId)
+        .maybeSingle();
+    return row;
+  }
+}
+=============================================================================================
+=============================================================================================
+=============================================================================================
+=============================================================================================
+=============================================================================================
+=============================================================================================
+=============================================================================================
+=============================================================================================
+=============================================================================================
+=============================================================================================
+=============================================================================================
+=============================================================================================
+=============================================================================================
+=============================================================================================
+=============================================================================================
+=============================================================================================
+=============================================================================================
+=============================================================================================
+=============================================================================================
+=============================================================================================
+=============================================================================================
+=============================================================================================
+=============================================================================================
+=============================================================================================
+=============================================================================================
+=============================================================================================
+=============================================================================================
+=============================================================================================
+=============================================================================================
+=============================================================================================
+=============================================================================================
+=============================================================================================
+=============================================================================================
+=============================================================================================
+=============================================================================================
+=============================================================================================
+=============================================================================================
+=============================================================================================
+=============================================================================================
+=============================================================================================
+=============================================================================================
+=============================================================================================
+=============================================================================================
+=============================================================================================
+

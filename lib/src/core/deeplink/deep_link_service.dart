@@ -12,13 +12,17 @@ class DeepLinkService {
   StreamSubscription<Uri>? _sub;
 
   Future<void> start() async {
-    final initial = await _appLinks.getInitialLink();
+    final initial = await _appLinks.getInitialLink(); // app_links 6.x
     if (initial != null) {
       await _handle(initial);
     }
 
     _sub = _appLinks.uriLinkStream.listen((uri) {
       unawaited(_handle(uri));
+    }, onError: (e) {
+      if (kDebugMode) {
+        // print('Deep link stream error: $e');
+      }
     });
   }
 
@@ -30,6 +34,8 @@ class DeepLinkService {
   Future<void> _handle(Uri uri) async {
     try {
       final s = uri.toString();
+
+      // Only process auth-related links
       final looksAuth = s.contains('access_token=') ||
           s.contains('refresh_token=') ||
           s.contains('type=recovery') ||
