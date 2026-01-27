@@ -75,8 +75,16 @@ final authViewStateProvider = StreamProvider<AuthViewState>((ref) {
   }
 
   // Initial state (non-blocking)
-  unawaited(emit(repo.currentSession, loading: true));
-  unawaited(emit(repo.currentSession, loading: false));
+unawaited(() async {
+  controller.add(const AuthViewState(
+    user: null,
+    session: null,
+    loading: true,
+    userType: UserType.guest,
+  ));
+  await emit(repo.currentSession, loading: false);
+}());
+
 
   final sub = repo.authStateChanges().listen((evt) async {
     // Admin status depends on DB; invalidate it on auth change
@@ -84,10 +92,11 @@ final authViewStateProvider = StreamProvider<AuthViewState>((ref) {
     await emit(evt.session, loading: false);
   });
 
-  ref.onDispose(() {
-    sub.cancel();
-    controller.close();
-  });
+ref.onDispose(() async {
+  await sub.cancel();
+  await controller.close();
+});
+
 
   return controller.stream;
 });
@@ -146,7 +155,7 @@ class AuthActionController extends StateNotifier<bool> {
       state = true;
       await _repo.resetPassword(
         email: email,
-        redirectTo: Env.deepLinkCallback.toString(),
+        redirectTo: Env.deepLinkResetPassword.toString(),
       );
       return null;
     } catch (e) {

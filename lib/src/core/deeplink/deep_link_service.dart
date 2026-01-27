@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:app_links/app_links.dart';
-import 'package:flutter/foundation.dart'; // for unawaited
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class DeepLinkService {
@@ -12,7 +12,6 @@ class DeepLinkService {
   StreamSubscription<Uri>? _sub;
 
   Future<void> start() async {
-    // app_links 6.x: use getInitialLink() (not getInitialAppLink)
     final initial = await _appLinks.getInitialLink();
     if (initial != null) {
       await _handle(initial);
@@ -30,10 +29,19 @@ class DeepLinkService {
 
   Future<void> _handle(Uri uri) async {
     try {
-      // Supabase parses tokens from deep link and restores session if applicable.
+      final s = uri.toString();
+      final looksAuth = s.contains('access_token=') ||
+          s.contains('refresh_token=') ||
+          s.contains('type=recovery') ||
+          s.contains('code=');
+
+      if (!looksAuth) return;
+
       await _client.auth.getSessionFromUrl(uri);
-    } catch (_) {
-      // Ignore expired/invalid links.
+    } catch (e) {
+      if (kDebugMode) {
+        // print('Deep link parse failed: $e');
+      }
     }
   }
 }

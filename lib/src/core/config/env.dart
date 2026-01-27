@@ -20,9 +20,13 @@ class Env {
   static String get deepLinkScheme =>
       (dotenv.env['DEEPLINK_SCHEME'] ?? 'ogrenci-intelligence').trim();
 
-  static Uri get deepLinkCallback => Uri.parse(
-        (dotenv.env['DEEPLINK_CALLBACK'] ??
-                '$deepLinkScheme://login-callback')
-            .trim(),
-      );
+  static Uri get deepLinkResetPassword => Uri.parse(
+  (dotenv.env['DEEPLINK_RESET_PASSWORD'] ??
+          '$deepLinkScheme://reset-password')
+      .trim(),
+  );
+
 }
+
+
+
