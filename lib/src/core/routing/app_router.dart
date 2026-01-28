@@ -6,6 +6,9 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/auth/domain/auth_models.dart';
 import '../../features/auth/presentation/controllers/auth_controller.dart';
+import '../../features/auth/presentation/screens/forgot_password_screen.dart';
+import '../../features/auth/presentation/screens/login_screen.dart';
+import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/auth/presentation/screens/reset_password_screen.dart';
 import '../../shared/widgets/empty_state.dart';
 import 'route_guards.dart';
@@ -17,6 +20,9 @@ final goRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: Routes.home,
     refreshListenable: GoRouterRefreshStream(authStream),
+
+    /// Important:
+    /// - use `state.uri.path` so guards work with subroutes too
     redirect: (context, state) {
       final location = state.uri.path;
 
@@ -26,6 +32,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       final auth = authAsync.value;
       if (auth == null) return null;
 
+      // Allow reset-password page ALWAYS (deep link recovery flow),
+      // regardless of auth state.
+      if (location == Routes.resetPassword) return null;
+
       final isAuthorized = auth.isAuthenticated;
 
       // 1) Not authorized: allow only public routes
@@ -33,14 +43,14 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         return RouteGuards.isPublicPath(location) ? null : Routes.login;
       }
 
-      // 2) Authorized: role-based route protection
+      // 2) Authorized: role-based protection
       final roleRedirect = RouteGuards.redirectForRole(
         userType: auth.userType,
         location: location,
       );
       if (roleRedirect != null) return roleRedirect;
 
-      // 3) Keep authenticated users out of auth pages (but allow reset-password)
+      // 3) Keep authenticated users out of auth pages
       const authPages = <String>{
         Routes.login,
         Routes.register,
@@ -55,7 +65,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         return Routes.dashboard;
       }
 
-      // 4) Optional: redirect "/" depending on role
+      // 4) Optional: redirect "/" for admin/company (students can see home)
       if (location == Routes.home) {
         if (auth.userType == UserType.admin) return Routes.adminDashboard;
         if (auth.userType == UserType.company) return Routes.companyDashboard;
@@ -63,8 +73,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
 
       return null;
     },
+
     routes: [
+      // -----------------------------
       // Admin auth routes (standalone)
+      // -----------------------------
       GoRoute(
         path: Routes.adminLogin,
         builder: (_, __) =>
@@ -76,7 +89,9 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             const PlaceholderScreen(title: 'Admin Setup', showAppBar: true),
       ),
 
-      // Admin area shell
+      // -------------
+      // Admin shell
+      // -------------
       ShellRoute(
         builder: (context, state, child) => AdminShell(child: child),
         routes: [
@@ -120,7 +135,9 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         ],
       ),
 
+      // -----------------------------
       // Main shell (public + student + company)
+      // -----------------------------
       ShellRoute(
         builder: (context, state, child) => MainShell(child: child),
         routes: [
@@ -129,27 +146,37 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             path: Routes.home,
             builder: (_, __) => const PlaceholderView(title: 'Home'),
           ),
+
+          // ✅ Real auth screens
           GoRoute(
             path: Routes.login,
-            builder: (_, __) => const PlaceholderView(title: 'Login'),
+            builder: (context, state) => LoginScreen(
+              // Match React's "from" behavior (location.state?.from?.pathname)
+              // Here we use query param: /login?from=/profile
+              from: state.uri.queryParameters['from'],
+            ),
           ),
           GoRoute(
             path: Routes.register,
-            builder: (_, __) => const PlaceholderView(title: 'Register'),
+            builder: (_, __) => const RegisterScreen(),
           ),
           GoRoute(
             path: Routes.forgotPassword,
-            builder: (_, __) => const PlaceholderView(title: 'Forgot Password'),
+            builder: (_, __) => const ForgotPasswordScreen(),
           ),
+
           GoRoute(
             path: Routes.emailVerification,
             builder: (_, __) =>
                 const PlaceholderView(title: 'Email Verification'),
           ),
+
+          // ✅ Reset password: deep link recovery flow
           GoRoute(
             path: Routes.resetPassword,
             builder: (_, __) => const ResetPasswordScreen(),
           ),
+
           GoRoute(
             path: Routes.companyAuth,
             builder: (_, __) => const PlaceholderView(title: 'Company Auth'),
@@ -322,6 +349,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         ],
       ),
     ],
+
     errorBuilder: (_, state) => PlaceholderScreen(
       title: '404',
       subtitle: state.error?.toString(),

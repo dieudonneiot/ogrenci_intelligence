@@ -1,3 +1,4 @@
+// lib/src/core/config/env.dart
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class Env {
@@ -16,17 +17,17 @@ class Env {
   static String get supabaseUrl => _must('SUPABASE_URL');
   static String get supabaseAnonKey => _must('SUPABASE_ANON_KEY');
 
-  // We'll use these later for deep links (safe defaults)
   static String get deepLinkScheme =>
-      (dotenv.env['DEEPLINK_SCHEME'] ?? 'ogrenci-intelligence').trim();
+      (dotenv.env['DEEPLINK_SCHEME'] ?? 'com.ogrenciintelligence').trim();
+
+  static Uri get deepLinkCallback => Uri.parse(
+        (dotenv.env['DEEPLINK_CALLBACK'] ?? '$deepLinkScheme://login-callback')
+            .trim(),
+      );
 
   static Uri get deepLinkResetPassword => Uri.parse(
-  (dotenv.env['DEEPLINK_RESET_PASSWORD'] ??
-          '$deepLinkScheme://reset-password')
-      .trim(),
-  );
-
+        (dotenv.env['DEEPLINK_RESET_PASSWORD'] ??
+                '$deepLinkScheme://reset-password')
+            .trim(),
+      );
 }
-
-
-
