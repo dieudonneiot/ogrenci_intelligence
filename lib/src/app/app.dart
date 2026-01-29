@@ -35,7 +35,7 @@ class _AppState extends ConsumerState<App> {
     unawaited(_deepLinks?.stop() ?? Future.value());
     super.dispose();
   }
-
+ 
   @override
   Widget build(BuildContext context) {
     final router = ref.watch(goRouterProvider);

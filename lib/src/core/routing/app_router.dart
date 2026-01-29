@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -19,8 +20,27 @@ import 'routes.dart';
 final goRouterProvider = Provider<GoRouter>((ref) {
   final authStream = ref.watch(authViewStateProvider.stream);
 
+  // ✅ IMPORTANT (Web): use the real browser URL, not defaultRouteName "/"
+  final String initialLocation = () {
+    if (kIsWeb) {
+      final base = Uri.base;
+
+      // Keep full path + query (React-like behavior)
+      var loc = base.path;
+      if (loc.isEmpty) loc = Routes.home;
+      if (!loc.startsWith('/')) loc = '/$loc';
+
+      if (base.hasQuery) loc = '$loc?${base.query}';
+      return loc;
+    }
+
+    // Mobile/desktop: platform initial route name is fine
+    final initial = WidgetsBinding.instance.platformDispatcher.defaultRouteName;
+    return initial.isEmpty ? Routes.home : initial;
+  }();
+
   return GoRouter(
-    initialLocation: Routes.home,
+    initialLocation: initialLocation,
     refreshListenable: GoRouterRefreshStream(authStream),
 
     redirect: (context, state) {
@@ -60,7 +80,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         Routes.forgotPassword,
         Routes.emailVerification,
         Routes.companyAuth,
-        Routes.companyRegister, // alias for company register mode
+        Routes.companyRegister,
         Routes.adminLogin,
         Routes.adminSetup,
       };
