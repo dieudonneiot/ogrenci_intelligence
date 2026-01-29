@@ -10,6 +10,8 @@ import '../../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/auth/presentation/screens/reset_password_screen.dart';
+import '../../features/auth/presentation/screens/email_verification_screen.dart';
+import '../../features/auth/presentation/screens/company_auth_screen.dart';
 import '../../shared/widgets/empty_state.dart';
 import 'route_guards.dart';
 import 'routes.dart';
@@ -155,8 +157,9 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: Routes.emailVerification,
-            builder: (_, __) =>
-                const PlaceholderView(title: 'Email Verification'),
+            builder: (context, state) => EmailVerificationScreen(
+              emailHint: state.uri.queryParameters['email'],
+            ),
           ),
           GoRoute(
             path: Routes.resetPassword,
@@ -164,9 +167,12 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: Routes.companyAuth,
-            builder: (_, __) => const PlaceholderView(title: 'Company Auth'),
+            builder: (_, __) => const CompanyAuthScreen(),
           ),
-
+          GoRoute(
+            path: Routes.companyRegister,
+            builder: (_, __) => const CompanyAuthScreen(initialIsLogin: false),
+          ),
           // Footer pages (public)
           GoRoute(
             path: Routes.howItWorks,

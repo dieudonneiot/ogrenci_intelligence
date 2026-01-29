@@ -1,7 +1,5 @@
-// lib/src/features/auth/presentation/screens/register_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../../core/routing/routes.dart';
 import '../../../../core/supabase/supabase_service.dart';
@@ -15,8 +13,6 @@ class RegisterScreen extends ConsumerStatefulWidget {
 }
 
 class _RegisterScreenState extends ConsumerState<RegisterScreen> {
-  final _formKey = GlobalKey<FormState>();
-
   final _fullName = TextEditingController();
   final _email = TextEditingController();
   final _password = TextEditingController();
@@ -27,9 +23,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   String? _department;
   int? _year;
+
   String? _error;
 
-  static const departments = <String>[
+  static const departments = [
     "Bilgisayar Mühendisliği",
     "Yazılım Mühendisliği",
     "Elektrik-Elektronik Mühendisliği",
@@ -48,7 +45,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     "Öğretmenlik",
     "İletişim",
     "Güzel Sanatlar",
-    "Diğer"
+    "Diğer",
   ];
 
   @override
@@ -60,31 +57,42 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     super.dispose();
   }
 
-  int _passwordStrength(String p) {
-    int s = 0;
-    if (p.length >= 8) s++;
-    if (RegExp(r'[a-z]').hasMatch(p) && RegExp(r'[A-Z]').hasMatch(p)) s++;
-    if (RegExp(r'[0-9]').hasMatch(p)) s++;
-    if (RegExp(r'[^a-zA-Z0-9]').hasMatch(p)) s++;
-    return s; // 0..4
+  bool _validate() {
+    setState(() => _error = null);
+
+    if (_password.text != _confirm.text) {
+      setState(() => _error = 'Passwords do not match.');
+      return false;
+    }
+    if (_password.text.length < 6) {
+      setState(() => _error = 'Password must be at least 6 characters.');
+      return false;
+    }
+    if (_department == null) {
+      setState(() => _error = 'Please select your department.');
+      return false;
+    }
+    if (_year == null) {
+      setState(() => _error = 'Please select your year.');
+      return false;
+    }
+    if (!_acceptTerms) {
+      setState(() => _error = 'You must accept Terms & Privacy.');
+      return false;
+    }
+    return true;
   }
 
   Future<void> _submit() async {
-    FocusScope.of(context).unfocus();
-    setState(() => _error = null);
+    if (!_validate()) return;
 
-    if (!_formKey.currentState!.validate()) return;
-    if (!_acceptTerms) {
-      setState(() => _error = 'Kullanım şartlarını kabul etmelisiniz!');
-      return;
-    }
+    final email = _email.text.trim();
+    final pass = _password.text;
+    final fullName = _fullName.text.trim();
 
-    final action = ref.read(authActionLoadingProvider.notifier);
-    final err = await action.signUp(
-      _email.text.trim(),
-      _password.text,
-      _fullName.text.trim(),
-    );
+    final err = await ref
+        .read(authActionLoadingProvider.notifier)
+        .signUp(email, pass, fullName);
 
     if (!mounted) return;
 
@@ -93,263 +101,244 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       return;
     }
 
-    // Mirror React: update profiles with extra fields (ignore errors)
+    // Try to update profile (same as React). Ignore errors if RLS blocks it.
     try {
       final user = SupabaseService.client.auth.currentUser;
       if (user != null) {
         await SupabaseService.client.from('profiles').update({
-          'full_name': _fullName.text.trim(),
+          'full_name': fullName,
           'department': _department,
           'year': _year,
-          'email': _email.text.trim(),
-          'updated_at': DateTime.now().toUtc().toIso8601String(),
+          'email': email,
+          'updated_at': DateTime.now().toIso8601String(),
         }).eq('id', user.id);
       }
-    } catch (_) {}
+    } catch (_) {
+      // ignore
+    }
 
-    if (!mounted) return;
+    // Professional flow: show email verification page, with email hint
+    final uri = Uri(
+      path: Routes.emailVerification,
+      queryParameters: {'email': email},
+    ).toString();
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Kayıt başarılı. Lütfen email adresinizi doğrulayın.'),
-      ),
-    );
-
-    context.go(Routes.login);
+    Navigator.of(context).pushReplacementNamed(uri);
   }
 
   @override
   Widget build(BuildContext context) {
-    final loading = ref.watch(authActionLoadingProvider);
-    final pStrength = _passwordStrength(_password.text);
+    final busy = ref.watch(authActionLoadingProvider);
 
     return Scaffold(
+      appBar: AppBar(title: const Text('Register')),
       body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 520),
-            child: Column(
-              children: [
-                Container(
-                  width: 72,
-                  height: 72,
-                  decoration: BoxDecoration(
-                    color: Colors.purple.withOpacity(0.12),
-                    shape: BoxShape.circle,
-                  ),
-                  child:
-                      const Icon(Icons.person, color: Colors.purple, size: 34),
-                ),
-                const SizedBox(height: 14),
-                Text('Hesap Oluşturun',
-                    style: Theme.of(context).textTheme.headlineSmall),
-                const SizedBox(height: 6),
-                Text('Kariyer yolculuğunuza başlayın',
-                    style: Theme.of(context).textTheme.bodyMedium),
-                const SizedBox(height: 6),
-                Text('Öğrenci Kaydı',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodySmall
-                        ?.copyWith(color: Colors.purple)),
-                const SizedBox(height: 18),
-
-                Card(
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18),
-                    side: BorderSide(color: Colors.grey.withOpacity(0.2)),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(18),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        children: [
-                          TextFormField(
-                            controller: _fullName,
-                            decoration: const InputDecoration(
-                              prefixIcon: Icon(Icons.person_outline),
-                              labelText: 'Ad Soyad',
-                              border: OutlineInputBorder(),
-                            ),
-                            validator: (v) =>
-                                (v ?? '').trim().isEmpty ? 'Ad Soyad gerekli' : null,
-                          ),
-                          const SizedBox(height: 12),
-
-                          TextFormField(
-                            controller: _email,
-                            keyboardType: TextInputType.emailAddress,
-                            decoration: const InputDecoration(
-                              prefixIcon: Icon(Icons.mail_outline),
-                              labelText: 'E-posta Adresi',
-                              border: OutlineInputBorder(),
-                            ),
-                            validator: (v) {
-                              final s = (v ?? '').trim();
-                              if (s.isEmpty) return 'Email gerekli';
-                              if (!s.contains('@')) return 'Geçerli email girin';
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 12),
-
-                          DropdownButtonFormField<String>(
-                            initialValue: _department,
-                            decoration: const InputDecoration(
-                              prefixIcon: Icon(Icons.school_outlined),
-                              labelText: 'Bölüm',
-                              border: OutlineInputBorder(),
-                            ),
-                            items: departments
-                                .map((d) => DropdownMenuItem(value: d, child: Text(d)))
-                                .toList(),
-                            onChanged: (v) => setState(() => _department = v),
-                            validator: (v) => v == null ? 'Lütfen bölüm seçin' : null,
-                          ),
-                          const SizedBox(height: 12),
-
-                          DropdownButtonFormField<int>(
-                            initialValue: _year,
-                            decoration: const InputDecoration(
-                              prefixIcon: Icon(Icons.calendar_month_outlined),
-                              labelText: 'Sınıf',
-                              border: OutlineInputBorder(),
-                            ),
-                            items: const [
-                              DropdownMenuItem(value: 1, child: Text('1. Sınıf')),
-                              DropdownMenuItem(value: 2, child: Text('2. Sınıf')),
-                              DropdownMenuItem(value: 3, child: Text('3. Sınıf')),
-                              DropdownMenuItem(value: 4, child: Text('4. Sınıf')),
-                              DropdownMenuItem(value: 5, child: Text('5. Sınıf ve üzeri')),
-                            ],
-                            onChanged: (v) => setState(() => _year = v),
-                            validator: (v) => v == null ? 'Lütfen sınıf seçin' : null,
-                          ),
-                          const SizedBox(height: 12),
-
-                          TextFormField(
-                            controller: _password,
-                            obscureText: !_showPassword,
-                            onChanged: (_) => setState(() {}),
-                            decoration: InputDecoration(
-                              prefixIcon: const Icon(Icons.lock_outline),
-                              labelText: 'Şifre',
-                              border: const OutlineInputBorder(),
-                              suffixIcon: IconButton(
-                                onPressed: () =>
-                                    setState(() => _showPassword = !_showPassword),
-                                icon: Icon(_showPassword
-                                    ? Icons.visibility_off
-                                    : Icons.visibility),
-                              ),
-                            ),
-                            validator: (v) {
-                              final s = (v ?? '');
-                              if (s.isEmpty) return 'Şifre gerekli';
-                              if (s.length < 6) return 'Şifre en az 6 karakter olmalı';
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 8),
-
-                          // strength bar (simple)
-                          if (_password.text.isNotEmpty)
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: LinearProgressIndicator(
-                                    value: pStrength / 4.0,
-                                    minHeight: 6,
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                Text('Güç: $pStrength/4',
-                                    style: Theme.of(context).textTheme.bodySmall),
-                              ],
-                            ),
-
-                          const SizedBox(height: 12),
-                          TextFormField(
-                            controller: _confirm,
-                            obscureText: !_showPassword,
-                            decoration: const InputDecoration(
-                              prefixIcon: Icon(Icons.lock_outline),
-                              labelText: 'Şifre Tekrar',
-                              border: OutlineInputBorder(),
-                            ),
-                            validator: (v) {
-                              if ((v ?? '').isEmpty) return 'Şifre tekrar gerekli';
-                              if (v != _password.text) return 'Şifreler eşleşmiyor!';
-                              return null;
-                            },
-                          ),
-
-                          const SizedBox(height: 12),
-                          CheckboxListTile(
-                            value: _acceptTerms,
-                            onChanged: (v) => setState(() => _acceptTerms = v ?? false),
-                            title: const Text('Kullanım Şartları ve Gizlilik Politikasını kabul ediyorum'),
-                            controlAffinity: ListTileControlAffinity.leading,
-                            contentPadding: EdgeInsets.zero,
-                          ),
-
-                          if (_error != null) ...[
-                            const SizedBox(height: 8),
-                            Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: Colors.red.withOpacity(0.08),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                    color: Colors.red.withOpacity(0.25)),
-                              ),
-                              child: Text(_error!,
-                                  style: const TextStyle(color: Colors.red)),
-                            ),
-                          ],
-
-                          const SizedBox(height: 12),
-                          SizedBox(
-                            width: double.infinity,
-                            height: 48,
-                            child: ElevatedButton(
-                              onPressed: loading ? null : _submit,
-                              child: loading
-                                  ? const SizedBox(
-                                      width: 18,
-                                      height: 18,
-                                      child: CircularProgressIndicator(strokeWidth: 2),
-                                    )
-                                  : const Text('Kayıt Ol'),
-                            ),
-                          ),
-
-                          const SizedBox(height: 10),
-                          TextButton(
-                            onPressed: () => context.go(Routes.companyAuth),
-                            child: const Text('İşletme olarak kayıt ol'),
-                          ),
-
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Text('Zaten hesabınız var mı? '),
-                              TextButton(
-                                onPressed: () => context.go(Routes.login),
-                                child: const Text('Giriş yapın'),
-                              )
-                            ],
-                          )
-                        ],
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 520),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 72,
+                        height: 72,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primaryContainer,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.person_outline,
+                          size: 34,
+                          color: Theme.of(context).colorScheme.onPrimaryContainer,
+                        ),
                       ),
                     ),
-                  ),
+                    const SizedBox(height: 14),
+                    Text(
+                      'Create your account',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Student registration',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                    const SizedBox(height: 18),
+
+                    TextField(
+                      controller: _fullName,
+                      decoration: const InputDecoration(
+                        labelText: 'Full name',
+                        prefixIcon: Icon(Icons.badge_outlined),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+
+                    TextField(
+                      controller: _email,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: const InputDecoration(
+                        labelText: 'Email',
+                        prefixIcon: Icon(Icons.mail_outline),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+
+                    DropdownButtonFormField<String>(
+                      value: _department,
+                      items: departments
+                          .map((d) => DropdownMenuItem(value: d, child: Text(d)))
+                          .toList(),
+                      onChanged: (v) => setState(() => _department = v),
+                      decoration: const InputDecoration(
+                        labelText: 'Department',
+                        prefixIcon: Icon(Icons.school_outlined),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+
+                    DropdownButtonFormField<int>(
+                      value: _year,
+                      items: const [1, 2, 3, 4, 5]
+                          .map((y) => DropdownMenuItem(
+                                value: y,
+                                child: Text(y == 5 ? '5+ (and above)' : '$y'),
+                              ))
+                          .toList(),
+                      onChanged: (v) => setState(() => _year = v),
+                      decoration: const InputDecoration(
+                        labelText: 'Year',
+                        prefixIcon: Icon(Icons.calendar_today_outlined),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+
+                    TextField(
+                      controller: _password,
+                      obscureText: !_showPassword,
+                      decoration: InputDecoration(
+                        labelText: 'Password',
+                        prefixIcon: const Icon(Icons.lock_outline),
+                        suffixIcon: IconButton(
+                          onPressed: () => setState(() => _showPassword = !_showPassword),
+                          icon: Icon(_showPassword ? Icons.visibility_off : Icons.visibility),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+
+                    TextField(
+                      controller: _confirm,
+                      obscureText: !_showPassword,
+                      decoration: const InputDecoration(
+                        labelText: 'Confirm password',
+                        prefixIcon: Icon(Icons.lock_outline),
+                      ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Checkbox(
+                          value: _acceptTerms,
+                          onChanged: (v) => setState(() => _acceptTerms = v ?? false),
+                        ),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 10),
+                            child: Wrap(
+                              children: [
+                                const Text('I accept '),
+                                GestureDetector(
+                                  onTap: () => Navigator.of(context).pushNamed(Routes.terms),
+                                  child: Text(
+                                    'Terms of Service',
+                                    style: TextStyle(
+                                      color: Theme.of(context).colorScheme.primary,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                                const Text(' and '),
+                                GestureDetector(
+                                  onTap: () => Navigator.of(context).pushNamed(Routes.privacy),
+                                  child: Text(
+                                    'Privacy Policy',
+                                    style: TextStyle(
+                                      color: Theme.of(context).colorScheme.primary,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                                const Text('.'),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    if (_error != null) ...[
+                      const SizedBox(height: 8),
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.red.withOpacity(0.10),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.red.withOpacity(0.25)),
+                        ),
+                        child: Text(_error!, style: const TextStyle(color: Colors.red)),
+                      ),
+                    ],
+
+                    const SizedBox(height: 14),
+
+                    ElevatedButton(
+                      onPressed: busy ? null : _submit,
+                      child: busy
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Text('Register'),
+                    ),
+
+                    const SizedBox(height: 14),
+                    const Divider(),
+                    const SizedBox(height: 10),
+
+                    OutlinedButton(
+                      onPressed: () => Navigator.of(context).pushNamed(Routes.companyAuth),
+                      child: const Text('Register as company'),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text('Already have an account? '),
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pushNamed(Routes.login),
+                          child: const Text('Login'),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),

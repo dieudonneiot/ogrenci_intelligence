@@ -109,4 +109,14 @@ class AuthRepository {
     if (row == null) return null;
     return CompanyMembership.fromJson(row);
   }
+
+  Future<User?> getFreshUser() async {
+    final res = await _client.auth.getUser();
+    return res.user;
+  }
+
+  Future<void> resendSignupVerificationEmail(String email) async {
+    await _client.auth.resend(type: OtpType.signup, email: email);
+  }
+
 }

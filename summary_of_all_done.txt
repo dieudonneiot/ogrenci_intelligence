@@ -632,403 +632,6 @@ class RouteGuards {
 }
 
 =============================================================================================
-import 'dart:async';
-
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-
-import '../../features/auth/domain/auth_models.dart';
-import '../../features/auth/presentation/controllers/auth_controller.dart';
-import '../../features/auth/presentation/screens/reset_password_screen.dart';
-import '../../shared/widgets/empty_state.dart';
-import 'route_guards.dart';
-import 'routes.dart';
-
-final goRouterProvider = Provider<GoRouter>((ref) {
-  final authStream = ref.watch(authViewStateProvider.stream);
-
-  return GoRouter(
-    initialLocation: Routes.home,
-    refreshListenable: GoRouterRefreshStream(authStream),
-    redirect: (context, state) {
-      final location = state.uri.path;
-
-      final authAsync = ref.read(authViewStateProvider);
-      if (authAsync.isLoading) return null;
-
-      final auth = authAsync.value;
-      if (auth == null) return null;
-
-      final isAuthorized = auth.isAuthenticated;
-
-      // 1) Not authorized: allow only public routes
-      if (!isAuthorized) {
-        return RouteGuards.isPublicPath(location) ? null : Routes.login;
-      }
-
-      // 2) Authorized: role-based route protection
-      final roleRedirect = RouteGuards.redirectForRole(
-        userType: auth.userType,
-        location: location,
-      );
-      if (roleRedirect != null) return roleRedirect;
-
-      // 3) Keep authenticated users out of auth pages (but allow reset-password)
-      const authPages = <String>{
-        Routes.login,
-        Routes.register,
-        Routes.forgotPassword,
-        Routes.emailVerification,
-        Routes.companyAuth,
-        Routes.adminLogin,
-      };
-      if (authPages.contains(location)) {
-        if (auth.userType == UserType.admin) return Routes.adminDashboard;
-        if (auth.userType == UserType.company) return Routes.companyDashboard;
-        return Routes.dashboard;
-      }
-
-      // 4) Optional: redirect "/" depending on role
-      if (location == Routes.home) {
-        if (auth.userType == UserType.admin) return Routes.adminDashboard;
-        if (auth.userType == UserType.company) return Routes.companyDashboard;
-      }
-
-      return null;
-    },
-    routes: [
-      // Admin auth routes (standalone)
-      GoRoute(
-        path: Routes.adminLogin,
-        builder: (_, __) =>
-            const PlaceholderScreen(title: 'Admin Login', showAppBar: true),
-      ),
-      GoRoute(
-        path: Routes.adminSetup,
-        builder: (_, __) =>
-            const PlaceholderScreen(title: 'Admin Setup', showAppBar: true),
-      ),
-
-      // Admin area shell
-      ShellRoute(
-        builder: (context, state, child) => AdminShell(child: child),
-        routes: [
-          GoRoute(
-            path: Routes.adminDashboard,
-            builder: (_, __) => const PlaceholderView(title: 'Admin Dashboard'),
-          ),
-          GoRoute(
-            path: Routes.adminCompanies,
-            builder: (_, __) => const PlaceholderView(title: 'Admin Companies'),
-          ),
-          GoRoute(
-            path: Routes.adminUsers,
-            builder: (_, __) => const PlaceholderView(title: 'Admin Users'),
-          ),
-          GoRoute(
-            path: Routes.adminJobs,
-            builder: (_, __) => const PlaceholderView(title: 'Admin Jobs'),
-          ),
-          GoRoute(
-            path: Routes.adminSubscriptions,
-            builder: (_, __) =>
-                const PlaceholderView(title: 'Admin Subscriptions'),
-          ),
-          GoRoute(
-            path: Routes.adminReports,
-            builder: (_, __) => const PlaceholderView(title: 'Admin Reports'),
-          ),
-          GoRoute(
-            path: Routes.adminSettings,
-            builder: (_, __) => const PlaceholderView(title: 'Admin Settings'),
-          ),
-          GoRoute(
-            path: Routes.adminLogs,
-            builder: (_, __) => const PlaceholderView(title: 'Admin Logs'),
-          ),
-          GoRoute(
-            path: Routes.adminProfile,
-            builder: (_, __) => const PlaceholderView(title: 'Admin Profile'),
-          ),
-        ],
-      ),
-
-      // Main shell (public + student + company)
-      ShellRoute(
-        builder: (context, state, child) => MainShell(child: child),
-        routes: [
-          // Public
-          GoRoute(
-            path: Routes.home,
-            builder: (_, __) => const PlaceholderView(title: 'Home'),
-          ),
-          GoRoute(
-            path: Routes.login,
-            builder: (_, __) => const PlaceholderView(title: 'Login'),
-          ),
-          GoRoute(
-            path: Routes.register,
-            builder: (_, __) => const PlaceholderView(title: 'Register'),
-          ),
-          GoRoute(
-            path: Routes.forgotPassword,
-            builder: (_, __) => const PlaceholderView(title: 'Forgot Password'),
-          ),
-          GoRoute(
-            path: Routes.emailVerification,
-            builder: (_, __) =>
-                const PlaceholderView(title: 'Email Verification'),
-          ),
-          GoRoute(
-            path: Routes.resetPassword,
-            builder: (_, __) => const ResetPasswordScreen(),
-          ),
-          GoRoute(
-            path: Routes.companyAuth,
-            builder: (_, __) => const PlaceholderView(title: 'Company Auth'),
-          ),
-
-          // Footer pages (public)
-          GoRoute(
-            path: Routes.howItWorks,
-            builder: (_, __) => const PlaceholderView(title: 'How It Works'),
-          ),
-          GoRoute(
-            path: Routes.about,
-            builder: (_, __) => const PlaceholderView(title: 'About'),
-          ),
-          GoRoute(
-            path: Routes.contact,
-            builder: (_, __) => const PlaceholderView(title: 'Contact'),
-          ),
-          GoRoute(
-            path: Routes.privacy,
-            builder: (_, __) => const PlaceholderView(title: 'Privacy Policy'),
-          ),
-          GoRoute(
-            path: Routes.terms,
-            builder: (_, __) => const PlaceholderView(title: 'Terms of Service'),
-          ),
-          GoRoute(
-            path: Routes.pointsSystem,
-            builder: (_, __) => const PlaceholderView(title: 'Points System'),
-          ),
-
-          // Student protected
-          GoRoute(
-            path: Routes.dashboard,
-            builder: (_, __) => const PlaceholderView(title: 'Dashboard'),
-          ),
-          GoRoute(
-            path: Routes.profile,
-            builder: (_, __) => const PlaceholderView(title: 'Profile'),
-          ),
-          GoRoute(
-            path: Routes.settings,
-            builder: (_, __) => const PlaceholderView(title: 'Settings'),
-          ),
-          GoRoute(
-            path: Routes.courses,
-            builder: (_, __) => const PlaceholderView(title: 'Courses'),
-          ),
-          GoRoute(
-            path: Routes.courseDetail,
-            builder: (_, s) => PlaceholderView(
-              title: 'Course Detail',
-              subtitle: 'id=${s.pathParameters['id']}',
-            ),
-          ),
-          GoRoute(
-            path: Routes.jobs,
-            builder: (_, __) => const PlaceholderView(title: 'Jobs'),
-          ),
-          GoRoute(
-            path: Routes.jobDetail,
-            builder: (_, s) => PlaceholderView(
-              title: 'Job Detail',
-              subtitle: 'id=${s.pathParameters['id']}',
-            ),
-          ),
-          GoRoute(
-            path: Routes.internships,
-            builder: (_, __) => const PlaceholderView(title: 'Internships'),
-          ),
-          GoRoute(
-            path: Routes.internshipDetail,
-            builder: (_, s) => PlaceholderView(
-              title: 'Internship Detail',
-              subtitle: 'id=${s.pathParameters['id']}',
-            ),
-          ),
-          GoRoute(
-            path: Routes.applications,
-            builder: (_, __) => const PlaceholderView(title: 'Applications'),
-          ),
-          GoRoute(
-            path: Routes.favorites,
-            builder: (_, __) => const PlaceholderView(title: 'Favorites'),
-          ),
-          GoRoute(
-            path: Routes.notifications,
-            builder: (_, __) => const PlaceholderView(title: 'Notifications'),
-          ),
-          GoRoute(
-            path: Routes.leaderboard,
-            builder: (_, __) => const PlaceholderView(title: 'Leaderboard'),
-          ),
-          GoRoute(
-            path: Routes.debug,
-            builder: (_, __) => const PlaceholderView(title: 'Database Debug'),
-          ),
-
-          // Company protected
-          GoRoute(
-            path: Routes.companyDashboard,
-            builder: (_, __) => const PlaceholderView(title: 'Company Dashboard'),
-          ),
-          GoRoute(
-            path: Routes.companyRegister,
-            builder: (_, __) => const PlaceholderView(title: 'Register Company'),
-          ),
-          GoRoute(
-            path: Routes.companyJobs,
-            builder: (_, __) => const PlaceholderView(title: 'Company Jobs'),
-          ),
-          GoRoute(
-            path: Routes.companyJobsCreate,
-            builder: (_, __) => const PlaceholderView(title: 'Create Job'),
-          ),
-          GoRoute(
-            path: Routes.companyJobsEdit,
-            builder: (_, s) => PlaceholderView(
-              title: 'Edit Job',
-              subtitle: 'id=${s.pathParameters['id']}',
-            ),
-          ),
-          GoRoute(
-            path: Routes.companyJobApplications,
-            builder: (_, s) => PlaceholderView(
-              title: 'Job Applications',
-              subtitle: 'id=${s.pathParameters['id']}',
-            ),
-          ),
-          GoRoute(
-            path: Routes.companyInternships,
-            builder: (_, __) =>
-                const PlaceholderView(title: 'Internship Management'),
-          ),
-          GoRoute(
-            path: Routes.companyInternshipsCreate,
-            builder: (_, __) => const PlaceholderView(title: 'Create Internship'),
-          ),
-          GoRoute(
-            path: Routes.companyInternshipsEdit,
-            builder: (_, s) => PlaceholderView(
-              title: 'Edit Internship',
-              subtitle: 'id=${s.pathParameters['id']}',
-            ),
-          ),
-          GoRoute(
-            path: Routes.companyInternshipApplications,
-            builder: (_, s) => PlaceholderView(
-              title: 'Internship Applications',
-              subtitle: 'id=${s.pathParameters['id']}',
-            ),
-          ),
-          GoRoute(
-            path: Routes.companyProfile,
-            builder: (_, __) => const PlaceholderView(title: 'Company Profile'),
-          ),
-          GoRoute(
-            path: Routes.companyReports,
-            builder: (_, __) => const PlaceholderView(title: 'Reports'),
-          ),
-          GoRoute(
-            path: Routes.companyApplications,
-            builder: (_, __) =>
-                const PlaceholderView(title: 'Company Applications'),
-          ),
-          GoRoute(
-            path: Routes.companyPricing,
-            builder: (_, __) => const PlaceholderView(title: 'Pricing'),
-          ),
-        ],
-      ),
-    ],
-    errorBuilder: (_, state) => PlaceholderScreen(
-      title: '404',
-      subtitle: state.error?.toString(),
-      showAppBar: true,
-    ),
-  );
-});
-
-class GoRouterRefreshStream extends ChangeNotifier {
-  GoRouterRefreshStream(Stream<dynamic> stream) {
-    _sub = stream.listen((_) => notifyListeners());
-  }
-
-  late final StreamSubscription _sub;
-
-  @override
-  void dispose() {
-    _sub.cancel();
-    super.dispose();
-  }
-}
-
-/// Main Shell (temporary)
-class MainShell extends StatelessWidget {
-  const MainShell({super.key, required this.child});
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Öğrenci Intelligence')),
-      body: Column(
-        children: [
-          Expanded(child: child),
-          const _Footer(),
-        ],
-      ),
-    );
-  }
-}
-
-/// Admin Shell (temporary)
-class AdminShell extends StatelessWidget {
-  const AdminShell({super.key, required this.child});
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Admin')),
-      body: child,
-    );
-  }
-}
-
-class _Footer extends StatelessWidget {
-  const _Footer();
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      top: false,
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Text(
-          '© ${DateTime.now().year} Öğrenci Intelligence',
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
-      ),
-    );
-  }
-}
-
 
 =============================================================================================
 lib/src/app/app.dart
@@ -1267,6 +870,16 @@ class AuthRepository {
     if (row == null) return null;
     return CompanyMembership.fromJson(row);
   }
+
+  Future<User?> getFreshUser() async {
+  final res = await _client.auth.getUser();
+  return res.user;
+}
+
+Future<void> resendSignupVerificationEmail(String email) async {
+  await _client.auth.resend(type: OtpType.signup, email: email);
+}
+
 }
 
 
@@ -2079,7 +1692,6 @@ class CompanyRepository {
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../../core/routing/routes.dart';
 import '../controllers/auth_controller.dart';
@@ -2094,11 +1706,10 @@ class LoginScreen extends ConsumerStatefulWidget {
 }
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
-  final _formKey = GlobalKey<FormState>();
   final _email = TextEditingController();
   final _password = TextEditingController();
-
   bool _showPassword = false;
+  bool _rememberMe = false;
   String? _error;
 
   @override
@@ -2109,13 +1720,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> _submit() async {
-    FocusScope.of(context).unfocus();
     setState(() => _error = null);
 
-    if (!_formKey.currentState!.validate()) return;
+    final email = _email.text.trim();
+    final pass = _password.text;
 
-    final action = ref.read(authActionLoadingProvider.notifier);
-    final err = await action.signIn(_email.text.trim(), _password.text);
+    final err = await ref.read(authActionLoadingProvider.notifier).signIn(email, pass);
 
     if (!mounted) return;
 
@@ -2124,203 +1734,155 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       return;
     }
 
-    // Let router guards redirect by role; optionally honor "from"
-    if (widget.from != null && widget.from!.isNotEmpty) {
-      context.go(widget.from!);
-    } else {
-      context.go(Routes.dashboard);
-    }
+    // Redirect: mimic React "from" behavior
+    final target = (widget.from != null && widget.from!.isNotEmpty)
+        ? widget.from!
+        : Routes.dashboard;
+
+    // Using Navigator here for simplicity; your router redirect will also handle roles.
+    Navigator.of(context).pushReplacementNamed(target);
   }
 
   @override
   Widget build(BuildContext context) {
-    final loading = ref.watch(authActionLoadingProvider);
+    final busy = ref.watch(authActionLoadingProvider);
 
     return Scaffold(
+      appBar: AppBar(title: const Text('Login')),
       body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 520),
-            child: Column(
-              children: [
-                const SizedBox(height: 10),
-                Container(
-                  width: 72,
-                  height: 72,
-                  decoration: BoxDecoration(
-                    color: Colors.purple.withOpacity(0.12),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.lock, color: Colors.purple, size: 34),
-                ),
-                const SizedBox(height: 14),
-                Text('Hoş Geldiniz',
-                    style: Theme.of(context).textTheme.headlineSmall),
-                const SizedBox(height: 6),
-                Text('Hesabınıza giriş yapın',
-                    style: Theme.of(context).textTheme.bodyMedium),
-                const SizedBox(height: 6),
-                Text('Öğrenci Girişi',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodySmall
-                        ?.copyWith(color: Colors.purple)),
-                const SizedBox(height: 18),
-
-                Card(
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18),
-                    side: BorderSide(color: Colors.grey.withOpacity(0.2)),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(18),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        children: [
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text('E-posta Adresi',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .labelLarge),
-                          ),
-                          const SizedBox(height: 8),
-                          TextFormField(
-                            controller: _email,
-                            keyboardType: TextInputType.emailAddress,
-                            autofillHints: const [AutofillHints.email],
-                            decoration: const InputDecoration(
-                              prefixIcon: Icon(Icons.mail_outline),
-                              hintText: 'ornek@email.com',
-                              border: OutlineInputBorder(),
-                            ),
-                            validator: (v) {
-                              final s = (v ?? '').trim();
-                              if (s.isEmpty) return 'Email gerekli';
-                              if (!s.contains('@')) return 'Geçerli email girin';
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 14),
-
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text('Şifre',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .labelLarge),
-                          ),
-                          const SizedBox(height: 8),
-                          TextFormField(
-                            controller: _password,
-                            obscureText: !_showPassword,
-                            autofillHints: const [AutofillHints.password],
-                            decoration: InputDecoration(
-                              prefixIcon: const Icon(Icons.lock_outline),
-                              hintText: '••••••••',
-                              border: const OutlineInputBorder(),
-                              suffixIcon: IconButton(
-                                onPressed: () =>
-                                    setState(() => _showPassword = !_showPassword),
-                                icon: Icon(_showPassword
-                                    ? Icons.visibility_off
-                                    : Icons.visibility),
-                              ),
-                            ),
-                            validator: (v) {
-                              if ((v ?? '').isEmpty) return 'Şifre gerekli';
-                              return null;
-                            },
-                          ),
-
-                          const SizedBox(height: 10),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: TextButton(
-                                  onPressed: () => context.go(Routes.forgotPassword),
-                                  child: const Text('Şifremi unuttum'),
-                                ),
-                              ),
-                            ],
-                          ),
-
-                          if (_error != null) ...[
-                            const SizedBox(height: 8),
-                            Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: Colors.red.withOpacity(0.08),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                    color: Colors.red.withOpacity(0.25)),
-                              ),
-                              child: Row(
-                                children: [
-                                  const Icon(Icons.error_outline,
-                                      color: Colors.red),
-                                  const SizedBox(width: 10),
-                                  Expanded(
-                                    child: Text(_error!,
-                                        style: const TextStyle(
-                                            color: Colors.red)),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-
-                          const SizedBox(height: 14),
-                          SizedBox(
-                            width: double.infinity,
-                            height: 48,
-                            child: ElevatedButton(
-                              onPressed: loading ? null : _submit,
-                              child: loading
-                                  ? const SizedBox(
-                                      width: 18,
-                                      height: 18,
-                                      child: CircularProgressIndicator(
-                                          strokeWidth: 2),
-                                    )
-                                  : const Text('Giriş Yap'),
-                            ),
-                          ),
-
-                          const SizedBox(height: 14),
-                          const Divider(),
-                          const SizedBox(height: 10),
-
-                          SizedBox(
-                            width: double.infinity,
-                            height: 48,
-                            child: OutlinedButton(
-                              onPressed: () => context.go(Routes.companyAuth),
-                              child: const Text('İşletme olarak giriş yap'),
-                            ),
-                          ),
-
-                          const SizedBox(height: 12),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Text('Hesabınız yok mu? '),
-                              TextButton(
-                                onPressed: () => context.go(Routes.register),
-                                child: const Text('Kayıt olun'),
-                              ),
-                            ],
-                          )
-                        ],
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 520),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 72,
+                        height: 72,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primaryContainer,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.lock_outline,
+                          size: 34,
+                          color: Theme.of(context).colorScheme.onPrimaryContainer,
+                        ),
                       ),
                     ),
-                  ),
+                    const SizedBox(height: 14),
+                    Text(
+                      'Welcome back',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Student login',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                    const SizedBox(height: 18),
+
+                    TextField(
+                      controller: _email,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: const InputDecoration(
+                        labelText: 'Email',
+                        prefixIcon: Icon(Icons.mail_outline),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+
+                    TextField(
+                      controller: _password,
+                      obscureText: !_showPassword,
+                      decoration: InputDecoration(
+                        labelText: 'Password',
+                        prefixIcon: const Icon(Icons.lock_outline),
+                        suffixIcon: IconButton(
+                          onPressed: () => setState(() => _showPassword = !_showPassword),
+                          icon: Icon(_showPassword ? Icons.visibility_off : Icons.visibility),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Checkbox(
+                          value: _rememberMe,
+                          onChanged: (v) => setState(() => _rememberMe = v ?? false),
+                        ),
+                        const Text('Remember me'),
+                        const Spacer(),
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pushNamed(Routes.forgotPassword),
+                          child: const Text('Forgot password?'),
+                        ),
+                      ],
+                    ),
+
+                    if (_error != null) ...[
+                      const SizedBox(height: 8),
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.red.withOpacity(0.10),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.red.withOpacity(0.25)),
+                        ),
+                        child: Text(
+                          _error!,
+                          style: const TextStyle(color: Colors.red),
+                        ),
+                      ),
+                    ],
+
+                    const SizedBox(height: 14),
+
+                    ElevatedButton(
+                      onPressed: busy ? null : _submit,
+                      child: busy
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Text('Login'),
+                    ),
+
+                    const SizedBox(height: 14),
+                    const Divider(),
+                    const SizedBox(height: 10),
+
+                    OutlinedButton(
+                      onPressed: () => Navigator.of(context).pushNamed(Routes.companyAuth),
+                      child: const Text('Login as company'),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text('No account? '),
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pushNamed(Routes.register),
+                          child: const Text('Register'),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),
@@ -2329,13 +1891,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 }
 
+
 =============================================================================================
 // lib/src/features/auth/presentation/screens/register_screen.dart
 
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../../core/routing/routes.dart';
 import '../../../../core/supabase/supabase_service.dart';
@@ -2349,8 +1911,6 @@ class RegisterScreen extends ConsumerStatefulWidget {
 }
 
 class _RegisterScreenState extends ConsumerState<RegisterScreen> {
-  final _formKey = GlobalKey<FormState>();
-
   final _fullName = TextEditingController();
   final _email = TextEditingController();
   final _password = TextEditingController();
@@ -2361,9 +1921,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   String? _department;
   int? _year;
+
   String? _error;
 
-  static const departments = <String>[
+  static const departments = [
     "Bilgisayar Mühendisliği",
     "Yazılım Mühendisliği",
     "Elektrik-Elektronik Mühendisliği",
@@ -2382,7 +1943,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     "Öğretmenlik",
     "İletişim",
     "Güzel Sanatlar",
-    "Diğer"
+    "Diğer",
   ];
 
   @override
@@ -2394,31 +1955,42 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     super.dispose();
   }
 
-  int _passwordStrength(String p) {
-    int s = 0;
-    if (p.length >= 8) s++;
-    if (RegExp(r'[a-z]').hasMatch(p) && RegExp(r'[A-Z]').hasMatch(p)) s++;
-    if (RegExp(r'[0-9]').hasMatch(p)) s++;
-    if (RegExp(r'[^a-zA-Z0-9]').hasMatch(p)) s++;
-    return s; // 0..4
+  bool _validate() {
+    setState(() => _error = null);
+
+    if (_password.text != _confirm.text) {
+      setState(() => _error = 'Passwords do not match.');
+      return false;
+    }
+    if (_password.text.length < 6) {
+      setState(() => _error = 'Password must be at least 6 characters.');
+      return false;
+    }
+    if (_department == null) {
+      setState(() => _error = 'Please select your department.');
+      return false;
+    }
+    if (_year == null) {
+      setState(() => _error = 'Please select your year.');
+      return false;
+    }
+    if (!_acceptTerms) {
+      setState(() => _error = 'You must accept Terms & Privacy.');
+      return false;
+    }
+    return true;
   }
 
   Future<void> _submit() async {
-    FocusScope.of(context).unfocus();
-    setState(() => _error = null);
+    if (!_validate()) return;
 
-    if (!_formKey.currentState!.validate()) return;
-    if (!_acceptTerms) {
-      setState(() => _error = 'Kullanım şartlarını kabul etmelisiniz!');
-      return;
-    }
+    final email = _email.text.trim();
+    final pass = _password.text;
+    final fullName = _fullName.text.trim();
 
-    final action = ref.read(authActionLoadingProvider.notifier);
-    final err = await action.signUp(
-      _email.text.trim(),
-      _password.text,
-      _fullName.text.trim(),
-    );
+    final err = await ref
+        .read(authActionLoadingProvider.notifier)
+        .signUp(email, pass, fullName);
 
     if (!mounted) return;
 
@@ -2427,263 +1999,244 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       return;
     }
 
-    // Mirror React: update profiles with extra fields (ignore errors)
+    // Try to update profile (same as React). Ignore errors if RLS blocks it.
     try {
       final user = SupabaseService.client.auth.currentUser;
       if (user != null) {
         await SupabaseService.client.from('profiles').update({
-          'full_name': _fullName.text.trim(),
+          'full_name': fullName,
           'department': _department,
           'year': _year,
-          'email': _email.text.trim(),
-          'updated_at': DateTime.now().toUtc().toIso8601String(),
+          'email': email,
+          'updated_at': DateTime.now().toIso8601String(),
         }).eq('id', user.id);
       }
-    } catch (_) {}
+    } catch (_) {
+      // ignore
+    }
 
-    if (!mounted) return;
+    // Professional flow: show email verification page, with email hint
+    final uri = Uri(
+      path: Routes.emailVerification,
+      queryParameters: {'email': email},
+    ).toString();
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Kayıt başarılı. Lütfen email adresinizi doğrulayın.'),
-      ),
-    );
-
-    context.go(Routes.login);
+    Navigator.of(context).pushReplacementNamed(uri);
   }
 
   @override
   Widget build(BuildContext context) {
-    final loading = ref.watch(authActionLoadingProvider);
-    final pStrength = _passwordStrength(_password.text);
+    final busy = ref.watch(authActionLoadingProvider);
 
     return Scaffold(
+      appBar: AppBar(title: const Text('Register')),
       body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 520),
-            child: Column(
-              children: [
-                Container(
-                  width: 72,
-                  height: 72,
-                  decoration: BoxDecoration(
-                    color: Colors.purple.withOpacity(0.12),
-                    shape: BoxShape.circle,
-                  ),
-                  child:
-                      const Icon(Icons.person, color: Colors.purple, size: 34),
-                ),
-                const SizedBox(height: 14),
-                Text('Hesap Oluşturun',
-                    style: Theme.of(context).textTheme.headlineSmall),
-                const SizedBox(height: 6),
-                Text('Kariyer yolculuğunuza başlayın',
-                    style: Theme.of(context).textTheme.bodyMedium),
-                const SizedBox(height: 6),
-                Text('Öğrenci Kaydı',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodySmall
-                        ?.copyWith(color: Colors.purple)),
-                const SizedBox(height: 18),
-
-                Card(
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18),
-                    side: BorderSide(color: Colors.grey.withOpacity(0.2)),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(18),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        children: [
-                          TextFormField(
-                            controller: _fullName,
-                            decoration: const InputDecoration(
-                              prefixIcon: Icon(Icons.person_outline),
-                              labelText: 'Ad Soyad',
-                              border: OutlineInputBorder(),
-                            ),
-                            validator: (v) =>
-                                (v ?? '').trim().isEmpty ? 'Ad Soyad gerekli' : null,
-                          ),
-                          const SizedBox(height: 12),
-
-                          TextFormField(
-                            controller: _email,
-                            keyboardType: TextInputType.emailAddress,
-                            decoration: const InputDecoration(
-                              prefixIcon: Icon(Icons.mail_outline),
-                              labelText: 'E-posta Adresi',
-                              border: OutlineInputBorder(),
-                            ),
-                            validator: (v) {
-                              final s = (v ?? '').trim();
-                              if (s.isEmpty) return 'Email gerekli';
-                              if (!s.contains('@')) return 'Geçerli email girin';
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 12),
-
-                          DropdownButtonFormField<String>(
-                            value: _department,
-                            decoration: const InputDecoration(
-                              prefixIcon: Icon(Icons.school_outlined),
-                              labelText: 'Bölüm',
-                              border: OutlineInputBorder(),
-                            ),
-                            items: departments
-                                .map((d) => DropdownMenuItem(value: d, child: Text(d)))
-                                .toList(),
-                            onChanged: (v) => setState(() => _department = v),
-                            validator: (v) => v == null ? 'Lütfen bölüm seçin' : null,
-                          ),
-                          const SizedBox(height: 12),
-
-                          DropdownButtonFormField<int>(
-                            value: _year,
-                            decoration: const InputDecoration(
-                              prefixIcon: Icon(Icons.calendar_month_outlined),
-                              labelText: 'Sınıf',
-                              border: OutlineInputBorder(),
-                            ),
-                            items: const [
-                              DropdownMenuItem(value: 1, child: Text('1. Sınıf')),
-                              DropdownMenuItem(value: 2, child: Text('2. Sınıf')),
-                              DropdownMenuItem(value: 3, child: Text('3. Sınıf')),
-                              DropdownMenuItem(value: 4, child: Text('4. Sınıf')),
-                              DropdownMenuItem(value: 5, child: Text('5. Sınıf ve üzeri')),
-                            ],
-                            onChanged: (v) => setState(() => _year = v),
-                            validator: (v) => v == null ? 'Lütfen sınıf seçin' : null,
-                          ),
-                          const SizedBox(height: 12),
-
-                          TextFormField(
-                            controller: _password,
-                            obscureText: !_showPassword,
-                            onChanged: (_) => setState(() {}),
-                            decoration: InputDecoration(
-                              prefixIcon: const Icon(Icons.lock_outline),
-                              labelText: 'Şifre',
-                              border: const OutlineInputBorder(),
-                              suffixIcon: IconButton(
-                                onPressed: () =>
-                                    setState(() => _showPassword = !_showPassword),
-                                icon: Icon(_showPassword
-                                    ? Icons.visibility_off
-                                    : Icons.visibility),
-                              ),
-                            ),
-                            validator: (v) {
-                              final s = (v ?? '');
-                              if (s.isEmpty) return 'Şifre gerekli';
-                              if (s.length < 6) return 'Şifre en az 6 karakter olmalı';
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 8),
-
-                          // strength bar (simple)
-                          if (_password.text.isNotEmpty)
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: LinearProgressIndicator(
-                                    value: pStrength / 4.0,
-                                    minHeight: 6,
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                Text('Güç: $pStrength/4',
-                                    style: Theme.of(context).textTheme.bodySmall),
-                              ],
-                            ),
-
-                          const SizedBox(height: 12),
-                          TextFormField(
-                            controller: _confirm,
-                            obscureText: !_showPassword,
-                            decoration: const InputDecoration(
-                              prefixIcon: Icon(Icons.lock_outline),
-                              labelText: 'Şifre Tekrar',
-                              border: OutlineInputBorder(),
-                            ),
-                            validator: (v) {
-                              if ((v ?? '').isEmpty) return 'Şifre tekrar gerekli';
-                              if (v != _password.text) return 'Şifreler eşleşmiyor!';
-                              return null;
-                            },
-                          ),
-
-                          const SizedBox(height: 12),
-                          CheckboxListTile(
-                            value: _acceptTerms,
-                            onChanged: (v) => setState(() => _acceptTerms = v ?? false),
-                            title: const Text('Kullanım Şartları ve Gizlilik Politikasını kabul ediyorum'),
-                            controlAffinity: ListTileControlAffinity.leading,
-                            contentPadding: EdgeInsets.zero,
-                          ),
-
-                          if (_error != null) ...[
-                            const SizedBox(height: 8),
-                            Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: Colors.red.withOpacity(0.08),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                    color: Colors.red.withOpacity(0.25)),
-                              ),
-                              child: Text(_error!,
-                                  style: const TextStyle(color: Colors.red)),
-                            ),
-                          ],
-
-                          const SizedBox(height: 12),
-                          SizedBox(
-                            width: double.infinity,
-                            height: 48,
-                            child: ElevatedButton(
-                              onPressed: loading ? null : _submit,
-                              child: loading
-                                  ? const SizedBox(
-                                      width: 18,
-                                      height: 18,
-                                      child: CircularProgressIndicator(strokeWidth: 2),
-                                    )
-                                  : const Text('Kayıt Ol'),
-                            ),
-                          ),
-
-                          const SizedBox(height: 10),
-                          TextButton(
-                            onPressed: () => context.go(Routes.companyAuth),
-                            child: const Text('İşletme olarak kayıt ol'),
-                          ),
-
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Text('Zaten hesabınız var mı? '),
-                              TextButton(
-                                onPressed: () => context.go(Routes.login),
-                                child: const Text('Giriş yapın'),
-                              )
-                            ],
-                          )
-                        ],
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 520),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 72,
+                        height: 72,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primaryContainer,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.person_outline,
+                          size: 34,
+                          color: Theme.of(context).colorScheme.onPrimaryContainer,
+                        ),
                       ),
                     ),
-                  ),
+                    const SizedBox(height: 14),
+                    Text(
+                      'Create your account',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Student registration',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                    const SizedBox(height: 18),
+
+                    TextField(
+                      controller: _fullName,
+                      decoration: const InputDecoration(
+                        labelText: 'Full name',
+                        prefixIcon: Icon(Icons.badge_outlined),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+
+                    TextField(
+                      controller: _email,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: const InputDecoration(
+                        labelText: 'Email',
+                        prefixIcon: Icon(Icons.mail_outline),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+
+                    DropdownButtonFormField<String>(
+                      value: _department,
+                      items: departments
+                          .map((d) => DropdownMenuItem(value: d, child: Text(d)))
+                          .toList(),
+                      onChanged: (v) => setState(() => _department = v),
+                      decoration: const InputDecoration(
+                        labelText: 'Department',
+                        prefixIcon: Icon(Icons.school_outlined),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+
+                    DropdownButtonFormField<int>(
+                      value: _year,
+                      items: const [1, 2, 3, 4, 5]
+                          .map((y) => DropdownMenuItem(
+                                value: y,
+                                child: Text(y == 5 ? '5+ (and above)' : '$y'),
+                              ))
+                          .toList(),
+                      onChanged: (v) => setState(() => _year = v),
+                      decoration: const InputDecoration(
+                        labelText: 'Year',
+                        prefixIcon: Icon(Icons.calendar_today_outlined),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+
+                    TextField(
+                      controller: _password,
+                      obscureText: !_showPassword,
+                      decoration: InputDecoration(
+                        labelText: 'Password',
+                        prefixIcon: const Icon(Icons.lock_outline),
+                        suffixIcon: IconButton(
+                          onPressed: () => setState(() => _showPassword = !_showPassword),
+                          icon: Icon(_showPassword ? Icons.visibility_off : Icons.visibility),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+
+                    TextField(
+                      controller: _confirm,
+                      obscureText: !_showPassword,
+                      decoration: const InputDecoration(
+                        labelText: 'Confirm password',
+                        prefixIcon: Icon(Icons.lock_outline),
+                      ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Checkbox(
+                          value: _acceptTerms,
+                          onChanged: (v) => setState(() => _acceptTerms = v ?? false),
+                        ),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 10),
+                            child: Wrap(
+                              children: [
+                                const Text('I accept '),
+                                GestureDetector(
+                                  onTap: () => Navigator.of(context).pushNamed(Routes.terms),
+                                  child: Text(
+                                    'Terms of Service',
+                                    style: TextStyle(
+                                      color: Theme.of(context).colorScheme.primary,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                                const Text(' and '),
+                                GestureDetector(
+                                  onTap: () => Navigator.of(context).pushNamed(Routes.privacy),
+                                  child: Text(
+                                    'Privacy Policy',
+                                    style: TextStyle(
+                                      color: Theme.of(context).colorScheme.primary,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                                const Text('.'),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    if (_error != null) ...[
+                      const SizedBox(height: 8),
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.red.withOpacity(0.10),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.red.withOpacity(0.25)),
+                        ),
+                        child: Text(_error!, style: const TextStyle(color: Colors.red)),
+                      ),
+                    ],
+
+                    const SizedBox(height: 14),
+
+                    ElevatedButton(
+                      onPressed: busy ? null : _submit,
+                      child: busy
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Text('Register'),
+                    ),
+
+                    const SizedBox(height: 14),
+                    const Divider(),
+                    const SizedBox(height: 10),
+
+                    OutlinedButton(
+                      onPressed: () => Navigator.of(context).pushNamed(Routes.companyAuth),
+                      child: const Text('Register as company'),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text('Already have an account? '),
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pushNamed(Routes.login),
+                          child: const Text('Login'),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),
@@ -2692,13 +2245,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   }
 }
 
+
 =============================================================================================
 // lib/src/features/auth/presentation/screens/forgot_password_screen.dart
 
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../../core/routing/routes.dart';
 import '../controllers/auth_controller.dart';
@@ -2712,8 +2265,8 @@ class ForgotPasswordScreen extends ConsumerStatefulWidget {
 
 class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   final _email = TextEditingController();
-  String? _error;
   bool _submitted = false;
+  String? _error;
 
   @override
   void dispose() {
@@ -2722,54 +2275,71 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   }
 
   Future<void> _submit() async {
-    FocusScope.of(context).unfocus();
     setState(() => _error = null);
 
-    final action = ref.read(authActionLoadingProvider.notifier);
-    final err = await action.resetPassword(_email.text.trim());
+    final email = _email.text.trim();
+    if (email.isEmpty) return;
+
+    final err = await ref.read(authActionLoadingProvider.notifier).resetPassword(email);
 
     if (!mounted) return;
 
     if (err != null) {
       setState(() => _error = err);
-      return;
+    } else {
+      setState(() => _submitted = true);
     }
-
-    setState(() => _submitted = true);
   }
 
   @override
   Widget build(BuildContext context) {
-    final loading = ref.watch(authActionLoadingProvider);
+    final busy = ref.watch(authActionLoadingProvider);
 
     if (_submitted) {
       return Scaffold(
+        appBar: AppBar(title: const Text('Forgot Password')),
         body: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 520),
             child: Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(16),
               child: Card(
                 child: Padding(
-                  padding: const EdgeInsets.all(18),
+                  padding: const EdgeInsets.all(20),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.check_circle, color: Colors.green, size: 44),
-                      const SizedBox(height: 10),
-                      Text('Email Gönderildi!',
-                          style: Theme.of(context).textTheme.titleLarge),
+                      const Icon(Icons.check_circle_outline, size: 54),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Email sent!',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.w700,
+                            ),
+                      ),
                       const SizedBox(height: 8),
                       Text(
-                        'Şifre sıfırlama linki ${_email.text.trim()} adresine gönderildi.\nLütfen email kutunuzu kontrol edin.',
+                        'A password reset link was sent to:\n${_email.text.trim()}',
                         textAlign: TextAlign.center,
                       ),
+                      const SizedBox(height: 12),
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.amber.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.amber.withOpacity(0.35)),
+                        ),
+                        child: const Text(
+                          'If you don’t see it, check your spam/junk folder.',
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
                       const SizedBox(height: 14),
-                      OutlinedButton.icon(
-                        onPressed: () => context.go(Routes.login),
-                        icon: const Icon(Icons.arrow_back),
-                        label: const Text('Giriş sayfasına dön'),
-                      )
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pushNamed(Routes.login),
+                        child: const Text('Back to Login'),
+                      ),
                     ],
                   ),
                 ),
@@ -2781,57 +2351,93 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     }
 
     return Scaffold(
+      appBar: AppBar(title: const Text('Forgot Password')),
       body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 520),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 520),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
             child: Card(
               child: Padding(
-                padding: const EdgeInsets.all(18),
+                padding: const EdgeInsets.all(20),
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const Icon(Icons.mail_outline, color: Colors.purple, size: 44),
-                    const SizedBox(height: 10),
-                    Text('Şifremi Unuttum',
-                        style: Theme.of(context).textTheme.titleLarge),
-                    const SizedBox(height: 8),
-                    const Text('Email adresinize şifre sıfırlama linki göndereceğiz'),
+                    Center(
+                      child: Container(
+                        width: 72,
+                        height: 72,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primaryContainer,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.mail_outline,
+                          size: 34,
+                          color: Theme.of(context).colorScheme.onPrimaryContainer,
+                        ),
+                      ),
+                    ),
                     const SizedBox(height: 14),
+                    Text(
+                      'Reset your password',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'We will send a reset link to your email.',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                    const SizedBox(height: 18),
+
                     TextField(
                       controller: _email,
                       keyboardType: TextInputType.emailAddress,
                       decoration: const InputDecoration(
-                        prefixIcon: Icon(Icons.mail_outline),
-                        hintText: 'ornek@email.com',
-                        border: OutlineInputBorder(),
+                        labelText: 'Email',
+                        prefixIcon: Icon(Icons.alternate_email),
                       ),
                     ),
+
                     if (_error != null) ...[
-                      const SizedBox(height: 10),
-                      Text(_error!, style: const TextStyle(color: Colors.red)),
-                    ],
-                    const SizedBox(height: 14),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 48,
-                      child: ElevatedButton(
-                        onPressed: loading ? null : _submit,
-                        child: loading
-                            ? const SizedBox(
-                                width: 18,
-                                height: 18,
-                                child: CircularProgressIndicator(strokeWidth: 2),
-                              )
-                            : const Text('Sıfırlama Linki Gönder'),
+                      const SizedBox(height: 12),
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.red.withOpacity(0.10),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.red.withOpacity(0.25)),
+                        ),
+                        child: Text(
+                          _error!,
+                          style: const TextStyle(color: Colors.red),
+                        ),
                       ),
+                    ],
+
+                    const SizedBox(height: 16),
+
+                    ElevatedButton(
+                      onPressed: busy ? null : _submit,
+                      child: busy
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Text('Send reset link'),
                     ),
+
                     const SizedBox(height: 10),
+
                     TextButton.icon(
-                      onPressed: () => context.go(Routes.login),
+                      onPressed: () => Navigator.of(context).pushNamed(Routes.login),
                       icon: const Icon(Icons.arrow_back),
-                      label: const Text('Giriş sayfasına dön'),
+                      label: const Text('Back to Login'),
                     ),
                   ],
                 ),
@@ -2844,6 +2450,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   }
 }
 
+
 =============================================================================================
 lib/src/core/routing/app_router.dart
 
@@ -2852,13 +2459,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-
+import '../../features/auth/presentation/screens/company_auth_screen.dart';
 import '../../features/auth/domain/auth_models.dart';
 import '../../features/auth/presentation/controllers/auth_controller.dart';
 import '../../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/auth/presentation/screens/reset_password_screen.dart';
+import '../../features/auth/presentation/screens/email_verification_screen.dart';
 import '../../shared/widgets/empty_state.dart';
 import 'route_guards.dart';
 import 'routes.dart';
@@ -3004,8 +2612,9 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: Routes.emailVerification,
-            builder: (_, __) =>
-                const PlaceholderView(title: 'Email Verification'),
+            builder: (context, state) => EmailVerificationScreen(
+              emailHint: state.uri.queryParameters['email'],
+            ),
           ),
           GoRoute(
             path: Routes.resetPassword,
@@ -3013,9 +2622,12 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: Routes.companyAuth,
-            builder: (_, __) => const PlaceholderView(title: 'Company Auth'),
+            builder: (_, __) => const CompanyAuthScreen(),
           ),
-
+          GoRoute(
+            path: Routes.companyRegister,
+            builder: (_, __) => const CompanyAuthScreen(initialIsLogin: false),
+          ),
           // Footer pages (public)
           GoRoute(
             path: Routes.howItWorks,
@@ -3315,9 +2927,1169 @@ class DeepLinkService {
   }
 }
 
+=============================================================================================
+lib/src/features/auth/presentation/screens/email_verification_screen.dart
+
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../../core/supabase/supabase_service.dart';
+import '../../../../core/routing/routes.dart';
+import '../controllers/auth_controller.dart';
+
+class EmailVerificationScreen extends ConsumerStatefulWidget {
+  const EmailVerificationScreen({super.key, this.emailHint});
+
+  /// If user session is null (e.g., signUp returns no session),
+  /// we still show the email and allow "resend" using this.
+  final String? emailHint;
+
+  @override
+  ConsumerState<EmailVerificationScreen> createState() =>
+      _EmailVerificationScreenState();
+}
+
+class _EmailVerificationScreenState extends ConsumerState<EmailVerificationScreen> {
+  Timer? _timer;
+  int _countdown = 0;
+
+  bool _resending = false;
+  bool _checking = false;
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void _startCountdown(int seconds) {
+    _timer?.cancel();
+    setState(() => _countdown = seconds);
+
+    _timer = Timer.periodic(const Duration(seconds: 1), (t) {
+      if (!mounted) return;
+      if (_countdown <= 1) {
+        t.cancel();
+        setState(() => _countdown = 0);
+      } else {
+        setState(() => _countdown -= 1);
+      }
+    });
+  }
+
+  String? _emailToShow() {
+    final auth = ref.watch(authViewStateProvider).value;
+    return auth?.user?.email ?? widget.emailHint;
+  }
+
+  Future<void> _resend() async {
+    final email = _emailToShow();
+    if (email == null || email.trim().isEmpty) {
+      _snack('Email not found. Please login again.', isError: true);
+      return;
+    }
+
+    if (_countdown > 0 || _resending) return;
+
+    setState(() => _resending = true);
+    try {
+      // Supabase resend signup verification email
+      await SupabaseService.client.auth.resend(
+        type: OtpType.signup,
+        email: email.trim(),
+      );
+
+      _snack('Verification email sent again.');
+      _startCountdown(60);
+    } catch (e) {
+      _snack('Failed to resend email: $e', isError: true);
+    } finally {
+      if (mounted) setState(() => _resending = false);
+    }
+  }
+
+  Future<void> _check() async {
+    final auth = ref.watch(authViewStateProvider).value;
+    final user = auth?.user;
+
+    // If no session/user, we cannot call getUser() reliably.
+    if (user == null) {
+      _snack('Please login again after verifying your email.', isError: true);
+      return;
+    }
+
+    if (_checking) return;
+
+    setState(() => _checking = true);
+    try {
+      final res = await SupabaseService.client.auth.getUser();
+      final updated = res.user;
+
+      if (updated?.emailConfirmedAt != null) {
+        _snack('Email verified successfully!');
+        if (!mounted) return;
+
+        // React goes to /profile
+        // Guards will redirect if company/admin.
+        // ignore: use_build_context_synchronously
+        Navigator.of(context).popUntil((route) => route.isFirst);
+        // Better with GoRouter, but keep this screen self-contained.
+        // Your router will handle redirect from home -> role dashboard.
+      } else {
+        _snack('Email not verified yet.', isError: true);
+      }
+    } catch (e) {
+      _snack('Verification check failed: $e', isError: true);
+    } finally {
+      if (mounted) setState(() => _checking = false);
+    }
+  }
+
+  void _snack(String msg, {bool isError = false}) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(msg),
+        backgroundColor: isError ? Colors.red : null,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final auth = ref.watch(authViewStateProvider).value;
+    final email = _emailToShow() ?? '—';
+    final hasUser = auth?.user != null;
+
+    return Scaffold(
+      appBar: AppBar(title: const Text('Email Verification')),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 520),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Card(
+              elevation: 2,
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const SizedBox(height: 6),
+                    Center(
+                      child: Container(
+                        width: 84,
+                        height: 84,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.secondaryContainer,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.mail_outline,
+                          size: 42,
+                          color: Theme.of(context).colorScheme.onSecondaryContainer,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Email verification pending',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'To activate your account, please verify your email address.',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                    const SizedBox(height: 16),
+
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primaryContainer,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        'Verification link sent to: $email',
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 18),
+                    _StepTile(
+                      index: 1,
+                      title: 'Check your inbox',
+                      subtitle: 'The verification email should arrive in a few minutes.',
+                    ),
+                    _StepTile(
+                      index: 2,
+                      title: 'Click the verification link',
+                      subtitle: 'Open the email and confirm your account.',
+                    ),
+                    _StepTile(
+                      index: 3,
+                      title: 'Return to the app',
+                      subtitle: 'After verification, you can access all features.',
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    ElevatedButton.icon(
+                      onPressed: (_checking || !hasUser) ? null : _check,
+                      icon: _checking
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Icon(Icons.verified_outlined),
+                      label: Text(_checking ? 'Checking...' : 'I verified my email'),
+                    ),
+
+                    const SizedBox(height: 10),
+
+                    OutlinedButton.icon(
+                      onPressed: (_resending || _countdown > 0) ? null : _resend,
+                      icon: _resending
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Icon(Icons.refresh),
+                      label: Text(
+                        _resending
+                            ? 'Sending...'
+                            : _countdown > 0
+                                ? 'Resend ($_countdown s)'
+                                : 'Resend email',
+                      ),
+                    ),
+
+                    const SizedBox(height: 14),
+
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.amber.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.amber.withOpacity(0.35)),
+                      ),
+                      child: const Text(
+                        'Didn’t receive the email? Check spam/junk, or try resending.',
+                        style: TextStyle(fontSize: 13),
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    TextButton(
+                      onPressed: () {
+                        // Use GoRouter if available
+                        // ignore: use_build_context_synchronously
+                        Navigator.of(context).pushNamed(Routes.login);
+                      },
+                      child: const Text('Login with a different account'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _StepTile extends StatelessWidget {
+  const _StepTile({
+    required this.index,
+    required this.title,
+    required this.subtitle,
+  });
+
+  final int index;
+  final String title;
+  final String subtitle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primaryContainer,
+              shape: BoxShape.circle,
+            ),
+            child: Center(
+              child: Text(
+                '$index',
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title,
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleSmall
+                        ?.copyWith(fontWeight: FontWeight.w700)),
+                const SizedBox(height: 2),
+                Text(subtitle, style: Theme.of(context).textTheme.bodySmall),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
 =============================================================================================
-=============================================================================================
+lib/src/features/auth/presentation/screens/company_auth_screen.dart
+
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../../core/supabase/supabase_service.dart';
+import '../../../../core/routing/routes.dart';
+import '../../data/auth_repository.dart';
+import '../controllers/auth_controller.dart';
+
+class CompanyAuthScreen extends ConsumerStatefulWidget {
+  const CompanyAuthScreen({super.key, this.initialIsLogin = true});
+
+  final bool initialIsLogin;
+
+  @override
+  ConsumerState<CompanyAuthScreen> createState() => _CompanyAuthScreenState();
+}
+
+class _CompanyAuthScreenState extends ConsumerState<CompanyAuthScreen> {
+  static const _sectors = <String>[
+    "Yazılım",
+    "Finans",
+    "Eğitim",
+    "Sağlık",
+    "Üretim",
+    "Danışmanlık",
+    "E-ticaret",
+    "Turizm",
+    "Diğer",
+  ];
+
+  static const _cities = <String>[
+    "İstanbul",
+    "Ankara",
+    "İzmir",
+    "Bursa",
+    "Antalya",
+    "Adana",
+    "Konya",
+    "Gaziantep",
+    "Kayseri",
+    "Diğer",
+  ];
+
+  late bool _isLogin;
+  bool _showPassword = false;
+  bool _loading = false;
+
+  // Login
+  final _loginEmail = TextEditingController();
+  final _loginPassword = TextEditingController();
+
+  // Register
+  final _regCompanyName = TextEditingController();
+  String? _regSector;
+  String? _regCity;
+  final _regTaxNumber = TextEditingController();
+  final _regEmail = TextEditingController();
+  final _regPassword = TextEditingController();
+  final _regPhone = TextEditingController();
+  final _regAddress = TextEditingController();
+
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _isLogin = widget.initialIsLogin;
+  }
+
+  @override
+  void dispose() {
+    _loginEmail.dispose();
+    _loginPassword.dispose();
+
+    _regCompanyName.dispose();
+    _regTaxNumber.dispose();
+    _regEmail.dispose();
+    _regPassword.dispose();
+    _regPhone.dispose();
+    _regAddress.dispose();
+    super.dispose();
+  }
+
+  void _snack(String msg, {bool error = false}) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(msg),
+        backgroundColor: error ? Colors.red : null,
+      ),
+    );
+  }
+
+  Future<void> _handleLogin() async {
+    final email = _loginEmail.text.trim();
+    final pass = _loginPassword.text;
+
+    if (email.isEmpty || pass.isEmpty) {
+      _snack('Lütfen tüm alanları doldurun', error: true);
+      return;
+    }
+
+    setState(() {
+      _error = null;
+      _loading = true;
+    });
+
+    try {
+      // 1) Supabase sign-in (your repo already blocks unverified emails)
+      final err = await ref
+          .read(authActionLoadingProvider.notifier)
+          .signIn(email, pass);
+
+      if (err != null) {
+        setState(() => _error = err);
+        return;
+      }
+
+      // 2) Verify that this account is actually a company account
+      final repo = ref.read(authRepositoryProvider);
+      final user = repo.currentUser;
+
+      if (user == null) {
+        setState(() => _error = 'Giriş başarısız: kullanıcı bulunamadı');
+        return;
+      }
+
+      final membership = await repo.fetchCompanyMembership(user.id);
+      if (membership == null) {
+        await repo.signOut();
+        setState(() => _error = 'Bu hesap bir işletme hesabı değil');
+        return;
+      }
+
+      _snack('Giriş başarılı!');
+      if (!mounted) return;
+      context.go(Routes.companyDashboard);
+    } catch (e) {
+      setState(() => _error = 'Bir hata oluştu: $e');
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _handleRegister() async {
+    final companyName = _regCompanyName.text.trim();
+    final sector = _regSector;
+    final city = _regCity;
+    final tax = _regTaxNumber.text.trim();
+    final email = _regEmail.text.trim();
+    final pass = _regPassword.text;
+    final phone = _regPhone.text.trim();
+    final address = _regAddress.text.trim();
+
+    if (companyName.isEmpty ||
+        sector == null ||
+        city == null ||
+        tax.isEmpty ||
+        email.isEmpty ||
+        pass.isEmpty ||
+        phone.isEmpty) {
+      _snack('Lütfen tüm zorunlu alanları doldurun', error: true);
+      return;
+    }
+
+    if (pass.length < 6) {
+      _snack('Şifre en az 6 karakter olmalıdır', error: true);
+      return;
+    }
+
+    setState(() {
+      _error = null;
+      _loading = true;
+    });
+
+    try {
+      final client = SupabaseService.client;
+
+      // 1) Tax number uniqueness check
+      final existing = await client
+          .from('companies')
+          .select('id')
+          .eq('tax_number', tax)
+          .maybeSingle();
+
+      if (existing != null) {
+        _snack('Bu vergi numarası ile kayıtlı bir şirket zaten var', error: true);
+        return;
+      }
+
+      // 2) Create auth user (company user)
+      //
+      // React also sets user metadata user_type='company'.
+      // This is optional for our Flutter logic (we rely on company_users table),
+      // but we mirror it for parity.
+      final signUpRes = await client.auth.signUp(
+        email: email,
+        password: pass,
+        data: {
+          'full_name': companyName,
+          'user_type': 'company',
+        },
+      );
+
+      final user = signUpRes.user;
+      if (user == null) {
+        _snack('Kullanıcı oluşturulamadı', error: true);
+        return;
+      }
+
+      // 3) Create company row
+      final nowIso = DateTime.now().toIso8601String();
+      final createdCompany = await client
+          .from('companies')
+          .insert({
+            'name': companyName,
+            'sector': sector,
+            'tax_number': tax,
+            'phone': phone,
+            'city': city,
+            'address': address.isEmpty ? null : address,
+            'verified': false,
+            'created_at': nowIso,
+            'updated_at': nowIso,
+          })
+          .select('id')
+          .single();
+
+      final companyId = createdCompany['id'] as String;
+
+      // 4) Link user to company in company_users
+      await client.from('company_users').insert({
+        'company_id': companyId,
+        'user_id': user.id,
+        'role': 'owner',
+        'permissions': ['all'],
+        'created_at': nowIso,
+      });
+
+      _snack('Kayıt başarılı! Lütfen email adresinizi doğrulayın.');
+      if (!mounted) return;
+
+      // Mirror React: switch back to login.
+      setState(() => _isLogin = true);
+
+      // Optional: route to email verification page (recommended UX)
+      context.go(Uri(path: Routes.emailVerification, queryParameters: {'email': email}).toString());
+    } catch (e) {
+      // Important note:
+      // React attempted supabase.auth.admin.deleteUser(...) on failure.
+      // That’s NOT safe/possible from a client without service_role.
+      // So here we show the error and leave cleanup to backend/admin tools.
+      setState(() => _error = 'Bir hata oluştu: $e');
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final auth = ref.watch(authViewStateProvider).value;
+    final isAuthed = auth?.isAuthenticated ?? false;
+
+    // If someone is already logged in, let router redirects handle it.
+    // (Your app_router already pushes company->dashboard, student->dashboard)
+    if (isAuthed) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    final w = MediaQuery.of(context).size.width;
+    final showLeftPanel = w >= 980;
+
+    return Scaffold(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFF0F172A), // slate-900
+              Color(0xFF1E293B), // slate-800
+              Color(0xFF1E3A8A), // blue-900
+            ],
+          ),
+        ),
+        child: Row(
+          children: [
+            if (showLeftPanel) Expanded(child: _LeftPanel()),
+            Expanded(
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 520),
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(18),
+                    child: _GlassCard(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const SizedBox(height: 8),
+                          Center(
+                            child: Container(
+                              width: 84,
+                              height: 84,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                gradient: const LinearGradient(
+                                  colors: [Color(0xFF3B82F6), Color(0xFF7C3AED)],
+                                ),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    blurRadius: 20,
+                                    offset: Offset(0, 8),
+                                    color: Colors.black26,
+                                  )
+                                ],
+                              ),
+                              child: const Icon(Icons.business, color: Colors.white, size: 44),
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+                          Text(
+                            _isLogin ? 'İşletme Girişi' : 'İşletme Kaydı',
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            _isLogin ? 'Hesabınıza giriş yapın' : 'Yeni işletme hesabı oluşturun',
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  color: Colors.white70,
+                                ),
+                          ),
+                          const SizedBox(height: 18),
+
+                          if (_isLogin) _buildLoginForm(context) else _buildRegisterForm(context),
+
+                          const SizedBox(height: 14),
+
+                          if (_error != null) ...[
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.red.withOpacity(0.12),
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(color: Colors.red.withOpacity(0.25)),
+                              ),
+                              child: Text(
+                                _error!,
+                                style: const TextStyle(color: Colors.redAccent),
+                              ),
+                            ),
+                            const SizedBox(height: 14),
+                          ],
+
+                          _GradientButton(
+                            text: _isLogin ? 'Giriş Yap' : 'Kayıt Ol',
+                            loading: _loading,
+                            onPressed: _loading ? null : () async {
+                              if (_isLogin) {
+                                await _handleLogin();
+                              } else {
+                                await _handleRegister();
+                              }
+                            },
+                          ),
+
+                          const SizedBox(height: 16),
+
+                          Center(
+                            child: Wrap(
+                              alignment: WrapAlignment.center,
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: [
+                                Text(
+                                  _isLogin ? 'Hesabınız yok mu?' : 'Zaten hesabınız var mı?',
+                                  style: const TextStyle(color: Colors.white70),
+                                ),
+                                TextButton(
+                                  onPressed: _loading
+                                      ? null
+                                      : () => setState(() {
+                                            _error = null;
+                                            _isLogin = !_isLogin;
+                                          }),
+                                  child: Text(
+                                    _isLogin ? 'Kayıt Ol' : 'Giriş Yap',
+                                    style: const TextStyle(
+                                      color: Color(0xFF60A5FA),
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          const SizedBox(height: 6),
+                          Center(
+                            child: TextButton(
+                              onPressed: _loading ? null : () => context.go(Routes.login),
+                              child: const Text(
+                                'Öğrenci girişine dön',
+                                style: TextStyle(color: Colors.white70),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoginForm(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _DarkField(
+          label: 'E-posta Adresi',
+          controller: _loginEmail,
+          keyboardType: TextInputType.emailAddress,
+          icon: Icons.mail_outline,
+          hint: 'ornek@sirket.com',
+        ),
+        const SizedBox(height: 12),
+        _DarkField(
+          label: 'Şifre',
+          controller: _loginPassword,
+          icon: Icons.lock_outline,
+          hint: '••••••••',
+          obscureText: !_showPassword,
+          suffix: IconButton(
+            onPressed: () => setState(() => _showPassword = !_showPassword),
+            icon: Icon(
+              _showPassword ? Icons.visibility_off : Icons.visibility,
+              color: Colors.white70,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRegisterForm(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _DarkField(
+          label: 'Şirket Adı *',
+          controller: _regCompanyName,
+          icon: Icons.apartment,
+          hint: 'Şirket adınız',
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: _DarkDropdown(
+                label: 'Sektör *',
+                value: _regSector,
+                items: _sectors,
+                icon: Icons.work_outline,
+                onChanged: (v) => setState(() => _regSector = v),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _DarkDropdown(
+                label: 'Şehir *',
+                value: _regCity,
+                items: _cities,
+                icon: Icons.location_on_outlined,
+                onChanged: (v) => setState(() => _regCity = v),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        _DarkField(
+          label: 'Vergi Numarası *',
+          controller: _regTaxNumber,
+          icon: Icons.receipt_long_outlined,
+          hint: 'Vergi numaranız',
+        ),
+        const SizedBox(height: 12),
+        _DarkField(
+          label: 'E-posta Adresi *',
+          controller: _regEmail,
+          keyboardType: TextInputType.emailAddress,
+          icon: Icons.mail_outline,
+          hint: 'ornek@sirket.com',
+        ),
+        const SizedBox(height: 12),
+        _DarkField(
+          label: 'Şifre *',
+          controller: _regPassword,
+          icon: Icons.lock_outline,
+          hint: 'En az 6 karakter',
+          obscureText: !_showPassword,
+          suffix: IconButton(
+            onPressed: () => setState(() => _showPassword = !_showPassword),
+            icon: Icon(
+              _showPassword ? Icons.visibility_off : Icons.visibility,
+              color: Colors.white70,
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
+        _DarkField(
+          label: 'Telefon *',
+          controller: _regPhone,
+          keyboardType: TextInputType.phone,
+          icon: Icons.phone_outlined,
+          hint: '0532 XXX XX XX',
+        ),
+        const SizedBox(height: 12),
+        _DarkField(
+          label: 'Adres',
+          controller: _regAddress,
+          icon: Icons.home_outlined,
+          hint: 'Şirket adresi (opsiyonel)',
+          maxLines: 2,
+        ),
+      ],
+    );
+  }
+}
+
+class _LeftPanel extends StatelessWidget {
+  const _LeftPanel();
+
+  @override
+  Widget build(BuildContext context) {
+    final features = const [
+      (Icons.work_outline, 'İlan Yönetimi', 'İş ve staj ilanlarınızı kolayca yönetin'),
+      (Icons.people_outline, 'Başvuru Takibi', 'Tüm başvuruları tek panelden inceleyin'),
+      (Icons.trending_up, 'Detaylı Analizler', 'İlan performanslarını takip edin'),
+      (Icons.emoji_events_outlined, 'Yetenekleri Keşfedin', 'En uygun adayları bulun'),
+    ];
+
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.blue.withOpacity(0.20),
+                  Colors.purple.withOpacity(0.18),
+                ],
+              ),
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(28),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 520),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(Icons.business, size: 68, color: Color(0xFF60A5FA)),
+                  const SizedBox(height: 14),
+                  const Text(
+                    'İşletme Yönetim Paneli',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 34,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  const Text(
+                    'Geleceğin yetenekleriyle buluşun',
+                    style: TextStyle(color: Colors.white70, fontSize: 18),
+                  ),
+                  const SizedBox(height: 22),
+                  ...features.map((f) {
+                    final icon = f.$1;
+                    final title = f.$2;
+                    final desc = f.$3;
+
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 14),
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.10),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Colors.white.withOpacity(0.18)),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [Color(0xFF3B82F6), Color(0xFF7C3AED)],
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Icon(icon, color: Colors.white, size: 22),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  title,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(desc, style: const TextStyle(color: Colors.white70)),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _GlassCard extends StatelessWidget {
+  const _GlassCard({required this.child});
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.10),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withOpacity(0.18)),
+        boxShadow: const [
+          BoxShadow(blurRadius: 28, offset: Offset(0, 14), color: Colors.black38),
+        ],
+      ),
+      child: child,
+    );
+  }
+}
+
+class _DarkField extends StatelessWidget {
+  const _DarkField({
+    required this.label,
+    required this.controller,
+    required this.icon,
+    this.hint,
+    this.keyboardType,
+    this.obscureText = false,
+    this.suffix,
+    this.maxLines = 1,
+  });
+
+  final String label;
+  final TextEditingController controller;
+  final IconData icon;
+  final String? hint;
+  final TextInputType? keyboardType;
+  final bool obscureText;
+  final Widget? suffix;
+  final int maxLines;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: controller,
+      keyboardType: keyboardType,
+      obscureText: obscureText,
+      maxLines: maxLines,
+      style: const TextStyle(color: Colors.white),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: const TextStyle(color: Colors.white70),
+        hintText: hint,
+        hintStyle: const TextStyle(color: Colors.white38),
+        prefixIcon: Icon(icon, color: Colors.white70),
+        suffixIcon: suffix,
+        filled: true,
+        fillColor: Colors.white.withOpacity(0.10),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(color: Colors.white.withOpacity(0.18)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: const BorderSide(color: Color(0xFF3B82F6), width: 2),
+        ),
+      ),
+    );
+  }
+}
+
+class _DarkDropdown extends StatelessWidget {
+  const _DarkDropdown({
+    required this.label,
+    required this.value,
+    required this.items,
+    required this.icon,
+    required this.onChanged,
+  });
+
+  final String label;
+  final String? value;
+  final List<String> items;
+  final IconData icon;
+  final ValueChanged<String?> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return DropdownButtonFormField<String>(
+      value: value,
+      dropdownColor: const Color(0xFF111827),
+      style: const TextStyle(color: Colors.white),
+      items: items
+          .map((v) => DropdownMenuItem<String>(
+                value: v,
+                child: Text(v, style: const TextStyle(color: Colors.white)),
+              ))
+          .toList(),
+      onChanged: onChanged,
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: const TextStyle(color: Colors.white70),
+        prefixIcon: Icon(icon, color: Colors.white70),
+        filled: true,
+        fillColor: Colors.white.withOpacity(0.10),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(color: Colors.white.withOpacity(0.18)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: const BorderSide(color: Color(0xFF3B82F6), width: 2),
+        ),
+      ),
+    );
+  }
+}
+
+class _GradientButton extends StatelessWidget {
+  const _GradientButton({
+    required this.text,
+    required this.loading,
+    required this.onPressed,
+  });
+
+  final String text;
+  final bool loading;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(colors: [Color(0xFF2563EB), Color(0xFF7C3AED)]),
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: const [
+          BoxShadow(blurRadius: 22, offset: Offset(0, 10), color: Colors.black26),
+        ],
+      ),
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        ),
+        onPressed: onPressed,
+        child: loading
+            ? const SizedBox(
+                width: 22,
+                height: 22,
+                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+              )
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(text, style: const TextStyle(fontWeight: FontWeight.w800)),
+                  const SizedBox(width: 10),
+                  const Icon(Icons.arrow_forward, size: 18),
+                ],
+              ),
+      ),
+    );
+  }
+}
+
 =============================================================================================
 =============================================================================================
 =============================================================================================
