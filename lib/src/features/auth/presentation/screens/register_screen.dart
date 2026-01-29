@@ -194,7 +194,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     const SizedBox(height: 12),
 
                     DropdownButtonFormField<String>(
-                      value: _department,
+                      initialValue: _department,
                       items: departments
                           .map((d) => DropdownMenuItem(value: d, child: Text(d)))
                           .toList(),
@@ -207,7 +207,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     const SizedBox(height: 12),
 
                     DropdownButtonFormField<int>(
-                      value: _year,
+                      initialValue: _year,
                       items: const [1, 2, 3, 4, 5]
                           .map((y) => DropdownMenuItem(
                                 value: y,

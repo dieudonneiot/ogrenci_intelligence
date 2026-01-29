@@ -6,12 +6,12 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/auth/domain/auth_models.dart';
 import '../../features/auth/presentation/controllers/auth_controller.dart';
+import '../../features/auth/presentation/screens/company_auth_screen.dart';
+import '../../features/auth/presentation/screens/email_verification_screen.dart';
 import '../../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/auth/presentation/screens/reset_password_screen.dart';
-import '../../features/auth/presentation/screens/email_verification_screen.dart';
-import '../../features/auth/presentation/screens/company_auth_screen.dart';
 import '../../shared/widgets/empty_state.dart';
 import 'route_guards.dart';
 import 'routes.dart';
@@ -32,24 +32,37 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       final auth = authAsync.value;
       if (auth == null) return null;
 
-      // ✅ Always allow reset-password (recovery deep-link flow)
+      // ✅ Always allow reset-password (deep-link recovery flow)
       if (location == Routes.resetPassword) return null;
 
       final isAuthorized = auth.isAuthenticated;
 
-      // 1) Not authorized: only public routes allowed
+      // 1) Not authorized: allow only public routes
       if (!isAuthorized) {
-        return RouteGuards.isPublicPath(location) ? null : Routes.login;
+        if (RouteGuards.isPublicPath(location)) return null;
+
+        // Preserve "from" like React (login then come back)
+        final from = Uri.encodeComponent(state.uri.toString());
+        return '${Routes.login}?from=$from';
       }
 
-      // 2) Authorized: keep signed-in users out of auth pages
+      // 2) Authorized: role-based protection (protected areas)
+      final roleRedirect = RouteGuards.redirectForRole(
+        userType: auth.userType,
+        location: location,
+      );
+      if (roleRedirect != null) return roleRedirect;
+
+      // 3) Keep authenticated users out of auth pages
       const authPages = <String>{
         Routes.login,
         Routes.register,
         Routes.forgotPassword,
         Routes.emailVerification,
         Routes.companyAuth,
+        Routes.companyRegister, // alias for company register mode
         Routes.adminLogin,
+        Routes.adminSetup,
       };
 
       if (authPages.contains(location)) {
@@ -58,14 +71,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         return Routes.dashboard;
       }
 
-      // 3) Authorized: role-based protection for protected areas
-      final roleRedirect = RouteGuards.redirectForRole(
-        userType: auth.userType,
-        location: location,
-      );
-      if (roleRedirect != null) return roleRedirect;
-
-      // 4) Optional: redirect "/" for admin/company only (students can see home)
+      // 4) Optional: redirect "/" for admin/company (students can see home)
       if (location == Routes.home) {
         if (auth.userType == UserType.admin) return Routes.adminDashboard;
         if (auth.userType == UserType.company) return Routes.companyDashboard;
@@ -75,7 +81,9 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     },
 
     routes: [
+      // -----------------------------
       // Admin auth routes (standalone)
+      // -----------------------------
       GoRoute(
         path: Routes.adminLogin,
         builder: (_, __) =>
@@ -87,7 +95,9 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             const PlaceholderScreen(title: 'Admin Setup', showAppBar: true),
       ),
 
-      // Admin area shell
+      // -------------
+      // Admin shell
+      // -------------
       ShellRoute(
         builder: (context, state, child) => AdminShell(child: child),
         routes: [
@@ -131,16 +141,19 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         ],
       ),
 
+      // -----------------------------
       // Main shell (public + student + company)
+      // -----------------------------
       ShellRoute(
         builder: (context, state, child) => MainShell(child: child),
         routes: [
+          // Public
           GoRoute(
             path: Routes.home,
             builder: (_, __) => const PlaceholderView(title: 'Home'),
           ),
 
-          // Real auth screens
+          // Auth screens
           GoRoute(
             path: Routes.login,
             builder: (context, state) => LoginScreen(
@@ -165,6 +178,8 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             path: Routes.resetPassword,
             builder: (_, __) => const ResetPasswordScreen(),
           ),
+
+          // Company auth
           GoRoute(
             path: Routes.companyAuth,
             builder: (_, __) => const CompanyAuthScreen(),
@@ -173,6 +188,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             path: Routes.companyRegister,
             builder: (_, __) => const CompanyAuthScreen(initialIsLogin: false),
           ),
+
           // Footer pages (public)
           GoRoute(
             path: Routes.howItWorks,
@@ -272,10 +288,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             builder: (_, __) => const PlaceholderView(title: 'Company Dashboard'),
           ),
           GoRoute(
-            path: Routes.companyRegister,
-            builder: (_, __) => const PlaceholderView(title: 'Register Company'),
-          ),
-          GoRoute(
             path: Routes.companyJobs,
             builder: (_, __) => const PlaceholderView(title: 'Company Jobs'),
           ),
@@ -363,6 +375,7 @@ class GoRouterRefreshStream extends ChangeNotifier {
   }
 }
 
+/// Main Shell (temporary)
 class MainShell extends StatelessWidget {
   const MainShell({super.key, required this.child});
   final Widget child;
@@ -381,6 +394,7 @@ class MainShell extends StatelessWidget {
   }
 }
 
+/// Admin Shell (temporary)
 class AdminShell extends StatelessWidget {
   const AdminShell({super.key, required this.child});
   final Widget child;

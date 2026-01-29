@@ -19,7 +19,14 @@ class _AppState extends ConsumerState<App> {
   @override
   void initState() {
     super.initState();
-    _deepLinks = DeepLinkService(SupabaseService.client);
+
+    final router = ref.read(goRouterProvider);
+
+    _deepLinks = DeepLinkService(
+      client: SupabaseService.client,
+      router: router,
+    );
+
     unawaited(_deepLinks!.start());
   }
 

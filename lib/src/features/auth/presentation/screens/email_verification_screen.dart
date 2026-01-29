@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../../../../core/supabase/supabase_service.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/routing/routes.dart';
+import '../../../../core/supabase/supabase_service.dart';
 import '../controllers/auth_controller.dart';
 
 class EmailVerificationScreen extends ConsumerStatefulWidget {

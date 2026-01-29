@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/supabase/supabase_service.dart';
 import '../../../../core/routing/routes.dart';
-import '../../data/auth_repository.dart';
+import '../../../../core/supabase/supabase_service.dart';
 import '../controllers/auth_controller.dart';
 
 class CompanyAuthScreen extends ConsumerStatefulWidget {
@@ -740,7 +739,7 @@ class _DarkDropdown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField<String>(
-      value: value,
+      initialValue: value,
       dropdownColor: const Color(0xFF111827),
       style: const TextStyle(color: Colors.white),
       items: items

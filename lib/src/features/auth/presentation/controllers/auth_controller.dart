@@ -28,7 +28,8 @@ class AuthViewState {
   final String? companyId;
   final String? companyRole;
 
-  bool get isAuthenticated => user != null && user!.emailConfirmedAt != null;
+  bool get isAuthenticated => user != null; // has session/user
+  bool get isEmailVerified => user?.emailConfirmedAt != null;
 }
 
 final authRepositoryProvider = Provider<AuthRepository>((ref) {

@@ -308,6 +308,8 @@ dev_dependencies:
 flutter:
   # Only Flutter-specific configurations belong here:
   uses-material-design: true
+  assets:
+    - .env
 
   # assets:
   #   - images/
@@ -640,11 +642,9 @@ lib/src/app/app.dart
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../core/deeplink/deep_link_service.dart';
 import '../core/routing/app_router.dart';
-import '../core/routing/routes.dart';
 import '../core/supabase/supabase_service.dart';
 
 class App extends ConsumerStatefulWidget {
@@ -656,26 +656,24 @@ class App extends ConsumerStatefulWidget {
 
 class _AppState extends ConsumerState<App> {
   DeepLinkService? _deepLinks;
-  StreamSubscription<AuthState>? _authSub;
 
   @override
   void initState() {
     super.initState();
 
-    _deepLinks = DeepLinkService(SupabaseService.client);
-    unawaited(_deepLinks!.start());
+    final router = ref.read(goRouterProvider);
 
-    _authSub = SupabaseService.client.auth.onAuthStateChange.listen((evt) {
-      if (evt.event == AuthChangeEvent.passwordRecovery) {
-        ref.read(goRouterProvider).go(Routes.resetPassword);
-      }
-    });
+    _deepLinks = DeepLinkService(
+      client: SupabaseService.client,
+      router: router,
+    );
+
+    unawaited(_deepLinks!.start());
   }
 
   @override
   void dispose() {
-    _authSub?.cancel();
-    _deepLinks?.stop();
+    unawaited(_deepLinks?.stop() ?? Future.value());
     super.dispose();
   }
 
@@ -690,6 +688,7 @@ class _AppState extends ConsumerState<App> {
     );
   }
 }
+
 
 =============================================================================================
 lib/src/shared/widgets/empty_state.dart
@@ -1428,7 +1427,8 @@ class AuthViewState {
   final String? companyId;
   final String? companyRole;
 
-  bool get isAuthenticated => user != null && user!.emailConfirmedAt != null;
+  bool get isAuthenticated => user != null; // has session/user
+bool get isEmailVerified => user?.emailConfirmedAt != null;
 }
 
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
@@ -1688,10 +1688,11 @@ class CompanyRepository {
   }
 }
 =============================================================================================
-// lib/src/features/auth/presentation/screens/login_screen.dart
+lib/src/features/auth/presentation/screens/login_screen.dart
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/routing/routes.dart';
 import '../controllers/auth_controller.dart';
@@ -1719,13 +1720,62 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
+  /// React-parity:
+  /// - If redirected to /login?from=..., after login go back to that exact location.
+  /// - If missing/invalid, go to student default: /dashboard
+  /// - Prevent external redirects + auth-page loops
+  String _resolveFromTarget() {
+    final raw = widget.from?.trim();
+    if (raw == null || raw.isEmpty) return Routes.dashboard;
+
+    String decoded;
+    try {
+      decoded = Uri.decodeComponent(raw);
+    } catch (_) {
+      return Routes.dashboard;
+    }
+
+    // Must be an internal absolute path.
+    if (!decoded.startsWith('/')) return Routes.dashboard;
+
+    final uri = Uri.tryParse(decoded);
+    if (uri == null) return Routes.dashboard;
+
+    // Block external redirects
+    if (uri.hasScheme || uri.hasAuthority) return Routes.dashboard;
+
+    // Avoid loops back into auth pages
+    const blocked = <String>{
+      Routes.login,
+      Routes.register,
+      Routes.forgotPassword,
+      Routes.emailVerification,
+      Routes.companyAuth,
+      Routes.companyRegister,
+      Routes.adminLogin,
+      Routes.adminSetup,
+    };
+
+    if (blocked.contains(uri.path)) return Routes.dashboard;
+
+    // Preserve path + query exactly
+    return uri.toString();
+  }
+
   Future<void> _submit() async {
     setState(() => _error = null);
 
     final email = _email.text.trim();
     final pass = _password.text;
 
-    final err = await ref.read(authActionLoadingProvider.notifier).signIn(email, pass);
+    if (email.isEmpty || pass.isEmpty) {
+      setState(() => _error = 'Please fill in all fields.');
+      return;
+    }
+
+    final err = await ref
+        .read(authActionLoadingProvider.notifier)
+        .signIn(email, pass);
 
     if (!mounted) return;
 
@@ -1734,13 +1784,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       return;
     }
 
-    // Redirect: mimic React "from" behavior
-    final target = (widget.from != null && widget.from!.isNotEmpty)
-        ? widget.from!
-        : Routes.dashboard;
-
-    // Using Navigator here for simplicity; your router redirect will also handle roles.
-    Navigator.of(context).pushReplacementNamed(target);
+    // React behavior: go to `from` if present; otherwise dashboard.
+    // Router will still enforce role redirects (admin/company).
+    final target = _resolveFromTarget();
+    context.go(target);
   }
 
   @override
@@ -1808,8 +1855,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         labelText: 'Password',
                         prefixIcon: const Icon(Icons.lock_outline),
                         suffixIcon: IconButton(
-                          onPressed: () => setState(() => _showPassword = !_showPassword),
-                          icon: Icon(_showPassword ? Icons.visibility_off : Icons.visibility),
+                          onPressed: () =>
+                              setState(() => _showPassword = !_showPassword),
+                          icon: Icon(
+                            _showPassword ? Icons.visibility_off : Icons.visibility,
+                          ),
                         ),
                       ),
                     ),
@@ -1819,12 +1869,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       children: [
                         Checkbox(
                           value: _rememberMe,
-                          onChanged: (v) => setState(() => _rememberMe = v ?? false),
+                          onChanged: (v) =>
+                              setState(() => _rememberMe = v ?? false),
                         ),
                         const Text('Remember me'),
                         const Spacer(),
                         TextButton(
-                          onPressed: () => Navigator.of(context).pushNamed(Routes.forgotPassword),
+                          onPressed: () => context.push(Routes.forgotPassword),
                           child: const Text('Forgot password?'),
                         ),
                       ],
@@ -1864,7 +1915,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     const SizedBox(height: 10),
 
                     OutlinedButton(
-                      onPressed: () => Navigator.of(context).pushNamed(Routes.companyAuth),
+                      onPressed: () => context.push(Routes.companyAuth),
                       child: const Text('Login as company'),
                     ),
 
@@ -1875,7 +1926,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       children: [
                         const Text('No account? '),
                         TextButton(
-                          onPressed: () => Navigator.of(context).pushNamed(Routes.register),
+                          onPressed: () => context.push(Routes.register),
                           child: const Text('Register'),
                         ),
                       ],
@@ -1890,8 +1941,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 }
-
-
 =============================================================================================
 // lib/src/features/auth/presentation/screens/register_screen.dart
 
@@ -2092,7 +2141,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     const SizedBox(height: 12),
 
                     DropdownButtonFormField<String>(
-                      value: _department,
+                      initialValue: _department,
                       items: departments
                           .map((d) => DropdownMenuItem(value: d, child: Text(d)))
                           .toList(),
@@ -2105,7 +2154,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     const SizedBox(height: 12),
 
                     DropdownButtonFormField<int>(
-                      value: _year,
+                      initialValue: _year,
                       items: const [1, 2, 3, 4, 5]
                           .map((y) => DropdownMenuItem(
                                 value: y,
@@ -2459,14 +2508,15 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../features/auth/presentation/screens/company_auth_screen.dart';
+
 import '../../features/auth/domain/auth_models.dart';
 import '../../features/auth/presentation/controllers/auth_controller.dart';
+import '../../features/auth/presentation/screens/company_auth_screen.dart';
+import '../../features/auth/presentation/screens/email_verification_screen.dart';
 import '../../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/auth/presentation/screens/reset_password_screen.dart';
-import '../../features/auth/presentation/screens/email_verification_screen.dart';
 import '../../shared/widgets/empty_state.dart';
 import 'route_guards.dart';
 import 'routes.dart';
@@ -2487,24 +2537,37 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       final auth = authAsync.value;
       if (auth == null) return null;
 
-      // ✅ Always allow reset-password (recovery deep-link flow)
+      // ✅ Always allow reset-password (deep-link recovery flow)
       if (location == Routes.resetPassword) return null;
 
       final isAuthorized = auth.isAuthenticated;
 
-      // 1) Not authorized: only public routes allowed
+      // 1) Not authorized: allow only public routes
       if (!isAuthorized) {
-        return RouteGuards.isPublicPath(location) ? null : Routes.login;
+        if (RouteGuards.isPublicPath(location)) return null;
+
+        // Preserve "from" like React (login then come back)
+        final from = Uri.encodeComponent(state.uri.toString());
+        return '${Routes.login}?from=$from';
       }
 
-      // 2) Authorized: keep signed-in users out of auth pages
+      // 2) Authorized: role-based protection (protected areas)
+      final roleRedirect = RouteGuards.redirectForRole(
+        userType: auth.userType,
+        location: location,
+      );
+      if (roleRedirect != null) return roleRedirect;
+
+      // 3) Keep authenticated users out of auth pages
       const authPages = <String>{
         Routes.login,
         Routes.register,
         Routes.forgotPassword,
         Routes.emailVerification,
         Routes.companyAuth,
+        Routes.companyRegister, // alias for company register mode
         Routes.adminLogin,
+        Routes.adminSetup,
       };
 
       if (authPages.contains(location)) {
@@ -2513,14 +2576,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         return Routes.dashboard;
       }
 
-      // 3) Authorized: role-based protection for protected areas
-      final roleRedirect = RouteGuards.redirectForRole(
-        userType: auth.userType,
-        location: location,
-      );
-      if (roleRedirect != null) return roleRedirect;
-
-      // 4) Optional: redirect "/" for admin/company only (students can see home)
+      // 4) Optional: redirect "/" for admin/company (students can see home)
       if (location == Routes.home) {
         if (auth.userType == UserType.admin) return Routes.adminDashboard;
         if (auth.userType == UserType.company) return Routes.companyDashboard;
@@ -2530,7 +2586,9 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     },
 
     routes: [
+      // -----------------------------
       // Admin auth routes (standalone)
+      // -----------------------------
       GoRoute(
         path: Routes.adminLogin,
         builder: (_, __) =>
@@ -2542,7 +2600,9 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             const PlaceholderScreen(title: 'Admin Setup', showAppBar: true),
       ),
 
-      // Admin area shell
+      // -------------
+      // Admin shell
+      // -------------
       ShellRoute(
         builder: (context, state, child) => AdminShell(child: child),
         routes: [
@@ -2586,16 +2646,19 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         ],
       ),
 
+      // -----------------------------
       // Main shell (public + student + company)
+      // -----------------------------
       ShellRoute(
         builder: (context, state, child) => MainShell(child: child),
         routes: [
+          // Public
           GoRoute(
             path: Routes.home,
             builder: (_, __) => const PlaceholderView(title: 'Home'),
           ),
 
-          // Real auth screens
+          // Auth screens
           GoRoute(
             path: Routes.login,
             builder: (context, state) => LoginScreen(
@@ -2620,6 +2683,8 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             path: Routes.resetPassword,
             builder: (_, __) => const ResetPasswordScreen(),
           ),
+
+          // Company auth
           GoRoute(
             path: Routes.companyAuth,
             builder: (_, __) => const CompanyAuthScreen(),
@@ -2628,6 +2693,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             path: Routes.companyRegister,
             builder: (_, __) => const CompanyAuthScreen(initialIsLogin: false),
           ),
+
           // Footer pages (public)
           GoRoute(
             path: Routes.howItWorks,
@@ -2727,10 +2793,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             builder: (_, __) => const PlaceholderView(title: 'Company Dashboard'),
           ),
           GoRoute(
-            path: Routes.companyRegister,
-            builder: (_, __) => const PlaceholderView(title: 'Register Company'),
-          ),
-          GoRoute(
             path: Routes.companyJobs,
             builder: (_, __) => const PlaceholderView(title: 'Company Jobs'),
           ),
@@ -2818,6 +2880,7 @@ class GoRouterRefreshStream extends ChangeNotifier {
   }
 }
 
+/// Main Shell (temporary)
 class MainShell extends StatelessWidget {
   const MainShell({super.key, required this.child});
   final Widget child;
@@ -2836,6 +2899,7 @@ class MainShell extends StatelessWidget {
   }
 }
 
+/// Admin Shell (temporary)
 class AdminShell extends StatelessWidget {
   const AdminShell({super.key, required this.child});
   final Widget child;
@@ -2867,43 +2931,50 @@ class _Footer extends StatelessWidget {
   }
 }
 
+
+
 =============================================================================================
-// lib/core/deeplink/deep_link_service.dart
+// lib/src/core/deeplink/deep_link_service.dart
 
-
+// lib/src/core/deeplink/deep_link_service.dart
 import 'dart:async';
+
 import 'package:app_links/app_links.dart';
 import 'package:flutter/foundation.dart';
+import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../config/env.dart';
+import '../routing/routes.dart';
 
 class DeepLinkService {
-  DeepLinkService({SupabaseClient? client})
-      : _client = client ?? Supabase.instance.client;
+  DeepLinkService({SupabaseClient? client, GoRouter? router})
+      : _client = client ?? Supabase.instance.client,
+        _router = router;
 
   final SupabaseClient _client;
+  final GoRouter? _router;
+
   final AppLinks _appLinks = AppLinks();
   StreamSubscription<Uri>? _sub;
 
+  /// Start listening to deep links.
+  /// app_links ^6.x: `uriLinkStream` emits the initial link + subsequent links.
   Future<void> start() async {
-    // Initial link
-    try {
-      final uri = await _appLinks.getInitialAppLink();
-      if (uri != null) {
-        await _handle(uri);
-      }
-    } catch (e) {
-      if (kDebugMode) debugPrint('DeepLink initial error: $e');
-    }
+    if (_sub != null) return;
 
-    // Stream links
     _sub = _appLinks.uriLinkStream.listen(
       (uri) => unawaited(_handle(uri)),
       onError: (e) {
         if (kDebugMode) debugPrint('DeepLink stream error: $e');
       },
     );
+  }
+
+  /// Stop listening (matches how you call it from app.dart)
+  Future<void> stop() async {
+    await _sub?.cancel();
+    _sub = null;
   }
 
   bool _shouldHandle(Uri uri) {
@@ -2914,18 +2985,31 @@ class DeepLinkService {
   Future<void> _handle(Uri uri) async {
     if (!_shouldHandle(uri)) return;
 
+    if (kDebugMode) debugPrint('DeepLink received: $uri');
+
+    // 1) Let Supabase parse tokens & establish session (recovery/login callback)
     try {
       await _client.auth.getSessionFromUrl(uri);
     } catch (e) {
       if (kDebugMode) debugPrint('getSessionFromUrl error: $e');
     }
-  }
 
-  Future<void> dispose() async {
-    await _sub?.cancel();
-    _sub = null;
+    // 2) Reproduce React behavior: open the correct screen
+    // - reset-password deep link should land on /reset-password
+    // - login-callback can land on / and redirects will take over
+    if (_router != null) {
+      await Future.microtask(() {
+        if (uri.host == 'reset-password') {
+          _router.go(Routes.resetPassword);
+        } else if (uri.host == 'login-callback') {
+          _router.go(Routes.home);
+        }
+      });
+    }
   }
 }
+
+
 
 =============================================================================================
 lib/src/features/auth/presentation/screens/email_verification_screen.dart
@@ -2934,9 +3018,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../../../../core/supabase/supabase_service.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/routing/routes.dart';
+import '../../../../core/supabase/supabase_service.dart';
 import '../controllers/auth_controller.dart';
 
 class EmailVerificationScreen extends ConsumerStatefulWidget {
@@ -3266,6 +3350,7 @@ class _StepTile extends StatelessWidget {
     );
   }
 }
+
 
 =============================================================================================
 lib/src/features/auth/presentation/screens/company_auth_screen.dart
@@ -4091,7 +4176,41 @@ class _GradientButton extends StatelessWidget {
 }
 
 =============================================================================================
+D:\Dev\ogrenci_intelligence\test\widget_test.dart
+
+
+import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'package:ogrenci_intelligence/src/app/app.dart';
+
+void main() {
+  testWidgets('App boots (smoke test)', (WidgetTester tester) async {
+    // Build the real app root
+    await tester.pumpWidget(const ProviderScope(child: App()));
+
+    // Let first frames build
+    await tester.pump();
+
+    // If we reach here without exceptions, boot is OK.
+    expect(find.byType(App), findsOneWidget);
+  });
+}
+
 =============================================================================================
+D:\Dev\ogrenci_intelligence\lib\src\app\bootstrap.dart
+
+import '../core/config/env.dart';
+import '../core/supabase/supabase_service.dart';
+
+Future<void> bootstrap() async {
+  await Env.load();
+
+  await SupabaseService.initialize(
+    supabaseUrl: Env.supabaseUrl,
+    supabaseAnonKey: Env.supabaseAnonKey,
+  );
+}
 =============================================================================================
 =============================================================================================
 =============================================================================================

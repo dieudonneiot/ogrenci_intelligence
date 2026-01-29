@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/routing/routes.dart';
 import '../controllers/auth_controller.dart';
@@ -27,13 +28,62 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
+  /// React-parity:
+  /// - If redirected to /login?from=..., after login go back to that exact location.
+  /// - If missing/invalid, go to student default: /dashboard
+  /// - Prevent external redirects + auth-page loops
+  String _resolveFromTarget() {
+    final raw = widget.from?.trim();
+    if (raw == null || raw.isEmpty) return Routes.dashboard;
+
+    String decoded;
+    try {
+      decoded = Uri.decodeComponent(raw);
+    } catch (_) {
+      return Routes.dashboard;
+    }
+
+    // Must be an internal absolute path.
+    if (!decoded.startsWith('/')) return Routes.dashboard;
+
+    final uri = Uri.tryParse(decoded);
+    if (uri == null) return Routes.dashboard;
+
+    // Block external redirects
+    if (uri.hasScheme || uri.hasAuthority) return Routes.dashboard;
+
+    // Avoid loops back into auth pages
+    const blocked = <String>{
+      Routes.login,
+      Routes.register,
+      Routes.forgotPassword,
+      Routes.emailVerification,
+      Routes.companyAuth,
+      Routes.companyRegister,
+      Routes.adminLogin,
+      Routes.adminSetup,
+    };
+
+    if (blocked.contains(uri.path)) return Routes.dashboard;
+
+    // Preserve path + query exactly
+    return uri.toString();
+  }
+
   Future<void> _submit() async {
     setState(() => _error = null);
 
     final email = _email.text.trim();
     final pass = _password.text;
 
-    final err = await ref.read(authActionLoadingProvider.notifier).signIn(email, pass);
+    if (email.isEmpty || pass.isEmpty) {
+      setState(() => _error = 'Please fill in all fields.');
+      return;
+    }
+
+    final err = await ref
+        .read(authActionLoadingProvider.notifier)
+        .signIn(email, pass);
 
     if (!mounted) return;
 
@@ -42,13 +92,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       return;
     }
 
-    // Redirect: mimic React "from" behavior
-    final target = (widget.from != null && widget.from!.isNotEmpty)
-        ? widget.from!
-        : Routes.dashboard;
-
-    // Using Navigator here for simplicity; your router redirect will also handle roles.
-    Navigator.of(context).pushReplacementNamed(target);
+    // React behavior: go to `from` if present; otherwise dashboard.
+    // Router will still enforce role redirects (admin/company).
+    final target = _resolveFromTarget();
+    context.go(target);
   }
 
   @override
@@ -116,8 +163,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         labelText: 'Password',
                         prefixIcon: const Icon(Icons.lock_outline),
                         suffixIcon: IconButton(
-                          onPressed: () => setState(() => _showPassword = !_showPassword),
-                          icon: Icon(_showPassword ? Icons.visibility_off : Icons.visibility),
+                          onPressed: () =>
+                              setState(() => _showPassword = !_showPassword),
+                          icon: Icon(
+                            _showPassword ? Icons.visibility_off : Icons.visibility,
+                          ),
                         ),
                       ),
                     ),
@@ -127,12 +177,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       children: [
                         Checkbox(
                           value: _rememberMe,
-                          onChanged: (v) => setState(() => _rememberMe = v ?? false),
+                          onChanged: (v) =>
+                              setState(() => _rememberMe = v ?? false),
                         ),
                         const Text('Remember me'),
                         const Spacer(),
                         TextButton(
-                          onPressed: () => Navigator.of(context).pushNamed(Routes.forgotPassword),
+                          onPressed: () => context.push(Routes.forgotPassword),
                           child: const Text('Forgot password?'),
                         ),
                       ],
@@ -172,7 +223,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     const SizedBox(height: 10),
 
                     OutlinedButton(
-                      onPressed: () => Navigator.of(context).pushNamed(Routes.companyAuth),
+                      onPressed: () => context.push(Routes.companyAuth),
                       child: const Text('Login as company'),
                     ),
 
@@ -183,7 +234,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       children: [
                         const Text('No account? '),
                         TextButton(
-                          onPressed: () => Navigator.of(context).pushNamed(Routes.register),
+                          onPressed: () => context.push(Routes.register),
                           child: const Text('Register'),
                         ),
                       ],

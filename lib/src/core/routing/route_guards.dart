@@ -40,11 +40,15 @@ class RouteGuards {
       Routes.emailVerification,
       Routes.resetPassword, // ✅ deep link recovery must be public
 
+      // Company auth (public)
       Routes.companyAuth,
+      Routes.companyRegister, // alias to open CompanyAuth in register mode
 
+      // Admin auth (public)
       Routes.adminLogin,
       Routes.adminSetup,
 
+      // Footer pages (public)
       Routes.howItWorks,
       Routes.about,
       Routes.contact,
@@ -54,6 +58,7 @@ class RouteGuards {
       // React: public
       Routes.pointsSystem,
     };
+
     return publicExact.contains(location);
   }
 
