@@ -1,4 +1,6 @@
+// lib/features/auth/presentation/controllers/auth_controller.dart
 import 'dart:async';
+// ✅ for unawaited
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -45,12 +47,11 @@ final authViewStateProvider = StreamProvider<AuthViewState>((ref) {
     String? companyRole;
 
     if (user != null && user.emailConfirmedAt != null) {
-      // Admin has priority (admins table)
+      // Admin has priority
       final admin = await ref.read(activeAdminProvider.future);
       if (admin != null) {
         userType = UserType.admin;
       } else {
-        // Company membership (company_users table)
         final membership = await repo.fetchCompanyMembership(user.id);
         if (membership != null) {
           userType = UserType.company;
@@ -74,29 +75,27 @@ final authViewStateProvider = StreamProvider<AuthViewState>((ref) {
     );
   }
 
-  // Initial state (non-blocking)
-unawaited(() async {
+  // initial
   controller.add(const AuthViewState(
     user: null,
     session: null,
     loading: true,
     userType: UserType.guest,
   ));
-  await emit(repo.currentSession, loading: false);
-}());
 
+  unawaited(() async {
+    await emit(repo.currentSession, loading: false);
+  }());
 
   final sub = repo.authStateChanges().listen((evt) async {
-    // Admin status depends on DB; invalidate it on auth change
     ref.invalidate(activeAdminProvider);
     await emit(evt.session, loading: false);
   });
 
-ref.onDispose(() async {
-  await sub.cancel();
-  await controller.close();
-});
-
+  ref.onDispose(() {
+    unawaited(sub.cancel());
+    unawaited(controller.close());
+  });
 
   return controller.stream;
 });
@@ -169,18 +168,6 @@ class AuthActionController extends StateNotifier<bool> {
     try {
       state = true;
       await _repo.updatePassword(newPassword);
-      return null;
-    } catch (e) {
-      return e.toString();
-    } finally {
-      state = false;
-    }
-  }
-
-  Future<String?> updateProfile(Map<String, dynamic> updates) async {
-    try {
-      state = true;
-      await _repo.updateProfile(updates);
       return null;
     } catch (e) {
       return e.toString();

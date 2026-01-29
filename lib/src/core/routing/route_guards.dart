@@ -17,32 +17,19 @@ class RouteGuards {
     Routes.debug,
   ];
 
-  // Mirrors adminPaths (including subroutes)
-  static const List<String> _adminRoots = [
-    Routes.adminDashboard,
-    Routes.adminCompanies,
-    Routes.adminUsers,
-    Routes.adminJobs,
-    Routes.adminSubscriptions,
-    Routes.adminReports,
-    Routes.adminSettings,
-    Routes.adminLogs,
-    Routes.adminProfile,
-  ];
-
   static bool isStudentPath(String location) {
     return _studentRoots.any(
       (root) => location == root || location.startsWith('$root/'),
     );
   }
 
-  static bool isCompanyPath(String location) => location.startsWith('/company/');
+  /// Treat everything under /company as company area.
+  static bool isCompanyPath(String location) =>
+      location == '/company' || location.startsWith('/company/');
 
-  static bool isAdminPath(String location) {
-    return _adminRoots.any(
-      (root) => location == root || location.startsWith('$root/'),
-    );
-  }
+  /// Treat everything under /admin as admin area (safer than enumerating).
+  static bool isAdminPath(String location) =>
+      location == '/admin' || location.startsWith('/admin/');
 
   static bool isPublicPath(String location) {
     const publicExact = <String>{
@@ -51,7 +38,7 @@ class RouteGuards {
       Routes.register,
       Routes.forgotPassword,
       Routes.emailVerification,
-      Routes.resetPassword, // ✅ important for deep link reset flow
+      Routes.resetPassword, // ✅ deep link recovery must be public
 
       Routes.companyAuth,
 
@@ -64,7 +51,7 @@ class RouteGuards {
       Routes.privacy,
       Routes.terms,
 
-      // In your React app, this route is NOT protected
+      // React: public
       Routes.pointsSystem,
     };
     return publicExact.contains(location);
@@ -75,26 +62,30 @@ class RouteGuards {
     required UserType userType,
     required String location,
   }) {
-    // Company account trying to access student routes
-    if (userType == UserType.company && isStudentPath(location)) {
-      return Routes.companyDashboard;
+    // Never role-redirect public pages (router handles auth pages separately)
+    if (isPublicPath(location)) return null;
+
+    // Admin can access ONLY admin area (recommended)
+    if (userType == UserType.admin) {
+      if (!isAdminPath(location)) return Routes.adminDashboard;
+      return null;
     }
 
-    // Student trying to access company routes
-    if (userType == UserType.student && isCompanyPath(location)) {
-      return Routes.dashboard;
+    // Company can access company area, not student/admin
+    if (userType == UserType.company) {
+      if (isAdminPath(location)) return Routes.companyDashboard;
+      if (isStudentPath(location)) return Routes.companyDashboard;
+      return null;
     }
 
-    // Non-admin trying to access admin routes (except setup/login)
-    if (userType != UserType.admin &&
-        isAdminPath(location) &&
-        location != Routes.adminSetup &&
-        location != Routes.adminLogin) {
-      return userType == UserType.company
-          ? Routes.companyDashboard
-          : Routes.dashboard;
+    // Student can access student area, not company/admin
+    if (userType == UserType.student) {
+      if (isAdminPath(location)) return Routes.dashboard;
+      if (isCompanyPath(location)) return Routes.dashboard;
+      return null;
     }
 
+    // Guest handling is done by router "not authorized" block
     return null;
   }
 }

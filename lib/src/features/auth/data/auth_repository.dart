@@ -1,3 +1,4 @@
+// lib/features/auth/data/auth_repository.dart
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../domain/auth_models.dart';
 
@@ -25,7 +26,7 @@ class AuthRepository {
       throw const AuthException('Sign-in failed: user is null.');
     }
 
-    // React behavior: block if email not confirmed + sign out
+    // Block if email not confirmed (same as React)
     if (user.emailConfirmedAt == null) {
       await _client.auth.signOut();
       throw const AuthException('Please verify your email address.');
@@ -74,7 +75,30 @@ class AuthRepository {
     return res.session;
   }
 
-  /// Mirrors AuthContext.jsx: if a row exists in company_users, userType = company.
+  Future<void> resendSignupOtp({required String email}) async {
+    await _client.auth.resend(
+      type: OtpType.signup,
+      email: email,
+    );
+  }
+
+  Future<void> upsertStudentProfile({
+    required String userId,
+    required String email,
+    required String fullName,
+    required String department,
+    required int year,
+  }) async {
+    await _client.from('profiles').upsert({
+      'id': userId,
+      'email': email,
+      'full_name': fullName,
+      'department': department,
+      'year': year,
+      'updated_at': DateTime.now().toUtc().toIso8601String(),
+    });
+  }
+
   Future<CompanyMembership?> fetchCompanyMembership(String userId) async {
     final row = await _client
         .from('company_users')

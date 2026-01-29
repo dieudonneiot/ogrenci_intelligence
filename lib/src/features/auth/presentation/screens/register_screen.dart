@@ -197,7 +197,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           const SizedBox(height: 12),
 
                           DropdownButtonFormField<String>(
-                            value: _department,
+                            initialValue: _department,
                             decoration: const InputDecoration(
                               prefixIcon: Icon(Icons.school_outlined),
                               labelText: 'Bölüm',
@@ -212,7 +212,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           const SizedBox(height: 12),
 
                           DropdownButtonFormField<int>(
-                            value: _year,
+                            initialValue: _year,
                             decoration: const InputDecoration(
                               prefixIcon: Icon(Icons.calendar_month_outlined),
                               labelText: 'Sınıf',
