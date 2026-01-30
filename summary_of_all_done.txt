@@ -1,9 +1,9 @@
 flutter create ogrenci_intelligence_app --org com.ogrenciintelligence
 cd ogrenci_intelligence_app
 
-=============================================================================================
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 
-=============================================================================================
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 ogrenci_intelligence/
 
 
@@ -102,26 +102,26 @@ $files | ForEach-Object { New-Item -ItemType File -Force -Path $_ | Out-Null }
 
 Write-Host "Scaffold created."
 
-=============================================================================================
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 
 git init
 git add .
 git commit -m "Initial Flutter scaffold"
 
-=============================================================================================
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 
 echo "" >> .gitignore
 echo "# Local environment files" >> .gitignore
 echo ".env" >> .gitignore
 echo "*.keystore" >> .gitignore
 
-=============================================================================================
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 
 git branch -M main
 git remote add origin https://github.com/<YOUR_USERNAME>/ogrenci_intelligence.git
 git push -u origin main
 
-=============================================================================================
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 .github/workflows/flutter-ci.yml
 
 name: Flutter CI
@@ -174,7 +174,7 @@ jobs:
           path: coverage/lcov.info
           if-no-files-found: ignore
 
-=============================================================================================
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 
 .github/dependabot.yml
 
@@ -201,7 +201,7 @@ updates:
         patterns:
           - "*"
 
-=============================================================================================
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 
 .github/pull_request_template.md
 
@@ -218,7 +218,7 @@ updates:
 - [ ] No secrets committed (.env, keys, credentials)
 - [ ] Relevant docs updated (README / docs/)
 
-=============================================================================================
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 
 SECURITY.md
 
@@ -237,7 +237,7 @@ Instead, email the maintainer with:
 
 We will respond as soon as possible and coordinate a responsible disclosure.
 
-=============================================================================================
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 D:\Dev\ogrenci_intelligence\pubspec.yaml
 
 name: ogrenci_intelligence
@@ -315,7 +315,7 @@ flutter:
   #   - images/
   # fonts:
   #   - family: ...
-=============================================================================================
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 
 D:\Dev\ogrenci_intelligence\analysis_options.yaml
 
@@ -369,7 +369,7 @@ linter:
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options
 
-=============================================================================================
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 
 lib/main.dart
 
@@ -386,7 +386,7 @@ Future<void> main() async {
   runApp(const ProviderScope(child: App()));
 }
 
-=============================================================================================
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 lib/src/app/bootstrap.dart
 
 import '../core/config/env.dart';
@@ -401,7 +401,7 @@ Future<void> bootstrap() async {
   );
 }
 
-=============================================================================================
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 
 lib/src/core/config/env.dart
 
@@ -438,7 +438,7 @@ class Env {
             .trim(),
       );
 }
-=============================================================================================
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 lib/src/core/supabase/supabase_service.dart
 
 
@@ -465,7 +465,7 @@ class SupabaseService {
   static SupabaseClient get client => Supabase.instance.client;
 }
 
-=============================================================================================
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 lib/src/core/routing/routes.dart
 
 
@@ -537,7 +537,7 @@ class Routes {
   static const adminProfile = '/admin/profile';
 }
 
-=============================================================================================
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 lib/src/core/routing/route_guards.dart
 
 
@@ -633,9 +633,9 @@ class RouteGuards {
   }
 }
 
-=============================================================================================
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 
-=============================================================================================
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 lib/src/app/app.dart
 
 
@@ -690,7 +690,7 @@ class _AppState extends ConsumerState<App> {
 }
 
 
-=============================================================================================
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 lib/src/shared/widgets/empty_state.dart
 
 
@@ -731,7 +731,7 @@ class PlaceholderScreen extends StatelessWidget {
   }
 }
 
-=============================================================================================
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 lib/src/features/auth/domain/auth_models.dart
 
 
@@ -754,7 +754,7 @@ class CompanyMembership {
 
 enum AppRole { guest, student, company, admin }
 
-=============================================================================================
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 lib/src/features/auth/data/auth_repository.dart
 
 
@@ -882,7 +882,7 @@ Future<void> resendSignupVerificationEmail(String email) async {
 }
 
 
-=============================================================================================
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 lib/src/features/auth/presentation/controllers/auth_controller.dart
 
 
@@ -1046,7 +1046,7 @@ class AuthController extends StateNotifier<bool> {
   }
 }
 
-=============================================================================================
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 android/app/src/main/AndroidManifest.xml
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
@@ -1108,7 +1108,7 @@ android/app/src/main/AndroidManifest.xml
         </intent>
     </queries>
 </manifest>
-=============================================================================================
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 ios/Runner/Info.plist
 
 <?xml version="1.0" encoding="UTF-8"?>
@@ -1170,7 +1170,7 @@ ios/Runner/Info.plist
 </dict>
 </plist>
 
-=============================================================================================
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 lib/src/features/admin/data/admin_repository.dart
 
 
@@ -1212,7 +1212,7 @@ class AdminRepository {
     });
   }
 }
-=============================================================================================
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 import 'dart:async';
 
 import 'package:app_links/app_links.dart';
@@ -1267,7 +1267,7 @@ class DeepLinkService {
   }
 }
 
-=============================================================================================
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 lib/src/features/admin/domain/admin_models.dart
 
 
@@ -1301,7 +1301,7 @@ class AdminData {
     );
   }
 }
-=============================================================================================
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 lib/src/features/admin/presentation/controllers/admin_controller.dart
 
 
@@ -1371,7 +1371,7 @@ class AdminActionController extends StateNotifier<bool> {
 }
 }
 
-=============================================================================================
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 lib/src/features/auth/domain/auth_models.dart
 
 
@@ -1393,7 +1393,7 @@ class CompanyMembership {
     );
   }
 }
-=============================================================================================
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 lib/src/features/auth/presentation/controllers/auth_controller.dart
 
 
@@ -1578,7 +1578,7 @@ class AuthActionController extends StateNotifier<bool> {
 }
 
 
-=============================================================================================
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 lib/src/features/auth/presentation/screens/reset_password_screen.dart
 
 
@@ -1649,7 +1649,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
   }
 }
 
-=============================================================================================
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 lib/src/features/company/data/company_repository.dart
 
 
@@ -1687,7 +1687,7 @@ class CompanyRepository {
     return row;
   }
 }
-=============================================================================================
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 lib/src/features/auth/presentation/screens/login_screen.dart
 
 import 'package:flutter/material.dart';
@@ -1941,7 +1941,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 }
-=============================================================================================
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 // lib/src/features/auth/presentation/screens/register_screen.dart
 
 
@@ -2295,7 +2295,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 }
 
 
-=============================================================================================
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 // lib/src/features/auth/presentation/screens/forgot_password_screen.dart
 
 
@@ -2500,7 +2500,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 }
 
 
-=============================================================================================
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 lib/src/core/routing/app_router.dart
 
 import 'dart:async';
@@ -2518,6 +2518,8 @@ import '../../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/auth/presentation/screens/reset_password_screen.dart';
+import '../../features/home/presentation/screens/home_screen.dart';
+import '../../shared/widgets/app_navbar.dart';
 import '../../shared/widgets/empty_state.dart';
 import 'route_guards.dart';
 import 'routes.dart';
@@ -2663,6 +2665,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             path: Routes.adminProfile,
             builder: (_, __) => const PlaceholderView(title: 'Admin Profile'),
           ),
+          GoRoute(
+            path: Routes.home,
+            builder: (_, __) => const HomeScreen(),
+          ),
+
         ],
       ),
 
@@ -2900,7 +2907,7 @@ class GoRouterRefreshStream extends ChangeNotifier {
   }
 }
 
-/// Main Shell (temporary)
+/// Main Shell (React-like Navbar + Footer)
 class MainShell extends StatelessWidget {
   const MainShell({super.key, required this.child});
   final Widget child;
@@ -2908,9 +2915,10 @@ class MainShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Öğrenci Intelligence')),
+      // ✅ No AppBar (we reproduce React navbar)
       body: Column(
         children: [
+          const AppNavbar(), // sticky-like top
           Expanded(child: child),
           const _Footer(),
         ],
@@ -2951,7 +2959,9 @@ class _Footer extends StatelessWidget {
   }
 }
 
-=============================================================================================
+
+
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 // lib/src/core/deeplink/deep_link_service.dart
 
 // lib/src/core/deeplink/deep_link_service.dart
@@ -3029,7 +3039,7 @@ class DeepLinkService {
 
 
 
-=============================================================================================
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 lib/src/features/auth/presentation/screens/email_verification_screen.dart
 
 import 'dart:async';
@@ -3370,7 +3380,7 @@ class _StepTile extends StatelessWidget {
 }
 
 
-=============================================================================================
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 lib/src/features/auth/presentation/screens/company_auth_screen.dart
 
 
@@ -4193,7 +4203,7 @@ class _GradientButton extends StatelessWidget {
   }
 }
 
-=============================================================================================
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 D:\Dev\ogrenci_intelligence\test\widget_test.dart
 
 
@@ -4215,7 +4225,7 @@ void main() {
   });
 }
 
-=============================================================================================
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 D:\Dev\ogrenci_intelligence\lib\src\app\bootstrap.dart
 
 import '../core/config/env.dart';
@@ -4229,39 +4239,1438 @@ Future<void> bootstrap() async {
     supabaseAnonKey: Env.supabaseAnonKey,
   );
 }
-=============================================================================================
-=============================================================================================
-=============================================================================================
-=============================================================================================
-=============================================================================================
-=============================================================================================
-=============================================================================================
-=============================================================================================
-=============================================================================================
-=============================================================================================
-=============================================================================================
-=============================================================================================
-=============================================================================================
-=============================================================================================
-=============================================================================================
-=============================================================================================
-=============================================================================================
-=============================================================================================
-=============================================================================================
-=============================================================================================
-=============================================================================================
-=============================================================================================
-=============================================================================================
-=============================================================================================
-=============================================================================================
-=============================================================================================
-=============================================================================================
-=============================================================================================
-=============================================================================================
-=============================================================================================
-=============================================================================================
-=============================================================================================
-=============================================================================================
-=============================================================================================
-=============================================================================================
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
+D:\Dev\ogrenci_intelligence\lib\src\features\home\presentation\screens\home_screen.dart
+
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../../core/routing/routes.dart';
+import '../../../../core/supabase/supabase_service.dart';
+import '../../../auth/presentation/controllers/auth_controller.dart';
+import '../widgets/how_it_works_section.dart';
+
+class HomeScreen extends ConsumerWidget {
+  const HomeScreen({super.key});
+
+  // Tailwind-like palette (close to your React UI)
+  static const _bgTop = Color(0xFFFFFFFF);
+  static const _bgBottom = Color(0xFFFAF5FF); // purple-50
+  static const _purple700 = Color(0xFF7E22CE);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authAsync = ref.watch(authViewStateProvider);
+
+    final isLoading = authAsync.isLoading;
+    final auth = authAsync.value;
+    final isLoggedIn = (!isLoading) && (auth?.isAuthenticated ?? false);
+
+    return DecoratedBox(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [_bgTop, _bgBottom],
+        ),
+      ),
+      child: SafeArea(
+        bottom: false,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1080),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _Hero(
+                    isLoggedIn: isLoggedIn,
+                    isLoading: isLoading,
+                    onRegister: () => context.go(Routes.register),
+                    onLogin: () => context.go(Routes.login),
+                    onProfile: () => context.go(Routes.profile),
+                    onLogout: () async {
+                      await SupabaseService.client.auth.signOut();
+                      if (context.mounted) context.go(Routes.home);
+                    },
+                  ),
+
+                  const SizedBox(height: 36),
+
+                  _SectionGrid(
+                    title: null,
+                    cards: const [
+                      _InfoCard(
+                        icon: Icons.school_outlined,
+                        iconColor: _purple700,
+                        title: 'Alanına Özel İçerikler',
+                        description:
+                            'Bölümüne uygun kurslar, stajlar ve iş ilanlarıyla odaklanmış öğrenme.',
+                      ),
+                      _InfoCard(
+                        icon: Icons.work_outline,
+                        iconColor: _purple700,
+                        title: 'Kariyerine Yön Ver',
+                        description:
+                            'Kişiselleştirilmiş kariyer rehberliği ve fırsatlarla desteklen.',
+                      ),
+                      _InfoCard(
+                        icon: Icons.assignment_outlined,
+                        iconColor: _purple700,
+                        title: 'Kolay ve Hızlı Kullanım',
+                        description:
+                            'Modern tasarım ve kullanıcı dostu arayüz ile zamandan tasarruf et.',
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 56),
+
+                  _SectionGrid(
+                    title: 'Öğrenciler İçin Faydalar',
+                    cards: const [
+                      _InfoCard(
+                        icon: Icons.track_changes_outlined,
+                        iconColor: _purple700,
+                        title: 'Hedef Odaklı İçerik',
+                        description:
+                            'Alanına uygun fırsatlarla zaman kaybetmeden hedefe ulaş.',
+                      ),
+                      _InfoCard(
+                        icon: Icons.star_outline,
+                        iconColor: _purple700,
+                        title: 'Rekabet Avantajı',
+                        description:
+                            'Özgeçmişini güçlendirecek fırsatlara herkesten önce ulaş.',
+                      ),
+                      _InfoCard(
+                        icon: Icons.bar_chart_outlined,
+                        iconColor: _purple700,
+                        title: 'Gelişim Takibi',
+                        description:
+                            'İlerleyişini takip et, eksiklerini zamanında fark et.',
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 56),
+
+                  _SectionGrid(
+                    title: 'İşletmeler İçin Faydalar',
+                    cards: const [
+                      _InfoCard(
+                        icon: Icons.people_outline,
+                        iconColor: _purple700,
+                        title: 'Genç Yeteneklere Erişim',
+                        description:
+                            'Motivasyonu yüksek, alanına ilgili öğrencilere ulaşın.',
+                      ),
+                      _InfoCard(
+                        icon: Icons.handshake_outlined,
+                        iconColor: _purple700,
+                        title: 'İşbirliği Olanakları',
+                        description:
+                            'Projelerinizde üniversite öğrencileriyle birlikte çalışın.',
+                      ),
+                      _InfoCard(
+                        icon: Icons.query_stats_outlined,
+                        iconColor: _purple700,
+                        title: 'Veriye Dayalı Seçim',
+                        description:
+                            'Profil verileriyle doğru kişiyi kolayca belirleyin.',
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 56),
+
+                  // ✅ Keep it here, from widgets/how_it_works_section.dart
+                  const HowItWorksSection(),
+
+                  const SizedBox(height: 24),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _Hero extends StatelessWidget {
+  const _Hero({
+    required this.isLoggedIn,
+    required this.isLoading,
+    required this.onRegister,
+    required this.onLogin,
+    required this.onProfile,
+    required this.onLogout,
+  });
+
+  final bool isLoggedIn;
+  final bool isLoading;
+  final VoidCallback onRegister;
+  final VoidCallback onLogin;
+  final VoidCallback onProfile;
+  final Future<void> Function() onLogout;
+
+  static const _purple700 = Color(0xFF7E22CE);
+  static const _indigo700 = Color(0xFF4338CA);
+  static const _blue800 = Color(0xFF1E40AF);
+  static const _yellow400 = Color(0xFFFACC15);
+  static const _green400 = Color(0xFF4ADE80);
+  static const _red400 = Color(0xFFF87171);
+
+  @override
+  Widget build(BuildContext context) {
+    final titleStyle = Theme.of(context).textTheme.headlineMedium?.copyWith(
+          color: Colors.white,
+          fontWeight: FontWeight.w800,
+          height: 1.15,
+        );
+
+    final subtitleStyle = Theme.of(context).textTheme.titleMedium?.copyWith(
+          color: const Color(0xFFC7D2FE), // indigo-200 vibe
+          height: 1.5,
+        );
+
+    return TweenAnimationBuilder<double>(
+      duration: const Duration(milliseconds: 900),
+      tween: Tween(begin: 0, end: 1),
+      builder: (context, t, child) => Opacity(
+        opacity: t,
+        child: Transform.translate(offset: Offset(0, (1 - t) * 40), child: child),
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(18),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [_purple700, _indigo700, _blue800],
+          ),
+          borderRadius: BorderRadius.circular(28),
+          boxShadow: const [
+            BoxShadow(
+              blurRadius: 20,
+              spreadRadius: 2,
+              offset: Offset(0, 10),
+              color: Color(0x26000000),
+            )
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 26),
+          child: Column(
+            children: [
+              Text(
+                'Üniversite Hayatını Güçlendir,\nKariyerine Hızla Yön Ver!',
+                textAlign: TextAlign.center,
+                style: titleStyle,
+              ),
+              const SizedBox(height: 14),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 720),
+                child: Text(
+                  'Alanına özel kurslar, stajlar ve iş ilanları ile geleceğine sağlam adımlarla ilerle.',
+                  textAlign: TextAlign.center,
+                  style: subtitleStyle,
+                ),
+              ),
+              const SizedBox(height: 22),
+              if (isLoading)
+                const Padding(
+                  padding: EdgeInsets.all(8),
+                  child: CircularProgressIndicator(color: Colors.white),
+                )
+              else
+                Wrap(
+                  spacing: 14,
+                  runSpacing: 12,
+                  alignment: WrapAlignment.center,
+                  children: [
+                    if (!isLoggedIn) ...[
+                      _FilledCta(
+                        label: 'Kayıt Ol',
+                        color: _yellow400,
+                        textColor: Color(0xFF111827),
+                        onTap: onRegister,
+                      ),
+                      _FilledCta(
+                        label: 'Giriş Yap',
+                        color: _yellow400,
+                        textColor: Color(0xFF111827),
+                        onTap: onLogin,
+                      ),
+                    ] else ...[
+                      _FilledCta(
+                        label: 'Profil',
+                        color: _green400,
+                        textColor: Color(0xFF111827),
+                        icon: Icons.person_outline,
+                        onTap: onProfile,
+                      ),
+                      _FilledCta(
+                        label: 'Çıkış Yap',
+                        color: _red400,
+                        textColor: Colors.white,
+                        icon: Icons.logout_outlined,
+                        onTapAsync: onLogout,
+                      ),
+                    ]
+                  ],
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _FilledCta extends StatefulWidget {
+  const _FilledCta({
+    required this.label,
+    required this.color,
+    required this.textColor,
+    this.icon,
+    this.onTap,
+    this.onTapAsync,
+  });
+
+  final String label;
+  final Color color;
+  final Color textColor;
+  final IconData? icon;
+  final VoidCallback? onTap;
+  final Future<void> Function()? onTapAsync;
+
+  @override
+  State<_FilledCta> createState() => _FilledCtaState();
+}
+
+class _FilledCtaState extends State<_FilledCta> {
+  bool _busy = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final onPressed = (widget.onTapAsync != null)
+        ? () async {
+            if (_busy) return;
+            setState(() => _busy = true);
+            try {
+              await widget.onTapAsync!.call();
+            } finally {
+              if (mounted) setState(() => _busy = false);
+            }
+          }
+        : widget.onTap;
+
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: widget.color,
+        foregroundColor: widget.textColor,
+        elevation: 10,
+        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (widget.icon != null) ...[
+            Icon(widget.icon, size: 18),
+            const SizedBox(width: 8),
+          ],
+          Text(
+            _busy ? '...' : widget.label,
+            style: const TextStyle(fontWeight: FontWeight.w800),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SectionGrid extends StatelessWidget {
+  const _SectionGrid({
+    required this.title,
+    required this.cards,
+  });
+
+  final String? title;
+  final List<_InfoCard> cards;
+
+  @override
+  Widget build(BuildContext context) {
+    final headerStyle = Theme.of(context).textTheme.headlineSmall?.copyWith(
+          fontWeight: FontWeight.w800,
+          color: const Color(0xFF3B0764), // deep purple
+        );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (title != null) ...[
+          Text(title!, textAlign: TextAlign.center, style: headerStyle),
+          const SizedBox(height: 18),
+        ],
+        LayoutBuilder(
+          builder: (context, c) {
+            final w = c.maxWidth;
+            final gap = 18.0;
+            final minItem = 280.0;
+
+            final count = (w / (minItem + gap)).floor().clamp(1, 3);
+            final itemW = (w - gap * (count - 1)) / count;
+
+            return Wrap(
+              spacing: gap,
+              runSpacing: gap,
+              children: [
+                for (final card in cards) SizedBox(width: itemW, child: card),
+              ],
+            );
+          },
+        ),
+      ],
+    );
+  }
+}
+
+class _InfoCard extends StatelessWidget {
+  const _InfoCard({
+    required this.icon,
+    required this.iconColor,
+    required this.title,
+    required this.description,
+  });
+
+  final IconData icon;
+  final Color iconColor;
+  final String title;
+  final String description;
+
+  @override
+  Widget build(BuildContext context) {
+    final titleStyle = Theme.of(context).textTheme.titleLarge?.copyWith(
+          fontWeight: FontWeight.w700,
+          color: const Color(0xFF5B21B6),
+        );
+
+    final descStyle = Theme.of(context).textTheme.bodyMedium?.copyWith(
+          color: const Color(0xFF4B5563),
+          height: 1.45,
+        );
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(26),
+        boxShadow: const [
+          BoxShadow(
+            blurRadius: 14,
+            offset: Offset(0, 8),
+            color: Color(0x1A000000),
+          )
+        ],
+      ),
+      child: Column(
+        children: [
+          Icon(icon, size: 46, color: iconColor),
+          const SizedBox(height: 12),
+          Text(title, textAlign: TextAlign.center, style: titleStyle),
+          const SizedBox(height: 10),
+          Text(description, textAlign: TextAlign.center, style: descStyle),
+        ],
+      ),
+    );
+  }
+}
+
+
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
+lib/src/features/home/presentation/widgets/how_it_works_section.dart
+
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../../core/routing/routes.dart';
+import '../../../auth/presentation/controllers/auth_controller.dart';
+
+class HowItWorksSection extends ConsumerWidget {
+  const HowItWorksSection({super.key});
+
+  static const _bg = Color(0xFFF9FAFB); // gray-50
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authAsync = ref.watch(authViewStateProvider);
+    final isLoading = authAsync.isLoading;
+    final isLoggedIn = (!isLoading) && (authAsync.value?.isAuthenticated ?? false);
+
+    final w = MediaQuery.of(context).size.width;
+
+    // Breakpoints proches du React: md=2 cols, lg=4 cols
+    final columns = w >= 1024 ? 4 : (w >= 768 ? 2 : 1);
+    final showArrows = columns >= 4;
+
+    const steps = <_HowStep>[
+      _HowStep(
+        index: 1,
+        title: 'Eğitim Modülü',
+        description:
+            'Alanına özel temel bilgiler, video anlatımlar ve mini sınavlarla kariyer yolculuğuna güçlü bir başlangıç yap.',
+        icon: Icons.menu_book_outlined,
+        iconColor: Color(0xFF4F46E5), // indigo-600
+        bgColor: Color(0xFFEFF6FF), // indigo-50 vibe
+        borderColor: Color(0xFFC7D2FE), // indigo-200
+      ),
+      _HowStep(
+        index: 2,
+        title: 'Saha Uygulaması',
+        description:
+            'Teorik bilgilerini pratikte uygulayarak gerçek iş ortamında deneyim kazan. Mentör desteği ile gelişimini pekiştir.',
+        icon: Icons.business_center_outlined,
+        iconColor: Color(0xFF7C3AED), // purple-600
+        bgColor: Color(0xFFF3E8FF), // purple-50
+        borderColor: Color(0xFFD8B4FE), // purple-200
+      ),
+      _HowStep(
+        index: 3,
+        title: 'Network Oluştur',
+        description:
+            'Sektör profesyonelleri ve diğer öğrencilerle tanış, kariyer ağını genişlet ve yeni fırsatlar keşfet.',
+        icon: Icons.groups_outlined,
+        iconColor: Color(0xFF16A34A), // green-600
+        bgColor: Color(0xFFECFDF5), // green-50
+        borderColor: Color(0xFFBBF7D0), // green-200
+      ),
+      _HowStep(
+        index: 4,
+        title: 'Başarıyı Yakala',
+        description:
+            'Sertifikalarını al, referanslarını topla ve hayalindeki kariyere doğru emin adımlarla ilerle.',
+        icon: Icons.emoji_events_outlined,
+        iconColor: Color(0xFFCA8A04), // yellow-600
+        bgColor: Color(0xFFFFFBEB), // yellow-50
+        borderColor: Color(0xFFFDE68A), // yellow-200
+      ),
+    ];
+
+    return Container(
+      width: double.infinity,
+      color: _bg,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 56),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1080),
+          child: Column(
+            children: [
+              // Title
+              Text(
+                'Nasıl Çalışır?',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: const Color(0xFF1F2937),
+                    ),
+              ),
+              const SizedBox(height: 12),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 720),
+                child: Text(
+                  'Platformumuz dört temel aşamadan oluşur. Her adımda yanındayız!',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: const Color(0xFF6B7280),
+                        height: 1.5,
+                      ),
+                ),
+              ),
+              const SizedBox(height: 28),
+
+              // Grid
+              LayoutBuilder(
+                builder: (context, c) {
+                  final gap = 16.0;
+                  final totalW = c.maxWidth;
+                  final itemW = (columns == 1)
+                      ? totalW
+                      : (totalW - gap * (columns - 1)) / columns;
+
+                  return Wrap(
+                    spacing: gap,
+                    runSpacing: gap,
+                    children: [
+                      for (var i = 0; i < steps.length; i++)
+                        SizedBox(
+                          width: itemW,
+                          child: _HowStepCard(
+                            step: steps[i],
+                            showArrow: showArrows && i < steps.length - 1,
+                          ),
+                        ),
+                    ],
+                  );
+                },
+              ),
+
+              const SizedBox(height: 34),
+
+              // CTA
+              _CtaButton(
+                label: isLoggedIn ? "Dashboard'a Git" : "Hemen Başla",
+                onTap: () => context.go(
+                  isLoggedIn ? Routes.dashboard : Routes.register,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _HowStep {
+  const _HowStep({
+    required this.index,
+    required this.title,
+    required this.description,
+    required this.icon,
+    required this.iconColor,
+    required this.bgColor,
+    required this.borderColor,
+  });
+
+  final int index;
+  final String title;
+  final String description;
+  final IconData icon;
+  final Color iconColor;
+  final Color bgColor;
+  final Color borderColor;
+}
+
+class _HowStepCard extends StatefulWidget {
+  const _HowStepCard({required this.step, required this.showArrow});
+
+  final _HowStep step;
+  final bool showArrow;
+
+  @override
+  State<_HowStepCard> createState() => _HowStepCardState();
+}
+
+class _HowStepCardState extends State<_HowStepCard> {
+  bool _hover = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) {
+        if (!_hover) setState(() => _hover = true);
+      },
+      onExit: (_) {
+        if (_hover) setState(() => _hover = false);
+      },
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            transform: Matrix4.identity()..translate(0.0, _hover ? -4.0 : 0.0),
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              color: widget.step.bgColor,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: widget.step.borderColor, width: 2),
+              boxShadow: _hover
+                  ? const [
+                      BoxShadow(
+                        blurRadius: 18,
+                        offset: Offset(0, 10),
+                        color: Color(0x1A000000),
+                      )
+                    ]
+                  : const [],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(widget.step.icon, size: 40, color: widget.step.iconColor),
+                const SizedBox(height: 12),
+                Text(
+                  widget.step.title,
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        color: const Color(0xFF1F2937),
+                      ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  widget.step.description,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: const Color(0xFF4B5563),
+                        height: 1.45,
+                      ),
+                ),
+              ],
+            ),
+          ),
+
+          // Step number (top-right)
+          Positioned(
+            top: -10,
+            right: -10,
+            child: Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: const Color(0xFF111827),
+                borderRadius: BorderRadius.circular(999),
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                '${widget.step.index}',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 12,
+                ),
+              ),
+            ),
+          ),
+
+          // Arrow (only large screens / not last)
+          if (widget.showArrow)
+            const Positioned(
+              right: -14,
+              top: 0,
+              bottom: 0,
+              child: Center(
+                child: Icon(
+                  Icons.arrow_forward,
+                  size: 22,
+                  color: Color(0xFF9CA3AF),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CtaButton extends StatefulWidget {
+  const _CtaButton({required this.label, required this.onTap});
+
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  State<_CtaButton> createState() => _CtaButtonState();
+}
+
+class _CtaButtonState extends State<_CtaButton> {
+  bool _hover = false;
+  static const _purple = Color(0xFF7C3AED);
+  static const _purpleHover = Color(0xFF6D28D9);
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) {
+        if (!_hover) setState(() => _hover = true);
+      },
+      onExit: (_) {
+        if (_hover) setState(() => _hover = false);
+      },
+      child: AnimatedScale(
+        duration: const Duration(milliseconds: 160),
+        scale: _hover ? 1.05 : 1.0,
+        child: ElevatedButton(
+          onPressed: widget.onTap,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: _hover ? _purpleHover : _purple,
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            elevation: 10,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(widget.label, style: const TextStyle(fontWeight: FontWeight.w800)),
+              const SizedBox(width: 10),
+              const Icon(Icons.arrow_forward, size: 18),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+
+
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
+lib\src\shared\widgets\app_navbar.dart
+
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../core/routing/routes.dart';
+import '../../features/auth/domain/auth_models.dart';
+import '../../features/auth/presentation/controllers/auth_controller.dart';
+
+class AppNavbar extends ConsumerStatefulWidget implements PreferredSizeWidget {
+  const AppNavbar({super.key});
+
+  @override
+  Size get preferredSize => const Size.fromHeight(72);
+
+  @override
+  ConsumerState<AppNavbar> createState() => _AppNavbarState();
+}
+
+class _AppNavbarState extends ConsumerState<AppNavbar> {
+  bool _mobileOpen = false;
+
+  void _toggleMobile() => setState(() => _mobileOpen = !_mobileOpen);
+  void _closeMobile() => setState(() => _mobileOpen = false);
+
+  @override
+  Widget build(BuildContext context) {
+    final authAsync = ref.watch(authViewStateProvider);
+    final auth = authAsync.value;
+
+    final isLoading = authAsync.isLoading;
+    final isLoggedIn = (!isLoading) && (auth?.isAuthenticated ?? false);
+    final userType = auth?.userType ?? UserType.student;
+
+    // React Navbar: company sees company menu; else student menu
+    final isCompany = isLoggedIn && userType == UserType.company;
+    final isAdmin = isLoggedIn && userType == UserType.admin;
+
+    // In React: logo click redirects by role (company -> company dashboard else home)
+    final logoTarget = isCompany
+        ? Routes.companyDashboard
+        : isAdmin
+            ? Routes.adminDashboard
+            : Routes.home;
+
+    final menuItems = isCompany
+        ? const <_NavItem>[
+            _NavItem("İlanlarım", Routes.companyJobs),
+            _NavItem("Staj Yönetimi", Routes.companyInternships),
+            _NavItem("Başvurular", Routes.companyApplications),
+            _NavItem("Raporlar", Routes.companyReports),
+          ]
+        : const <_NavItem>[
+            _NavItem("Anasayfa", Routes.home),
+            _NavItem("Kurslar", Routes.courses),
+            _NavItem("İş İlanları", Routes.jobs),
+            _NavItem("Stajlar", Routes.internships),
+          ];
+
+    // Dropdown items
+    final dropdownItems = isCompany
+        ? const <_NavItem>[
+            _NavItem("Şirket Profili", Routes.companyProfile, icon: Icons.business),
+            _NavItem("Dashboard", Routes.companyDashboard, icon: Icons.dashboard_outlined),
+            _NavItem("Paketler ve Fiyatlar", Routes.companyPricing, icon: Icons.credit_card),
+            // NOTE: you don't currently have Routes.companySettings in your routes.dart
+            // If you add it later, you can put it here.
+          ]
+        : const <_NavItem>[
+            _NavItem("Profilim", Routes.profile, icon: Icons.person_outline),
+            _NavItem("Dashboard", Routes.dashboard, icon: Icons.dashboard_outlined),
+            _NavItem("Başvurularım", Routes.applications, icon: Icons.article_outlined),
+            _NavItem("Favorilerim", Routes.favorites, icon: Icons.favorite_border),
+            _NavItem("Bildirimler", Routes.notifications, icon: Icons.notifications_none),
+            _NavItem("Ayarlar", Routes.settings, icon: Icons.settings_outlined),
+          ];
+
+    final isDesktop = MediaQuery.of(context).size.width >= 900;
+
+    return Material(
+      color: Colors.white,
+      elevation: 0,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Top bar (sticky look)
+          Container(
+            decoration: const BoxDecoration(
+              border: Border(
+                bottom: BorderSide(color: Color(0xFFE5E7EB)), // gray-200
+              ),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1100),
+                child: Row(
+                  children: [
+                    // Logo + Brand
+                    InkWell(
+                      onTap: () {
+                        _closeMobile();
+                        context.go(logoTarget);
+                      },
+                      borderRadius: BorderRadius.circular(12),
+                      child: Row(
+                        children: [
+                          if (isCompany)
+                            Icon(Icons.apartment, size: 34, color: const Color(0xFF7C3AED))
+                          else
+                            const Icon(Icons.school, size: 34, color: Color(0xFF7C3AED)),
+                          const SizedBox(width: 10),
+                          if (isDesktop)
+                            Text(
+                              isCompany ? "İşletme Paneli" : "Öğrenci İntelligence",
+                              style: const TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.w800,
+                                color: Color(0xFF7C3AED),
+                                letterSpacing: -0.2,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+
+                    const Spacer(),
+
+                    // Desktop menu
+                    if (isDesktop) ...[
+                      for (final item in menuItems)
+                        _NavLink(
+                          label: item.label,
+                          onTap: () {
+                            _closeMobile();
+                            context.go(item.path);
+                          },
+                        ),
+
+                      const SizedBox(width: 10),
+
+                      // Not logged in: show company auth button (React behavior)
+                      if (!isLoggedIn && !isLoading) ...[
+                        _PrimaryPillButton(
+                          label: "İşletme Girişi",
+                          onTap: () {
+                            _closeMobile();
+                            context.go(Routes.companyAuth);
+                          },
+                        ),
+                        const SizedBox(width: 10),
+                      ],
+
+                      if (isLoading)
+                        Container(
+                          width: 80,
+                          height: 34,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFE5E7EB),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        )
+                      else if (!isLoggedIn) ...[
+                        _PrimaryPillButton(
+                          label: "Öğrenci Girişi",
+                          onTap: () {
+                            _closeMobile();
+                            context.go(Routes.login);
+                          },
+                        ),
+                        const SizedBox(width: 10),
+                        _PrimaryPillButton(
+                          label: "Kayıt Ol",
+                          onTap: () {
+                            _closeMobile();
+                            context.go(Routes.register);
+                          },
+                        ),
+                      ] else ...[
+                        // Company: "Yeni İlan"
+                        if (isCompany) ...[
+                          _PrimaryPillButton(
+                            label: "Yeni İlan",
+                            onTap: () {
+                              _closeMobile();
+                              context.go(Routes.companyJobsCreate);
+                            },
+                            radius: 12,
+                          ),
+                          const SizedBox(width: 10),
+                        ],
+
+                        // User dropdown (hover in React; click here)
+                        _ProfileMenu(
+                          isCompany: isCompany,
+                          label: _displayName(auth),
+                          tag: isCompany ? "İşletme" : null,
+                          items: dropdownItems,
+                          onItemTap: (path) {
+                            _closeMobile();
+                            context.go(path);
+                          },
+                          onLogout: () async {
+                            _closeMobile();
+                            // You likely already have signOut in your controller/provider.
+                            // If your signOut method is elsewhere, tell me where and I adapt.
+                            await ref.read(authActionLoadingProvider.notifier).signOut();
+                            if (context.mounted) context.go(Routes.home);
+                          },
+                        ),
+                      ],
+                    ] else ...[
+                      // Mobile hamburger
+                      IconButton(
+                        onPressed: _toggleMobile,
+                        icon: Icon(
+                          _mobileOpen ? Icons.close : Icons.menu,
+                          color: const Color(0xFF374151), // gray-700
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          // Mobile menu
+          if (!isDesktop && _mobileOpen)
+            Container(
+              decoration: const BoxDecoration(
+                border: Border(bottom: BorderSide(color: Color(0xFFE5E7EB))),
+              ),
+              padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 1100),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      for (final item in menuItems)
+                        _MobileLink(
+                          label: item.label,
+                          onTap: () {
+                            _closeMobile();
+                            context.go(item.path);
+                          },
+                        ),
+
+                      const SizedBox(height: 8),
+
+                      if (!isLoggedIn && !isLoading)
+                        _MobilePrimary(
+                          label: "İşletme Girişi",
+                          onTap: () {
+                            _closeMobile();
+                            context.go(Routes.companyAuth);
+                          },
+                        ),
+
+                      const SizedBox(height: 8),
+
+                      if (isLoading)
+                        Container(
+                          height: 44,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFE5E7EB),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        )
+                      else if (!isLoggedIn) ...[
+                        _MobilePrimary(
+                          label: "Öğrenci Girişi",
+                          onTap: () {
+                            _closeMobile();
+                            context.go(Routes.login);
+                          },
+                        ),
+                        const SizedBox(height: 8),
+                        _MobilePrimary(
+                          label: "Kayıt Ol",
+                          onTap: () {
+                            _closeMobile();
+                            context.go(Routes.register);
+                          },
+                        ),
+                      ] else ...[
+                        const SizedBox(height: 10),
+                        Container(
+                          padding: const EdgeInsets.only(top: 12),
+                          decoration: const BoxDecoration(
+                            border: Border(top: BorderSide(color: Color(0xFFE5E7EB))),
+                          ),
+                          child: Column(
+                            children: [
+                              Text(
+                                _displayName(auth),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFF7C3AED),
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              if (isCompany)
+                                const Padding(
+                                  padding: EdgeInsets.only(top: 6),
+                                  child: _TagPill(text: "İşletme"),
+                                ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+
+                        for (final it in dropdownItems)
+                          _MobileLink(
+                            label: it.label,
+                            leading: it.icon,
+                            onTap: () {
+                              _closeMobile();
+                              context.go(it.path);
+                            },
+                          ),
+
+                        const SizedBox(height: 10),
+
+                        _MobileDanger(
+                          label: "Çıkış Yap",
+                          onTap: () async {
+                            _closeMobile();
+                            await ref.read(authActionLoadingProvider.notifier).signOut();
+                            if (context.mounted) context.go(Routes.home);
+                          },
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  String _displayName(AuthViewState? auth) {
+    // If you have full_name in your auth models, plug it here.
+    // For now: role-based placeholder.
+    final t = auth?.userType;
+    if (t == UserType.company) return "Company";
+    if (t == UserType.admin) return "Admin";
+    return "Student";
+  }
+}
+
+class _NavItem {
+  const _NavItem(this.label, this.path, {this.icon});
+  final String label;
+  final String path;
+  final IconData? icon;
+}
+
+class _NavLink extends StatelessWidget {
+  const _NavLink({required this.label, required this.onTap});
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(10),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        child: Text(
+          label,
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF111827), // gray-900
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PrimaryPillButton extends StatefulWidget {
+  const _PrimaryPillButton({required this.label, required this.onTap, this.radius = 10});
+
+  final String label;
+  final VoidCallback onTap;
+  final double radius;
+
+  @override
+  State<_PrimaryPillButton> createState() => _PrimaryPillButtonState();
+}
+
+class _PrimaryPillButtonState extends State<_PrimaryPillButton> {
+  bool _hover = false;
+  static const _purple = Color(0xFF7C3AED);
+  static const _purpleHover = Color(0xFF6D28D9);
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hover = true),
+      onExit: (_) => setState(() => _hover = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 160),
+        transform: Matrix4.identity()..scale(_hover ? 1.05 : 1.0),
+        child: InkWell(
+          onTap: widget.onTap,
+          borderRadius: BorderRadius.circular(widget.radius),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+            decoration: BoxDecoration(
+              color: _hover ? _purpleHover : _purple,
+              borderRadius: BorderRadius.circular(widget.radius),
+              boxShadow: const [
+                BoxShadow(
+                  blurRadius: 6,
+                  offset: Offset(0, 2),
+                  color: Color(0x14000000),
+                ),
+              ],
+            ),
+            child: Text(
+              widget.label,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+                fontSize: 13,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ProfileMenu extends StatelessWidget {
+  const _ProfileMenu({
+    required this.isCompany,
+    required this.label,
+    required this.items,
+    required this.onItemTap,
+    required this.onLogout,
+    this.tag,
+  });
+
+  final bool isCompany;
+  final String label;
+  final String? tag;
+  final List<_NavItem> items;
+  final ValueChanged<String> onItemTap;
+  final Future<void> Function() onLogout;
+
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton<String>(
+      tooltip: '',
+      offset: const Offset(0, 44),
+      onSelected: (value) async {
+        if (value == '__logout__') {
+          await onLogout();
+          return;
+        }
+        onItemTap(value);
+      },
+      itemBuilder: (context) => [
+        for (final it in items)
+          PopupMenuItem<String>(
+            value: it.path,
+            child: Row(
+              children: [
+                if (it.icon != null) ...[
+                  Icon(it.icon, size: 18, color: const Color(0xFF374151)),
+                  const SizedBox(width: 10),
+                ],
+                Text(it.label),
+              ],
+            ),
+          ),
+        const PopupMenuDivider(),
+        PopupMenuItem<String>(
+          value: '__logout__',
+          child: Row(
+            children: const [
+              Icon(Icons.logout, size: 18, color: Color(0xFFDC2626)),
+              SizedBox(width: 10),
+              Text(
+                'Çıkış Yap',
+                style: TextStyle(color: Color(0xFFDC2626), fontWeight: FontWeight.w600),
+              ),
+            ],
+          ),
+        ),
+      ],
+      child: Row(
+        children: [
+          Icon(isCompany ? Icons.apartment : Icons.person, size: 18, color: const Color(0xFF111827)),
+          const SizedBox(width: 8),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+          ),
+          if (tag != null) ...[
+            const SizedBox(width: 8),
+            _TagPill(text: tag!),
+          ],
+          const SizedBox(width: 4),
+          const Icon(Icons.expand_more, size: 18, color: Color(0xFF6B7280)),
+        ],
+      ),
+    );
+  }
+}
+
+class _TagPill extends StatelessWidget {
+  const _TagPill({required this.text});
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF3E8FF), // purple-100
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: const Text(
+        'İşletme',
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          color: Color(0xFF7C3AED),
+        ),
+      ),
+    );
+  }
+}
+
+class _MobileLink extends StatelessWidget {
+  const _MobileLink({required this.label, required this.onTap, this.leading});
+
+  final String label;
+  final VoidCallback onTap;
+  final IconData? leading;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (leading != null) ...[
+              Icon(leading, size: 18, color: const Color(0xFF6B7280)),
+              const SizedBox(width: 10),
+            ],
+            Text(
+              label,
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MobilePrimary extends StatelessWidget {
+  const _MobilePrimary({required this.label, required this.onTap});
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: onTap,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFF7C3AED),
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+      child: Text(label, style: const TextStyle(fontWeight: FontWeight.w700)),
+    );
+  }
+}
+
+class _MobileDanger extends StatelessWidget {
+  const _MobileDanger({required this.label, required this.onTap});
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: onTap,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFFEF4444),
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+      child: Text(label, style: const TextStyle(fontWeight: FontWeight.w700)),
+    );
+  }
+}
+
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 
