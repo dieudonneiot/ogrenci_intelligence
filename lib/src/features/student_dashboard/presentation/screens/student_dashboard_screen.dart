@@ -5,16 +5,16 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/routing/routes.dart';
 import '../../../../features/auth/presentation/controllers/auth_controller.dart';
+import '../../../auth/domain/auth_models.dart';
 import '../../domain/dashboard_application.dart';
 import '../controllers/student_dashboard_controller.dart';
-
+// keep your other imports for StudentDashboardData widgets
 
 class StudentDashboardScreen extends ConsumerWidget {
   const StudentDashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // ✅ Gate by auth first (prevents "No authenticated user" race)
     final authAsync = ref.watch(authViewStateProvider);
 
     if (authAsync.isLoading) {
@@ -29,19 +29,19 @@ class StudentDashboardScreen extends ConsumerWidget {
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Card(
-              elevation: 0,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.lock_outline, size: 38, color: Color(0xFF6D28D9)),
-                    const SizedBox(height: 10),
-                    const Text('Login required', style: TextStyle(fontWeight: FontWeight.w900)),
-                    const SizedBox(height: 8),
-                    const Text('Please login to access your dashboard.', textAlign: TextAlign.center),
-                    const SizedBox(height: 14),
+                    const Icon(Icons.lock_outline, size: 40),
+                    const SizedBox(height: 12),
+                    const Text(
+                      'Please log in to view your dashboard.',
+                      style: TextStyle(fontWeight: FontWeight.w800),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 12),
                     ElevatedButton(
                       onPressed: () => context.go(Routes.login),
                       child: const Text('Go to Login'),
@@ -55,7 +55,11 @@ class StudentDashboardScreen extends ConsumerWidget {
       );
     }
 
-    // ✅ Only load dashboard data when authenticated
+    // Optional safety (router redirect should already enforce)
+    if (auth.userType != UserType.student) {
+      return const Center(child: Text('Not a student account.'));
+    }
+
     final async = ref.watch(studentDashboardProvider);
 
     return async.when(

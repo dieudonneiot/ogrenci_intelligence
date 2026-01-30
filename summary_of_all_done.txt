@@ -5928,10 +5928,11 @@ class StudentDashboardData {
 
 D:\Dev\ogrenci_intelligence\lib\src\features\student_dashboard\data\student_dashboard_repository.dart
 
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/supabase/supabase_service.dart';
-import '../domain/student_dashboard_models.dart';
+import '../domain/dashboard_application.dart';
 
 typedef Json = Map<String, dynamic>;
 
@@ -6114,6 +6115,7 @@ class StudentDashboardRepository {
 }
 
 
+
 ✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 D:\Dev\ogrenci_intelligence\lib\src\features\student_dashboard\presentation\controllers\student_dashboard_controller.dart
 
@@ -6170,35 +6172,73 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/routing/routes.dart';
-import '../../../../shared/widgets/app_navbar.dart';
-import '../../domain/student_dashboard_models.dart';
+import '../../../../features/auth/presentation/controllers/auth_controller.dart';
+import '../../../auth/domain/auth_models.dart';
+import '../../domain/dashboard_application.dart';
 import '../controllers/student_dashboard_controller.dart';
+// keep your other imports for StudentDashboardData widgets
 
 class StudentDashboardScreen extends ConsumerWidget {
   const StudentDashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final async = ref.watch(studentDashboardProvider);
+    final authAsync = ref.watch(authViewStateProvider);
 
-    return Scaffold(
-      body: Column(
-        children: [
-          const AppNavbar(),
-          Expanded(
-            child: async.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => _ErrorState(
-                message: e.toString(),
-                onRetry: () => ref.read(studentDashboardProvider.notifier).refresh(),
-              ),
-              data: (data) => RefreshIndicator(
-                onRefresh: () => ref.read(studentDashboardProvider.notifier).refresh(),
-                child: _DashboardBody(data: data),
+    if (authAsync.isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    final auth = authAsync.value;
+    if (auth == null || !auth.isAuthenticated) {
+      return Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 520),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.lock_outline, size: 40),
+                    const SizedBox(height: 12),
+                    const Text(
+                      'Please log in to view your dashboard.',
+                      style: TextStyle(fontWeight: FontWeight.w800),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 12),
+                    ElevatedButton(
+                      onPressed: () => context.go(Routes.login),
+                      child: const Text('Go to Login'),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
-        ],
+        ),
+      );
+    }
+
+    // Optional safety (router redirect should already enforce)
+    if (auth.userType != UserType.student) {
+      return const Center(child: Text('Not a student account.'));
+    }
+
+    final async = ref.watch(studentDashboardProvider);
+
+    return async.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => _ErrorState(
+        message: e.toString(),
+        onRetry: () => ref.read(studentDashboardProvider.notifier).refresh(),
+      ),
+      data: (data) => RefreshIndicator(
+        onRefresh: () => ref.read(studentDashboardProvider.notifier).refresh(),
+        child: _DashboardBody(data: data),
       ),
     );
   }
@@ -6803,6 +6843,7 @@ class _ErrorState extends StatelessWidget {
     );
   }
 }
+
 
 ✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 
