@@ -4,35 +4,69 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/routing/routes.dart';
-import '../../../../shared/widgets/app_navbar.dart';
+import '../../../../features/auth/presentation/controllers/auth_controller.dart';
 import '../../domain/dashboard_application.dart';
 import '../controllers/student_dashboard_controller.dart';
+
 
 class StudentDashboardScreen extends ConsumerWidget {
   const StudentDashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final async = ref.watch(studentDashboardProvider);
+    // ✅ Gate by auth first (prevents "No authenticated user" race)
+    final authAsync = ref.watch(authViewStateProvider);
 
-    return Scaffold(
-      body: Column(
-        children: [
-          const AppNavbar(),
-          Expanded(
-            child: async.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => _ErrorState(
-                message: e.toString(),
-                onRetry: () => ref.read(studentDashboardProvider.notifier).refresh(),
-              ),
-              data: (data) => RefreshIndicator(
-                onRefresh: () => ref.read(studentDashboardProvider.notifier).refresh(),
-                child: _DashboardBody(data: data),
+    if (authAsync.isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    final auth = authAsync.value;
+    if (auth == null || !auth.isAuthenticated) {
+      return Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 520),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Card(
+              elevation: 0,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.lock_outline, size: 38, color: Color(0xFF6D28D9)),
+                    const SizedBox(height: 10),
+                    const Text('Login required', style: TextStyle(fontWeight: FontWeight.w900)),
+                    const SizedBox(height: 8),
+                    const Text('Please login to access your dashboard.', textAlign: TextAlign.center),
+                    const SizedBox(height: 14),
+                    ElevatedButton(
+                      onPressed: () => context.go(Routes.login),
+                      child: const Text('Go to Login'),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
-        ],
+        ),
+      );
+    }
+
+    // ✅ Only load dashboard data when authenticated
+    final async = ref.watch(studentDashboardProvider);
+
+    return async.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => _ErrorState(
+        message: e.toString(),
+        onRetry: () => ref.read(studentDashboardProvider.notifier).refresh(),
+      ),
+      data: (data) => RefreshIndicator(
+        onRefresh: () => ref.read(studentDashboardProvider.notifier).refresh(),
+        child: _DashboardBody(data: data),
       ),
     );
   }

@@ -161,10 +161,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             path: Routes.adminProfile,
             builder: (_, __) => const PlaceholderView(title: 'Admin Profile'),
           ),
-          GoRoute(
-            path: Routes.dashboard,
-            builder: (context, state) => const StudentDashboardScreen(),
-          ),
         ],
       ),
 
@@ -214,6 +210,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: Routes.companyRegister,
             builder: (_, __) => const CompanyAuthScreen(initialIsLogin: false),
+          ),
+
+           GoRoute(
+            path: Routes.dashboard,
+            builder: (context, state) => const StudentDashboardScreen(),
           ),
 
           // Footer pages (public)

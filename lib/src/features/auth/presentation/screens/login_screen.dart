@@ -103,8 +103,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
     // React behavior: go to `from` if present; otherwise dashboard.
     // Router will still enforce role redirects (admin/company).
-    final target = _resolveFromTarget();
-    context.go(target);
+    final stream = ref.read(authViewStateProvider.stream);
+    await stream.firstWhere((s) => s.isAuthenticated);
+
+    if (!mounted) return;
+    context.go(_resolveFromTarget());
+
   }
 
   @override
