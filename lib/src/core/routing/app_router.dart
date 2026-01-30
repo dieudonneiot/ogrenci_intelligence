@@ -13,6 +13,8 @@ import '../../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/auth/presentation/screens/reset_password_screen.dart';
+import '../../features/home/presentation/screens/home_screen.dart';
+import '../../shared/widgets/app_navbar.dart';
 import '../../shared/widgets/empty_state.dart';
 import 'route_guards.dart';
 import 'routes.dart';
@@ -158,6 +160,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             path: Routes.adminProfile,
             builder: (_, __) => const PlaceholderView(title: 'Admin Profile'),
           ),
+          GoRoute(
+            path: Routes.home,
+            builder: (_, __) => const HomeScreen(),
+          ),
+
         ],
       ),
 
@@ -395,7 +402,7 @@ class GoRouterRefreshStream extends ChangeNotifier {
   }
 }
 
-/// Main Shell (temporary)
+/// Main Shell (React-like Navbar + Footer)
 class MainShell extends StatelessWidget {
   const MainShell({super.key, required this.child});
   final Widget child;
@@ -403,9 +410,10 @@ class MainShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Öğrenci Intelligence')),
+      // ✅ No AppBar (we reproduce React navbar)
       body: Column(
         children: [
+          const AppNavbar(), // sticky-like top
           Expanded(child: child),
           const _Footer(),
         ],
