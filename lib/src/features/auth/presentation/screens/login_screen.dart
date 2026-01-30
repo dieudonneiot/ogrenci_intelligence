@@ -92,6 +92,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       return;
     }
 
+    final user = ref.read(authViewStateProvider).value?.user;
+    if (user != null && user.emailConfirmedAt == null) {
+      final uri = Uri(
+        path: Routes.emailVerification,
+        queryParameters: {'email': email},
+      ).toString();
+      context.go(uri);
+      return;
+    }
     // React behavior: go to `from` if present; otherwise dashboard.
     // Router will still enforce role redirects (admin/company).
     final target = _resolveFromTarget();

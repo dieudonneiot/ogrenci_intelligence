@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/routing/routes.dart';
@@ -123,7 +124,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       queryParameters: {'email': email},
     ).toString();
 
-    Navigator.of(context).pushReplacementNamed(uri);
+    context.go(uri);
   }
 
   @override
@@ -261,7 +262,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               children: [
                                 const Text('I accept '),
                                 GestureDetector(
-                                  onTap: () => Navigator.of(context).pushNamed(Routes.terms),
+                                  onTap: () => context.push(Routes.terms),
                                   child: Text(
                                     'Terms of Service',
                                     style: TextStyle(
@@ -272,7 +273,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                 ),
                                 const Text(' and '),
                                 GestureDetector(
-                                  onTap: () => Navigator.of(context).pushNamed(Routes.privacy),
+                                  onTap: () => context.push(Routes.privacy),
                                   child: Text(
                                     'Privacy Policy',
                                     style: TextStyle(
@@ -320,7 +321,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     const SizedBox(height: 10),
 
                     OutlinedButton(
-                      onPressed: () => Navigator.of(context).pushNamed(Routes.companyAuth),
+                      onPressed: () => context.push(Routes.companyAuth),
                       child: const Text('Register as company'),
                     ),
 
@@ -331,7 +332,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       children: [
                         const Text('Already have an account? '),
                         TextButton(
-                          onPressed: () => Navigator.of(context).pushNamed(Routes.login),
+                          onPressed: () => context.go(Routes.login),
                           child: const Text('Login'),
                         ),
                       ],

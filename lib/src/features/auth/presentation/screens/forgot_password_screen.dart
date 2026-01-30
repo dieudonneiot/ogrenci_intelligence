@@ -1,6 +1,7 @@
 // lib/src/features/auth/presentation/screens/forgot_password_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/routing/routes.dart';
 import '../controllers/auth_controller.dart';
 
@@ -85,7 +86,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                       ),
                       const SizedBox(height: 14),
                       TextButton(
-                        onPressed: () => Navigator.of(context).pushNamed(Routes.login),
+                        onPressed: () => context.go(Routes.login),
                         child: const Text('Back to Login'),
                       ),
                     ],
@@ -183,7 +184,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                     const SizedBox(height: 10),
 
                     TextButton.icon(
-                      onPressed: () => Navigator.of(context).pushNamed(Routes.login),
+                      onPressed: () => context.go(Routes.login),
                       icon: const Icon(Icons.arrow_back),
                       label: const Text('Back to Login'),
                     ),

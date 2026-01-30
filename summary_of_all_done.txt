@@ -1783,7 +1783,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       setState(() => _error = err);
       return;
     }
-
+    final user = ref.read(authViewStateProvider).value?.user;
+    if (user != null && user.emailConfirmedAt == null) {
+      final uri = Uri(
+        path: Routes.emailVerification,
+        queryParameters: {'email': email},
+      ).toString();
+      context.go(uri);
+      return;
+    }
     // React behavior: go to `from` if present; otherwise dashboard.
     // Router will still enforce role redirects (admin/company).
     final target = _resolveFromTarget();
@@ -1946,6 +1954,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/routing/routes.dart';
@@ -2070,7 +2079,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       queryParameters: {'email': email},
     ).toString();
 
-    Navigator.of(context).pushReplacementNamed(uri);
+    context.go(uri);
   }
 
   @override
@@ -2208,7 +2217,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               children: [
                                 const Text('I accept '),
                                 GestureDetector(
-                                  onTap: () => Navigator.of(context).pushNamed(Routes.terms),
+                                  onTap: () => context.push(Routes.terms),
                                   child: Text(
                                     'Terms of Service',
                                     style: TextStyle(
@@ -2219,7 +2228,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                 ),
                                 const Text(' and '),
                                 GestureDetector(
-                                  onTap: () => Navigator.of(context).pushNamed(Routes.privacy),
+                                  onTap: () => context.push(Routes.privacy),
                                   child: Text(
                                     'Privacy Policy',
                                     style: TextStyle(
@@ -2267,7 +2276,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     const SizedBox(height: 10),
 
                     OutlinedButton(
-                      onPressed: () => Navigator.of(context).pushNamed(Routes.companyAuth),
+                      onPressed: () => context.push(Routes.companyAuth),
                       child: const Text('Register as company'),
                     ),
 
@@ -2278,7 +2287,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       children: [
                         const Text('Already have an account? '),
                         TextButton(
-                          onPressed: () => Navigator.of(context).pushNamed(Routes.login),
+                          onPressed: () => context.go(Routes.login),
                           child: const Text('Login'),
                         ),
                       ],
@@ -2295,13 +2304,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 }
 
 
+
 ✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 // lib/src/features/auth/presentation/screens/forgot_password_screen.dart
 
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import 'package:go_router/go_router.dart';
 import '../../../../core/routing/routes.dart';
 import '../controllers/auth_controller.dart';
 
