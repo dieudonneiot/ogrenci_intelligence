@@ -160,11 +160,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             path: Routes.adminProfile,
             builder: (_, __) => const PlaceholderView(title: 'Admin Profile'),
           ),
-          GoRoute(
-            path: Routes.home,
-            builder: (_, __) => const HomeScreen(),
-          ),
-
         ],
       ),
 
@@ -177,7 +172,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           // Public
           GoRoute(
             path: Routes.home,
-            builder: (_, __) => const PlaceholderView(title: 'Home'),
+            builder: (_, __) => const HomeScreen(),
           ),
 
           // Auth screens
