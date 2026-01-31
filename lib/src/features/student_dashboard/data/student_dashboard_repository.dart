@@ -32,7 +32,7 @@ class StudentDashboardRepository {
     final completedRows = await _client
         .from('completed_courses')
         .select('id')
-        .eq('user_id', userId);
+        .eq('id', userId);
 
     final coursesCompleted = completedRows.length;
 
@@ -40,7 +40,7 @@ class StudentDashboardRepository {
     final ongoingEnrollRows = await _client
         .from('course_enrollments')
         .select('course_id, progress, enrolled_at')
-        .eq('user_id', userId)
+        .eq('id', userId)
         .lt('progress', 100)
         .order('enrolled_at', ascending: false);
 
@@ -95,13 +95,13 @@ class StudentDashboardRepository {
     final jobPending = await _client
         .from('job_applications')
         .select('id')
-        .eq('user_id', userId)
+        .eq('id', userId)
         .eq('status', 'pending');
 
     final internshipPending = await _client
         .from('internship_applications')
         .select('id')
-        .eq('user_id', userId)
+        .eq('id', userId)
         .eq('status', 'pending');
 
     final activeApplications = jobPending.length + internshipPending.length;
@@ -111,7 +111,7 @@ class StudentDashboardRepository {
     final lb = await _client
         .from('leaderboard_snapshots')
         .select('rank_department, created_at')
-        .eq('user_id', userId)
+        .eq('id', userId)
         .order('created_at', ascending: false)
         .limit(1);
 
@@ -123,7 +123,7 @@ class StudentDashboardRepository {
     final activityRows = await _client
         .from('activity_logs')
         .select('category, action, points, created_at')
-        .eq('user_id', userId)
+        .eq('id', userId)
         .order('created_at', ascending: false)
         .limit(6);
 
@@ -146,13 +146,13 @@ class StudentDashboardRepository {
     final todayRows = await _client
         .from('activity_logs')
         .select('points, created_at')
-        .eq('user_id', userId)
+        .eq('id', userId)
         .gte('created_at', startOfDay.toUtc().toIso8601String());
 
     final weekRows = await _client
         .from('activity_logs')
         .select('points, created_at')
-        .eq('user_id', userId)
+        .eq('id', userId)
         .gte('created_at', startOfWeek.toUtc().toIso8601String());
 
     final todayPoints = todayRows.fold<int>(0, (sum, r) => sum + ((r['points'] as int?) ?? 0));

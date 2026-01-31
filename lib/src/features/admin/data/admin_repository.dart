@@ -10,7 +10,7 @@ class AdminRepository {
     final row = await _client
         .from('admins')
         .select('*')
-        .eq('user_id', userId)
+        .eq('id', userId)
         .eq('is_active', true)
         .maybeSingle();
 

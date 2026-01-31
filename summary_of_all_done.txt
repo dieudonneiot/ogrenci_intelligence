@@ -863,7 +863,7 @@ class AuthRepository {
     final row = await _client
         .from('company_users')
         .select('company_id, role')
-        .eq('user_id', userId)
+        .eq('id', userId)
         .maybeSingle();
 
     if (row == null) return null;
@@ -1231,7 +1231,7 @@ class AdminRepository {
     final row = await _client
         .from('admins')
         .select('*')
-        .eq('user_id', userId)
+        .eq('id', userId)
         .eq('is_active', true)
         .maybeSingle();
 
@@ -1711,7 +1711,7 @@ class CompanyRepository {
     final row = await _client
         .from('company_users')
         .select('company_id, role')
-        .eq('user_id', userId)
+        .eq('id', userId)
         .maybeSingle();
 
     if (row == null) return null;
@@ -6010,7 +6010,7 @@ class StudentDashboardRepository {
     final completedRows = await _client
         .from('completed_courses')
         .select('id')
-        .eq('user_id', userId);
+        .eq('id', userId);
 
     final coursesCompleted = completedRows.length;
 
@@ -6018,7 +6018,7 @@ class StudentDashboardRepository {
     final ongoingEnrollRows = await _client
         .from('course_enrollments')
         .select('course_id, progress, enrolled_at')
-        .eq('user_id', userId)
+        .eq('id', userId)
         .lt('progress', 100)
         .order('enrolled_at', ascending: false);
 
@@ -6072,13 +6072,13 @@ class StudentDashboardRepository {
     final jobPending = await _client
         .from('job_applications')
         .select('id')
-        .eq('user_id', userId)
+        .eq('id', userId)
         .eq('status', 'pending');
 
     final internshipPending = await _client
         .from('internship_applications')
         .select('id')
-        .eq('user_id', userId)
+        .eq('id', userId)
         .eq('status', 'pending');
 
     final activeApplications = jobPending.length + internshipPending.length;
@@ -6088,7 +6088,7 @@ class StudentDashboardRepository {
     final lb = await _client
         .from('leaderboard_snapshots')
         .select('rank_department, created_at')
-        .eq('user_id', userId)
+        .eq('id', userId)
         .order('created_at', ascending: false)
         .limit(1);
 
@@ -6100,7 +6100,7 @@ class StudentDashboardRepository {
     final activityRows = await _client
         .from('activity_logs')
         .select('category, action, points, created_at')
-        .eq('user_id', userId)
+        .eq('id', userId)
         .order('created_at', ascending: false)
         .limit(6);
 
@@ -6123,13 +6123,13 @@ class StudentDashboardRepository {
     final todayRows = await _client
         .from('activity_logs')
         .select('points, created_at')
-        .eq('user_id', userId)
+        .eq('id', userId)
         .gte('created_at', startOfDay.toUtc().toIso8601String());
 
     final weekRows = await _client
         .from('activity_logs')
         .select('points, created_at')
-        .eq('user_id', userId)
+        .eq('id', userId)
         .gte('created_at', startOfWeek.toUtc().toIso8601String());
 
     final todayPoints = todayRows.fold<int>(0, (sum, r) => sum + ((r['points'] as int?) ?? 0));
@@ -7129,7 +7129,7 @@ class CoursesRepository {
     final rows = await _client
         .from('course_enrollments')
         .select('id,user_id,course_id,enrolled_at,progress')
-        .eq('user_id', userId)
+        .eq('id', userId)
         .eq('course_id', courseId)
         .limit(1) as List<dynamic>;
 
@@ -7145,7 +7145,7 @@ class CoursesRepository {
           'id,user_id,course_id,enrolled_at,progress,'
           'courses(id,title,description,department,video_url,duration,level,instructor)',
         )
-        .eq('user_id', userId)
+        .eq('id', userId)
         .order('enrolled_at', ascending: false) as List<dynamic>;
 
     return rows.map((r) {
@@ -7183,7 +7183,7 @@ final courseMap = rawCourse == null ? null : Map<String, dynamic>.from(rawCourse
     await _client
         .from('course_enrollments')
         .delete()
-        .eq('user_id', userId)
+        .eq('id', userId)
         .eq('course_id', courseId);
   }
 
@@ -9628,7 +9628,7 @@ class PointsRepository {
     final res = await SupabaseService.client
         .from('profiles')
         .select('total_points')
-        .eq('user_id', userId)
+        .eq('id', userId)
         .maybeSingle();
 
     if (res == null) return 0;
@@ -9639,7 +9639,7 @@ class PointsRepository {
     final rows = await SupabaseService.client
         .from('user_points')
         .select('id, source, description, points, created_at')
-        .eq('user_id', userId)
+        .eq('id', userId)
         .order('created_at', ascending: false)
         .limit(limit);
 
@@ -9659,7 +9659,7 @@ class PointsRepository {
     final rows = await SupabaseService.client
         .from('user_badges')
         .select('id, badge_type, badge_title, badge_description, icon, earned_at, points_awarded')
-        .eq('user_id', userId)
+        .eq('id', userId)
         .order('earned_at', ascending: false);
 
     return (rows as List).map((e) => UserBadge.fromMap(e as Map<String, dynamic>)).toList();

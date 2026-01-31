@@ -53,7 +53,7 @@ class CoursesRepository {
     final rows = await _client
         .from('course_enrollments')
         .select('id,user_id,course_id,enrolled_at,progress')
-        .eq('user_id', userId)
+        .eq('id', userId)
         .eq('course_id', courseId)
         .limit(1) as List<dynamic>;
 
@@ -69,7 +69,7 @@ class CoursesRepository {
           'id,user_id,course_id,enrolled_at,progress,'
           'courses(id,title,description,department,video_url,duration,level,instructor)',
         )
-        .eq('user_id', userId)
+        .eq('id', userId)
         .order('enrolled_at', ascending: false) as List<dynamic>;
 
     return rows.map((r) {
@@ -107,7 +107,7 @@ final courseMap = rawCourse == null ? null : Map<String, dynamic>.from(rawCourse
     await _client
         .from('course_enrollments')
         .delete()
-        .eq('user_id', userId)
+        .eq('id', userId)
         .eq('course_id', courseId);
   }
 

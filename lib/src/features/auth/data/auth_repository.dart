@@ -103,7 +103,7 @@ class AuthRepository {
     final row = await _client
         .from('company_users')
         .select('company_id, role')
-        .eq('user_id', userId)
+        .eq('id', userId)
         .maybeSingle();
 
     if (row == null) return null;
