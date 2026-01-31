@@ -5978,199 +5978,286 @@ D:\Dev\ogrenci_intelligence\lib\src\features\student_dashboard\data\student_dash
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../core/supabase/supabase_service.dart';
 import '../domain/student_dashboard_models.dart';
 
 class StudentDashboardRepository {
-  StudentDashboardRepository(this._client);
+  StudentDashboardRepository({SupabaseClient? client})
+      : _client = client ?? SupabaseService.client;
 
   final SupabaseClient _client;
 
-  Future<StudentDashboardVm> fetchDashboard({required String userId}) async {
-    // 1) Profile: name + points (+ department)
-    final profileRows = await _client
+  Future<_ProfileInfo> getProfile(String uid) async {
+    final rows = await _client
         .from('profiles')
-        .select('id, email, full_name, total_points, department')
-        .eq('id', userId)
-        .limit(1);
+        .select('id,full_name,department,total_points')
+        .eq('id', uid)
+        .limit(1) as List<dynamic>;
 
-    final profile = profileRows.isNotEmpty ? profileRows.first : <String, dynamic>{};
+    if (rows.isEmpty) {
+      return _ProfileInfo(uid: uid, fullName: null, department: null, totalPoints: 0);
+    }
 
-    final fullName = (profile['full_name'] as String?)?.trim();
-    final email = (profile['email'] as String?)?.trim();
+    final m = rows.first as Map<String, dynamic>;
+    return _ProfileInfo(
+      uid: uid,
+      fullName: (m['full_name'] as String?)?.trim(),
+      department: (m['department'] as String?)?.trim(),
+      totalPoints: (m['total_points'] as num?)?.toInt() ?? 0,
+    );
+  }
 
-    final displayName = (fullName != null && fullName.isNotEmpty)
-        ? fullName
-        : (email != null && email.contains('@'))
-            ? email.split('@').first
-            : 'Öğrenci';
+  Future<int?> getLatestDepartmentRank(String uid) async {
+    final rows = await _client
+        .from('leaderboard_snapshots')
+        .select('rank_department,period_end')
+        .eq('user_id', uid)
+        .order('period_end', ascending: false)
+        .limit(1) as List<dynamic>;
 
-    final totalPoints = (profile['total_points'] as int?) ?? 0;
+    if (rows.isEmpty) return null;
+    final m = rows.first as Map<String, dynamic>;
+    return (m['rank_department'] as num?)?.toInt();
+  }
 
-    // 2) Completed courses count
+  Future<_Counts> getCounts(String uid) async {
     final completedRows = await _client
         .from('completed_courses')
         .select('id')
-        .eq('id', userId);
+        .eq('user_id', uid) as List<dynamic>;
 
-    final coursesCompleted = completedRows.length;
-
-    // 3) Ongoing courses count + list (progress < 100)
-    final ongoingEnrollRows = await _client
+    final enrollRows = await _client
         .from('course_enrollments')
-        .select('course_id, progress, enrolled_at')
-        .eq('id', userId)
-        .lt('progress', 100)
-        .order('enrolled_at', ascending: false);
+        .select('id,progress')
+        .eq('user_id', uid) as List<dynamic>;
 
-    final ongoingCoursesCount = ongoingEnrollRows.length;
+    final ongoing = enrollRows.where((e) {
+      final m = e as Map<String, dynamic>;
+      final p = (m['progress'] as num?)?.toInt() ?? 0;
+      return p < 100;
+    }).length;
 
-    // take top 3 for the dashboard card
-    final ongoingTop = ongoingEnrollRows.take(3).toList();
-    final courseIds = ongoingTop
-        .map((e) => (e['course_id'] as String?) ?? '')
-        .where((id) => id.isNotEmpty)
-        .toList();
-
-    Map<String, Map<String, dynamic>> courseById = {};
-    if (courseIds.isNotEmpty) {
-      final courseRows = await _client
-          .from('courses')
-          .select('id, title, description, duration, level')
-          .inFilter('id', courseIds);
-
-      courseById = {
-        for (final r in courseRows)
-          (r['id'] as String): (r as Map<String, dynamic>),
-      };
-    }
-
-    final enrolledCourses = <EnrolledCourse>[
-      for (final enr in ongoingTop)
-        () {
-          final cid = (enr['course_id'] as String?) ?? '';
-          final c = courseById[cid] ?? const <String, dynamic>{};
-
-          final title = (c['title'] as String?) ?? 'Kurs';
-          final description = (c['description'] as String?) ?? '';
-          final duration = (c['duration'] as String?) ?? '';
-          final level = (c['level'] as String?) ?? '';
-
-          final progress = (enr['progress'] as int?) ?? 0;
-
-          return EnrolledCourse(
-            courseId: cid,
-            title: title,
-            description: description,
-            duration: duration,
-            level: level,
-            progress: progress.clamp(0, 100),
-          );
-        }(),
-    ];
-
-    // 4) Active applications count (pending)
     final jobPending = await _client
         .from('job_applications')
         .select('id')
-        .eq('id', userId)
-        .eq('status', 'pending');
+        .eq('user_id', uid)
+        .eq('status', 'pending') as List<dynamic>;
 
     final internshipPending = await _client
         .from('internship_applications')
         .select('id')
-        .eq('id', userId)
-        .eq('status', 'pending');
+        .eq('user_id', uid)
+        .eq('status', 'pending') as List<dynamic>;
 
-    final activeApplications = jobPending.length + internshipPending.length;
-
-    // 5) Department rank (optional): latest snapshot for user
-    int? departmentRank;
-    final lb = await _client
-        .from('leaderboard_snapshots')
-        .select('rank_department, created_at')
-        .eq('id', userId)
-        .order('created_at', ascending: false)
-        .limit(1);
-
-    if (lb.isNotEmpty) {
-      departmentRank = (lb.first['rank_department'] as int?);
-    }
-
-    // 6) Activities (from activity_logs)
-    final activityRows = await _client
-        .from('activity_logs')
-        .select('category, action, points, created_at')
-        .eq('id', userId)
-        .order('created_at', ascending: false)
-        .limit(6);
-
-    final activities = <ActivityItem>[
-      for (final r in activityRows)
-        ActivityItem(
-          category: _mapCategory((r['category'] as String?) ?? ''),
-          action: (r['action'] as String?) ?? '',
-          points: (r['points'] as int?) ?? 0,
-          createdAt: DateTime.tryParse((r['created_at'] as String?) ?? '')?.toLocal() ??
-              DateTime.now(),
-        ),
-    ];
-
-    // 7) Today + week points (sum activity_logs.points)
-    final now = DateTime.now();
-    final startOfDay = DateTime(now.year, now.month, now.day);
-    final startOfWeek = startOfDay.subtract(Duration(days: now.weekday - 1)); // Monday
-
-    final todayRows = await _client
-        .from('activity_logs')
-        .select('points, created_at')
-        .eq('id', userId)
-        .gte('created_at', startOfDay.toUtc().toIso8601String());
-
-    final weekRows = await _client
-        .from('activity_logs')
-        .select('points, created_at')
-        .eq('id', userId)
-        .gte('created_at', startOfWeek.toUtc().toIso8601String());
-
-    final todayPoints = todayRows.fold<int>(0, (sum, r) => sum + ((r['points'] as int?) ?? 0));
-    final weekPoints = weekRows.fold<int>(0, (sum, r) => sum + ((r['points'] as int?) ?? 0));
-
-    final stats = DashboardStats(
-      totalPoints: totalPoints,
-      coursesCompleted: coursesCompleted,
-      activeApplications: activeApplications,
-      ongoingCourses: ongoingCoursesCount,
-      departmentRank: departmentRank,
-    );
-
-    return StudentDashboardVm(
-      displayName: displayName,
-      stats: stats,
-      enrolledCourses: enrolledCourses,
-      activities: activities,
-      todayPoints: todayPoints,
-      weekPoints: weekPoints,
+    return _Counts(
+      coursesCompleted: completedRows.length,
+      ongoingCourses: ongoing,
+      activeApplications: jobPending.length + internshipPending.length,
     );
   }
 
-  static ActivityCategory _mapCategory(String raw) {
-    switch (raw.trim().toLowerCase()) {
-      case 'course':
-        return ActivityCategory.course;
-      case 'job':
-        return ActivityCategory.job;
-      case 'internship':
-        return ActivityCategory.internship;
-      case 'achievement':
-        return ActivityCategory.achievement;
-      case 'platform':
-        return ActivityCategory.platform;
-      default:
-        return ActivityCategory.platform;
+  Future<int> sumPointsSince(String uid, DateTime fromUtc) async {
+    final rows = await _client
+        .from('user_points')
+        .select('points,created_at')
+        .eq('user_id', uid)
+        .gte('created_at', fromUtc.toIso8601String())
+        .order('created_at', ascending: false) as List<dynamic>;
+
+    var sum = 0;
+    for (final r in rows) {
+      final m = r as Map<String, dynamic>;
+      sum += (m['points'] as num?)?.toInt() ?? 0;
     }
+    return sum;
+  }
+
+  Future<List<DashboardEnrolledCourse>> listOngoingCourses({
+    required String uid,
+    int limit = 3,
+  }) async {
+    final rows = await _client
+        .from('course_enrollments')
+        .select('progress,enrolled_at,courses(id,title,description,duration,level)')
+        .eq('user_id', uid)
+        .lt('progress', 100)
+        .order('enrolled_at', ascending: false)
+        .limit(limit) as List<dynamic>;
+
+    return rows.map((r) {
+      final m = r as Map<String, dynamic>;
+      final p = (m['progress'] as num?)?.toInt() ?? 0;
+
+      final c = (m['courses'] as Map<String, dynamic>?) ?? const <String, dynamic>{};
+
+      return DashboardEnrolledCourse(
+        courseId: (c['id']?.toString() ?? ''),
+        title: (c['title'] as String?) ?? 'Course',
+        description: (c['description'] as String?) ?? 'Açıklama yok.',
+        duration: (c['duration'] as String?) ?? '—',
+        level: (c['level'] as String?) ?? '—',
+        progress: p.clamp(0, 100),
+      );
+    }).toList();
+  }
+
+  Future<List<ActivityItem>> listActivities({
+    required String uid,
+    int limit = 8,
+  }) async {
+    final List<ActivityItem> items = [];
+
+    // 1) Points ledger
+    final pointsRows = await _client
+        .from('user_points')
+        .select('points,event_type,description,created_at')
+        .eq('user_id', uid)
+        .order('created_at', ascending: false)
+        .limit(10) as List<dynamic>;
+
+    for (final r in pointsRows) {
+      final m = r as Map<String, dynamic>;
+      final pts = (m['points'] as num?)?.toInt() ?? 0;
+      final type = (m['event_type'] as String?) ?? '';
+      final desc = (m['description'] as String?) ?? 'Puan kazanıldı';
+      final created = DateTime.tryParse(m['created_at']?.toString() ?? '') ?? DateTime.now();
+
+      items.add(ActivityItem(
+        category: _mapEventType(type),
+        action: desc,
+        points: pts,
+        createdAt: created,
+      ));
+    }
+
+    // 2) Course completions
+    final completedRows = await _client
+        .from('completed_courses')
+        .select('created_at,courses(title)')
+        .eq('user_id', uid)
+        .order('created_at', ascending: false)
+        .limit(5) as List<dynamic>;
+
+    for (final r in completedRows) {
+      final m = r as Map<String, dynamic>;
+      final c = (m['courses'] as Map<String, dynamic>?) ?? const <String, dynamic>{};
+      final title = (c['title'] as String?) ?? 'Kurs';
+      final created = DateTime.tryParse(m['created_at']?.toString() ?? '') ?? DateTime.now();
+
+      items.add(ActivityItem(
+        category: ActivityCategory.course,
+        action: 'Kurs tamamlandı: $title',
+        points: 0,
+        createdAt: created,
+      ));
+    }
+
+    // 3) Job applications
+    final jobRows = await _client
+        .from('job_applications')
+        .select('created_at,status,jobs(title)')
+        .eq('user_id', uid)
+        .order('created_at', ascending: false)
+        .limit(5) as List<dynamic>;
+
+    for (final r in jobRows) {
+      final m = r as Map<String, dynamic>;
+      final j = (m['jobs'] as Map<String, dynamic>?) ?? const <String, dynamic>{};
+      final title = (j['title'] as String?) ?? 'İş';
+      final created = DateTime.tryParse(m['created_at']?.toString() ?? '') ?? DateTime.now();
+
+      items.add(ActivityItem(
+        category: ActivityCategory.job,
+        action: 'İş başvurusu: $title',
+        points: 0,
+        createdAt: created,
+      ));
+    }
+
+    // 4) Internship applications
+    final internRows = await _client
+        .from('internship_applications')
+        .select('created_at,status,internships(title)')
+        .eq('user_id', uid)
+        .order('created_at', ascending: false)
+        .limit(5) as List<dynamic>;
+
+    for (final r in internRows) {
+      final m = r as Map<String, dynamic>;
+      final it = (m['internships'] as Map<String, dynamic>?) ?? const <String, dynamic>{};
+      final title = (it['title'] as String?) ?? 'Staj';
+      final created = DateTime.tryParse(m['created_at']?.toString() ?? '') ?? DateTime.now();
+
+      items.add(ActivityItem(
+        category: ActivityCategory.internship,
+        action: 'Staj başvurusu: $title',
+        points: 0,
+        createdAt: created,
+      ));
+    }
+
+    // 5) Badges
+    final badgeRows = await _client
+        .from('user_badges')
+        .select('earned_at,badges(name)')
+        .eq('user_id', uid)
+        .order('earned_at', ascending: false)
+        .limit(5) as List<dynamic>;
+
+    for (final r in badgeRows) {
+      final m = r as Map<String, dynamic>;
+      final b = (m['badges'] as Map<String, dynamic>?) ?? const <String, dynamic>{};
+      final name = (b['name'] as String?) ?? 'Rozet';
+      final created = DateTime.tryParse(m['earned_at']?.toString() ?? '') ?? DateTime.now();
+
+      items.add(ActivityItem(
+        category: ActivityCategory.achievement,
+        action: 'Rozet kazanıldı: $name',
+        points: 0,
+        createdAt: created,
+      ));
+    }
+
+    items.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    if (items.length > limit) return items.take(limit).toList();
+    return items;
+  }
+
+  static ActivityCategory _mapEventType(String eventType) {
+    final t = eventType.toLowerCase();
+    if (t.contains('course')) return ActivityCategory.course;
+    if (t.contains('job')) return ActivityCategory.job;
+    if (t.contains('intern')) return ActivityCategory.internship;
+    if (t.contains('badge') || t.contains('achievement')) return ActivityCategory.achievement;
+    return ActivityCategory.platform;
   }
 }
 
+class _ProfileInfo {
+  const _ProfileInfo({
+    required this.uid,
+    required this.fullName,
+    required this.department,
+    required this.totalPoints,
+  });
+
+  final String uid;
+  final String? fullName;
+  final String? department;
+  final int totalPoints;
+}
+
+class _Counts {
+  const _Counts({
+    required this.coursesCompleted,
+    required this.activeApplications,
+    required this.ongoingCourses,
+  });
+
+  final int coursesCompleted;
+  final int activeApplications;
+  final int ongoingCourses;
+}
 
 
 ✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
@@ -6185,17 +6272,17 @@ import '../../data/student_dashboard_repository.dart';
 import '../../domain/student_dashboard_models.dart';
 
 final studentDashboardRepositoryProvider = Provider<StudentDashboardRepository>((ref) {
-  return StudentDashboardRepository(Supabase.instance.client);
+  return StudentDashboardRepository(client: Supabase.instance.client);
 });
 
 final studentDashboardProvider =
-    AutoDisposeAsyncNotifierProvider<StudentDashboardController, StudentDashboardVm>(
+    AutoDisposeAsyncNotifierProvider<StudentDashboardController, StudentDashboardViewModel>(
   StudentDashboardController.new,
 );
 
-class StudentDashboardController extends AutoDisposeAsyncNotifier<StudentDashboardVm> {
+class StudentDashboardController extends AutoDisposeAsyncNotifier<StudentDashboardViewModel> {
   @override
-  Future<StudentDashboardVm> build() async {
+  Future<StudentDashboardViewModel> build() async {
     final auth = ref.watch(authViewStateProvider).value;
     final userId = auth?.user?.id;
 
@@ -6204,7 +6291,7 @@ class StudentDashboardController extends AutoDisposeAsyncNotifier<StudentDashboa
     }
 
     final repo = ref.watch(studentDashboardRepositoryProvider);
-    return repo.fetchDashboard(userId: userId);
+    return repo.fetchDashboard(uid: userId);
   }
 
   Future<void> refresh() async {
@@ -6223,8 +6310,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/routing/routes.dart';
+import '../../application/student_dashboard_providers.dart';
 import '../../domain/student_dashboard_models.dart';
-import '../controllers/student_dashboard_controller.dart';
 
 class StudentDashboardScreen extends ConsumerWidget {
   const StudentDashboardScreen({super.key});
@@ -6233,41 +6320,39 @@ class StudentDashboardScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final dashAsync = ref.watch(studentDashboardProvider);
 
-    // NOTE: MainShell already provides Scaffold + Navbar + Footer.
-    // So this screen should be BODY content, not another Scaffold.
     return dashAsync.when(
       loading: () => const _DashboardLoading(),
-        error: (e, _) => Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.error_outline, size: 48, color: Color(0xFFEF4444)),
-                const SizedBox(height: 12),
-                const Text(
-                  'Dashboard yüklenemedi',
-                  style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+      error: (e, _) => Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.error_outline, size: 48, color: Color(0xFFEF4444)),
+              const SizedBox(height: 12),
+              const Text(
+                'Dashboard yüklenemedi',
+                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                e.toString(),
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 14),
+              SizedBox(
+                height: 44,
+                child: ElevatedButton(
+                  onPressed: () => ref.read(studentDashboardProvider.notifier).refresh(),
+                  child: const Text('Tekrar dene'),
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  e.toString(),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
-                ),
-                const SizedBox(height: 14),
-                SizedBox(
-                  height: 44,
-                  child: ElevatedButton(
-                    onPressed: () => ref.read(studentDashboardProvider.notifier).refresh(),
-                    child: const Text('Tekrar dene'),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
-              data: (vm) {
+      ),
+      data: (vm) {
         final stats = vm.stats;
 
         return Container(
@@ -6284,7 +6369,6 @@ class StudentDashboardScreen extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Welcome
                         Text(
                           'Hoş Geldin, ${vm.displayName}! 👋',
                           style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900),
@@ -6292,14 +6376,10 @@ class StudentDashboardScreen extends ConsumerWidget {
                         const SizedBox(height: 6),
                         const Text(
                           'Bugün kariyerine yön verecek yeni fırsatlar seni bekliyor.',
-                          style: TextStyle(
-                            color: Color(0xFF6B7280),
-                            fontWeight: FontWeight.w700,
-                          ),
+                          style: TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
                         ),
                         const SizedBox(height: 18),
 
-                        // Stats cards (4)
                         LayoutBuilder(
                           builder: (_, c) {
                             final w = c.maxWidth;
@@ -6350,7 +6430,6 @@ class StudentDashboardScreen extends ConsumerWidget {
                               );
                             }
 
-                            // 2x2 wrap on smaller screens
                             final half = (w - 14) / 2;
                             return Wrap(
                               spacing: 14,
@@ -6362,7 +6441,6 @@ class StudentDashboardScreen extends ConsumerWidget {
 
                         const SizedBox(height: 16),
 
-                        // Big Points Widget (gradient)
                         _PointsHero(
                           totalPoints: stats.totalPoints,
                           departmentRank: stats.departmentRank,
@@ -6376,7 +6454,6 @@ class StudentDashboardScreen extends ConsumerWidget {
 
                         const SizedBox(height: 18),
 
-                        // 2-col grid: left = ongoing courses, right = activities
                         LayoutBuilder(
                           builder: (_, c) {
                             final isWide = c.maxWidth >= 1024;
@@ -6470,9 +6547,7 @@ class _StatCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: const [
-          BoxShadow(color: Color(0x0A000000), blurRadius: 18, offset: Offset(0, 8)),
-        ],
+        boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 18, offset: Offset(0, 8))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -6482,10 +6557,7 @@ class _StatCard extends StatelessWidget {
               Container(
                 width: 46,
                 height: 46,
-                decoration: BoxDecoration(
-                  color: iconBg,
-                  borderRadius: BorderRadius.circular(14),
-                ),
+                decoration: BoxDecoration(color: iconBg, borderRadius: BorderRadius.circular(14)),
                 child: Icon(icon, color: iconColor),
               ),
               const Spacer(),
@@ -6541,9 +6613,7 @@ class _PointsHero extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        boxShadow: const [
-          BoxShadow(color: Color(0x22000000), blurRadius: 22, offset: Offset(0, 10)),
-        ],
+        boxShadow: const [BoxShadow(color: Color(0x22000000), blurRadius: 22, offset: Offset(0, 10))],
       ),
       child: Column(
         children: [
@@ -6695,8 +6765,7 @@ class _MiniMetric extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Text(title,
-              style: const TextStyle(color: Color(0xCCFFFFFF), fontWeight: FontWeight.w800, fontSize: 12)),
+          Text(title, style: const TextStyle(color: Color(0xCCFFFFFF), fontWeight: FontWeight.w800, fontSize: 12)),
           const SizedBox(height: 6),
           Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900)),
         ],
@@ -6707,7 +6776,7 @@ class _MiniMetric extends StatelessWidget {
 
 class _OngoingCoursesCard extends StatelessWidget {
   const _OngoingCoursesCard({required this.enrolledCourses, required this.onSeeAll});
-  final List<EnrolledCourse> enrolledCourses;
+  final List<DashboardEnrolledCourse> enrolledCourses;
   final VoidCallback onSeeAll;
 
   @override
@@ -6734,7 +6803,6 @@ class _OngoingCoursesCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-
           if (enrolledCourses.isEmpty)
             Center(
               child: Padding(
@@ -6763,10 +6831,12 @@ class _OngoingCoursesCard extends StatelessWidget {
 
 class _EnrolledCourseTile extends StatelessWidget {
   const _EnrolledCourseTile({required this.course});
-  final EnrolledCourse course;
+  final DashboardEnrolledCourse course;
 
   @override
   Widget build(BuildContext context) {
+    final p = course.progress.clamp(0, 100);
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(14),
@@ -6779,15 +6849,10 @@ class _EnrolledCourseTile extends StatelessWidget {
         children: [
           Row(
             children: [
-              Expanded(
-                child: Text(course.title, style: const TextStyle(fontWeight: FontWeight.w900)),
-              ),
+              Expanded(child: Text(course.title, style: const TextStyle(fontWeight: FontWeight.w900))),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFDBEAFE),
-                  borderRadius: BorderRadius.circular(999),
-                ),
+                decoration: BoxDecoration(color: const Color(0xFFDBEAFE), borderRadius: BorderRadius.circular(999)),
                 child: Text(course.level,
                     style: const TextStyle(color: Color(0xFF1D4ED8), fontWeight: FontWeight.w900, fontSize: 12)),
               ),
@@ -6816,14 +6881,14 @@ class _EnrolledCourseTile extends StatelessWidget {
                     ClipRRect(
                       borderRadius: BorderRadius.circular(999),
                       child: LinearProgressIndicator(
-                        value: course.progress / 100,
+                        value: p / 100,
                         minHeight: 8,
                         backgroundColor: const Color(0xFFE5E7EB),
                         valueColor: const AlwaysStoppedAnimation(Color(0xFF2563EB)),
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Text('%${course.progress} tamamlandı',
+                    Text('%$p tamamlandı',
                         style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700, fontSize: 12)),
                   ],
                 ),
@@ -6863,7 +6928,6 @@ class _RecentActivitiesCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-
           if (activities.isEmpty)
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 22),
@@ -6873,9 +6937,7 @@ class _RecentActivitiesCard extends StatelessWidget {
               ),
             )
           else
-            Column(
-              children: activities.map((a) => _ActivityRow(activity: a)).toList(),
-            ),
+            Column(children: activities.map((a) => _ActivityRow(activity: a)).toList()),
         ],
       ),
     );
@@ -6898,10 +6960,7 @@ class _ActivityRow extends StatelessWidget {
           Container(
             width: 40,
             height: 40,
-            decoration: BoxDecoration(
-              color: style.bg,
-              borderRadius: BorderRadius.circular(12),
-            ),
+            decoration: BoxDecoration(color: style.bg, borderRadius: BorderRadius.circular(12)),
             child: Icon(style.icon, color: style.fg, size: 20),
           ),
           const SizedBox(width: 10),
@@ -6964,7 +7023,6 @@ class _ActStyle {
   final Color fg;
   final Color bg;
 }
-
 
 
 ✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
@@ -8416,42 +8474,6 @@ lib/src/features/student_dashboard/domain/student_dashboard_models.dart
 
 import 'package:flutter/foundation.dart';
 
-@immutable
-class DashboardStats {
-  const DashboardStats({
-    required this.totalPoints,
-    required this.coursesCompleted,
-    required this.activeApplications,
-    required this.ongoingCourses,
-    this.departmentRank,
-  });
-
-  final int totalPoints;
-  final int coursesCompleted;
-  final int activeApplications;
-  final int ongoingCourses;
-  final int? departmentRank;
-}
-
-@immutable
-class EnrolledCourse {
-  const EnrolledCourse({
-    required this.courseId,
-    required this.title,
-    required this.description,
-    required this.duration,
-    required this.level,
-    required this.progress,
-  });
-
-  final String courseId;
-  final String title;
-  final String description;
-  final String duration;
-  final String level;
-  final int progress; // 0..100
-}
-
 enum ActivityCategory { course, job, internship, achievement, platform }
 
 @immutable
@@ -8470,61 +8492,164 @@ class ActivityItem {
 }
 
 @immutable
-class StudentDashboardVm {
-  const StudentDashboardVm({
+class DashboardEnrolledCourse {
+  const DashboardEnrolledCourse({
+    required this.courseId,
+    required this.title,
+    required this.description,
+    required this.duration,
+    required this.level,
+    required this.progress,
+  });
+
+  final String courseId;
+  final String title;
+  final String description;
+  final String duration;
+  final String level;
+  final int progress; // 0..100
+}
+
+@immutable
+class StudentDashboardStats {
+  const StudentDashboardStats({
+    required this.totalPoints,
+    required this.coursesCompleted,
+    required this.activeApplications,
+    required this.ongoingCourses,
+    this.departmentRank,
+  });
+
+  final int totalPoints;
+  final int coursesCompleted;
+  final int activeApplications;
+  final int ongoingCourses;
+  final int? departmentRank;
+}
+
+@immutable
+class StudentDashboardViewModel {
+  const StudentDashboardViewModel({
     required this.displayName,
     required this.stats,
-    required this.enrolledCourses,
-    required this.activities,
     required this.todayPoints,
     required this.weekPoints,
+    required this.enrolledCourses,
+    required this.activities,
   });
 
   final String displayName;
-  final DashboardStats stats;
-  final List<EnrolledCourse> enrolledCourses;
-  final List<ActivityItem> activities;
+  final StudentDashboardStats stats;
 
   final int todayPoints;
   final int weekPoints;
+
+  final List<DashboardEnrolledCourse> enrolledCourses;
+  final List<ActivityItem> activities;
+
+  static StudentDashboardViewModel empty({String displayName = 'Öğrenci'}) {
+    return StudentDashboardViewModel(
+      displayName: displayName,
+      stats: const StudentDashboardStats(
+        totalPoints: 0,
+        coursesCompleted: 0,
+        activeApplications: 0,
+        ongoingCourses: 0,
+        departmentRank: null,
+      ),
+      todayPoints: 0,
+      weekPoints: 0,
+      enrolledCourses: const <DashboardEnrolledCourse>[],
+      activities: const <ActivityItem>[],
+    );
+  }
 }
 
 
-✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
-lib/src/features/student_dashboard/presentation/controllers/student_dashboard_providers.dart
 
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
+D:\Dev\ogrenci_intelligence\lib\src\features\student_dashboard\application\student_dashboard_providers.dart
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../auth/presentation/controllers/auth_controller.dart';
-import '../../data/student_dashboard_repository.dart';
-import '../../domain/student_dashboard_models.dart';
-import '../../../../core/supabase/supabase_service.dart';
+import '../../auth/presentation/controllers/auth_controller.dart';
+import '../data/student_dashboard_repository.dart';
+import '../domain/student_dashboard_models.dart';
 
-final supabaseClientProvider = Provider<SupabaseClient>((ref) {
-  return SupabaseService.client;
-});
-
-final studentDashboardRepositoryProvider =
-    Provider<StudentDashboardRepository>((ref) {
-  final client = ref.watch(supabaseClientProvider);
-  return StudentDashboardRepository(client);
+final studentDashboardRepositoryProvider = Provider<StudentDashboardRepository>((ref) {
+  return StudentDashboardRepository();
 });
 
 final studentDashboardProvider =
-    FutureProvider.autoDispose<StudentDashboardVm>((ref) async {
-  final authAsync = ref.watch(authViewStateProvider);
-  final auth = authAsync.value;
+    AsyncNotifierProvider<StudentDashboardNotifier, StudentDashboardViewModel>(
+  StudentDashboardNotifier.new,
+);
 
-  final userId = auth?.user?.id;
-  if (userId == null || userId.isEmpty) {
-    throw StateError('No authenticated user');
+class StudentDashboardNotifier extends AsyncNotifier<StudentDashboardViewModel> {
+  @override
+  Future<StudentDashboardViewModel> build() async {
+    return _load();
   }
 
-  final repo = ref.watch(studentDashboardRepositoryProvider);
-  return repo.fetchDashboard(userId: userId);
-});
+  Future<void> refresh() async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(_load);
+  }
+
+  Future<StudentDashboardViewModel> _load() async {
+    final repo = ref.read(studentDashboardRepositoryProvider);
+
+    final auth = ref.read(authViewStateProvider).value;
+    final uid = auth?.user?.id;
+
+    final fallbackName = (auth?.user?.email ?? 'Öğrenci').split('@').first;
+
+    if (uid == null || uid.isEmpty) {
+      return StudentDashboardViewModel.empty(displayName: fallbackName);
+    }
+
+    final profile = await repo.getProfile(uid);
+
+    final now = DateTime.now().toUtc();
+    final startToday = DateTime.utc(now.year, now.month, now.day);
+
+    // Monday-based week start
+    final startWeek = startToday.subtract(Duration(days: startToday.weekday - 1));
+
+    final countsF = repo.getCounts(uid);
+    final rankF = repo.getLatestDepartmentRank(uid);
+    final todayF = repo.sumPointsSince(uid, startToday);
+    final weekF = repo.sumPointsSince(uid, startWeek);
+    final ongoingCoursesF = repo.listOngoingCourses(uid: uid, limit: 3);
+    final activitiesF = repo.listActivities(uid: uid, limit: 8);
+
+    final counts = await countsF;
+    final rank = await rankF;
+    final todayPts = await todayF;
+    final weekPts = await weekF;
+    final ongoingCourses = await ongoingCoursesF;
+    final activities = await activitiesF;
+
+    final displayName = (profile.fullName == null || profile.fullName!.isEmpty)
+        ? fallbackName
+        : profile.fullName!;
+
+    return StudentDashboardViewModel(
+      displayName: displayName,
+      stats: StudentDashboardStats(
+        totalPoints: profile.totalPoints,
+        coursesCompleted: counts.coursesCompleted,
+        activeApplications: counts.activeApplications,
+        ongoingCourses: counts.ongoingCourses,
+        departmentRank: rank,
+      ),
+      todayPoints: todayPts,
+      weekPoints: weekPts,
+      enrolledCourses: ongoingCourses,
+      activities: activities,
+    );
+  }
+}
 
 ✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 lib\src\features\courses\presentation\screens\course_detail_screen.dart

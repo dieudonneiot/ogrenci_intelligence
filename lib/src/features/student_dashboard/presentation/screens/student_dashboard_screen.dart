@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/routing/routes.dart';
+import '../../application/student_dashboard_providers.dart';
 import '../../domain/student_dashboard_models.dart';
-import '../controllers/student_dashboard_controller.dart';
 
 class StudentDashboardScreen extends ConsumerWidget {
   const StudentDashboardScreen({super.key});
@@ -13,41 +13,39 @@ class StudentDashboardScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final dashAsync = ref.watch(studentDashboardProvider);
 
-    // NOTE: MainShell already provides Scaffold + Navbar + Footer.
-    // So this screen should be BODY content, not another Scaffold.
     return dashAsync.when(
       loading: () => const _DashboardLoading(),
-        error: (e, _) => Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.error_outline, size: 48, color: Color(0xFFEF4444)),
-                const SizedBox(height: 12),
-                const Text(
-                  'Dashboard yüklenemedi',
-                  style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+      error: (e, _) => Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.error_outline, size: 48, color: Color(0xFFEF4444)),
+              const SizedBox(height: 12),
+              const Text(
+                'Dashboard yüklenemedi',
+                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                e.toString(),
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 14),
+              SizedBox(
+                height: 44,
+                child: ElevatedButton(
+                  onPressed: () => ref.read(studentDashboardProvider.notifier).refresh(),
+                  child: const Text('Tekrar dene'),
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  e.toString(),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
-                ),
-                const SizedBox(height: 14),
-                SizedBox(
-                  height: 44,
-                  child: ElevatedButton(
-                    onPressed: () => ref.read(studentDashboardProvider.notifier).refresh(),
-                    child: const Text('Tekrar dene'),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
-              data: (vm) {
+      ),
+      data: (vm) {
         final stats = vm.stats;
 
         return Container(
@@ -64,7 +62,6 @@ class StudentDashboardScreen extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Welcome
                         Text(
                           'Hoş Geldin, ${vm.displayName}! 👋',
                           style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900),
@@ -72,14 +69,10 @@ class StudentDashboardScreen extends ConsumerWidget {
                         const SizedBox(height: 6),
                         const Text(
                           'Bugün kariyerine yön verecek yeni fırsatlar seni bekliyor.',
-                          style: TextStyle(
-                            color: Color(0xFF6B7280),
-                            fontWeight: FontWeight.w700,
-                          ),
+                          style: TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
                         ),
                         const SizedBox(height: 18),
 
-                        // Stats cards (4)
                         LayoutBuilder(
                           builder: (_, c) {
                             final w = c.maxWidth;
@@ -130,7 +123,6 @@ class StudentDashboardScreen extends ConsumerWidget {
                               );
                             }
 
-                            // 2x2 wrap on smaller screens
                             final half = (w - 14) / 2;
                             return Wrap(
                               spacing: 14,
@@ -142,7 +134,6 @@ class StudentDashboardScreen extends ConsumerWidget {
 
                         const SizedBox(height: 16),
 
-                        // Big Points Widget (gradient)
                         _PointsHero(
                           totalPoints: stats.totalPoints,
                           departmentRank: stats.departmentRank,
@@ -156,7 +147,6 @@ class StudentDashboardScreen extends ConsumerWidget {
 
                         const SizedBox(height: 18),
 
-                        // 2-col grid: left = ongoing courses, right = activities
                         LayoutBuilder(
                           builder: (_, c) {
                             final isWide = c.maxWidth >= 1024;
@@ -250,9 +240,7 @@ class _StatCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: const [
-          BoxShadow(color: Color(0x0A000000), blurRadius: 18, offset: Offset(0, 8)),
-        ],
+        boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 18, offset: Offset(0, 8))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -262,10 +250,7 @@ class _StatCard extends StatelessWidget {
               Container(
                 width: 46,
                 height: 46,
-                decoration: BoxDecoration(
-                  color: iconBg,
-                  borderRadius: BorderRadius.circular(14),
-                ),
+                decoration: BoxDecoration(color: iconBg, borderRadius: BorderRadius.circular(14)),
                 child: Icon(icon, color: iconColor),
               ),
               const Spacer(),
@@ -321,9 +306,7 @@ class _PointsHero extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        boxShadow: const [
-          BoxShadow(color: Color(0x22000000), blurRadius: 22, offset: Offset(0, 10)),
-        ],
+        boxShadow: const [BoxShadow(color: Color(0x22000000), blurRadius: 22, offset: Offset(0, 10))],
       ),
       child: Column(
         children: [
@@ -475,8 +458,7 @@ class _MiniMetric extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Text(title,
-              style: const TextStyle(color: Color(0xCCFFFFFF), fontWeight: FontWeight.w800, fontSize: 12)),
+          Text(title, style: const TextStyle(color: Color(0xCCFFFFFF), fontWeight: FontWeight.w800, fontSize: 12)),
           const SizedBox(height: 6),
           Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900)),
         ],
@@ -487,7 +469,7 @@ class _MiniMetric extends StatelessWidget {
 
 class _OngoingCoursesCard extends StatelessWidget {
   const _OngoingCoursesCard({required this.enrolledCourses, required this.onSeeAll});
-  final List<EnrolledCourse> enrolledCourses;
+  final List<DashboardEnrolledCourse> enrolledCourses;
   final VoidCallback onSeeAll;
 
   @override
@@ -514,7 +496,6 @@ class _OngoingCoursesCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-
           if (enrolledCourses.isEmpty)
             Center(
               child: Padding(
@@ -543,10 +524,12 @@ class _OngoingCoursesCard extends StatelessWidget {
 
 class _EnrolledCourseTile extends StatelessWidget {
   const _EnrolledCourseTile({required this.course});
-  final EnrolledCourse course;
+  final DashboardEnrolledCourse course;
 
   @override
   Widget build(BuildContext context) {
+    final p = course.progress.clamp(0, 100);
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(14),
@@ -559,15 +542,10 @@ class _EnrolledCourseTile extends StatelessWidget {
         children: [
           Row(
             children: [
-              Expanded(
-                child: Text(course.title, style: const TextStyle(fontWeight: FontWeight.w900)),
-              ),
+              Expanded(child: Text(course.title, style: const TextStyle(fontWeight: FontWeight.w900))),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFDBEAFE),
-                  borderRadius: BorderRadius.circular(999),
-                ),
+                decoration: BoxDecoration(color: const Color(0xFFDBEAFE), borderRadius: BorderRadius.circular(999)),
                 child: Text(course.level,
                     style: const TextStyle(color: Color(0xFF1D4ED8), fontWeight: FontWeight.w900, fontSize: 12)),
               ),
@@ -596,14 +574,14 @@ class _EnrolledCourseTile extends StatelessWidget {
                     ClipRRect(
                       borderRadius: BorderRadius.circular(999),
                       child: LinearProgressIndicator(
-                        value: course.progress / 100,
+                        value: p / 100,
                         minHeight: 8,
                         backgroundColor: const Color(0xFFE5E7EB),
                         valueColor: const AlwaysStoppedAnimation(Color(0xFF2563EB)),
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Text('%${course.progress} tamamlandı',
+                    Text('%$p tamamlandı',
                         style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700, fontSize: 12)),
                   ],
                 ),
@@ -643,7 +621,6 @@ class _RecentActivitiesCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-
           if (activities.isEmpty)
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 22),
@@ -653,9 +630,7 @@ class _RecentActivitiesCard extends StatelessWidget {
               ),
             )
           else
-            Column(
-              children: activities.map((a) => _ActivityRow(activity: a)).toList(),
-            ),
+            Column(children: activities.map((a) => _ActivityRow(activity: a)).toList()),
         ],
       ),
     );
@@ -678,10 +653,7 @@ class _ActivityRow extends StatelessWidget {
           Container(
             width: 40,
             height: 40,
-            decoration: BoxDecoration(
-              color: style.bg,
-              borderRadius: BorderRadius.circular(12),
-            ),
+            decoration: BoxDecoration(color: style.bg, borderRadius: BorderRadius.circular(12)),
             child: Icon(style.icon, color: style.fg, size: 20),
           ),
           const SizedBox(width: 10),

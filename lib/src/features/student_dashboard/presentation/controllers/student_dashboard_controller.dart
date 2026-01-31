@@ -6,17 +6,17 @@ import '../../data/student_dashboard_repository.dart';
 import '../../domain/student_dashboard_models.dart';
 
 final studentDashboardRepositoryProvider = Provider<StudentDashboardRepository>((ref) {
-  return StudentDashboardRepository(Supabase.instance.client);
+  return StudentDashboardRepository(client: Supabase.instance.client);
 });
 
 final studentDashboardProvider =
-    AutoDisposeAsyncNotifierProvider<StudentDashboardController, StudentDashboardVm>(
+    AutoDisposeAsyncNotifierProvider<StudentDashboardController, StudentDashboardViewModel>(
   StudentDashboardController.new,
 );
 
-class StudentDashboardController extends AutoDisposeAsyncNotifier<StudentDashboardVm> {
+class StudentDashboardController extends AutoDisposeAsyncNotifier<StudentDashboardViewModel> {
   @override
-  Future<StudentDashboardVm> build() async {
+  Future<StudentDashboardViewModel> build() async {
     final auth = ref.watch(authViewStateProvider).value;
     final userId = auth?.user?.id;
 
@@ -25,7 +25,7 @@ class StudentDashboardController extends AutoDisposeAsyncNotifier<StudentDashboa
     }
 
     final repo = ref.watch(studentDashboardRepositoryProvider);
-    return repo.fetchDashboard(userId: userId);
+    return repo.fetchDashboard(uid: userId);
   }
 
   Future<void> refresh() async {
