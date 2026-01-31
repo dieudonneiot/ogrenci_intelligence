@@ -887,77 +887,141 @@ lib/src/features/auth/presentation/controllers/auth_controller.dart
 
 
 import 'dart:async';
+// ✅ for unawaited
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../..//core/supabase/supabase_service.dart';
+import '../../../../core/config/env.dart';
+import '../../../../core/supabase/supabase_service.dart';
+import '../../../admin/presentation/controllers/admin_controller.dart';
 import '../../data/auth_repository.dart';
 import '../../domain/auth_models.dart';
+
+class AuthViewState {
+  const AuthViewState({
+    required this.user,
+    required this.session,
+    required this.loading,
+    required this.userType,
+    this.companyId,
+    this.companyRole,
+  });
+
+  final User? user;
+  final Session? session;
+  final bool loading;
+
+  final UserType userType;
+  final String? companyId;
+  final String? companyRole;
+
+  bool get isEmailVerified => user?.emailConfirmedAt != null;
+
+  // ✅ AUTHENTICATED = signed in + verified
+  bool get isAuthenticated => user != null && session != null && isEmailVerified;
+}
 
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
   return AuthRepository(SupabaseService.client);
 });
 
-/// Session stream (source of truth)
-final sessionProvider = StreamProvider<Session?>((ref) {
+final authViewStateProvider = StreamProvider<AuthViewState>((ref) {
   final repo = ref.watch(authRepositoryProvider);
-  final controller = StreamController<Session?>();
+  final controller = StreamController<AuthViewState>.broadcast();
 
-  controller.add(repo.currentSession);
+  Future<void> emit(Session? session, {required bool loading}) async {
+    final user = session?.user;
 
-  final sub = repo.authStateChanges().listen((evt) {
-    controller.add(evt.session);
+    // Default state
+    UserType userType = UserType.guest;
+    String? companyId;
+    String? companyRole;
+
+    // If user exists but not verified -> keep as guest (not authenticated)
+    final verified = user != null && user.emailConfirmedAt != null;
+
+    if (verified) {
+      userType = UserType.student; // ✅ default if verified
+
+      // Admin check (best-effort, must not break auth stream)
+      try {
+        final admin = await ref.read(activeAdminProvider.future);
+        if (admin != null) {
+          userType = UserType.admin;
+        }
+      } catch (_) {
+        // ignore: treat as not admin
+      }
+
+      // Company membership (best-effort)
+      if (userType != UserType.admin) {
+        try {
+          final membership = await repo.fetchCompanyMembership(user.id);
+          if (membership != null) {
+            userType = UserType.company;
+            companyId = membership.companyId;
+            companyRole = membership.role;
+          }
+        } catch (_) {
+          // ignore: treat as student
+        }
+      }
+    }
+
+    // ✅ ALWAYS emit a state (never skip)
+    controller.add(
+      AuthViewState(
+        user: user,
+        session: session,
+        loading: loading,
+        userType: userType,
+        companyId: companyId,
+        companyRole: companyRole,
+      ),
+    );
+  }
+  // initial
+  controller.add(const AuthViewState(
+    user: null,
+    session: null,
+    loading: true,
+    userType: UserType.guest,
+  ));
+
+  unawaited(() async {
+    await emit(repo.currentSession, loading: false);
+  }());
+
+  final sub = repo.authStateChanges().listen((evt) async {
+    try {
+      ref.invalidate(activeAdminProvider);
+      await emit(evt.session, loading: false);
+    } catch (_) {
+      // last-resort: still emit minimal state
+      controller.add(AuthViewState(
+        user: evt.session?.user,
+        session: evt.session,
+        loading: false,
+        userType: UserType.guest,
+      ));
+    }
   });
 
-ref.onDispose(() async {
-  await sub.cancel();
-  await controller.close();
-});
+  ref.onDispose(() {
+    unawaited(sub.cancel());
+    unawaited(controller.close());
+  });
 
   return controller.stream;
 });
 
-final currentUserProvider = Provider<User?>((ref) {
-  final session = ref.watch(sessionProvider).value;
-  return session?.user;
+final authActionLoadingProvider =
+    StateNotifierProvider<AuthActionController, bool>((ref) {
+  return AuthActionController(ref.watch(authRepositoryProvider));
 });
 
-/// Company membership (company_id + role) like in AuthContext.jsx
-final companyMembershipProvider = FutureProvider<CompanyMembership?>((ref) async {
-  final user = ref.watch(currentUserProvider);
-  if (user == null) return null;
-
-  final repo = ref.watch(authRepositoryProvider);
-  return repo.fetchCompanyMembership(user.id);
-});
-
-/// App role (admin > company > student)
-final appRoleProvider = FutureProvider<AppRole>((ref) async {
-  final user = ref.watch(currentUserProvider);
-  if (user == null) return AppRole.guest;
-
-  // Email verification gate (same philosophy as ProtectedRoute + signIn)
-  if (user.emailConfirmedAt == null) return AppRole.guest;
-
-  final repo = ref.watch(authRepositoryProvider);
-
-  if (await repo.isAdmin(user)) return AppRole.admin;
-
-  final membership = await ref.watch(companyMembershipProvider.future);
-  if (membership != null) return AppRole.company;
-
-  return AppRole.student;
-});
-
-/// Simple controller for auth actions + loading flag
-final authControllerProvider =
-    StateNotifierProvider<AuthController, bool>((ref) {
-  return AuthController(ref.watch(authRepositoryProvider));
-});
-
-class AuthController extends StateNotifier<bool> {
-  AuthController(this._repo) : super(false);
-
+class AuthActionController extends StateNotifier<bool> {
+  AuthActionController(this._repo) : super(false);
   final AuthRepository _repo;
 
   Future<String?> signIn(String email, String password) async {
@@ -1000,10 +1064,13 @@ class AuthController extends StateNotifier<bool> {
     }
   }
 
-  Future<String?> resetPassword(String email, {String? redirectTo}) async {
+  Future<String?> resetPassword(String email) async {
     try {
       state = true;
-      await _repo.resetPassword(email: email, redirectTo: redirectTo);
+      await _repo.resetPassword(
+        email: email,
+        redirectTo: Env.deepLinkResetPassword.toString(),
+      );
       return null;
     } catch (e) {
       return e.toString();
@@ -1023,29 +1090,7 @@ class AuthController extends StateNotifier<bool> {
       state = false;
     }
   }
-
-  Future<String?> updateProfile(Map<String, dynamic> updates) async {
-    try {
-      state = true;
-      await _repo.updateProfile(updates);
-      return null;
-    } catch (e) {
-      return e.toString();
-    } finally {
-      state = false;
-    }
-  }
-
-  Future<String?> refreshSession() async {
-    try {
-      await _repo.refreshSession();
-      return null;
-    } catch (e) {
-      return e.toString();
-    }
-  }
 }
-
 ✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 android/app/src/main/AndroidManifest.xml
 
@@ -6127,11 +6172,10 @@ D:\Dev\ogrenci_intelligence\lib\src\features\student_dashboard\presentation\cont
 
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-
 import '../../../auth/presentation/controllers/auth_controller.dart';
 import '../../data/student_dashboard_repository.dart';
-import '../../domain/student_dashboard_models.dart';
+import '../../domain/dashboard_application.dart';
+
 
 final studentDashboardRepositoryProvider = Provider<StudentDashboardRepository>((ref) {
   return const StudentDashboardRepository();
@@ -6143,31 +6187,29 @@ final studentDashboardProvider =
 );
 
 class StudentDashboardController extends AutoDisposeAsyncNotifier<StudentDashboardData> {
-  @override
-  Future<StudentDashboardData> build() async {
-    final auth = ref.watch(authViewStateProvider).value;
-    final User? user = auth?.user;
+@override
+Future<StudentDashboardData> build() async {
+  final auth = await ref.watch(authViewStateProvider.future);
+  final user = auth.user;
+  if (user == null) throw StateError('No authenticated user for dashboard');
 
-    if (user == null) {
-      throw StateError('No authenticated user for dashboard');
-    }
+  final email = user.email ?? '';
+  final fallbackName = email.isNotEmpty ? email.split('@').first : 'Kullanıcı';
 
-    final email = user.email ?? '';
-    final fallbackName = (email.isNotEmpty ? email.split('@').first : 'Kullanıcı');
-
-    final repo = ref.read(studentDashboardRepositoryProvider);
-    return repo.fetchDashboard(
-      userId: user.id,
-      email: email,
-      fallbackFullName: fallbackName,
-    );
-  }
+  final repo = ref.read(studentDashboardRepositoryProvider);
+  return repo.fetchDashboard(
+    userId: user.id,
+    email: email,
+    fallbackFullName: fallbackName,
+  );
+}
 
   Future<void> refresh() async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(build);
   }
 }
+
 
 ✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 D:\Dev\ogrenci_intelligence\lib\src\features\student_dashboard\presentation\screens\student_dashboard_screen.dart

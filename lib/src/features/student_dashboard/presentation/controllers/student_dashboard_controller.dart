@@ -1,7 +1,5 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-
 import '../../../auth/presentation/controllers/auth_controller.dart';
 import '../../data/student_dashboard_repository.dart';
 import '../../domain/dashboard_application.dart';
@@ -17,25 +15,22 @@ final studentDashboardProvider =
 );
 
 class StudentDashboardController extends AutoDisposeAsyncNotifier<StudentDashboardData> {
-  @override
-  Future<StudentDashboardData> build() async {
-    final auth = ref.watch(authViewStateProvider).value;
-    final User? user = auth?.user;
+@override
+Future<StudentDashboardData> build() async {
+  final auth = await ref.watch(authViewStateProvider.future);
+  final user = auth.user;
+  if (user == null) throw StateError('No authenticated user for dashboard');
 
-    if (user == null) {
-      throw StateError('No authenticated user for dashboard');
-    }
+  final email = user.email ?? '';
+  final fallbackName = email.isNotEmpty ? email.split('@').first : 'Kullanıcı';
 
-    final email = user.email ?? '';
-    final fallbackName = (email.isNotEmpty ? email.split('@').first : 'Kullanıcı');
-
-    final repo = ref.read(studentDashboardRepositoryProvider);
-    return repo.fetchDashboard(
-      userId: user.id,
-      email: email,
-      fallbackFullName: fallbackName,
-    );
-  }
+  final repo = ref.read(studentDashboardRepositoryProvider);
+  return repo.fetchDashboard(
+    userId: user.id,
+    email: email,
+    fallbackFullName: fallbackName,
+  );
+}
 
   Future<void> refresh() async {
     state = const AsyncLoading();

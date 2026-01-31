@@ -1,4 +1,3 @@
-// lib/features/auth/presentation/controllers/auth_controller.dart
 import 'dart:async';
 // ✅ for unawaited
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -28,8 +27,10 @@ class AuthViewState {
   final String? companyId;
   final String? companyRole;
 
-  bool get isAuthenticated => user != null; // has session/user
   bool get isEmailVerified => user?.emailConfirmedAt != null;
+
+  // ✅ AUTHENTICATED = signed in + verified
+  bool get isAuthenticated => user != null && session != null && isEmailVerified;
 }
 
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
@@ -43,27 +44,43 @@ final authViewStateProvider = StreamProvider<AuthViewState>((ref) {
   Future<void> emit(Session? session, {required bool loading}) async {
     final user = session?.user;
 
+    // Default state
     UserType userType = UserType.guest;
     String? companyId;
     String? companyRole;
 
-    if (user != null && user.emailConfirmedAt != null) {
-      // Admin has priority
-      final admin = await ref.read(activeAdminProvider.future);
-      if (admin != null) {
-        userType = UserType.admin;
-      } else {
-        final membership = await repo.fetchCompanyMembership(user.id);
-        if (membership != null) {
-          userType = UserType.company;
-          companyId = membership.companyId;
-          companyRole = membership.role;
-        } else {
-          userType = UserType.student;
+    // If user exists but not verified -> keep as guest (not authenticated)
+    final verified = user != null && user.emailConfirmedAt != null;
+
+    if (verified) {
+      userType = UserType.student; // ✅ default if verified
+
+      // Admin check (best-effort, must not break auth stream)
+      try {
+        final admin = await ref.read(activeAdminProvider.future);
+        if (admin != null) {
+          userType = UserType.admin;
+        }
+      } catch (_) {
+        // ignore: treat as not admin
+      }
+
+      // Company membership (best-effort)
+      if (userType != UserType.admin) {
+        try {
+          final membership = await repo.fetchCompanyMembership(user.id);
+          if (membership != null) {
+            userType = UserType.company;
+            companyId = membership.companyId;
+            companyRole = membership.role;
+          }
+        } catch (_) {
+          // ignore: treat as student
         }
       }
     }
 
+    // ✅ ALWAYS emit a state (never skip)
     controller.add(
       AuthViewState(
         user: user,
@@ -75,7 +92,6 @@ final authViewStateProvider = StreamProvider<AuthViewState>((ref) {
       ),
     );
   }
-
   // initial
   controller.add(const AuthViewState(
     user: null,
@@ -89,8 +105,18 @@ final authViewStateProvider = StreamProvider<AuthViewState>((ref) {
   }());
 
   final sub = repo.authStateChanges().listen((evt) async {
-    ref.invalidate(activeAdminProvider);
-    await emit(evt.session, loading: false);
+    try {
+      ref.invalidate(activeAdminProvider);
+      await emit(evt.session, loading: false);
+    } catch (_) {
+      // last-resort: still emit minimal state
+      controller.add(AuthViewState(
+        user: evt.session?.user,
+        session: evt.session,
+        loading: false,
+        userType: UserType.guest,
+      ));
+    }
   });
 
   ref.onDispose(() {
