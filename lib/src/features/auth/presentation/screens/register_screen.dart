@@ -106,13 +106,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     try {
       final user = SupabaseService.client.auth.currentUser;
       if (user != null) {
-        await SupabaseService.client.from('profiles').update({
-          'full_name': fullName,
-          'department': _department,
-          'year': _year,
-          'email': email,
-          'updated_at': DateTime.now().toIso8601String(),
-        }).eq('id', user.id);
+      await SupabaseService.client.from('profiles').upsert({
+        'id': user.id,
+        'full_name': fullName,
+        'department': _department,
+        'year': _year,
+        'email': email,
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
+      });
       }
     } catch (_) {
       // ignore

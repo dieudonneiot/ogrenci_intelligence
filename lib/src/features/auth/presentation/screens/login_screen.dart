@@ -70,49 +70,52 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     return uri.toString();
   }
 
-  Future<void> _submit() async {
-    setState(() => _error = null);
+Future<void> _submit() async {
+  setState(() => _error = null);
 
-    final email = _email.text.trim();
-    final pass = _password.text;
+  final email = _email.text.trim();
+  final pass = _password.text;
 
-    if (email.isEmpty || pass.isEmpty) {
-      setState(() => _error = 'Please fill in all fields.');
-      return;
-    }
-
-    final err = await ref
-        .read(authActionLoadingProvider.notifier)
-        .signIn(email, pass);
-
-    if (!mounted) return;
-
-    if (err != null) {
-      setState(() => _error = err);
-      return;
-    }
-
-    final user = ref.read(authViewStateProvider).value?.user;
-    if (user != null && user.emailConfirmedAt == null) {
-      final uri = Uri(
-        path: Routes.emailVerification,
-        queryParameters: {'email': email},
-      ).toString();
-      context.go(uri);
-      return;
-    }
-    // React behavior: go to `from` if present; otherwise dashboard.
-    // Router will still enforce role redirects (admin/company).
-    final stream = ref.read(authViewStateProvider.stream);
-    await stream.firstWhere((s) => s.isAuthenticated);
-
-    if (!mounted) return;
-    context.go(_resolveFromTarget());
-
+  if (email.isEmpty || pass.isEmpty) {
+    setState(() => _error = 'Please fill in all fields.');
+    return;
   }
+
+  final err = await ref
+      .read(authActionLoadingProvider.notifier)
+      .signIn(email, pass);
+
+  if (!mounted) return;
+
+  if (err != null) {
+    setState(() => _error = err);
+    return;
+  }
+
+  // ✅ If auth state is already updated, navigate immediately.
+  final current = ref.read(authViewStateProvider).valueOrNull;
+  if (current?.isAuthenticated == true) {
+    context.go(_resolveFromTarget());
+    return;
+  }
+
+  // ✅ Otherwise wait a bit for the auth stream to emit (but never hang forever).
+  try {
+    await ref
+        .read(authViewStateProvider.stream)
+        .firstWhere((s) => s.isAuthenticated)
+        .timeout(const Duration(seconds: 2));
+  } catch (_) {
+    // ignore timeout; router redirect will handle if needed
+  }
+
+  if (!mounted) return;
+  context.go(_resolveFromTarget());
+}
 
   @override
   Widget build(BuildContext context) {
+    
     final busy = ref.watch(authActionLoadingProvider);
 
     return Scaffold(
