@@ -16,6 +16,7 @@ import '../../features/auth/presentation/screens/reset_password_screen.dart';
 import '../../features/courses/presentation/screens/course_detail_screen.dart';
 import '../../features/courses/presentation/screens/courses_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
+import '../../features/points/presentation/screens/points_system_screen.dart';
 import '../../features/student_dashboard/presentation/screens/student_dashboard_screen.dart';
 import '../../shared/widgets/app_navbar.dart';
 import '../../shared/widgets/empty_state.dart';
@@ -242,7 +243,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: Routes.pointsSystem,
-            builder: (_, __) => const PlaceholderView(title: 'Points System'),
+            builder: (_, __) => const PointsSystemScreen(),
           ),
           GoRoute(
             path: Routes.profile,

@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../../core/supabase/supabase_service.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
 import '../../data/student_dashboard_repository.dart';
 import '../../domain/student_dashboard_models.dart';
-import '../../../../core/supabase/supabase_service.dart';
 
 final supabaseClientProvider = Provider<SupabaseClient>((ref) {
   return SupabaseService.client;

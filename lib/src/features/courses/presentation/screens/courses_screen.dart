@@ -240,6 +240,7 @@ class _FiltersCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final dept = ref.watch(coursesDepartmentProvider);
     final level = ref.watch(coursesLevelProvider);
+    final search = ref.watch(coursesSearchProvider);
 
     return Container(
       padding: const EdgeInsets.all(14),
@@ -269,7 +270,7 @@ class _FiltersCard extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(14),
                 borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
               ),
-              suffixIcon: (searchController.text.isNotEmpty || dept != null || level != null)
+              suffixIcon: (search.isNotEmpty || dept != null || level != null)
                   ? IconButton(
                       onPressed: onClear,
                       icon: const Icon(Icons.close),
@@ -644,7 +645,11 @@ class _ErrorBlock extends StatelessWidget {
               const SizedBox(height: 10),
               Text(title, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
               const SizedBox(height: 6),
-              Text(message, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFF6B7280))),
+              Text(
+                message,
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Color(0xFF6B7280)),
+              ),
               const SizedBox(height: 10),
               ElevatedButton(onPressed: onRetry, child: const Text('Retry')),
             ],
@@ -654,3 +659,4 @@ class _ErrorBlock extends StatelessWidget {
     );
   }
 }
+
