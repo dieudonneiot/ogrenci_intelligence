@@ -15,6 +15,9 @@ import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/auth/presentation/screens/reset_password_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/student_dashboard/presentation/screens/student_dashboard_screen.dart';
+import '../../features/user/presentation/screens/courses_screen.dart';
+import '../../features/user/presentation/screens/course_detail_screen.dart';
+
 import '../../shared/widgets/app_navbar.dart';
 import '../../shared/widgets/empty_state.dart';
 import 'route_guards.dart';
@@ -242,12 +245,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             path: Routes.pointsSystem,
             builder: (_, __) => const PlaceholderView(title: 'Points System'),
           ),
-
-          // Student protected
-          GoRoute(
-            path: Routes.dashboard,
-            builder: (_, __) => const PlaceholderView(title: 'Dashboard'),
-          ),
           GoRoute(
             path: Routes.profile,
             builder: (_, __) => const PlaceholderView(title: 'Profile'),
@@ -258,14 +255,14 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: Routes.courses,
-            builder: (_, __) => const PlaceholderView(title: 'Courses'),
+            builder: (_, __) => const CoursesScreen(),
           ),
           GoRoute(
             path: Routes.courseDetail,
-            builder: (_, s) => PlaceholderView(
-              title: 'Course Detail',
-              subtitle: 'id=${s.pathParameters['id']}',
-            ),
+            builder: (_, state) {
+              final id = state.pathParameters['id']!;
+              return CourseDetailScreen(courseId: id);
+            },
           ),
           GoRoute(
             path: Routes.jobs,
