@@ -13,11 +13,10 @@ import '../../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/auth/presentation/screens/reset_password_screen.dart';
+import '../../features/courses/presentation/screens/course_detail_screen.dart';
+import '../../features/courses/presentation/screens/courses_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/student_dashboard/presentation/screens/student_dashboard_screen.dart';
-import '../../features/user/presentation/screens/courses_screen.dart';
-import '../../features/user/presentation/screens/course_detail_screen.dart';
-
 import '../../shared/widgets/app_navbar.dart';
 import '../../shared/widgets/empty_state.dart';
 import 'route_guards.dart';

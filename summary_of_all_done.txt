@@ -2583,11 +2583,10 @@ import '../../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/auth/presentation/screens/reset_password_screen.dart';
+import '../../features/courses/presentation/screens/course_detail_screen.dart';
+import '../../features/courses/presentation/screens/courses_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/student_dashboard/presentation/screens/student_dashboard_screen.dart';
-import '../../features/user/presentation/screens/courses_screen.dart';
-import '../../features/user/presentation/screens/course_detail_screen.dart';
-
 import '../../shared/widgets/app_navbar.dart';
 import '../../shared/widgets/empty_state.dart';
 import 'route_guards.dart';
@@ -6969,7 +6968,7 @@ class _ActStyle {
 
 
 ✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
-lib/src/features/courses/domain/course.dart
+lib/src/features/courses/domain/course_models.dart
 
 import 'package:flutter/foundation.dart';
 
@@ -6978,15 +6977,15 @@ class Course {
   const Course({
     required this.id,
     required this.title,
-    required this.description,
-    required this.department,
-    required this.duration,
-    required this.level,
-    required this.instructor,
-    required this.category,
-    required this.rating,
-    required this.totalRatings,
-    required this.enrolledCount,
+    this.description,
+    this.department,
+    this.duration,
+    this.level,
+    this.instructor,
+    this.category,
+    this.rating = 0.0,
+    this.totalRatings = 0,
+    this.enrolledCount = 0,
     this.videoUrl,
     this.pointsEnrollment = 10,
     this.pointsCompletion = 50,
@@ -6994,32 +6993,210 @@ class Course {
 
   final String id;
   final String title;
-  final String description;
-  final String department;
-  final String duration;   // e.g. "4 saat"
-  final String level;      // e.g. "Başlangıç"
-  final String instructor; // e.g. "Dr. X"
-  final String category;   // e.g. "Temel Dersler"
-  final double rating;     // 0..5
-  final int totalRatings;
-  final int enrolledCount;
+
+  final String? description;
+  final String? department;
+  final String? duration;   // e.g. "4 saat"
+  final String? level;      // e.g. "Başlangıç"
+  final String? instructor; // e.g. "Dr. X"
+  final String? category;   // derived/optional (React concept)
+
+  final double rating;      // derived/optional
+  final int totalRatings;   // derived/optional
+  final int enrolledCount;  // derived/optional
 
   final String? videoUrl;
 
-  // UI points (match React concept; later compute from DB or config)
+  // UI points (match React concept; later compute from DB/config)
   final int pointsEnrollment;
   final int pointsCompletion;
+
+  factory Course.fromMap(Map<String, dynamic> map) {
+    return Course(
+      id: map['id'] as String,
+      title: (map['title'] as String?) ?? '',
+      description: map['description'] as String?,
+      department: map['department'] as String?,
+      videoUrl: map['video_url'] as String?,
+      duration: map['duration'] as String?,
+      level: map['level'] as String?,
+      instructor: map['instructor'] as String?,
+      // optional/derived fields (if later you include them in select)
+      category: map['category'] as String?,
+      rating: (map['rating'] as num?)?.toDouble() ?? 0.0,
+      totalRatings: (map['total_ratings'] as int?) ?? 0,
+      enrolledCount: (map['enrolled_count'] as int?) ?? 0,
+    );
+  }
+}
+
+@immutable
+class CourseEnrollment {
+  const CourseEnrollment({
+    required this.id,
+    required this.userId,
+    required this.courseId,
+    required this.progress,
+    this.enrolledAt,
+  });
+
+  final String id;
+  final String userId;
+  final String courseId;
+  final int progress; // 0..100
+  final DateTime? enrolledAt;
+
+  factory CourseEnrollment.fromMap(Map<String, dynamic> map) {
+    return CourseEnrollment(
+      id: map['id'] as String,
+      userId: map['user_id'] as String,
+      courseId: map['course_id'] as String,
+      progress: (map['progress'] as int?) ?? 0,
+      enrolledAt: map['enrolled_at'] == null
+          ? null
+          : DateTime.tryParse(map['enrolled_at'].toString()),
+    );
+  }
+}
+
+@immutable
+class EnrolledCourse {
+  const EnrolledCourse({
+    required this.course,
+    required this.enrollment,
+  });
+
+  final Course course;
+  final CourseEnrollment enrollment;
 }
 
 
 ✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 lib/src/features/courses/data/courses_repository.dart
 
-import '../domain/course.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-abstract class CoursesRepository {
-  Future<List<Course>> fetchCourses({String? department});
-  Future<Course?> fetchCourseById(String id);
+import '../../../core/supabase/supabase_service.dart';
+import '../domain/course_models.dart';
+
+class CoursesRepository {
+  CoursesRepository({SupabaseClient? client})
+      : _client = client ?? SupabaseService.client;
+
+  final SupabaseClient _client;
+
+  Future<List<Course>> listCourses({
+    String? search,
+    String? department,
+    String? level,
+  }) async {
+    PostgrestFilterBuilder qb = _client
+        .from('courses')
+        .select('id,title,description,department,video_url,duration,level,instructor');
+
+    final q = (search ?? '').trim();
+    if (q.isNotEmpty) {
+      qb = qb.ilike('title', '%$q%');
+    }
+    if (department != null && department.trim().isNotEmpty) {
+      qb = qb.eq('department', department.trim());
+    }
+    if (level != null && level.trim().isNotEmpty) {
+      qb = qb.eq('level', level.trim());
+    }
+
+    final rows = await qb.order('title', ascending: true) as List<dynamic>;
+    return rows
+    .map((e) => Course.fromMap(Map<String, dynamic>.from(e as Map)))
+    .toList();
+  }
+
+  Future<Course> getCourseById(String courseId) async {
+    final row = await _client
+        .from('courses')
+        .select('id,title,description,department,video_url,duration,level,instructor')
+        .eq('id', courseId)
+        .single();
+
+    return Course.fromMap(row);
+  }
+
+  Future<CourseEnrollment?> getMyEnrollment({
+    required String userId,
+    required String courseId,
+  }) async {
+    // Using .limit(1) to be version-safe (instead of maybeSingle()).
+    final rows = await _client
+        .from('course_enrollments')
+        .select('id,user_id,course_id,enrolled_at,progress')
+        .eq('user_id', userId)
+        .eq('course_id', courseId)
+        .limit(1) as List<dynamic>;
+
+    if (rows.isEmpty) return null;
+    return CourseEnrollment.fromMap(Map<String, dynamic>.from(rows.first as Map));
+  }
+
+  Future<List<EnrolledCourse>> listMyEnrolledCourses(String userId) async {
+    // FK exists: course_enrollments.course_id -> courses.id
+    final rows = await _client
+        .from('course_enrollments')
+        .select(
+          'id,user_id,course_id,enrolled_at,progress,'
+          'courses(id,title,description,department,video_url,duration,level,instructor)',
+        )
+        .eq('user_id', userId)
+        .order('enrolled_at', ascending: false) as List<dynamic>;
+
+    return rows.map((r) {
+      final map = Map<String, dynamic>.from(r as Map);
+      final enrollment = CourseEnrollment.fromMap(map);
+
+      final rawCourse = map['courses'];
+final courseMap = rawCourse == null ? null : Map<String, dynamic>.from(rawCourse as Map);
+      final course = courseMap == null
+          ? Course(
+              id: enrollment.courseId,
+              title: 'Course',
+            )
+          : Course.fromMap(courseMap);
+
+      return EnrolledCourse(course: course, enrollment: enrollment);
+    }).toList();
+  }
+
+  Future<void> enroll({
+    required String userId,
+    required String courseId,
+  }) async {
+    await _client.from('course_enrollments').insert({
+      'user_id': userId,
+      'course_id': courseId,
+      'progress': 0,
+    });
+  }
+
+  Future<void> unenroll({
+    required String userId,
+    required String courseId,
+  }) async {
+    await _client
+        .from('course_enrollments')
+        .delete()
+        .eq('user_id', userId)
+        .eq('course_id', courseId);
+  }
+
+  Future<void> updateProgress({
+    required String enrollmentId,
+    required int progress,
+  }) async {
+    final p = progress.clamp(0, 100);
+    await _client
+        .from('course_enrollments')
+        .update({'progress': p})
+        .eq('id', enrollmentId);
+  }
 }
 
 
@@ -7027,37 +7204,54 @@ abstract class CoursesRepository {
 lib/src/features/courses/data/fake_courses_repository.dart
 
 import 'dart:math';
-import '../domain/course.dart';
-import 'courses_repository.dart';
+import '../domain/course_models.dart';
 
-class FakeCoursesRepository implements CoursesRepository {
-  FakeCoursesRepository() {
-    _courses = _seed();
-  }
+class FakeCoursesRepository {
+  FakeCoursesRepository() : _courses = _seed();
 
-  late final List<Course> _courses;
+  final List<Course> _courses;
 
-  @override
-  Future<List<Course>> fetchCourses({String? department}) async {
-    // simulate latency
+  Future<List<Course>> listCourses({
+    String? search,
+    String? department,
+    String? level,
+  }) async {
     await Future<void>.delayed(const Duration(milliseconds: 250));
-    if (department == null || department.trim().isEmpty) return _courses;
-    return _courses.where((c) => c.department == department).toList();
+
+    Iterable<Course> out = _courses;
+
+    final q = (search ?? '').trim().toLowerCase();
+    if (q.isNotEmpty) {
+      out = out.where((c) => c.title.toLowerCase().contains(q));
+    }
+
+    final dep = (department ?? '').trim();
+    if (dep.isNotEmpty) {
+      out = out.where((c) => (c.department ?? '') == dep);
+    }
+
+    final lev = (level ?? '').trim();
+    if (lev.isNotEmpty) {
+      out = out.where((c) => (c.level ?? '') == lev);
+    }
+
+    return out.toList();
   }
 
-  @override
-  Future<Course?> fetchCourseById(String id) async {
+  Future<Course?> getCourseById(String courseId) async {
     await Future<void>.delayed(const Duration(milliseconds: 150));
     try {
-      return _courses.firstWhere((c) => c.id == id);
+      return _courses.firstWhere((c) => c.id == courseId);
     } catch (_) {
       return null;
     }
   }
 
-  List<Course> _seed() {
+  static List<Course> _seed() {
     final rng = Random(42);
+    // ignore: unused_element
     double r() => (rng.nextInt(17) + 30) / 10.0; // 3.0..4.6
+    // using r() is optional; keeping seed constant is fine
 
     return const [
       Course(
@@ -7169,8 +7363,9 @@ lib/src/features/courses/presentation/state/courses_controller.dart
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../data/courses_repository.dart';
-import '../../domain/course.dart';
+import '../../domain/course_models.dart';
 
 @immutable
 class CoursesState {
@@ -7258,17 +7453,37 @@ class CoursesController extends StateNotifier<CoursesState> {
 
   Future<void> load() async {
     state = state.copyWith(isLoading: true, error: null);
+
     try {
-      final list = await _repo.fetchCourses();
-      state = state.copyWith(isLoading: false, courses: list);
+      // DB fetch (title search supported). Category is UI-only for now.
+      final list = await _repo.listCourses(
+        search: state.query,
+        department: null,
+        level: null,
+      );
+
+      // If category filter is used, filter locally (since DB has no "category" yet)
+      final filtered = (state.category == 'Tümü')
+          ? list
+          : list.where((c) => (c.category ?? '') == state.category).toList();
+
+      state = state.copyWith(isLoading: false, courses: filtered);
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
 
-  void setQuery(String v) => state = state.copyWith(query: v);
+  void setQuery(String v) {
+    state = state.copyWith(query: v);
+    // optional: auto reload on query change
+    // unawaited(load());
+  }
 
-  void setCategory(String v) => state = state.copyWith(category: v);
+  void setCategory(String v) {
+    state = state.copyWith(category: v);
+    // optional: auto reload (since we filter locally, no need)
+    // state = state.copyWith(courses: ...)
+  }
 
   void toggleFavorite(String courseId) {
     final next = {...state.favorites};
@@ -7288,8 +7503,9 @@ class CoursesController extends StateNotifier<CoursesState> {
 
     // award enrollment points once
     var earned = state.earnedPoints;
-    var given = {...state.enrollmentPointsGiven};
-    final course = state.courses.where((c) => c.id == courseId).cast<Course?>().firstOrNull;
+    final given = {...state.enrollmentPointsGiven};
+
+    final course = state.courses.firstWhereOrNull((c) => c.id == courseId);
     if (!given.contains(courseId) && course != null) {
       earned += course.pointsEnrollment;
       given.add(courseId);
@@ -7322,8 +7538,9 @@ class CoursesController extends StateNotifier<CoursesState> {
 
     // award completion points once
     var earned = state.earnedPoints;
-    var given = {...state.completionPointsGiven};
-    final course = state.courses.where((c) => c.id == courseId).cast<Course?>().firstOrNull;
+    final given = {...state.completionPointsGiven};
+
+    final course = state.courses.firstWhereOrNull((c) => c.id == courseId);
     if (!given.contains(courseId) && course != null) {
       earned += course.pointsCompletion;
       given.add(courseId);
@@ -7338,8 +7555,13 @@ class CoursesController extends StateNotifier<CoursesState> {
   }
 }
 
-extension _FirstOrNull<E> on Iterable<E> {
-  E? get firstOrNull => isEmpty ? null : first;
+extension _IterableX<E> on Iterable<E> {
+  E? firstWhereOrNull(bool Function(E e) test) {
+    for (final e in this) {
+      if (test(e)) return e;
+    }
+    return null;
+  }
 }
 
 
@@ -7353,7 +7575,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../courses/application/courses_providers.dart';
 import '../../../courses/presentation/state/courses_controller.dart';
-import '../../../courses/domain/course.dart';
+import '../../../courses/domain/course_models.dart';
 
 class CoursesScreen extends ConsumerWidget {
   const CoursesScreen({super.key});
@@ -7860,122 +8082,100 @@ lib\src\features\user\presentation\screens\course_detail_screen.dart
 
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../courses/application/courses_providers.dart';
-import '../../../courses/domain/course.dart';
+import '../../../auth/presentation/controllers/auth_controller.dart';
+import '../../application/courses_providers.dart';
+import '../../domain/course_models.dart';
 
-class CourseDetailScreen extends ConsumerStatefulWidget {
+class CourseDetailScreen extends ConsumerWidget {
   const CourseDetailScreen({super.key, required this.courseId});
+
   final String courseId;
 
   @override
-  ConsumerState<CourseDetailScreen> createState() => _CourseDetailScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final courseAsync = ref.watch(courseDetailProvider(courseId));
+    final enrollmentAsync = ref.watch(myCourseEnrollmentProvider(courseId));
+    final repo = ref.read(coursesRepositoryProvider);
 
-class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> {
-  bool _showVideo = false;
-  bool _videoWatched = false;
-
-  static const _totalModules = 5;
-
-  @override
-  Widget build(BuildContext context) {
-    final st = ref.watch(coursesControllerProvider);
-    final ctrl = ref.read(coursesControllerProvider.notifier);
-
-    final course = st.courses.where((c) => c.id == widget.courseId).cast<Course?>().firstOrNull;
-    if (course == null) {
-      return const Scaffold(
-        backgroundColor: Color(0xFFF9FAFB),
-        body: Center(child: Text('Kurs bulunamadı')),
-      );
-    }
-
-    final isFav = st.favorites.contains(course.id);
-    final isEnrolled = st.enrolled.contains(course.id);
-    final isCompleted = st.completed.contains(course.id);
-    final progress = st.progressByCourse[course.id] ?? 0;
-
-    return Scaffold(
-      backgroundColor: const Color(0xFFF9FAFB),
-      body: SingleChildScrollView(
+    return Container(
+      color: const Color(0xFFF9FAFB),
+      child: SingleChildScrollView(
         child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 1080),
+            constraints: const BoxConstraints(maxWidth: 1120),
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 18, 16, 28),
-              child: LayoutBuilder(
-                builder: (context, c) {
-                  final isWide = c.maxWidth >= 980;
+              padding: const EdgeInsets.fromLTRB(16, 22, 16, 28),
+              child: courseAsync.when(
+                loading: () => const Center(
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 40),
+                    child: SizedBox(width: 28, height: 28, child: CircularProgressIndicator(strokeWidth: 2.5)),
+                  ),
+                ),
+                error: (e, _) => _DetailError(e.toString(), onRetry: () {
+                  ref.invalidate(courseDetailProvider(courseId));
+                  ref.invalidate(myCourseEnrollmentProvider(courseId));
+                }),
+                data: (course) {
+                  return enrollmentAsync.when(
+                    loading: () => _CourseDetailBody(
+                      course: course,
+                      enrollment: null,
+                      enrolling: true,
+                      onEnroll: null,
+                      onUnenroll: null,
+                      onUpdateProgress: null,
+                    ),
+                    error: (e, _) => _CourseDetailBody(
+                      course: course,
+                      enrollment: null,
+                      enrolling: false,
+                      onEnroll: null,
+                      onUnenroll: null,
+                      onUpdateProgress: null,
+                      warning: 'Enrollment yüklenemedi: $e',
+                    ),
+                    data: (enrollment) {
+                      Future<void> doEnroll() async {
+                        final auth = ref.read(authViewStateProvider).value;
+                        final uid = auth?.user?.id;
+                        if (uid == null || uid.isEmpty) return;
 
-                  final left = _LeftColumn(
-                    course: course,
-                    isFavorite: isFav,
-                    isEnrolled: isEnrolled,
-                    isCompleted: isCompleted,
-                    progress: progress,
-                    showVideo: _showVideo,
-                    videoWatched: _videoWatched,
-                    totalModules: _totalModules,
-                    onToggleFavorite: () => ctrl.toggleFavorite(course.id),
-                    onCopyShare: () async {
-                      await Clipboard.setData(ClipboardData(text: '/courses/${course.id}'));
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Link kopyalandı')),
-                        );
+                        await repo.enroll(userId: uid, courseId: courseId);
+
+                        ref.invalidate(myEnrolledCoursesProvider);
+                        ref.invalidate(myCourseEnrollmentProvider(courseId));
                       }
-                    },
-                    onToggleVideo: () => setState(() => _showVideo = !_showVideo),
-                    onVideoWatched: (v) => setState(() => _videoWatched = v),
-                    onCompleteCourse: () {
-                      ctrl.completeCourse(course.id);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Kurs tamamlandı! 🎉')),
+
+                      Future<void> doUnenroll() async {
+                        final auth = ref.read(authViewStateProvider).value;
+                        final uid = auth?.user?.id;
+                        if (uid == null || uid.isEmpty) return;
+
+                        await repo.unenroll(userId: uid, courseId: courseId);
+
+                        ref.invalidate(myEnrolledCoursesProvider);
+                        ref.invalidate(myCourseEnrollmentProvider(courseId));
+                      }
+
+                      Future<void> doUpdateProgress(int p) async {
+                        if (enrollment == null) return;
+                        await repo.updateProgress(enrollmentId: enrollment.id, progress: p);
+                        ref.invalidate(myEnrolledCoursesProvider);
+                        ref.invalidate(myCourseEnrollmentProvider(courseId));
+                      }
+
+                      return _CourseDetailBody(
+                        course: course,
+                        enrollment: enrollment,
+                        enrolling: false,
+                        onEnroll: doEnroll,
+                        onUnenroll: enrollment == null ? null : doUnenroll,
+                        onUpdateProgress: enrollment == null ? null : doUpdateProgress,
                       );
                     },
-                    onCompleteModule: (idx) => ctrl.markModuleComplete(course.id, idx, totalModules: _totalModules),
-                  );
-
-                  final right = _RightCard(
-                    course: course,
-                    isEnrolled: isEnrolled,
-                    isCompleted: isCompleted,
-                    progress: progress,
-                    onEnroll: () {
-                      ctrl.enroll(course.id);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Kursa kaydolundu ✅')),
-                      );
-                    },
-                    onComplete: () {
-                      ctrl.completeCourse(course.id);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Kurs tamamlandı! 🎉')),
-                      );
-                    },
-                  );
-
-                  if (!isWide) {
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        left,
-                        const SizedBox(height: 14),
-                        right,
-                      ],
-                    );
-                  }
-
-                  return Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(flex: 2, child: left),
-                      const SizedBox(width: 16),
-                      SizedBox(width: 360, child: right),
-                    ],
                   );
                 },
               ),
@@ -7987,228 +8187,168 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> {
   }
 }
 
-class _LeftColumn extends StatelessWidget {
-  const _LeftColumn({
+class _CourseDetailBody extends StatelessWidget {
+  const _CourseDetailBody({
     required this.course,
-    required this.isFavorite,
-    required this.isEnrolled,
-    required this.isCompleted,
-    required this.progress,
-    required this.showVideo,
-    required this.videoWatched,
-    required this.totalModules,
-    required this.onToggleFavorite,
-    required this.onCopyShare,
-    required this.onToggleVideo,
-    required this.onVideoWatched,
-    required this.onCompleteCourse,
-    required this.onCompleteModule,
+    required this.enrollment,
+    required this.enrolling,
+    required this.onEnroll,
+    required this.onUnenroll,
+    required this.onUpdateProgress,
+    this.warning,
   });
 
   final Course course;
-  final bool isFavorite;
-  final bool isEnrolled;
-  final bool isCompleted;
-  final int progress;
+  final CourseEnrollment? enrollment;
+  final bool enrolling;
 
-  final bool showVideo;
-  final bool videoWatched;
-  final int totalModules;
+  final Future<void> Function()? onEnroll;
+  final Future<void> Function()? onUnenroll;
+  final Future<void> Function(int p)? onUpdateProgress;
 
-  final VoidCallback onToggleFavorite;
-  final VoidCallback onCopyShare;
-  final VoidCallback onToggleVideo;
-  final ValueChanged<bool> onVideoWatched;
-  final VoidCallback onCompleteCourse;
-  final ValueChanged<int> onCompleteModule;
+  final String? warning;
 
   @override
   Widget build(BuildContext context) {
+    final enrolled = enrollment != null;
+    final progress = (enrollment?.progress ?? 0).clamp(0, 100);
+
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _Card(
+        // Simple back row (Navbar exists already, but this helps mobile)
+        Row(
+          children: [
+            IconButton(
+              onPressed: () => Navigator.of(context).maybePop(),
+              icon: const Icon(Icons.arrow_back),
+              tooltip: 'Geri',
+            ),
+            const SizedBox(width: 6),
+            const Text('Kurs Detayı', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18)),
+          ],
+        ),
+        const SizedBox(height: 10),
+
+        if (warning != null) ...[
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.orange.withOpacity(0.10),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.orange.withOpacity(0.25)),
+            ),
+            child: Text(warning!, style: const TextStyle(color: Colors.orange)),
+          ),
+          const SizedBox(height: 12),
+        ],
+
+        Container(
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: const Color(0xFFE5E7EB)),
+            boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 18, offset: Offset(0, 8))],
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // top row actions
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              Text(course.title, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900)),
+              const SizedBox(height: 10),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
                 children: [
-                  Expanded(
-                    child: Text(
-                      course.title,
-                      style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  _IconPill(
-                    icon: isFavorite ? Icons.favorite : Icons.favorite_border,
-                    onTap: onToggleFavorite,
-                    tooltip: 'Favori',
-                  ),
-                  const SizedBox(width: 8),
-                  _IconPill(
-                    icon: Icons.share_outlined,
-                    onTap: onCopyShare,
-                    tooltip: 'Paylaş',
-                  ),
+                  _Meta(Icons.school_outlined, course.department ?? '—'),
+                  _Meta(Icons.bar_chart_outlined, course.level ?? '—'),
+                  _Meta(Icons.access_time, course.duration ?? '—'),
+                  _Meta(Icons.person_outline, course.instructor ?? '—'),
                 ],
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
               Text(
-                course.description,
-                style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
+                course.description ?? 'Açıklama yok.',
+                style: const TextStyle(color: Color(0xFF374151), fontWeight: FontWeight.w600, height: 1.45),
               ),
               const SizedBox(height: 14),
 
-              // stats grid (like React)
-              Wrap(
-                runSpacing: 10,
-                spacing: 10,
-                children: [
-                  _MiniStat(icon: Icons.access_time, label: 'Süre', value: course.duration),
-                  _MiniStat(icon: Icons.people_outline, label: 'Kayıtlı', value: '${course.enrolledCount}'),
-                  _MiniStat(icon: Icons.star, label: 'Puan', value: course.rating.toStringAsFixed(1)),
-                  _MiniStat(icon: Icons.bar_chart, label: 'Seviye', value: course.level),
-                ],
-              ),
-            ],
-          ),
-        ),
+              if (course.videoUrl != null && course.videoUrl!.trim().isNotEmpty) ...[
+                const Text('Video URL', style: TextStyle(fontWeight: FontWeight.w900)),
+                const SizedBox(height: 6),
+                SelectableText(course.videoUrl!, style: const TextStyle(color: Color(0xFF6D28D9))),
+                const SizedBox(height: 12),
+              ],
 
-        const SizedBox(height: 14),
+              Container(height: 1, color: const Color(0xFFE5E7EB)),
+              const SizedBox(height: 12),
 
-        if (isEnrolled) ...[
-          _Card(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+              if (!enrolled) ...[
+                SizedBox(
+                  height: 44,
+                  child: ElevatedButton.icon(
+                    onPressed: (enrolling || onEnroll == null) ? null : () async => onEnroll!(),
+                    icon: const Icon(Icons.add),
+                    label: Text(enrolling ? 'Yükleniyor...' : 'Kursa Kayıt Ol', style: const TextStyle(fontWeight: FontWeight.w900)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF6D28D9),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      elevation: 0,
+                    ),
+                  ),
+                ),
+              ] else ...[
                 Row(
                   children: [
-                    const Expanded(
-                      child: Text('İlerlemeniz', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('İlerleme', style: TextStyle(fontWeight: FontWeight.w900)),
+                          const SizedBox(height: 6),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(999),
+                            child: LinearProgressIndicator(
+                              value: progress / 100,
+                              minHeight: 10,
+                              backgroundColor: const Color(0xFFE5E7EB),
+                              valueColor: const AlwaysStoppedAnimation(Color(0xFF2563EB)),
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text('%$progress tamamlandı', style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w800)),
+                        ],
+                      ),
                     ),
-                    Text('$progress%', style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w800)),
+                    const SizedBox(width: 12),
+                    if (onUnenroll != null)
+                      OutlinedButton(
+                        onPressed: () async => onUnenroll!(),
+                        child: const Text('Kayıt İptal'),
+                      ),
                   ],
                 ),
                 const SizedBox(height: 10),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(999),
-                  child: LinearProgressIndicator(
-                    value: progress / 100.0,
-                    minHeight: 10,
-                    backgroundColor: const Color(0xFFE5E7EB),
-                    valueColor: const AlwaysStoppedAnimation(Color(0xFF7C3AED)),
+                if (onUpdateProgress != null)
+                  Wrap(
+                    spacing: 10,
+                    children: [
+                      OutlinedButton(
+                        onPressed: () async => onUpdateProgress!(progress + 10),
+                        child: const Text('+10%'),
+                      ),
+                      OutlinedButton(
+                        onPressed: () async => onUpdateProgress!(progress + 25),
+                        child: const Text('+25%'),
+                      ),
+                      OutlinedButton(
+                        onPressed: () async => onUpdateProgress!(100),
+                        child: const Text('Tamamlandı'),
+                      ),
+                    ],
                   ),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  isCompleted ? 'Tebrikler! Kursu tamamladınız.' : 'Devam edin! Bir sonraki modüle geçebilirsiniz.',
-                  style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
-                ),
               ],
-            ),
-          ),
-          const SizedBox(height: 14),
-        ],
-
-        // Video block (UI-first; actual player later)
-        if (course.videoUrl != null) ...[
-          _Card(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    const Expanded(
-                      child: Text('Video', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
-                    ),
-                    TextButton.icon(
-                      onPressed: onToggleVideo,
-                      icon: Icon(showVideo ? Icons.close : Icons.play_circle_outline),
-                      label: Text(showVideo ? 'Kapat' : 'Videoyu Göster'),
-                    ),
-                  ],
-                ),
-                if (!showVideo) ...[
-                  const SizedBox(height: 6),
-                  const Text(
-                    'Video entegrasyonunu DB wiring aşamasında (YouTube iframe / player) ekleyeceğiz.',
-                    style: TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
-                  ),
-                ] else ...[
-                  const SizedBox(height: 10),
-                  AspectRatio(
-                    aspectRatio: 16 / 9,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF111827),
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: const Center(
-                        child: Icon(Icons.play_circle_fill, size: 64, color: Color(0x55FFFFFF)),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFFFBEB),
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: const Color(0xFFFDE68A)),
-                    ),
-                    child: const Text(
-                      'Video izleme durumu, gerçek player entegrasyonunda otomatik takip edilecek.',
-                      style: TextStyle(color: Color(0xFF92400E), fontWeight: FontWeight.w700),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  CheckboxListTile(
-                    value: videoWatched,
-                    onChanged: (v) => onVideoWatched(v ?? false),
-                    title: const Text('Video izlendi'),
-                    controlAffinity: ListTileControlAffinity.leading,
-                  ),
-                  const SizedBox(height: 8),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 44,
-                    child: ElevatedButton.icon(
-                      onPressed: videoWatched && isEnrolled && !isCompleted ? onCompleteCourse : null,
-                      icon: const Icon(Icons.check_circle_outline),
-                      label: const Text('Kursu Tamamla', style: TextStyle(fontWeight: FontWeight.w900)),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF7C3AED),
-                        foregroundColor: Colors.white,
-                        disabledBackgroundColor: const Color(0xFFE5E7EB),
-                        disabledForegroundColor: const Color(0xFF9CA3AF),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                        elevation: 0,
-                      ),
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-          const SizedBox(height: 14),
-        ],
-
-        _Card(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('Modüller', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
-              const SizedBox(height: 10),
-              for (int i = 0; i < totalModules; i++)
-                _ModuleTile(
-                  index: i,
-                  title: 'Modül ${i + 1}',
-                  isCompleted: (progress >= (((i + 1) / totalModules) * 100).round()),
-                  enabled: isEnrolled && !isCompleted,
-                  onComplete: () => onCompleteModule(i),
-                ),
             ],
           ),
         ),
@@ -8217,271 +8357,56 @@ class _LeftColumn extends StatelessWidget {
   }
 }
 
-class _RightCard extends StatelessWidget {
-  const _RightCard({
-    required this.course,
-    required this.isEnrolled,
-    required this.isCompleted,
-    required this.progress,
-    required this.onEnroll,
-    required this.onComplete,
-  });
-
-  final Course course;
-  final bool isEnrolled;
-  final bool isCompleted;
-  final int progress;
-  final VoidCallback onEnroll;
-  final VoidCallback onComplete;
-
-  @override
-  Widget build(BuildContext context) {
-    final canComplete = isEnrolled && !isCompleted && progress >= 80;
-
-    return _Card(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Container(
-            height: 120,
-            decoration: const BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(16)),
-              gradient: LinearGradient(
-                colors: [Color(0xFF7C3AED), Color(0xFF4F46E5)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-            child: const Center(
-              child: Icon(Icons.menu_book_rounded, size: 56, color: Color(0x55FFFFFF)),
-            ),
-          ),
-          const SizedBox(height: 14),
-          Row(
-            children: [
-              const Expanded(
-                child: Text('Ücretsiz', style: TextStyle(fontWeight: FontWeight.w900)),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF3E8FF),
-                  borderRadius: BorderRadius.circular(999),
-                ),
-                child: Text(
-                  '+${course.pointsCompletion} puan',
-                  style: const TextStyle(color: Color(0xFF7C3AED), fontWeight: FontWeight.w900),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          SizedBox(
-            height: 44,
-            child: ElevatedButton(
-              onPressed: !isEnrolled ? onEnroll : null,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF7C3AED),
-                foregroundColor: Colors.white,
-                disabledBackgroundColor: const Color(0xFFE5E7EB),
-                disabledForegroundColor: const Color(0xFF9CA3AF),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                elevation: 0,
-              ),
-              child: Text(
-                isEnrolled ? 'Kayıtlısınız' : 'Kursa Kaydol (+${course.pointsEnrollment})',
-                style: const TextStyle(fontWeight: FontWeight.w900),
-              ),
-            ),
-          ),
-          const SizedBox(height: 10),
-          if (canComplete)
-            SizedBox(
-              height: 44,
-              child: OutlinedButton.icon(
-                onPressed: onComplete,
-                icon: const Icon(Icons.verified_outlined),
-                label: const Text('Kursu Tamamla', style: TextStyle(fontWeight: FontWeight.w900)),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: const Color(0xFF7C3AED),
-                  side: const BorderSide(color: Color(0xFFD8B4FE)),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                ),
-              ),
-            ),
-          if (isCompleted)
-            const Padding(
-              padding: EdgeInsets.only(top: 10),
-              child: Text(
-                'Kurs Tamamlandı ✅',
-                style: TextStyle(color: Color(0xFF10B981), fontWeight: FontWeight.w900),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          const SizedBox(height: 14),
-          const Divider(height: 1),
-          const SizedBox(height: 14),
-          const _FeatureRow(icon: Icons.check_circle_outline, text: 'Ömür boyu erişim'),
-          const SizedBox(height: 8),
-          const _FeatureRow(icon: Icons.check_circle_outline, text: 'Sertifika (yakında)'),
-          const SizedBox(height: 8),
-          const _FeatureRow(icon: Icons.check_circle_outline, text: 'Mobil uyumlu içerik'),
-        ],
-      ),
-    );
-  }
-}
-
-class _FeatureRow extends StatelessWidget {
-  const _FeatureRow({required this.icon, required this.text});
+class _Meta extends StatelessWidget {
+  const _Meta(this.icon, this.text);
   final IconData icon;
   final String text;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Icon(icon, size: 18, color: const Color(0xFF7C3AED)),
-        const SizedBox(width: 8),
-        Expanded(child: Text(text, style: const TextStyle(fontWeight: FontWeight.w700))),
-      ],
-    );
-  }
-}
-
-class _ModuleTile extends StatelessWidget {
-  const _ModuleTile({
-    required this.index,
-    required this.title,
-    required this.isCompleted,
-    required this.enabled,
-    required this.onComplete,
-  });
-
-  final int index;
-  final String title;
-  final bool isCompleted;
-  final bool enabled;
-  final VoidCallback onComplete;
-
-  @override
-  Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
       decoration: BoxDecoration(
-        color: isCompleted ? const Color(0xFFECFDF5) : Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: isCompleted ? const Color(0xFFA7F3D0) : const Color(0xFFE5E7EB)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 34,
-            height: 34,
-            decoration: BoxDecoration(
-              color: isCompleted ? const Color(0xFFD1FAE5) : const Color(0xFFF3E8FF),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(
-              isCompleted ? Icons.check : Icons.play_arrow,
-              color: isCompleted ? const Color(0xFF10B981) : const Color(0xFF7C3AED),
-            ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(child: Text(title, style: const TextStyle(fontWeight: FontWeight.w900))),
-          if (!isCompleted)
-            TextButton(
-              onPressed: enabled ? onComplete : null,
-              child: const Text('Tamamla'),
-            )
-          else
-            const Text('Tamamlandı', style: TextStyle(color: Color(0xFF10B981), fontWeight: FontWeight.w900)),
-        ],
-      ),
-    );
-  }
-}
-
-class _MiniStat extends StatelessWidget {
-  const _MiniStat({required this.icon, required this.label, required this.value});
-  final IconData icon;
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 240,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF9FAFB),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, size: 18, color: const Color(0xFF6B7280)),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              '$label: $value',
-              style: const TextStyle(fontWeight: FontWeight.w800),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _IconPill extends StatelessWidget {
-  const _IconPill({required this.icon, required this.onTap, required this.tooltip});
-  final IconData icon;
-  final VoidCallback onTap;
-  final String tooltip;
-
-  @override
-  Widget build(BuildContext context) {
-    return Tooltip(
-      message: tooltip,
-      child: Material(
         color: const Color(0xFFF3F4F6),
         borderRadius: BorderRadius.circular(999),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(999),
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.all(10),
-            child: Icon(icon, size: 20),
-          ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: const Color(0xFF4B5563)),
+          const SizedBox(width: 6),
+          Text(text, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12, color: Color(0xFF374151))),
+        ],
+      ),
+    );
+  }
+}
+
+class _DetailError extends StatelessWidget {
+  const _DetailError(this.message, {required this.onRetry});
+  final String message;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 620),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.error_outline, size: 54),
+            const SizedBox(height: 10),
+            const Text('Course yüklenemedi', style: TextStyle(fontWeight: FontWeight.w900)),
+            const SizedBox(height: 8),
+            Text(message, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFF6B7280))),
+            const SizedBox(height: 10),
+            ElevatedButton(onPressed: onRetry, child: const Text('Retry')),
+          ],
         ),
       ),
     );
   }
-}
-
-class _Card extends StatelessWidget {
-  const _Card({required this.child});
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 18, offset: Offset(0, 8))],
-      ),
-      child: child,
-    );
-  }
-}
-
-extension _FirstOrNull<E> on Iterable<E> {
-  E? get firstOrNull => isEmpty ? null : first;
 }
 
 
@@ -8602,7 +8527,998 @@ final studentDashboardProvider =
 });
 
 ✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
+lib\src\features\courses\presentation\screens\course_detail_screen.dart
+
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../application/courses_providers.dart';
+import '../../domain/course_models.dart';
+
+class CourseDetailScreen extends ConsumerWidget {
+  const CourseDetailScreen({super.key, required this.courseId});
+
+  final String courseId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final courseAsync = ref.watch(courseDetailProvider(courseId));
+    final enrollmentAsync = ref.watch(myCourseEnrollmentProvider(courseId));
+    final repo = ref.read(coursesRepositoryProvider);
+
+    return Container(
+      color: const Color(0xFFF9FAFB),
+      child: SingleChildScrollView(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 1120),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 22, 16, 28),
+              child: courseAsync.when(
+                loading: () => const Center(
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 40),
+                    child: SizedBox(width: 28, height: 28, child: CircularProgressIndicator(strokeWidth: 2.5)),
+                  ),
+                ),
+                error: (e, _) => _DetailError(e.toString(), onRetry: () {
+                  ref.invalidate(courseDetailProvider(courseId));
+                  ref.invalidate(myCourseEnrollmentProvider(courseId));
+                }),
+                data: (course) {
+                  return enrollmentAsync.when(
+                    loading: () => _CourseDetailBody(
+                      course: course,
+                      enrollment: null,
+                      enrolling: true,
+                      onEnroll: null,
+                      onUnenroll: null,
+                      onUpdateProgress: null,
+                    ),
+                    error: (e, _) => _CourseDetailBody(
+                      course: course,
+                      enrollment: null,
+                      enrolling: false,
+                      onEnroll: null,
+                      onUnenroll: null,
+                      onUpdateProgress: null,
+                      warning: 'Enrollment yüklenemedi: $e',
+                    ),
+                    data: (enrollment) {
+                      Future<void> doEnroll() async {
+                        final auth = ref.read(authViewStateProvider).value;
+                        final uid = auth?.user?.id;
+                        if (uid == null || uid.isEmpty) return;
+
+                        await repo.enroll(userId: uid, courseId: courseId);
+
+                        ref.invalidate(myEnrolledCoursesProvider);
+                        ref.invalidate(myCourseEnrollmentProvider(courseId));
+                      }
+
+                      Future<void> doUnenroll() async {
+                        final auth = ref.read(authViewStateProvider).value;
+                        final uid = auth?.user?.id;
+                        if (uid == null || uid.isEmpty) return;
+
+                        await repo.unenroll(userId: uid, courseId: courseId);
+
+                        ref.invalidate(myEnrolledCoursesProvider);
+                        ref.invalidate(myCourseEnrollmentProvider(courseId));
+                      }
+
+                      Future<void> doUpdateProgress(int p) async {
+                        if (enrollment == null) return;
+                        await repo.updateProgress(enrollmentId: enrollment.id, progress: p);
+                        ref.invalidate(myEnrolledCoursesProvider);
+                        ref.invalidate(myCourseEnrollmentProvider(courseId));
+                      }
+
+                      return _CourseDetailBody(
+                        course: course,
+                        enrollment: enrollment,
+                        enrolling: false,
+                        onEnroll: doEnroll,
+                        onUnenroll: enrollment == null ? null : doUnenroll,
+                        onUpdateProgress: enrollment == null ? null : doUpdateProgress,
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CourseDetailBody extends StatelessWidget {
+  const _CourseDetailBody({
+    required this.course,
+    required this.enrollment,
+    required this.enrolling,
+    required this.onEnroll,
+    required this.onUnenroll,
+    required this.onUpdateProgress,
+    this.warning,
+  });
+
+  final Course course;
+  final CourseEnrollment? enrollment;
+  final bool enrolling;
+
+  final Future<void> Function()? onEnroll;
+  final Future<void> Function()? onUnenroll;
+  final Future<void> Function(int p)? onUpdateProgress;
+
+  final String? warning;
+
+  @override
+  Widget build(BuildContext context) {
+    final enrolled = enrollment != null;
+    final progress = (enrollment?.progress ?? 0).clamp(0, 100);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Simple back row (Navbar exists already, but this helps mobile)
+        Row(
+          children: [
+            IconButton(
+              onPressed: () => Navigator.of(context).maybePop(),
+              icon: const Icon(Icons.arrow_back),
+              tooltip: 'Geri',
+            ),
+            const SizedBox(width: 6),
+            const Text('Kurs Detayı', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18)),
+          ],
+        ),
+        const SizedBox(height: 10),
+
+        if (warning != null) ...[
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.orange.withOpacity(0.10),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.orange.withOpacity(0.25)),
+            ),
+            child: Text(warning!, style: const TextStyle(color: Colors.orange)),
+          ),
+          const SizedBox(height: 12),
+        ],
+
+        Container(
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: const Color(0xFFE5E7EB)),
+            boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 18, offset: Offset(0, 8))],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(course.title, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900)),
+              const SizedBox(height: 10),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  _Meta(Icons.school_outlined, course.department ?? '—'),
+                  _Meta(Icons.bar_chart_outlined, course.level ?? '—'),
+                  _Meta(Icons.access_time, course.duration ?? '—'),
+                  _Meta(Icons.person_outline, course.instructor ?? '—'),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Text(
+                course.description ?? 'Açıklama yok.',
+                style: const TextStyle(color: Color(0xFF374151), fontWeight: FontWeight.w600, height: 1.45),
+              ),
+              const SizedBox(height: 14),
+
+              if (course.videoUrl != null && course.videoUrl!.trim().isNotEmpty) ...[
+                const Text('Video URL', style: TextStyle(fontWeight: FontWeight.w900)),
+                const SizedBox(height: 6),
+                SelectableText(course.videoUrl!, style: const TextStyle(color: Color(0xFF6D28D9))),
+                const SizedBox(height: 12),
+              ],
+
+              Container(height: 1, color: const Color(0xFFE5E7EB)),
+              const SizedBox(height: 12),
+
+              if (!enrolled) ...[
+                SizedBox(
+                  height: 44,
+                  child: ElevatedButton.icon(
+                    onPressed: (enrolling || onEnroll == null) ? null : () async => onEnroll!(),
+                    icon: const Icon(Icons.add),
+                    label: Text(enrolling ? 'Yükleniyor...' : 'Kursa Kayıt Ol', style: const TextStyle(fontWeight: FontWeight.w900)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF6D28D9),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      elevation: 0,
+                    ),
+                  ),
+                ),
+              ] else ...[
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('İlerleme', style: TextStyle(fontWeight: FontWeight.w900)),
+                          const SizedBox(height: 6),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(999),
+                            child: LinearProgressIndicator(
+                              value: progress / 100,
+                              minHeight: 10,
+                              backgroundColor: const Color(0xFFE5E7EB),
+                              valueColor: const AlwaysStoppedAnimation(Color(0xFF2563EB)),
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text('%$progress tamamlandı', style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w800)),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    if (onUnenroll != null)
+                      OutlinedButton(
+                        onPressed: () async => onUnenroll!(),
+                        child: const Text('Kayıt İptal'),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                if (onUpdateProgress != null)
+                  Wrap(
+                    spacing: 10,
+                    children: [
+                      OutlinedButton(
+                        onPressed: () async => onUpdateProgress!(progress + 10),
+                        child: const Text('+10%'),
+                      ),
+                      OutlinedButton(
+                        onPressed: () async => onUpdateProgress!(progress + 25),
+                        child: const Text('+25%'),
+                      ),
+                      OutlinedButton(
+                        onPressed: () async => onUpdateProgress!(100),
+                        child: const Text('Tamamlandı'),
+                      ),
+                    ],
+                  ),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _Meta extends StatelessWidget {
+  const _Meta(this.icon, this.text);
+  final IconData icon;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF3F4F6),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: const Color(0xFF4B5563)),
+          const SizedBox(width: 6),
+          Text(text, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12, color: Color(0xFF374151))),
+        ],
+      ),
+    );
+  }
+}
+
+class _DetailError extends StatelessWidget {
+  const _DetailError(this.message, {required this.onRetry});
+  final String message;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 620),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.error_outline, size: 54),
+            const SizedBox(height: 10),
+            const Text('Course yüklenemedi', style: TextStyle(fontWeight: FontWeight.w900)),
+            const SizedBox(height: 8),
+            Text(message, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFF6B7280))),
+            const SizedBox(height: 10),
+            ElevatedButton(onPressed: onRetry, child: const Text('Retry')),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 ✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
+lib\src\features\courses\presentation\screens\courses_screen.dart
+
+
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../../core/routing/routes.dart';
+import '../../application/courses_providers.dart';
+import '../../domain/course_models.dart';
+
+class CoursesScreen extends ConsumerStatefulWidget {
+  const CoursesScreen({super.key});
+
+  @override
+  ConsumerState<CoursesScreen> createState() => _CoursesScreenState();
+}
+
+class _CoursesScreenState extends ConsumerState<CoursesScreen>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tabs;
+  final _search = TextEditingController();
+  Timer? _debounce;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabs = TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    _search.dispose();
+    _tabs.dispose();
+    super.dispose();
+  }
+
+  void _onSearchChanged(String v) {
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 250), () {
+      ref.read(coursesSearchProvider.notifier).state = v;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final allCoursesAsync = ref.watch(coursesListProvider);
+    final myCoursesAsync = ref.watch(myEnrolledCoursesProvider);
+
+    // For "Enrolled" badges in ALL tab
+    final enrolledIds = myCoursesAsync.maybeWhen(
+      data: (list) => list.map((e) => e.course.id).toSet(),
+      orElse: () => <String>{},
+    );
+
+    return Container(
+      color: const Color(0xFFF9FAFB),
+      child: SingleChildScrollView(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 1120),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 22, 16, 28),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Kurslar',
+                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900),
+                  ),
+                  const SizedBox(height: 6),
+                  const Text(
+                    'Kurslara göz at, kaydol ve puan kazan.',
+                    style: TextStyle(
+                      color: Color(0xFF6B7280),
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+
+                  // Search + filters container
+                  _FiltersCard(
+                    searchController: _search,
+                    onSearchChanged: _onSearchChanged,
+                    onClear: () {
+                      _search.clear();
+                      ref.read(coursesSearchProvider.notifier).state = '';
+                      ref.read(coursesDepartmentProvider.notifier).state = null;
+                      ref.read(coursesLevelProvider.notifier).state = null;
+                      ref.invalidate(coursesListProvider);
+                    },
+                  ),
+
+                  const SizedBox(height: 14),
+
+                  // Tabs
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: const Color(0xFFE5E7EB)),
+                    ),
+                    child: TabBar(
+                      controller: _tabs,
+                      labelColor: const Color(0xFF111827),
+                      unselectedLabelColor: const Color(0xFF6B7280),
+                      labelStyle: const TextStyle(fontWeight: FontWeight.w900),
+                      indicatorColor: const Color(0xFF6D28D9),
+                      tabs: const [
+                        Tab(text: 'Tümü'),
+                        Tab(text: 'Kayıtlılarım'),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 14),
+
+                  SizedBox(
+                    height: 720, // keeps layout stable inside SingleChildScrollView
+                    child: TabBarView(
+                      controller: _tabs,
+                      children: [
+                        // ALL COURSES
+                        allCoursesAsync.when(
+                          loading: () => const _LoadingBlock(),
+                          error: (e, _) => _ErrorBlock(
+                            title: 'Kurslar yüklenemedi',
+                            message: e.toString(),
+                            onRetry: () => ref.invalidate(coursesListProvider),
+                          ),
+                          data: (courses) {
+                            if (courses.isEmpty) {
+                              return const _EmptyBlock(
+                                icon: Icons.menu_book_outlined,
+                                title: 'Kurs bulunamadı',
+                                message: 'Filtreleri temizleyip tekrar deneyin.',
+                              );
+                            }
+
+                            // Build dynamic filter chips (departments + levels) from dataset
+                            final departments = courses
+                                .map((c) => (c.department ?? '').trim())
+                                .where((d) => d.isNotEmpty)
+                                .toSet()
+                                .toList()
+                              ..sort();
+
+                            final levels = courses
+                                .map((c) => (c.level ?? '').trim())
+                                .where((d) => d.isNotEmpty)
+                                .toSet()
+                                .toList()
+                              ..sort();
+
+                            return Column(
+                              children: [
+                                _QuickChipsRow(
+                                  departments: departments,
+                                  levels: levels,
+                                ),
+                                const SizedBox(height: 10),
+                                Expanded(
+                                  child: ListView.builder(
+                                    itemCount: courses.length,
+                                    itemBuilder: (_, i) {
+                                      final c = courses[i];
+                                      final isEnrolled = enrolledIds.contains(c.id);
+
+                                      return _CourseCard(
+                                        course: c,
+                                        enrolled: isEnrolled,
+                                        onOpen: () => context.push('/courses/${c.id}'),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+
+                        // MY ENROLLED COURSES
+                        myCoursesAsync.when(
+                          loading: () => const _LoadingBlock(),
+                          error: (e, _) => _ErrorBlock(
+                            title: 'Kayıtlı kurslar yüklenemedi',
+                            message: e.toString(),
+                            onRetry: () => ref.invalidate(myEnrolledCoursesProvider),
+                          ),
+                          data: (myCourses) {
+                            if (myCourses.isEmpty) {
+                              return _EmptyBlock(
+                                icon: Icons.school_outlined,
+                                title: 'Henüz kayıtlı kurs yok',
+                                message: '“Tümü” sekmesinden bir kursa kayıt olabilirsin.',
+                                actionLabel: 'Kursları Keşfet',
+                                onAction: () => _tabs.animateTo(0),
+                              );
+                            }
+
+                            return ListView.builder(
+                              itemCount: myCourses.length,
+                              itemBuilder: (_, i) {
+                                final item = myCourses[i];
+                                return _EnrolledCourseCard(
+                                  item: item,
+                                  onOpen: () => context.push('/courses/${item.course.id}'),
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/* ---------------------------- Widgets ---------------------------- */
+
+class _FiltersCard extends ConsumerWidget {
+  const _FiltersCard({
+    required this.searchController,
+    required this.onSearchChanged,
+    required this.onClear,
+  });
+
+  final TextEditingController searchController;
+  final ValueChanged<String> onSearchChanged;
+  final VoidCallback onClear;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final dept = ref.watch(coursesDepartmentProvider);
+    final level = ref.watch(coursesLevelProvider);
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
+        boxShadow: const [
+          BoxShadow(color: Color(0x0A000000), blurRadius: 18, offset: Offset(0, 8)),
+        ],
+      ),
+      child: Column(
+        children: [
+          TextField(
+            controller: searchController,
+            onChanged: onSearchChanged,
+            decoration: InputDecoration(
+              prefixIcon: const Icon(Icons.search),
+              hintText: 'Kurs ara (örn: SQL, Flutter, Veri...)',
+              filled: true,
+              fillColor: const Color(0xFFF9FAFB),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+              ),
+              suffixIcon: (searchController.text.isNotEmpty || dept != null || level != null)
+                  ? IconButton(
+                      onPressed: onClear,
+                      icon: const Icon(Icons.close),
+                      tooltip: 'Temizle',
+                    )
+                  : null,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              _SmallPill(
+                icon: Icons.filter_alt_outlined,
+                text: dept == null ? 'Bölüm: Hepsi' : 'Bölüm: $dept',
+              ),
+              const SizedBox(width: 8),
+              _SmallPill(
+                icon: Icons.bar_chart_outlined,
+                text: level == null ? 'Seviye: Hepsi' : 'Seviye: $level',
+              ),
+              const Spacer(),
+              TextButton.icon(
+                onPressed: () => context.go(Routes.pointsSystem),
+                icon: const Icon(Icons.track_changes_outlined),
+                label: const Text('Puan Sistemi'),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _QuickChipsRow extends ConsumerWidget {
+  const _QuickChipsRow({
+    required this.departments,
+    required this.levels,
+  });
+
+  final List<String> departments;
+  final List<String> levels;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selectedDept = ref.watch(coursesDepartmentProvider);
+    final selectedLevel = ref.watch(coursesLevelProvider);
+
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        const Text('Hızlı Filtre:', style: TextStyle(fontWeight: FontWeight.w900)),
+        const SizedBox(width: 6),
+
+        // Departments
+        ...departments.take(6).map((d) {
+          final selected = selectedDept == d;
+          return FilterChip(
+            selected: selected,
+            label: Text(d),
+            onSelected: (_) {
+              ref.read(coursesDepartmentProvider.notifier).state = selected ? null : d;
+              ref.invalidate(coursesListProvider);
+            },
+          );
+        }),
+
+        // Levels
+        ...levels.take(4).map((l) {
+          final selected = selectedLevel == l;
+          return FilterChip(
+            selected: selected,
+            label: Text(l),
+            onSelected: (_) {
+              ref.read(coursesLevelProvider.notifier).state = selected ? null : l;
+              ref.invalidate(coursesListProvider);
+            },
+          );
+        }),
+      ],
+    );
+  }
+}
+
+class _CourseCard extends StatelessWidget {
+  const _CourseCard({
+    required this.course,
+    required this.enrolled,
+    required this.onOpen,
+  });
+
+  final Course course;
+  final bool enrolled;
+  final VoidCallback onOpen;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
+        boxShadow: const [BoxShadow(color: Color(0x08000000), blurRadius: 14, offset: Offset(0, 8))],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              color: const Color(0xFFEDE9FE),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: const Icon(Icons.menu_book_outlined, color: Color(0xFF6D28D9)),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        course.title,
+                        style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+                      ),
+                    ),
+                    if (enrolled)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFDCFCE7),
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: const Text(
+                          'Kayıtlı',
+                          style: TextStyle(color: Color(0xFF16A34A), fontWeight: FontWeight.w900, fontSize: 12),
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  (course.description ?? 'Açıklama yok.'),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    _MetaChip(icon: Icons.school_outlined, text: course.department ?? '—'),
+                    _MetaChip(icon: Icons.bar_chart_outlined, text: course.level ?? '—'),
+                    _MetaChip(icon: Icons.access_time, text: course.duration ?? '—'),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 10),
+          ElevatedButton(
+            onPressed: onOpen,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF6D28D9),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              elevation: 0,
+            ),
+            child: const Text('Detay →', style: TextStyle(fontWeight: FontWeight.w900)),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _EnrolledCourseCard extends StatelessWidget {
+  const _EnrolledCourseCard({required this.item, required this.onOpen});
+
+  final EnrolledCourse item;
+  final VoidCallback onOpen;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = item.course;
+    final p = item.enrollment.progress.clamp(0, 100);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(c.title, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
+              ),
+              TextButton(onPressed: onOpen, child: const Text('Aç →')),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            c.description ?? 'Açıklama yok.',
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 10),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(999),
+            child: LinearProgressIndicator(
+              value: p / 100,
+              minHeight: 10,
+              backgroundColor: const Color(0xFFE5E7EB),
+              valueColor: const AlwaysStoppedAnimation(Color(0xFF2563EB)),
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text('%$p tamamlandı', style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w800, fontSize: 12)),
+        ],
+      ),
+    );
+  }
+}
+
+class _MetaChip extends StatelessWidget {
+  const _MetaChip({required this.icon, required this.text});
+  final IconData icon;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF3F4F6),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: const Color(0xFF4B5563)),
+          const SizedBox(width: 6),
+          Text(
+            text,
+            style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12, color: Color(0xFF374151)),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SmallPill extends StatelessWidget {
+  const _SmallPill({required this.icon, required this.text});
+  final IconData icon;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF3F4F6),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: const Color(0xFF4B5563)),
+          const SizedBox(width: 6),
+          Text(text, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12)),
+        ],
+      ),
+    );
+  }
+}
+
+class _LoadingBlock extends StatelessWidget {
+  const _LoadingBlock();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: SizedBox(
+        width: 28,
+        height: 28,
+        child: CircularProgressIndicator(strokeWidth: 2.5),
+      ),
+    );
+  }
+}
+
+class _EmptyBlock extends StatelessWidget {
+  const _EmptyBlock({
+    required this.icon,
+    required this.title,
+    required this.message,
+    this.actionLabel,
+    this.onAction,
+  });
+
+  final IconData icon;
+  final String title;
+  final String message;
+  final String? actionLabel;
+  final VoidCallback? onAction;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 520),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 56, color: const Color(0xFFD1D5DB)),
+              const SizedBox(height: 10),
+              Text(title, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
+              const SizedBox(height: 6),
+              Text(message, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600)),
+              if (actionLabel != null && onAction != null) ...[
+                const SizedBox(height: 10),
+                OutlinedButton(onPressed: onAction, child: Text('$actionLabel →')),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ErrorBlock extends StatelessWidget {
+  const _ErrorBlock({
+    required this.title,
+    required this.message,
+    required this.onRetry,
+  });
+
+  final String title;
+  final String message;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 620),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.error_outline, size: 54),
+              const SizedBox(height: 10),
+              Text(title, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
+              const SizedBox(height: 6),
+              Text(message, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFF6B7280))),
+              const SizedBox(height: 10),
+              ElevatedButton(onPressed: onRetry, child: const Text('Retry')),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+
 ✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 ✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 ✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅

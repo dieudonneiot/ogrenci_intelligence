@@ -1,7 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../data/courses_repository.dart';
-import '../../domain/course.dart';
+import '../../domain/course_models.dart';
 
 @immutable
 class CoursesState {
@@ -89,17 +90,37 @@ class CoursesController extends StateNotifier<CoursesState> {
 
   Future<void> load() async {
     state = state.copyWith(isLoading: true, error: null);
+
     try {
-      final list = await _repo.fetchCourses();
-      state = state.copyWith(isLoading: false, courses: list);
+      // DB fetch (title search supported). Category is UI-only for now.
+      final list = await _repo.listCourses(
+        search: state.query,
+        department: null,
+        level: null,
+      );
+
+      // If category filter is used, filter locally (since DB has no "category" yet)
+      final filtered = (state.category == 'Tümü')
+          ? list
+          : list.where((c) => (c.category ?? '') == state.category).toList();
+
+      state = state.copyWith(isLoading: false, courses: filtered);
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
 
-  void setQuery(String v) => state = state.copyWith(query: v);
+  void setQuery(String v) {
+    state = state.copyWith(query: v);
+    // optional: auto reload on query change
+    // unawaited(load());
+  }
 
-  void setCategory(String v) => state = state.copyWith(category: v);
+  void setCategory(String v) {
+    state = state.copyWith(category: v);
+    // optional: auto reload (since we filter locally, no need)
+    // state = state.copyWith(courses: ...)
+  }
 
   void toggleFavorite(String courseId) {
     final next = {...state.favorites};
@@ -119,8 +140,9 @@ class CoursesController extends StateNotifier<CoursesState> {
 
     // award enrollment points once
     var earned = state.earnedPoints;
-    var given = {...state.enrollmentPointsGiven};
-    final course = state.courses.where((c) => c.id == courseId).cast<Course?>().firstOrNull;
+    final given = {...state.enrollmentPointsGiven};
+
+    final course = state.courses.firstWhereOrNull((c) => c.id == courseId);
     if (!given.contains(courseId) && course != null) {
       earned += course.pointsEnrollment;
       given.add(courseId);
@@ -153,8 +175,9 @@ class CoursesController extends StateNotifier<CoursesState> {
 
     // award completion points once
     var earned = state.earnedPoints;
-    var given = {...state.completionPointsGiven};
-    final course = state.courses.where((c) => c.id == courseId).cast<Course?>().firstOrNull;
+    final given = {...state.completionPointsGiven};
+
+    final course = state.courses.firstWhereOrNull((c) => c.id == courseId);
     if (!given.contains(courseId) && course != null) {
       earned += course.pointsCompletion;
       given.add(courseId);
@@ -169,6 +192,11 @@ class CoursesController extends StateNotifier<CoursesState> {
   }
 }
 
-extension _FirstOrNull<E> on Iterable<E> {
-  E? get firstOrNull => isEmpty ? null : first;
+extension _IterableX<E> on Iterable<E> {
+  E? firstWhereOrNull(bool Function(E e) test) {
+    for (final e in this) {
+      if (test(e)) return e;
+    }
+    return null;
+  }
 }

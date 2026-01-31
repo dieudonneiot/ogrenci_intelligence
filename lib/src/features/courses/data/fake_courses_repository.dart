@@ -1,36 +1,52 @@
 import 'dart:math';
-import '../domain/course.dart';
-import 'courses_repository.dart';
+import '../domain/course_models.dart';
 
-class FakeCoursesRepository implements CoursesRepository {
-  FakeCoursesRepository() {
-    _courses = _seed();
-  }
+class FakeCoursesRepository {
+  FakeCoursesRepository() : _courses = _seed();
 
-  late final List<Course> _courses;
+  final List<Course> _courses;
 
-  @override
-  Future<List<Course>> fetchCourses({String? department}) async {
-    // simulate latency
+  Future<List<Course>> listCourses({
+    String? search,
+    String? department,
+    String? level,
+  }) async {
     await Future<void>.delayed(const Duration(milliseconds: 250));
-    if (department == null || department.trim().isEmpty) return _courses;
-    return _courses.where((c) => c.department == department).toList();
+
+    Iterable<Course> out = _courses;
+
+    final q = (search ?? '').trim().toLowerCase();
+    if (q.isNotEmpty) {
+      out = out.where((c) => c.title.toLowerCase().contains(q));
+    }
+
+    final dep = (department ?? '').trim();
+    if (dep.isNotEmpty) {
+      out = out.where((c) => (c.department ?? '') == dep);
+    }
+
+    final lev = (level ?? '').trim();
+    if (lev.isNotEmpty) {
+      out = out.where((c) => (c.level ?? '') == lev);
+    }
+
+    return out.toList();
   }
 
-  @override
-  Future<Course?> fetchCourseById(String id) async {
+  Future<Course?> getCourseById(String courseId) async {
     await Future<void>.delayed(const Duration(milliseconds: 150));
     try {
-      return _courses.firstWhere((c) => c.id == id);
+      return _courses.firstWhere((c) => c.id == courseId);
     } catch (_) {
       return null;
     }
   }
 
-  List<Course> _seed() {
+  static List<Course> _seed() {
     final rng = Random(42);
     // ignore: unused_element
     double r() => (rng.nextInt(17) + 30) / 10.0; // 3.0..4.6
+    // using r() is optional; keeping seed constant is fine
 
     return const [
       Course(
