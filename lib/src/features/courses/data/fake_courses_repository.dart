@@ -29,6 +29,7 @@ class FakeCoursesRepository implements CoursesRepository {
 
   List<Course> _seed() {
     final rng = Random(42);
+    // ignore: unused_element
     double r() => (rng.nextInt(17) + 30) / 10.0; // 3.0..4.6
 
     return const [

@@ -1,185 +1,195 @@
-
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../core/supabase/supabase_service.dart';
-import '../domain/dashboard_application.dart';
-
-typedef Json = Map<String, dynamic>;
-
-Json _asJson(dynamic v) {
-  if (v is Json) return v;
-  if (v is Map) return v.cast<String, dynamic>();
-  throw StateError('Expected Map<String,dynamic> but got ${v.runtimeType}');
-}
-
-List<Json> _asJsonList(dynamic v) {
-  if (v is List) {
-    return v
-        .where((e) => e != null)
-        .map((e) => _asJson(e))
-        .toList(growable: false);
-  }
-  return const <Json>[];
-}
-
-int _asInt(dynamic v, {int fallback = 0}) {
-  if (v is int) return v;
-  if (v is num) return v.toInt();
-  if (v is String) return int.tryParse(v) ?? fallback;
-  return fallback;
-}
-
-String _asString(dynamic v, {String fallback = ''}) {
-  if (v is String) return v;
-  return v?.toString() ?? fallback;
-}
-
-DateTime? _asDate(dynamic v) {
-  if (v is String) return DateTime.tryParse(v);
-  return null;
-}
+import '../domain/student_dashboard_models.dart';
 
 class StudentDashboardRepository {
-  const StudentDashboardRepository();
+  StudentDashboardRepository(this._client);
 
-  SupabaseClient get _client => SupabaseService.client;
+  final SupabaseClient _client;
 
-  Future<StudentDashboardData> fetchDashboard({
-    required String userId,
-    required String email,
-    required String fallbackFullName,
-  }) async {
-    final profile = await _fetchProfile(
-      userId: userId,
-      email: email,
-      fallbackFullName: fallbackFullName,
-    );
-
-    final completedCourses = await _fetchCompletedCoursesCount(userId);
-    final activeApplications = await _fetchActiveApplicationsCount(userId);
-
-    final enrolledCourses = await _fetchEnrolledCourses(userId);
-    final activities = await _fetchRecentActivities(userId);
-
-    return StudentDashboardData(
-      profile: profile,
-      completedCourses: completedCourses,
-      activeApplications: activeApplications,
-      enrolledCourses: enrolledCourses,
-      recentActivities: activities,
-    );
-  }
-
-  Future<StudentProfile> _fetchProfile({
-    required String userId,
-    required String email,
-    required String fallbackFullName,
-  }) async {
-    // profiles: id, full_name, department, year, total_points, email
-    final dynamic res = await _client
+  Future<StudentDashboardVm> fetchDashboard({required String userId}) async {
+    // 1) Profile: name + points (+ department)
+    final profileRows = await _client
         .from('profiles')
-        .select('id, full_name, department, year, total_points')
+        .select('id, email, full_name, total_points, department')
         .eq('id', userId)
-        .maybeSingle();
+        .limit(1);
 
-    final Json? row = (res == null) ? null : _asJson(res);
+    final profile = profileRows.isNotEmpty ? profileRows.first : <String, dynamic>{};
 
-    final fullName = _asString(row?['full_name']).trim();
-    final department = _asString(row?['department']).trim();
-    final year = _asInt(row?['year'], fallback: 1);
-    final points = _asInt(row?['total_points'], fallback: 0);
+    final fullName = (profile['full_name'] as String?)?.trim();
+    final email = (profile['email'] as String?)?.trim();
 
-    return StudentProfile(
-      userId: userId,
-      email: email,
-      fullName: fullName.isNotEmpty ? fullName : fallbackFullName,
-      department: department.isNotEmpty ? department : '—',
-      year: year,
-      totalPoints: points,
-    );
-  }
+    final displayName = (fullName != null && fullName.isNotEmpty)
+        ? fullName
+        : (email != null && email.contains('@'))
+            ? email.split('@').first
+            : 'Öğrenci';
 
-  Future<int> _fetchCompletedCoursesCount(String userId) async {
-    // completed_courses: id, user_id
-    final dynamic res = await _client
+    final totalPoints = (profile['total_points'] as int?) ?? 0;
+
+    // 2) Completed courses count
+    final completedRows = await _client
         .from('completed_courses')
         .select('id')
         .eq('user_id', userId);
 
-    return _asJsonList(res).length;
-  }
+    final coursesCompleted = completedRows.length;
 
-  Future<int> _fetchActiveApplicationsCount(String userId) async {
-    // job_applications: user_id, status
-    // internship_applications: user_id, status
-    final dynamic jobs = await _client
-        .from('job_applications')
-        .select('id, status')
-        .eq('user_id', userId)
-        .eq('status', 'pending');
-
-    final dynamic internships = await _client
-        .from('internship_applications')
-        .select('id, status')
-        .eq('user_id', userId)
-        .eq('status', 'pending');
-
-    return _asJsonList(jobs).length + _asJsonList(internships).length;
-  }
-
-  Future<List<EnrolledCourse>> _fetchEnrolledCourses(String userId) async {
-    // course_enrollments: id, user_id, progress, enrolled_at, course_id
-    // courses: id, title, description, duration, level
-    final dynamic res = await _client
+    // 3) Ongoing courses count + list (progress < 100)
+    final ongoingEnrollRows = await _client
         .from('course_enrollments')
-        .select('id, progress, enrolled_at, courses(id, title, description, duration, level)')
+        .select('course_id, progress, enrolled_at')
         .eq('user_id', userId)
+        .lt('progress', 100)
         .order('enrolled_at', ascending: false);
 
-    final rows = _asJsonList(res);
+    final ongoingCoursesCount = ongoingEnrollRows.length;
 
-    return rows.map((r) {
-      final enrollmentId = _asString(r['id']);
-      final progress = _asInt(r['progress'], fallback: 0).clamp(0, 100);
+    // take top 3 for the dashboard card
+    final ongoingTop = ongoingEnrollRows.take(3).toList();
+    final courseIds = ongoingTop
+        .map((e) => (e['course_id'] as String?) ?? '')
+        .where((id) => id.isNotEmpty)
+        .toList();
 
-      final Json course = r['courses'] == null ? const <String, dynamic>{} : _asJson(r['courses']);
-      final courseId = _asString(course['id']);
-      final title = _asString(course['title']);
-      final description = _asString(course['description']);
-      final duration = _asString(course['duration'], fallback: '—');
-      final level = _asString(course['level'], fallback: '—');
+    Map<String, Map<String, dynamic>> courseById = {};
+    if (courseIds.isNotEmpty) {
+      final courseRows = await _client
+          .from('courses')
+          .select('id, title, description, duration, level')
+          .inFilter('id', courseIds);
 
-      return EnrolledCourse(
-        enrollmentId: enrollmentId,
-        courseId: courseId,
-        title: title.isNotEmpty ? title : 'Untitled course',
-        description: description,
-        duration: duration,
-        level: level,
-        progress: progress,
-        enrolledAt: _asDate(r['enrolled_at']),
-      );
-    }).toList(growable: false);
-  }
+      courseById = {
+        for (final r in courseRows)
+          // ignore: unnecessary_cast
+          (r['id'] as String): (r as Map<String, dynamic>),
+      };
+    }
 
-  Future<List<ActivityItem>> _fetchRecentActivities(String userId) async {
-    // activity_logs: user_id, type, points, created_at, description
-    final dynamic res = await _client
-        .from('activity_logs')
-        .select('type, points, created_at, description')
+    final enrolledCourses = <EnrolledCourse>[
+      for (final enr in ongoingTop)
+        () {
+          final cid = (enr['course_id'] as String?) ?? '';
+          final c = courseById[cid] ?? const <String, dynamic>{};
+
+          final title = (c['title'] as String?) ?? 'Kurs';
+          final description = (c['description'] as String?) ?? '';
+          final duration = (c['duration'] as String?) ?? '';
+          final level = (c['level'] as String?) ?? '';
+
+          final progress = (enr['progress'] as int?) ?? 0;
+
+          return EnrolledCourse(
+            courseId: cid,
+            title: title,
+            description: description,
+            duration: duration,
+            level: level,
+            progress: progress.clamp(0, 100),
+          );
+        }(),
+    ];
+
+    // 4) Active applications count (pending)
+    final jobPending = await _client
+        .from('job_applications')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('status', 'pending');
+
+    final internshipPending = await _client
+        .from('internship_applications')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('status', 'pending');
+
+    final activeApplications = jobPending.length + internshipPending.length;
+
+    // 5) Department rank (optional): latest snapshot for user
+    int? departmentRank;
+    final lb = await _client
+        .from('leaderboard_snapshots')
+        .select('rank_department, created_at')
         .eq('user_id', userId)
         .order('created_at', ascending: false)
-        .limit(10);
+        .limit(1);
 
-    final rows = _asJsonList(res);
+    if (lb.isNotEmpty) {
+      departmentRank = (lb.first['rank_department'] as int?);
+    }
 
-    return rows.map((r) {
-      return ActivityItem(
-        type: _asString(r['type']),
-        points: _asInt(r['points'], fallback: 0),
-        createdAt: _asDate(r['created_at']),
-        description: _asString(r['description'], fallback: ''),
-      );
-    }).toList(growable: false);
+    // 6) Activities (from activity_logs)
+    final activityRows = await _client
+        .from('activity_logs')
+        .select('category, action, points, created_at')
+        .eq('user_id', userId)
+        .order('created_at', ascending: false)
+        .limit(6);
+
+    final activities = <ActivityItem>[
+      for (final r in activityRows)
+        ActivityItem(
+          category: _mapCategory((r['category'] as String?) ?? ''),
+          action: (r['action'] as String?) ?? '',
+          points: (r['points'] as int?) ?? 0,
+          createdAt: DateTime.tryParse((r['created_at'] as String?) ?? '')?.toLocal() ??
+              DateTime.now(),
+        ),
+    ];
+
+    // 7) Today + week points (sum activity_logs.points)
+    final now = DateTime.now();
+    final startOfDay = DateTime(now.year, now.month, now.day);
+    final startOfWeek = startOfDay.subtract(Duration(days: now.weekday - 1)); // Monday
+
+    final todayRows = await _client
+        .from('activity_logs')
+        .select('points, created_at')
+        .eq('user_id', userId)
+        .gte('created_at', startOfDay.toUtc().toIso8601String());
+
+    final weekRows = await _client
+        .from('activity_logs')
+        .select('points, created_at')
+        .eq('user_id', userId)
+        .gte('created_at', startOfWeek.toUtc().toIso8601String());
+
+    final todayPoints = todayRows.fold<int>(0, (sum, r) => sum + ((r['points'] as int?) ?? 0));
+    final weekPoints = weekRows.fold<int>(0, (sum, r) => sum + ((r['points'] as int?) ?? 0));
+
+    final stats = DashboardStats(
+      totalPoints: totalPoints,
+      coursesCompleted: coursesCompleted,
+      activeApplications: activeApplications,
+      ongoingCourses: ongoingCoursesCount,
+      departmentRank: departmentRank,
+    );
+
+    return StudentDashboardVm(
+      displayName: displayName,
+      stats: stats,
+      enrolledCourses: enrolledCourses,
+      activities: activities,
+      todayPoints: todayPoints,
+      weekPoints: weekPoints,
+    );
+  }
+
+  static ActivityCategory _mapCategory(String raw) {
+    switch (raw.trim().toLowerCase()) {
+      case 'course':
+        return ActivityCategory.course;
+      case 'job':
+        return ActivityCategory.job;
+      case 'internship':
+        return ActivityCategory.internship;
+      case 'achievement':
+        return ActivityCategory.achievement;
+      case 'platform':
+        return ActivityCategory.platform;
+      default:
+        return ActivityCategory.platform;
+    }
   }
 }
