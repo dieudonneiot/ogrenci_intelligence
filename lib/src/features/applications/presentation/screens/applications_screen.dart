@@ -413,7 +413,7 @@ class _FiltersBar extends StatelessWidget {
           SizedBox(
             width: 190,
             child: DropdownButtonFormField<ApplicationStatus?>(
-              value: status,
+              initialValue: status,
               decoration: InputDecoration(
                 filled: true,
                 fillColor: Colors.white,

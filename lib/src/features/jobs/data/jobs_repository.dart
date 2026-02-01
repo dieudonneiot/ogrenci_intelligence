@@ -67,7 +67,7 @@ class JobsRepository {
     var q = _client
         .from('jobs')
         .select(
-          'id, company_id, company_name, title, department, location, description, requirements, '
+          'id, company_id, company, title, department, location, description, requirements, '
           'salary_min, salary_max, type, is_remote, work_type, deadline, is_active, min_year, max_year, created_at',
         )
         .eq('is_active', true);
@@ -79,7 +79,7 @@ class JobsRepository {
     final search = _safeLike(filters.query);
     if (search.isNotEmpty) {
       q = q.or(
-        'title.ilike.%$search%,company_name.ilike.%$search%,department.ilike.%$search%,location.ilike.%$search%',
+        'title.ilike.%$search%,company.ilike.%$search%,department.ilike.%$search%,location.ilike.%$search%',
       );
     }
 
@@ -125,7 +125,7 @@ class JobsRepository {
     final row = await _client
         .from('jobs')
         .select(
-          'id, company_id, company_name, title, department, location, description, requirements, '
+          'id, company_id, company, title, department, location, description, requirements, '
           'salary_min, salary_max, type, is_remote, work_type, deadline, is_active, min_year, max_year, created_at',
         )
         .eq('id', jobId)

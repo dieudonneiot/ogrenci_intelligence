@@ -82,7 +82,7 @@ class Job {
     return Job(
       id: (map['id'] ?? '').toString(),
       companyId: (map['company_id'] ?? '').toString(),
-      companyName: (map['company_name'] ?? '').toString(),
+      companyName: (map['company_name'] ?? map['company'] ?? '').toString(),
       title: (map['title'] ?? '').toString(),
       department: (map['department'] ?? '').toString(),
       location: (map['location'] ?? '').toString(),
