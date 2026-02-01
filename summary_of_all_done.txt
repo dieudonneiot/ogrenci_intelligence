@@ -6007,12 +6007,13 @@ class StudentDashboardRepository {
     );
   }
 
+  // ✅ FIX: leaderboard_snapshots.period_date (NOT period_end)
   Future<int?> getLatestDepartmentRank(String uid) async {
     final rows = await _client
         .from('leaderboard_snapshots')
-        .select('rank_department,period_date') // ✅ period_date exists
+        .select('rank_department,period_date')
         .eq('user_id', uid)
-        .order('period_date', ascending: false) // ✅ order by existing column
+        .order('period_date', ascending: false)
         .limit(1) as List<dynamic>;
 
     if (rows.isEmpty) return null;
@@ -6022,7 +6023,7 @@ class StudentDashboardRepository {
 
   Future<_Counts> getCounts(String uid) async {
     final completedRows = await _client
-        .from('completed_at')
+        .from('completed_courses')
         .select('id')
         .eq('user_id', uid) as List<dynamic>;
 
@@ -6037,14 +6038,16 @@ class StudentDashboardRepository {
       return p < 100;
     }).length;
 
+    // ✅ FIX: pending applications are in job_applications / internship_applications
+    // application_notes has NO status column.
     final jobPending = await _client
-        .from('applied_at')
+        .from('job_applications')
         .select('id')
         .eq('user_id', uid)
         .eq('status', 'pending') as List<dynamic>;
 
     final internshipPending = await _client
-        .from('applied_at')
+        .from('internship_applications')
         .select('id')
         .eq('user_id', uid)
         .eq('status', 'pending') as List<dynamic>;
@@ -6107,7 +6110,7 @@ class StudentDashboardRepository {
   }) async {
     final List<ActivityItem> items = [];
 
-    // 1) Points ledger
+    // ✅ FIX: user_points.source (NOT event_type)
     final pointsRows = await _client
         .from('user_points')
         .select('points,source,description,created_at')
@@ -6118,31 +6121,31 @@ class StudentDashboardRepository {
     for (final r in pointsRows) {
       final m = r as Map<String, dynamic>;
       final pts = (m['points'] as num?)?.toInt() ?? 0;
-      final type = (m['source'] as String?) ?? '';
+      final source = (m['source'] as String?) ?? '';
       final desc = (m['description'] as String?) ?? 'Puan kazanıldı';
       final created = DateTime.tryParse(m['created_at']?.toString() ?? '') ?? DateTime.now();
 
       items.add(ActivityItem(
-        category: _mapEventType(type),
+        category: _mapEventType(source),
         action: desc,
         points: pts,
         createdAt: created,
       ));
     }
 
-    // 2) Course completions
+    // ✅ FIX: completed_courses.completed_at (NOT created_at)
     final completedRows = await _client
-        .from('completed_at')
-        .select('created_at,courses(title)')
+        .from('completed_courses')
+        .select('completed_at,courses(title)')
         .eq('user_id', uid)
-        .order('created_at', ascending: false)
+        .order('completed_at', ascending: false)
         .limit(5) as List<dynamic>;
 
     for (final r in completedRows) {
       final m = r as Map<String, dynamic>;
       final c = (m['courses'] as Map<String, dynamic>?) ?? const <String, dynamic>{};
       final title = (c['title'] as String?) ?? 'Kurs';
-      final created = DateTime.tryParse(m['created_at']?.toString() ?? '') ?? DateTime.now();
+      final created = DateTime.tryParse(m['completed_at']?.toString() ?? '') ?? DateTime.now();
 
       items.add(ActivityItem(
         category: ActivityCategory.course,
@@ -6152,19 +6155,19 @@ class StudentDashboardRepository {
       ));
     }
 
-    // 3) Job applications
+    // ✅ FIX: job_applications.applied_at (NOT created_at)
     final jobRows = await _client
-        .from('applied_at')
-        .select('created_at,status,jobs(title)')
+        .from('job_applications')
+        .select('applied_at,status,jobs(title)')
         .eq('user_id', uid)
-        .order('created_at', ascending: false)
+        .order('applied_at', ascending: false)
         .limit(5) as List<dynamic>;
 
     for (final r in jobRows) {
       final m = r as Map<String, dynamic>;
       final j = (m['jobs'] as Map<String, dynamic>?) ?? const <String, dynamic>{};
       final title = (j['title'] as String?) ?? 'İş';
-      final created = DateTime.tryParse(m['created_at']?.toString() ?? '') ?? DateTime.now();
+      final created = DateTime.tryParse(m['applied_at']?.toString() ?? '') ?? DateTime.now();
 
       items.add(ActivityItem(
         category: ActivityCategory.job,
@@ -6174,19 +6177,19 @@ class StudentDashboardRepository {
       ));
     }
 
-    // 4) Internship applications
+    // ✅ FIX: internship_applications.applied_at (NOT created_at)
     final internRows = await _client
-        .from('applied_at')
-        .select('created_at,status,internships(title)')
+        .from('internship_applications')
+        .select('applied_at,status,internships(title)')
         .eq('user_id', uid)
-        .order('created_at', ascending: false)
+        .order('applied_at', ascending: false)
         .limit(5) as List<dynamic>;
 
     for (final r in internRows) {
       final m = r as Map<String, dynamic>;
       final it = (m['internships'] as Map<String, dynamic>?) ?? const <String, dynamic>{};
       final title = (it['title'] as String?) ?? 'Staj';
-      final created = DateTime.tryParse(m['created_at']?.toString() ?? '') ?? DateTime.now();
+      final created = DateTime.tryParse(m['applied_at']?.toString() ?? '') ?? DateTime.now();
 
       items.add(ActivityItem(
         category: ActivityCategory.internship,
@@ -6196,18 +6199,17 @@ class StudentDashboardRepository {
       ));
     }
 
-    // 5) Badges
+    // Badges (use badge_title)
     final badgeRows = await _client
         .from('user_badges')
-        .select('earned_at,badges(name)')
+        .select('earned_at,badge_title')
         .eq('user_id', uid)
         .order('earned_at', ascending: false)
         .limit(5) as List<dynamic>;
 
     for (final r in badgeRows) {
       final m = r as Map<String, dynamic>;
-      final b = (m['badges'] as Map<String, dynamic>?) ?? const <String, dynamic>{};
-      final name = (b['name'] as String?) ?? 'Rozet';
+      final name = (m['badge_title'] as String?) ?? 'Rozet';
       final created = DateTime.tryParse(m['earned_at']?.toString() ?? '') ?? DateTime.now();
 
       items.add(ActivityItem(
@@ -6250,7 +6252,7 @@ class StudentDashboardRepository {
     final activities = await activitiesF;
 
     final displayFallback =
-        (fallbackName == null || fallbackName.isEmpty) ? 'Ã–ÄŸrenci' : fallbackName;
+        (fallbackName == null || fallbackName.isEmpty) ? 'Öğrenci' : fallbackName;
     final displayName = (profile.fullName == null || profile.fullName!.isEmpty)
         ? displayFallback
         : profile.fullName!;
@@ -6271,8 +6273,8 @@ class StudentDashboardRepository {
     );
   }
 
-  static ActivityCategory _mapEventType(String eventType) {
-    final t = eventType.toLowerCase();
+  static ActivityCategory _mapEventType(String source) {
+    final t = source.toLowerCase();
     if (t.contains('course')) return ActivityCategory.course;
     if (t.contains('job')) return ActivityCategory.job;
     if (t.contains('intern')) return ActivityCategory.internship;
@@ -6306,6 +6308,7 @@ class _Counts {
   final int activeApplications;
   final int ongoingCourses;
 }
+
 
 
 ✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
@@ -6509,7 +6512,6 @@ class StudentDashboardScreen extends ConsumerWidget {
                             final left = _OngoingCoursesCard(
                               enrolledCourses: vm.enrolledCourses,
                               onSeeAll: () => context.go(Routes.courses),
-                              onContinue: (courseId) => context.go('/courses/$courseId'),
                             );
 
 
@@ -6828,12 +6830,10 @@ class _OngoingCoursesCard extends StatelessWidget {
   const _OngoingCoursesCard({
     required this.enrolledCourses,
     required this.onSeeAll,
-    required this.onContinue,
   });
 
   final List<DashboardEnrolledCourse> enrolledCourses;
   final VoidCallback onSeeAll;
-  final void Function(String courseId) onContinue;
 
   @override
   Widget build(BuildContext context) {
@@ -6882,10 +6882,7 @@ class _OngoingCoursesCard extends StatelessWidget {
             Column(
               children: enrolledCourses
                   .map(
-                    (e) => _EnrolledCourseTile(
-                      course: e,
-                      onContinue: () => onContinue(e.courseId),
-                    ),
+                    (e) => _EnrolledCourseTile(course: e),
                   )
                   .toList(),
             ),
@@ -6896,13 +6893,8 @@ class _OngoingCoursesCard extends StatelessWidget {
 }
 
 class _EnrolledCourseTile extends StatelessWidget {
-  const _EnrolledCourseTile({
-    required this.course,
-    required this.onContinue,
-  });
-
+  const _EnrolledCourseTile({required this.course});
   final DashboardEnrolledCourse course;
-  final VoidCallback onContinue;
 
   @override
   Widget build(BuildContext context) {
@@ -6931,23 +6923,8 @@ class _EnrolledCourseTile extends StatelessWidget {
                 ),
                 child: Text(
                   course.level,
-                  style: const TextStyle(
-                    color: Color(0xFF1D4ED8),
-                    fontWeight: FontWeight.w900,
-                    fontSize: 12,
-                  ),
+                  style: const TextStyle(color: Color(0xFF1D4ED8), fontWeight: FontWeight.w900, fontSize: 12),
                 ),
-              ),
-              const SizedBox(width: 10),
-              ElevatedButton(
-                onPressed: () => context.push('/courses/${course.courseId}'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF6D28D9),
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  elevation: 0,
-                ),
-                child: const Text('Devam →', style: TextStyle(fontWeight: FontWeight.w900)),
               ),
             ],
           ),
@@ -6959,6 +6936,7 @@ class _EnrolledCourseTile extends StatelessWidget {
             style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 10),
+
           Row(
             children: [
               const Icon(Icons.access_time, size: 16, color: Color(0xFF6B7280)),
@@ -6968,29 +6946,40 @@ class _EnrolledCourseTile extends StatelessWidget {
                 style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700, fontSize: 12),
               ),
               const Spacer(),
-              SizedBox(
-                width: 150,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(999),
-                      child: LinearProgressIndicator(
-                        value: p / 100,
-                        minHeight: 8,
-                        backgroundColor: const Color(0xFFE5E7EB),
-                        valueColor: const AlwaysStoppedAnimation(Color(0xFF2563EB)),
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '%$p tamamlandı',
-                      style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700, fontSize: 12),
-                    ),
-                  ],
+
+                            SizedBox(
+                height: 36,
+                child: ElevatedButton(
+                  onPressed: () => context.go('/courses/${course.courseId}'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF6D28D9),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    elevation: 0,
+                  ),
+                  child: const Text('Devam Et →', style: TextStyle(fontWeight: FontWeight.w900)),
                 ),
               ),
             ],
+          ),
+
+          const SizedBox(height: 10),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(999),
+            child: LinearProgressIndicator(
+              value: p / 100,
+              minHeight: 8,
+              backgroundColor: const Color(0xFFE5E7EB),
+              valueColor: const AlwaysStoppedAnimation(Color(0xFF2563EB)),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Align(
+            alignment: Alignment.centerRight,
+            child: Text(
+              '%$p tamamlandı',
+              style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700, fontSize: 12),
+            ),
           ),
         ],
       ),
@@ -7252,8 +7241,12 @@ class CoursesRepository {
 
     final q = (search ?? '').trim();
     if (q.isNotEmpty) {
-      qb = qb.ilike('title', '%$q%');
+      // Optional: also search description
+      qb = qb.or('title.ilike.%$q%,description.ilike.%$q%');
+      // If you prefer title only, revert to:
+      // qb = qb.ilike('title', '%$q%');
     }
+
     if (department != null && department.trim().isNotEmpty) {
       qb = qb.eq('department', department.trim());
     }
@@ -7263,8 +7256,8 @@ class CoursesRepository {
 
     final rows = await qb.order('title', ascending: true) as List<dynamic>;
     return rows
-    .map((e) => Course.fromMap(Map<String, dynamic>.from(e as Map)))
-    .toList();
+        .map((e) => Course.fromMap(Map<String, dynamic>.from(e as Map)))
+        .toList();
   }
 
   Future<Course> getCourseById(String courseId) async {
@@ -7281,12 +7274,13 @@ class CoursesRepository {
     required String userId,
     required String courseId,
   }) async {
-    // Using .limit(1) to be version-safe (instead of maybeSingle()).
+    // ✅ FIX: filter by user_id (NOT id)
     final rows = await _client
         .from('course_enrollments')
         .select('id,user_id,course_id,enrolled_at,progress')
-        .eq('id', userId)
+        .eq('user_id', userId)
         .eq('course_id', courseId)
+        .order('enrolled_at', ascending: false)
         .limit(1) as List<dynamic>;
 
     if (rows.isEmpty) return null;
@@ -7294,22 +7288,30 @@ class CoursesRepository {
   }
 
   Future<List<EnrolledCourse>> listMyEnrolledCourses(String userId) async {
-    // FK exists: course_enrollments.course_id -> courses.id
+    // ✅ FIX: filter by user_id (NOT id)
     final rows = await _client
         .from('course_enrollments')
         .select(
           'id,user_id,course_id,enrolled_at,progress,'
           'courses(id,title,description,department,video_url,duration,level,instructor)',
         )
-        .eq('id', userId)
+        .eq('user_id', userId)
         .order('enrolled_at', ascending: false) as List<dynamic>;
 
     return rows.map((r) {
       final map = Map<String, dynamic>.from(r as Map);
+
       final enrollment = CourseEnrollment.fromMap(map);
 
+      // Supabase may return relationship as Map OR List depending on relationship config.
       final rawCourse = map['courses'];
-final courseMap = rawCourse == null ? null : Map<String, dynamic>.from(rawCourse as Map);
+      Map<String, dynamic>? courseMap;
+      if (rawCourse is Map) {
+        courseMap = Map<String, dynamic>.from(rawCourse);
+      } else if (rawCourse is List && rawCourse.isNotEmpty && rawCourse.first is Map) {
+        courseMap = Map<String, dynamic>.from(rawCourse.first as Map);
+      }
+
       final course = courseMap == null
           ? Course(
               id: enrollment.courseId,
@@ -7325,21 +7327,27 @@ final courseMap = rawCourse == null ? null : Map<String, dynamic>.from(rawCourse
     required String userId,
     required String courseId,
   }) async {
-    await _client.from('course_enrollments').insert({
-      'user_id': userId,
-      'course_id': courseId,
-      'progress': 0,
-    });
+    // ✅ Optional safety: prevents duplicates if a unique constraint exists on (user_id, course_id).
+    // If you DON'T have unique constraint, this still works (it will just insert).
+    await _client.from('course_enrollments').upsert(
+      {
+        'user_id': userId,
+        'course_id': courseId,
+        'progress': 0,
+      },
+      onConflict: 'user_id,course_id',
+    );
   }
 
   Future<void> unenroll({
     required String userId,
     required String courseId,
   }) async {
+    // ✅ FIX: delete by user_id (NOT id)
     await _client
         .from('course_enrollments')
         .delete()
-        .eq('id', userId)
+        .eq('user_id', userId)
         .eq('course_id', courseId);
   }
 
@@ -7498,21 +7506,64 @@ class FakeCoursesRepository {
 ✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 lib/src/features/courses/application/courses_providers.dart
 
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../auth/presentation/controllers/auth_controller.dart';
 import '../data/courses_repository.dart';
-import '../data/fake_courses_repository.dart';
-import '../presentation/state/courses_controller.dart';
+import '../domain/course_models.dart';
 
 final coursesRepositoryProvider = Provider<CoursesRepository>((ref) {
-  return FakeCoursesRepository();
+  return CoursesRepository();
 });
 
-final coursesControllerProvider =
-    StateNotifierProvider<CoursesController, CoursesState>((ref) {
+// Filters
+final coursesSearchProvider = StateProvider<String>((ref) => '');
+final coursesDepartmentProvider = StateProvider<String?>((ref) => null);
+final coursesLevelProvider = StateProvider<String?>((ref) => null);
+
+// All courses (filtered)
+final coursesListProvider = FutureProvider.autoDispose<List<Course>>((ref) async {
   final repo = ref.watch(coursesRepositoryProvider);
-  return CoursesController(repo)..load();
+  final search = ref.watch(coursesSearchProvider);
+  final dept = ref.watch(coursesDepartmentProvider);
+  final level = ref.watch(coursesLevelProvider);
+
+  return repo.listCourses(
+    search: search,
+    department: dept,
+    level: level,
+  );
 });
+
+// My enrolled courses (includes real progress)
+final myEnrolledCoursesProvider =
+    FutureProvider.autoDispose<List<EnrolledCourse>>((ref) async {
+  final repo = ref.watch(coursesRepositoryProvider);
+  final auth = ref.watch(authViewStateProvider).value;
+  final uid = auth?.user?.id;
+
+  if (uid == null || uid.isEmpty) return <EnrolledCourse>[];
+  return repo.listMyEnrolledCourses(uid);
+});
+
+// Course detail
+final courseDetailProvider =
+    FutureProvider.autoDispose.family<Course, String>((ref, courseId) async {
+  final repo = ref.watch(coursesRepositoryProvider);
+  return repo.getCourseById(courseId);
+});
+
+// Enrollment for a specific course (detail screen progress)
+final myCourseEnrollmentProvider =
+    FutureProvider.autoDispose.family<CourseEnrollment?, String>((ref, courseId) async {
+  final repo = ref.watch(coursesRepositoryProvider);
+  final auth = ref.watch(authViewStateProvider).value;
+  final uid = auth?.user?.id;
+
+  if (uid == null || uid.isEmpty) return null;
+  return repo.getMyEnrollment(userId: uid, courseId: courseId);
+});
+
 
 ✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 lib/src/features/courses/presentation/state/courses_controller.dart
@@ -7771,6 +7822,7 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen>
 
   @override
   Widget build(BuildContext context) {
+
     final allCoursesAsync = ref.watch(coursesListProvider);
     final myCoursesAsync = ref.watch(myEnrolledCoursesProvider);
 
@@ -7782,7 +7834,6 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen>
       },
       orElse: () => <String, int>{},
     );
-
     return Container(
       color: const Color(0xFFF9FAFB),
       child: SingleChildScrollView(
@@ -7900,7 +7951,7 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen>
                                       return _CourseCard(
                                         course: c,
                                         enrolled: isEnrolled,
-                                        enrolledProgress: progress,
+                                        progress: progress,
                                         onOpen: () => context.push('/courses/${c.id}'),
                                       );
                                     },
@@ -8093,16 +8144,18 @@ class _CourseCard extends StatelessWidget {
     required this.course,
     required this.enrolled,
     required this.onOpen,
-    this.enrolledProgress,
+    this.progress,
   });
 
   final Course course;
   final bool enrolled;
-  final int? enrolledProgress;
+  final int? progress;
   final VoidCallback onOpen;
 
   @override
   Widget build(BuildContext context) {
+    final p = (progress ?? 0).clamp(0, 100);
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(14),
@@ -8168,27 +8221,27 @@ class _CourseCard extends StatelessWidget {
                     _MetaChip(icon: Icons.access_time, text: course.duration ?? '—'),
                   ],
                 ),
-                  if (enrolledProgress != null) ...[
-                    const SizedBox(height: 10),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(999),
-                      child: LinearProgressIndicator(
-                        value: enrolledProgress!.clamp(0, 100) / 100,
-                        minHeight: 8,
-                        backgroundColor: const Color(0xFFE5E7EB),
-                        valueColor: const AlwaysStoppedAnimation(Color(0xFF2563EB)),
-                      ),
+                if (enrolled) ...[
+                  const SizedBox(height: 10),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(999),
+                    child: LinearProgressIndicator(
+                      value: p / 100,
+                      minHeight: 8,
+                      backgroundColor: const Color(0xFFE5E7EB),
+                      valueColor: const AlwaysStoppedAnimation(Color(0xFF2563EB)),
                     ),
-                    const SizedBox(height: 6),
-                    Text(
-                      'İlerleme: %${enrolledProgress!.clamp(0, 100)}',
-                      style: const TextStyle(
-                        color: Color(0xFF6B7280),
-                        fontWeight: FontWeight.w800,
-                        fontSize: 12,
-                      ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '%$p tamamlandı',
+                    style: const TextStyle(
+                      color: Color(0xFF6B7280),
+                      fontWeight: FontWeight.w800,
+                      fontSize: 12,
                     ),
-                  ]
+                  ),
+                ]
               ],
             ),
           ),
@@ -8202,7 +8255,7 @@ class _CourseCard extends StatelessWidget {
               elevation: 0,
             ),
             child: Text(
-              enrolled ? 'Devam Et →' : 'Detay →',
+              (enrolled && p < 100) ? 'Continue →' : 'Detay →',
               style: const TextStyle(fontWeight: FontWeight.w900),
             ),
           ),
@@ -8220,6 +8273,7 @@ class _EnrolledCourseCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     final c = item.course;
     final p = item.enrollment.progress.clamp(0, 100);
 
@@ -8274,6 +8328,7 @@ class _MetaChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
       decoration: BoxDecoration(
@@ -8302,6 +8357,7 @@ class _SmallPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
@@ -8326,6 +8382,7 @@ class _LoadingBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return const Center(
       child: SizedBox(
         width: 28,
@@ -8353,6 +8410,7 @@ class _EmptyBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 520),
@@ -8391,6 +8449,7 @@ class _ErrorBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 620),
@@ -8417,6 +8476,8 @@ class _ErrorBlock extends StatelessWidget {
     );
   }
 }
+
+
 
 
 

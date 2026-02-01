@@ -20,8 +20,12 @@ class CoursesRepository {
 
     final q = (search ?? '').trim();
     if (q.isNotEmpty) {
-      qb = qb.ilike('title', '%$q%');
+      // Optional: also search description
+      qb = qb.or('title.ilike.%$q%,description.ilike.%$q%');
+      // If you prefer title only, revert to:
+      // qb = qb.ilike('title', '%$q%');
     }
+
     if (department != null && department.trim().isNotEmpty) {
       qb = qb.eq('department', department.trim());
     }
@@ -31,8 +35,8 @@ class CoursesRepository {
 
     final rows = await qb.order('title', ascending: true) as List<dynamic>;
     return rows
-    .map((e) => Course.fromMap(Map<String, dynamic>.from(e as Map)))
-    .toList();
+        .map((e) => Course.fromMap(Map<String, dynamic>.from(e as Map)))
+        .toList();
   }
 
   Future<Course> getCourseById(String courseId) async {
@@ -49,12 +53,13 @@ class CoursesRepository {
     required String userId,
     required String courseId,
   }) async {
-    // Using .limit(1) to be version-safe (instead of maybeSingle()).
+    // ✅ FIX: filter by user_id (NOT id)
     final rows = await _client
         .from('course_enrollments')
         .select('id,user_id,course_id,enrolled_at,progress')
-        .eq('id', userId)
+        .eq('user_id', userId)
         .eq('course_id', courseId)
+        .order('enrolled_at', ascending: false)
         .limit(1) as List<dynamic>;
 
     if (rows.isEmpty) return null;
@@ -62,22 +67,30 @@ class CoursesRepository {
   }
 
   Future<List<EnrolledCourse>> listMyEnrolledCourses(String userId) async {
-    // FK exists: course_enrollments.course_id -> courses.id
+    // ✅ FIX: filter by user_id (NOT id)
     final rows = await _client
         .from('course_enrollments')
         .select(
           'id,user_id,course_id,enrolled_at,progress,'
           'courses(id,title,description,department,video_url,duration,level,instructor)',
         )
-        .eq('id', userId)
+        .eq('user_id', userId)
         .order('enrolled_at', ascending: false) as List<dynamic>;
 
     return rows.map((r) {
       final map = Map<String, dynamic>.from(r as Map);
+
       final enrollment = CourseEnrollment.fromMap(map);
 
+      // Supabase may return relationship as Map OR List depending on relationship config.
       final rawCourse = map['courses'];
-final courseMap = rawCourse == null ? null : Map<String, dynamic>.from(rawCourse as Map);
+      Map<String, dynamic>? courseMap;
+      if (rawCourse is Map) {
+        courseMap = Map<String, dynamic>.from(rawCourse);
+      } else if (rawCourse is List && rawCourse.isNotEmpty && rawCourse.first is Map) {
+        courseMap = Map<String, dynamic>.from(rawCourse.first as Map);
+      }
+
       final course = courseMap == null
           ? Course(
               id: enrollment.courseId,
@@ -93,21 +106,27 @@ final courseMap = rawCourse == null ? null : Map<String, dynamic>.from(rawCourse
     required String userId,
     required String courseId,
   }) async {
-    await _client.from('course_enrollments').insert({
-      'user_id': userId,
-      'course_id': courseId,
-      'progress': 0,
-    });
+    // ✅ Optional safety: prevents duplicates if a unique constraint exists on (user_id, course_id).
+    // If you DON'T have unique constraint, this still works (it will just insert).
+    await _client.from('course_enrollments').upsert(
+      {
+        'user_id': userId,
+        'course_id': courseId,
+        'progress': 0,
+      },
+      onConflict: 'user_id,course_id',
+    );
   }
 
   Future<void> unenroll({
     required String userId,
     required String courseId,
   }) async {
+    // ✅ FIX: delete by user_id (NOT id)
     await _client
         .from('course_enrollments')
         .delete()
-        .eq('id', userId)
+        .eq('user_id', userId)
         .eq('course_id', courseId);
   }
 

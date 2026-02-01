@@ -44,6 +44,7 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen>
 
   @override
   Widget build(BuildContext context) {
+
     final allCoursesAsync = ref.watch(coursesListProvider);
     final myCoursesAsync = ref.watch(myEnrolledCoursesProvider);
 
@@ -55,7 +56,6 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen>
       },
       orElse: () => <String, int>{},
     );
-
     return Container(
       color: const Color(0xFFF9FAFB),
       child: SingleChildScrollView(
@@ -173,7 +173,7 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen>
                                       return _CourseCard(
                                         course: c,
                                         enrolled: isEnrolled,
-                                        enrolledProgress: progress,
+                                        progress: progress,
                                         onOpen: () => context.push('/courses/${c.id}'),
                                       );
                                     },
@@ -366,16 +366,18 @@ class _CourseCard extends StatelessWidget {
     required this.course,
     required this.enrolled,
     required this.onOpen,
-    this.enrolledProgress,
+    this.progress,
   });
 
   final Course course;
   final bool enrolled;
-  final int? enrolledProgress;
+  final int? progress;
   final VoidCallback onOpen;
 
   @override
   Widget build(BuildContext context) {
+    final p = (progress ?? 0).clamp(0, 100);
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(14),
@@ -441,27 +443,27 @@ class _CourseCard extends StatelessWidget {
                     _MetaChip(icon: Icons.access_time, text: course.duration ?? '—'),
                   ],
                 ),
-                  if (enrolledProgress != null) ...[
-                    const SizedBox(height: 10),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(999),
-                      child: LinearProgressIndicator(
-                        value: enrolledProgress!.clamp(0, 100) / 100,
-                        minHeight: 8,
-                        backgroundColor: const Color(0xFFE5E7EB),
-                        valueColor: const AlwaysStoppedAnimation(Color(0xFF2563EB)),
-                      ),
+                if (enrolled) ...[
+                  const SizedBox(height: 10),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(999),
+                    child: LinearProgressIndicator(
+                      value: p / 100,
+                      minHeight: 8,
+                      backgroundColor: const Color(0xFFE5E7EB),
+                      valueColor: const AlwaysStoppedAnimation(Color(0xFF2563EB)),
                     ),
-                    const SizedBox(height: 6),
-                    Text(
-                      'İlerleme: %${enrolledProgress!.clamp(0, 100)}',
-                      style: const TextStyle(
-                        color: Color(0xFF6B7280),
-                        fontWeight: FontWeight.w800,
-                        fontSize: 12,
-                      ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '%$p tamamlandı',
+                    style: const TextStyle(
+                      color: Color(0xFF6B7280),
+                      fontWeight: FontWeight.w800,
+                      fontSize: 12,
                     ),
-                  ]
+                  ),
+                ]
               ],
             ),
           ),
@@ -475,7 +477,7 @@ class _CourseCard extends StatelessWidget {
               elevation: 0,
             ),
             child: Text(
-              enrolled ? 'Devam Et →' : 'Detay →',
+              (enrolled && p < 100) ? 'Continue →' : 'Detay →',
               style: const TextStyle(fontWeight: FontWeight.w900),
             ),
           ),
@@ -493,6 +495,7 @@ class _EnrolledCourseCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     final c = item.course;
     final p = item.enrollment.progress.clamp(0, 100);
 
@@ -547,6 +550,7 @@ class _MetaChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
       decoration: BoxDecoration(
@@ -575,6 +579,7 @@ class _SmallPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
@@ -599,6 +604,7 @@ class _LoadingBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return const Center(
       child: SizedBox(
         width: 28,
@@ -626,6 +632,7 @@ class _EmptyBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 520),
@@ -664,6 +671,7 @@ class _ErrorBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 620),

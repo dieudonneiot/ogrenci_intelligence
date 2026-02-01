@@ -154,7 +154,6 @@ class StudentDashboardScreen extends ConsumerWidget {
                             final left = _OngoingCoursesCard(
                               enrolledCourses: vm.enrolledCourses,
                               onSeeAll: () => context.go(Routes.courses),
-                              onContinue: (courseId) => context.go('/courses/$courseId'),
                             );
 
 
@@ -473,12 +472,10 @@ class _OngoingCoursesCard extends StatelessWidget {
   const _OngoingCoursesCard({
     required this.enrolledCourses,
     required this.onSeeAll,
-    required this.onContinue,
   });
 
   final List<DashboardEnrolledCourse> enrolledCourses;
   final VoidCallback onSeeAll;
-  final void Function(String courseId) onContinue;
 
   @override
   Widget build(BuildContext context) {
@@ -527,10 +524,7 @@ class _OngoingCoursesCard extends StatelessWidget {
             Column(
               children: enrolledCourses
                   .map(
-                    (e) => _EnrolledCourseTile(
-                      course: e,
-                      onContinue: () => onContinue(e.courseId),
-                    ),
+                    (e) => _EnrolledCourseTile(course: e),
                   )
                   .toList(),
             ),
@@ -541,13 +535,8 @@ class _OngoingCoursesCard extends StatelessWidget {
 }
 
 class _EnrolledCourseTile extends StatelessWidget {
-  const _EnrolledCourseTile({
-    required this.course,
-    required this.onContinue,
-  });
-
+  const _EnrolledCourseTile({required this.course});
   final DashboardEnrolledCourse course;
-  final VoidCallback onContinue;
 
   @override
   Widget build(BuildContext context) {
@@ -576,23 +565,8 @@ class _EnrolledCourseTile extends StatelessWidget {
                 ),
                 child: Text(
                   course.level,
-                  style: const TextStyle(
-                    color: Color(0xFF1D4ED8),
-                    fontWeight: FontWeight.w900,
-                    fontSize: 12,
-                  ),
+                  style: const TextStyle(color: Color(0xFF1D4ED8), fontWeight: FontWeight.w900, fontSize: 12),
                 ),
-              ),
-              const SizedBox(width: 10),
-              ElevatedButton(
-                onPressed: () => context.push('/courses/${course.courseId}'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF6D28D9),
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  elevation: 0,
-                ),
-                child: const Text('Devam →', style: TextStyle(fontWeight: FontWeight.w900)),
               ),
             ],
           ),
@@ -604,6 +578,7 @@ class _EnrolledCourseTile extends StatelessWidget {
             style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 10),
+
           Row(
             children: [
               const Icon(Icons.access_time, size: 16, color: Color(0xFF6B7280)),
@@ -613,29 +588,40 @@ class _EnrolledCourseTile extends StatelessWidget {
                 style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700, fontSize: 12),
               ),
               const Spacer(),
-              SizedBox(
-                width: 150,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(999),
-                      child: LinearProgressIndicator(
-                        value: p / 100,
-                        minHeight: 8,
-                        backgroundColor: const Color(0xFFE5E7EB),
-                        valueColor: const AlwaysStoppedAnimation(Color(0xFF2563EB)),
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '%$p tamamlandı',
-                      style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700, fontSize: 12),
-                    ),
-                  ],
+
+                            SizedBox(
+                height: 36,
+                child: ElevatedButton(
+                  onPressed: () => context.go('/courses/${course.courseId}'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF6D28D9),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    elevation: 0,
+                  ),
+                  child: const Text('Devam Et →', style: TextStyle(fontWeight: FontWeight.w900)),
                 ),
               ),
             ],
+          ),
+
+          const SizedBox(height: 10),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(999),
+            child: LinearProgressIndicator(
+              value: p / 100,
+              minHeight: 8,
+              backgroundColor: const Color(0xFFE5E7EB),
+              valueColor: const AlwaysStoppedAnimation(Color(0xFF2563EB)),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Align(
+            alignment: Alignment.centerRight,
+            child: Text(
+              '%$p tamamlandı',
+              style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700, fontSize: 12),
+            ),
           ),
         ],
       ),

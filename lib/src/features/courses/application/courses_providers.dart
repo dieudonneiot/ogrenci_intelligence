@@ -27,7 +27,7 @@ final coursesListProvider = FutureProvider.autoDispose<List<Course>>((ref) async
   );
 });
 
-// My enrolled courses
+// My enrolled courses (includes real progress)
 final myEnrolledCoursesProvider =
     FutureProvider.autoDispose<List<EnrolledCourse>>((ref) async {
   final repo = ref.watch(coursesRepositoryProvider);
@@ -45,7 +45,7 @@ final courseDetailProvider =
   return repo.getCourseById(courseId);
 });
 
-// Enrollment for a specific course (so detail page can show enroll/progress)
+// Enrollment for a specific course (detail screen progress)
 final myCourseEnrollmentProvider =
     FutureProvider.autoDispose.family<CourseEnrollment?, String>((ref, courseId) async {
   final repo = ref.watch(coursesRepositoryProvider);

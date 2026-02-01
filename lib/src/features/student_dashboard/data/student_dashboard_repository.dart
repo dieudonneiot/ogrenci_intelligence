@@ -29,12 +29,13 @@ class StudentDashboardRepository {
     );
   }
 
+  // ✅ FIX: leaderboard_snapshots.period_date (NOT period_end)
   Future<int?> getLatestDepartmentRank(String uid) async {
     final rows = await _client
         .from('leaderboard_snapshots')
-        .select('rank_department,period_date') // ✅ period_date exists
+        .select('rank_department,period_date')
         .eq('user_id', uid)
-        .order('period_date', ascending: false) // ✅ order by existing column
+        .order('period_date', ascending: false)
         .limit(1) as List<dynamic>;
 
     if (rows.isEmpty) return null;
@@ -44,7 +45,7 @@ class StudentDashboardRepository {
 
   Future<_Counts> getCounts(String uid) async {
     final completedRows = await _client
-        .from('completed_at')
+        .from('completed_courses')
         .select('id')
         .eq('user_id', uid) as List<dynamic>;
 
@@ -59,14 +60,16 @@ class StudentDashboardRepository {
       return p < 100;
     }).length;
 
+    // ✅ FIX: pending applications are in job_applications / internship_applications
+    // application_notes has NO status column.
     final jobPending = await _client
-        .from('applied_at')
+        .from('job_applications')
         .select('id')
         .eq('user_id', uid)
         .eq('status', 'pending') as List<dynamic>;
 
     final internshipPending = await _client
-        .from('applied_at')
+        .from('internship_applications')
         .select('id')
         .eq('user_id', uid)
         .eq('status', 'pending') as List<dynamic>;
@@ -129,7 +132,7 @@ class StudentDashboardRepository {
   }) async {
     final List<ActivityItem> items = [];
 
-    // 1) Points ledger
+    // ✅ FIX: user_points.source (NOT event_type)
     final pointsRows = await _client
         .from('user_points')
         .select('points,source,description,created_at')
@@ -140,31 +143,31 @@ class StudentDashboardRepository {
     for (final r in pointsRows) {
       final m = r as Map<String, dynamic>;
       final pts = (m['points'] as num?)?.toInt() ?? 0;
-      final type = (m['source'] as String?) ?? '';
+      final source = (m['source'] as String?) ?? '';
       final desc = (m['description'] as String?) ?? 'Puan kazanıldı';
       final created = DateTime.tryParse(m['created_at']?.toString() ?? '') ?? DateTime.now();
 
       items.add(ActivityItem(
-        category: _mapEventType(type),
+        category: _mapEventType(source),
         action: desc,
         points: pts,
         createdAt: created,
       ));
     }
 
-    // 2) Course completions
+    // ✅ FIX: completed_courses.completed_at (NOT created_at)
     final completedRows = await _client
-        .from('completed_at')
-        .select('created_at,courses(title)')
+        .from('completed_courses')
+        .select('completed_at,courses(title)')
         .eq('user_id', uid)
-        .order('created_at', ascending: false)
+        .order('completed_at', ascending: false)
         .limit(5) as List<dynamic>;
 
     for (final r in completedRows) {
       final m = r as Map<String, dynamic>;
       final c = (m['courses'] as Map<String, dynamic>?) ?? const <String, dynamic>{};
       final title = (c['title'] as String?) ?? 'Kurs';
-      final created = DateTime.tryParse(m['created_at']?.toString() ?? '') ?? DateTime.now();
+      final created = DateTime.tryParse(m['completed_at']?.toString() ?? '') ?? DateTime.now();
 
       items.add(ActivityItem(
         category: ActivityCategory.course,
@@ -174,19 +177,19 @@ class StudentDashboardRepository {
       ));
     }
 
-    // 3) Job applications
+    // ✅ FIX: job_applications.applied_at (NOT created_at)
     final jobRows = await _client
-        .from('applied_at')
-        .select('created_at,status,jobs(title)')
+        .from('job_applications')
+        .select('applied_at,status,jobs(title)')
         .eq('user_id', uid)
-        .order('created_at', ascending: false)
+        .order('applied_at', ascending: false)
         .limit(5) as List<dynamic>;
 
     for (final r in jobRows) {
       final m = r as Map<String, dynamic>;
       final j = (m['jobs'] as Map<String, dynamic>?) ?? const <String, dynamic>{};
       final title = (j['title'] as String?) ?? 'İş';
-      final created = DateTime.tryParse(m['created_at']?.toString() ?? '') ?? DateTime.now();
+      final created = DateTime.tryParse(m['applied_at']?.toString() ?? '') ?? DateTime.now();
 
       items.add(ActivityItem(
         category: ActivityCategory.job,
@@ -196,19 +199,19 @@ class StudentDashboardRepository {
       ));
     }
 
-    // 4) Internship applications
+    // ✅ FIX: internship_applications.applied_at (NOT created_at)
     final internRows = await _client
-        .from('applied_at')
-        .select('created_at,status,internships(title)')
+        .from('internship_applications')
+        .select('applied_at,status,internships(title)')
         .eq('user_id', uid)
-        .order('created_at', ascending: false)
+        .order('applied_at', ascending: false)
         .limit(5) as List<dynamic>;
 
     for (final r in internRows) {
       final m = r as Map<String, dynamic>;
       final it = (m['internships'] as Map<String, dynamic>?) ?? const <String, dynamic>{};
       final title = (it['title'] as String?) ?? 'Staj';
-      final created = DateTime.tryParse(m['created_at']?.toString() ?? '') ?? DateTime.now();
+      final created = DateTime.tryParse(m['applied_at']?.toString() ?? '') ?? DateTime.now();
 
       items.add(ActivityItem(
         category: ActivityCategory.internship,
@@ -218,18 +221,17 @@ class StudentDashboardRepository {
       ));
     }
 
-    // 5) Badges
+    // Badges (use badge_title)
     final badgeRows = await _client
         .from('user_badges')
-        .select('earned_at,badges(name)')
+        .select('earned_at,badge_title')
         .eq('user_id', uid)
         .order('earned_at', ascending: false)
         .limit(5) as List<dynamic>;
 
     for (final r in badgeRows) {
       final m = r as Map<String, dynamic>;
-      final b = (m['badges'] as Map<String, dynamic>?) ?? const <String, dynamic>{};
-      final name = (b['name'] as String?) ?? 'Rozet';
+      final name = (m['badge_title'] as String?) ?? 'Rozet';
       final created = DateTime.tryParse(m['earned_at']?.toString() ?? '') ?? DateTime.now();
 
       items.add(ActivityItem(
@@ -272,7 +274,7 @@ class StudentDashboardRepository {
     final activities = await activitiesF;
 
     final displayFallback =
-        (fallbackName == null || fallbackName.isEmpty) ? 'Ã–ÄŸrenci' : fallbackName;
+        (fallbackName == null || fallbackName.isEmpty) ? 'Öğrenci' : fallbackName;
     final displayName = (profile.fullName == null || profile.fullName!.isEmpty)
         ? displayFallback
         : profile.fullName!;
@@ -293,8 +295,8 @@ class StudentDashboardRepository {
     );
   }
 
-  static ActivityCategory _mapEventType(String eventType) {
-    final t = eventType.toLowerCase();
+  static ActivityCategory _mapEventType(String source) {
+    final t = source.toLowerCase();
     if (t.contains('course')) return ActivityCategory.course;
     if (t.contains('job')) return ActivityCategory.job;
     if (t.contains('intern')) return ActivityCategory.internship;
