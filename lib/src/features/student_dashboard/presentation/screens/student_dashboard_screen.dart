@@ -96,6 +96,7 @@ class _StudentDashboardScreenState extends ConsumerState<StudentDashboardScreen>
       ),
       data: (vm) {
         final stats = vm.stats;
+        final ongoingCount = vm.enrolledCourses.length;
 
         return Container(
           color: const Color(0xFFF9FAFB),
@@ -137,6 +138,7 @@ class _StudentDashboardScreenState extends ConsumerState<StudentDashboardScreen>
                                 subtitle: stats.departmentRank != null
                                     ? 'Bölüm sıralaması: ${stats.departmentRank}.'
                                     : null,
+                                showTrend: true,
                               ),
                               _StatCard(
                                 icon: Icons.menu_book_outlined,
@@ -157,7 +159,7 @@ class _StudentDashboardScreenState extends ConsumerState<StudentDashboardScreen>
                                 iconBg: const Color(0xFFFEF3C7),
                                 iconColor: const Color(0xFFD97706),
                                 title: 'Devam Eden Kurs',
-                                value: '${stats.ongoingCourses}',
+                                value: '$ongoingCount',
                               ),
                             ];
 
@@ -264,6 +266,7 @@ class _StatCard extends StatelessWidget {
     required this.title,
     required this.value,
     this.subtitle,
+    this.showTrend = false,
   });
 
   final IconData icon;
@@ -272,6 +275,7 @@ class _StatCard extends StatelessWidget {
   final String title;
   final String value;
   final String? subtitle;
+  final bool showTrend;
 
   @override
   Widget build(BuildContext context) {
@@ -295,7 +299,7 @@ class _StatCard extends StatelessWidget {
                 child: Icon(icon, color: iconColor),
               ),
               const Spacer(),
-              const Icon(Icons.trending_up, color: Color(0xFF10B981)),
+              if (showTrend) const Icon(Icons.trending_up, color: Color(0xFF10B981)),
             ],
           ),
           const SizedBox(height: 12),
@@ -551,7 +555,7 @@ class _OngoingCoursesCard extends StatelessWidget {
                     const Icon(Icons.menu_book, size: 46, color: Color(0xFFD1D5DB)),
                     const SizedBox(height: 10),
                     const Text(
-                      'Henüz devam eden kursunuz yok.',
+                      'Henüz kayıtlı kursunuz yok.',
                       style: TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
                     ),
                     const SizedBox(height: 10),
@@ -629,38 +633,28 @@ class _EnrolledCourseTile extends StatelessWidget {
               ),
               const Spacer(),
               SizedBox(
-                height: 36,
-                child: ElevatedButton(
-                  onPressed: () => context.go('/courses/${course.courseId}'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF6D28D9),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    elevation: 0,
-                  ),
-                  child: const Text('Devam Et →', style: TextStyle(fontWeight: FontWeight.w900)),
+                width: 128,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(999),
+                      child: LinearProgressIndicator(
+                        value: p / 100,
+                        minHeight: 8,
+                        backgroundColor: const Color(0xFFE5E7EB),
+                        valueColor: const AlwaysStoppedAnimation(Color(0xFF2563EB)),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '%$p tamamlandı',
+                      style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700, fontSize: 12),
+                    ),
+                  ],
                 ),
               ),
             ],
-          ),
-
-          const SizedBox(height: 10),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(999),
-            child: LinearProgressIndicator(
-              value: p / 100,
-              minHeight: 8,
-              backgroundColor: const Color(0xFFE5E7EB),
-              valueColor: const AlwaysStoppedAnimation(Color(0xFF2563EB)),
-            ),
-          ),
-          const SizedBox(height: 4),
-          Align(
-            alignment: Alignment.centerRight,
-            child: Text(
-              '%$p tamamlandı',
-              style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700, fontSize: 12),
-            ),
           ),
         ],
       ),
@@ -764,16 +758,9 @@ class _ActivityRow extends StatelessWidget {
   }
 
   static String _dateText(DateTime dt) {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final d = DateTime(dt.year, dt.month, dt.day);
-
-    final diffDays = today.difference(d).inDays;
-
-    if (diffDays == 0) return 'Bugün';
-    if (diffDays == 1) return 'Dün';
-    if (diffDays < 7) return '$diffDays gün önce';
-    return '${dt.day.toString().padLeft(2, '0')}.${dt.month.toString().padLeft(2, '0')}.${dt.year}';
+    return '${dt.day.toString().padLeft(2, '0')}.'
+        '${dt.month.toString().padLeft(2, '0')}.'
+        '${dt.year}';
   }
 
   static _ActStyle _activityStyle(ActivityCategory c) {

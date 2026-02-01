@@ -81,12 +81,12 @@ class StudentDashboardRepository {
     );
   }
 
-  Future<int> sumPointsSince(String uid, DateTime fromUtc) async {
+  Future<int> sumPointsSince(String uid, DateTime from) async {
     final rows = await _client
         .from('user_points')
         .select('points,created_at')
         .eq('user_id', uid)
-        .gte('created_at', fromUtc.toIso8601String())
+        .gte('created_at', from.toUtc().toIso8601String())
         .order('created_at', ascending: false) as List<dynamic>;
 
     var sum = 0;
@@ -105,7 +105,6 @@ class StudentDashboardRepository {
         .from('course_enrollments')
         .select('progress,enrolled_at,courses(id,title,description,duration,level)')
         .eq('user_id', uid)
-        .lt('progress', 100)
         .order('enrolled_at', ascending: false)
         .limit(limit) as List<dynamic>;
 
@@ -117,7 +116,7 @@ class StudentDashboardRepository {
 
       return DashboardEnrolledCourse(
         courseId: (c['id']?.toString() ?? ''),
-        title: (c['title'] as String?) ?? 'Course',
+        title: (c['title'] as String?) ?? 'Kurs',
         description: (c['description'] as String?) ?? 'Açıklama yok.',
         duration: (c['duration'] as String?) ?? '—',
         level: (c['level'] as String?) ?? '—',
@@ -128,123 +127,27 @@ class StudentDashboardRepository {
 
   Future<List<ActivityItem>> listActivities({
     required String uid,
-    int limit = 8,
+    int limit = 10,
   }) async {
-    final List<ActivityItem> items = [];
-
-    // ✅ FIX: user_points.source (NOT event_type)
-    final pointsRows = await _client
-        .from('user_points')
-        .select('points,source,description,created_at')
+    final rows = await _client
+        .from('activity_logs')
+        .select('category,action,points,created_at')
         .eq('user_id', uid)
         .order('created_at', ascending: false)
-        .limit(10) as List<dynamic>;
+        .limit(limit) as List<dynamic>;
 
-    for (final r in pointsRows) {
+    return rows.map((r) {
       final m = r as Map<String, dynamic>;
-      final pts = (m['points'] as num?)?.toInt() ?? 0;
-      final source = (m['source'] as String?) ?? '';
-      final desc = (m['description'] as String?) ?? 'Puan kazanıldı';
+      final category = (m['category'] as String?)?.trim() ?? 'platform';
+      final action = (m['action'] as String?)?.trim();
       final created = DateTime.tryParse(m['created_at']?.toString() ?? '') ?? DateTime.now();
-
-      items.add(ActivityItem(
-        category: _mapEventType(source),
-        action: desc,
-        points: pts,
+      return ActivityItem(
+        category: _mapCategory(category),
+        action: (action == null || action.isEmpty) ? 'Aktivite' : action,
+        points: (m['points'] as num?)?.toInt() ?? 0,
         createdAt: created,
-      ));
-    }
-
-    // ✅ FIX: completed_courses.completed_at (NOT created_at)
-    final completedRows = await _client
-        .from('completed_courses')
-        .select('completed_at,courses(title)')
-        .eq('user_id', uid)
-        .order('completed_at', ascending: false)
-        .limit(5) as List<dynamic>;
-
-    for (final r in completedRows) {
-      final m = r as Map<String, dynamic>;
-      final c = (m['courses'] as Map<String, dynamic>?) ?? const <String, dynamic>{};
-      final title = (c['title'] as String?) ?? 'Kurs';
-      final created = DateTime.tryParse(m['completed_at']?.toString() ?? '') ?? DateTime.now();
-
-      items.add(ActivityItem(
-        category: ActivityCategory.course,
-        action: 'Kurs tamamlandı: $title',
-        points: 0,
-        createdAt: created,
-      ));
-    }
-
-    // ✅ FIX: job_applications.applied_at (NOT created_at)
-    final jobRows = await _client
-        .from('job_applications')
-        .select('applied_at,status,jobs(title)')
-        .eq('user_id', uid)
-        .order('applied_at', ascending: false)
-        .limit(5) as List<dynamic>;
-
-    for (final r in jobRows) {
-      final m = r as Map<String, dynamic>;
-      final j = (m['jobs'] as Map<String, dynamic>?) ?? const <String, dynamic>{};
-      final title = (j['title'] as String?) ?? 'İş';
-      final created = DateTime.tryParse(m['applied_at']?.toString() ?? '') ?? DateTime.now();
-
-      items.add(ActivityItem(
-        category: ActivityCategory.job,
-        action: 'İş başvurusu: $title',
-        points: 0,
-        createdAt: created,
-      ));
-    }
-
-    // ✅ FIX: internship_applications.applied_at (NOT created_at)
-    final internRows = await _client
-        .from('internship_applications')
-        .select('applied_at,status,internships(title)')
-        .eq('user_id', uid)
-        .order('applied_at', ascending: false)
-        .limit(5) as List<dynamic>;
-
-    for (final r in internRows) {
-      final m = r as Map<String, dynamic>;
-      final it = (m['internships'] as Map<String, dynamic>?) ?? const <String, dynamic>{};
-      final title = (it['title'] as String?) ?? 'Staj';
-      final created = DateTime.tryParse(m['applied_at']?.toString() ?? '') ?? DateTime.now();
-
-      items.add(ActivityItem(
-        category: ActivityCategory.internship,
-        action: 'Staj başvurusu: $title',
-        points: 0,
-        createdAt: created,
-      ));
-    }
-
-    // Badges (use badge_title)
-    final badgeRows = await _client
-        .from('user_badges')
-        .select('earned_at,badge_title')
-        .eq('user_id', uid)
-        .order('earned_at', ascending: false)
-        .limit(5) as List<dynamic>;
-
-    for (final r in badgeRows) {
-      final m = r as Map<String, dynamic>;
-      final name = (m['badge_title'] as String?) ?? 'Rozet';
-      final created = DateTime.tryParse(m['earned_at']?.toString() ?? '') ?? DateTime.now();
-
-      items.add(ActivityItem(
-        category: ActivityCategory.achievement,
-        action: 'Rozet kazanıldı: $name',
-        points: 0,
-        createdAt: created,
-      ));
-    }
-
-    items.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-    if (items.length > limit) return items.take(limit).toList();
-    return items;
+      );
+    }).toList();
   }
 
   Future<StudentDashboardViewModel> fetchDashboard({
@@ -253,18 +156,16 @@ class StudentDashboardRepository {
   }) async {
     final profile = await getProfile(uid);
 
-    final now = DateTime.now().toUtc();
-    final startToday = DateTime.utc(now.year, now.month, now.day);
-
-    // Monday-based week start
-    final startWeek = startToday.subtract(Duration(days: startToday.weekday - 1));
+    final nowLocal = DateTime.now();
+    final startTodayLocal = DateTime(nowLocal.year, nowLocal.month, nowLocal.day);
+    final startWeek = nowLocal.subtract(const Duration(days: 7));
 
     final countsF = getCounts(uid);
     final rankF = getLatestDepartmentRank(uid);
-    final todayF = sumPointsSince(uid, startToday);
+    final todayF = sumPointsSince(uid, startTodayLocal);
     final weekF = sumPointsSince(uid, startWeek);
     final ongoingCoursesF = listOngoingCourses(uid: uid, limit: 3);
-    final activitiesF = listActivities(uid: uid, limit: 8);
+    final activitiesF = listActivities(uid: uid, limit: 10);
 
     final counts = await countsF;
     final rank = await rankF;
@@ -295,8 +196,8 @@ class StudentDashboardRepository {
     );
   }
 
-  static ActivityCategory _mapEventType(String source) {
-    final t = source.toLowerCase();
+  static ActivityCategory _mapCategory(String category) {
+    final t = category.toLowerCase();
     if (t.contains('course')) return ActivityCategory.course;
     if (t.contains('job')) return ActivityCategory.job;
     if (t.contains('intern')) return ActivityCategory.internship;
