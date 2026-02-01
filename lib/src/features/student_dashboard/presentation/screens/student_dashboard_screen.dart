@@ -154,7 +154,9 @@ class StudentDashboardScreen extends ConsumerWidget {
                             final left = _OngoingCoursesCard(
                               enrolledCourses: vm.enrolledCourses,
                               onSeeAll: () => context.go(Routes.courses),
+                              onContinue: (courseId) => context.go('/courses/$courseId'),
                             );
+
 
                             final right = _RecentActivitiesCard(activities: vm.activities);
 
@@ -468,9 +470,15 @@ class _MiniMetric extends StatelessWidget {
 }
 
 class _OngoingCoursesCard extends StatelessWidget {
-  const _OngoingCoursesCard({required this.enrolledCourses, required this.onSeeAll});
+  const _OngoingCoursesCard({
+    required this.enrolledCourses,
+    required this.onSeeAll,
+    required this.onContinue,
+  });
+
   final List<DashboardEnrolledCourse> enrolledCourses;
   final VoidCallback onSeeAll;
+  final void Function(String courseId) onContinue;
 
   @override
   Widget build(BuildContext context) {
@@ -496,6 +504,7 @@ class _OngoingCoursesCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
+
           if (enrolledCourses.isEmpty)
             Center(
               child: Padding(
@@ -504,8 +513,10 @@ class _OngoingCoursesCard extends StatelessWidget {
                   children: [
                     const Icon(Icons.menu_book, size: 46, color: Color(0xFFD1D5DB)),
                     const SizedBox(height: 10),
-                    const Text('Henüz kayıtlı kursunuz yok.',
-                        style: TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700)),
+                    const Text(
+                      'Henüz devam eden kursunuz yok.',
+                      style: TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
+                    ),
                     const SizedBox(height: 10),
                     OutlinedButton(onPressed: onSeeAll, child: const Text('Kursları Keşfet →')),
                   ],
@@ -514,7 +525,14 @@ class _OngoingCoursesCard extends StatelessWidget {
             )
           else
             Column(
-              children: enrolledCourses.map((e) => _EnrolledCourseTile(course: e)).toList(),
+              children: enrolledCourses
+                  .map(
+                    (e) => _EnrolledCourseTile(
+                      course: e,
+                      onContinue: () => onContinue(e.courseId),
+                    ),
+                  )
+                  .toList(),
             ),
         ],
       ),
@@ -523,8 +541,13 @@ class _OngoingCoursesCard extends StatelessWidget {
 }
 
 class _EnrolledCourseTile extends StatelessWidget {
-  const _EnrolledCourseTile({required this.course});
+  const _EnrolledCourseTile({
+    required this.course,
+    required this.onContinue,
+  });
+
   final DashboardEnrolledCourse course;
+  final VoidCallback onContinue;
 
   @override
   Widget build(BuildContext context) {
@@ -540,17 +563,26 @@ class _EnrolledCourseTile extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Title + Level chip
           Row(
             children: [
-              Expanded(child: Text(course.title, style: const TextStyle(fontWeight: FontWeight.w900))),
+              Expanded(
+                child: Text(course.title, style: const TextStyle(fontWeight: FontWeight.w900)),
+              ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(color: const Color(0xFFDBEAFE), borderRadius: BorderRadius.circular(999)),
-                child: Text(course.level,
-                    style: const TextStyle(color: Color(0xFF1D4ED8), fontWeight: FontWeight.w900, fontSize: 12)),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFDBEAFE),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Text(
+                  course.level,
+                  style: const TextStyle(color: Color(0xFF1D4ED8), fontWeight: FontWeight.w900, fontSize: 12),
+                ),
               ),
             ],
           ),
+
           const SizedBox(height: 6),
           Text(
             course.description,
@@ -558,41 +590,58 @@ class _EnrolledCourseTile extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
           ),
+
           const SizedBox(height: 10),
+
+          // Duration + progress + Continue button
           Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const Icon(Icons.access_time, size: 16, color: Color(0xFF6B7280)),
               const SizedBox(width: 6),
-              Text(course.duration,
-                  style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700, fontSize: 12)),
+              Text(
+                course.duration,
+                style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700, fontSize: 12),
+              ),
               const Spacer(),
+              Text(
+                '%$p',
+                style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w800, fontSize: 12),
+              ),
+              const SizedBox(width: 10),
               SizedBox(
-                width: 150,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(999),
-                      child: LinearProgressIndicator(
-                        value: p / 100,
-                        minHeight: 8,
-                        backgroundColor: const Color(0xFFE5E7EB),
-                        valueColor: const AlwaysStoppedAnimation(Color(0xFF2563EB)),
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text('%$p tamamlandı',
-                        style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700, fontSize: 12)),
-                  ],
+                height: 36,
+                child: ElevatedButton.icon(
+                  onPressed: onContinue,
+                  icon: const Icon(Icons.play_arrow_rounded),
+                  label: const Text('Devam Et', style: TextStyle(fontWeight: FontWeight.w900)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF2563EB),
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
                 ),
               ),
             ],
+          ),
+
+          const SizedBox(height: 10),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(999),
+            child: LinearProgressIndicator(
+              value: p / 100,
+              minHeight: 8,
+              backgroundColor: const Color(0xFFE5E7EB),
+              valueColor: const AlwaysStoppedAnimation(Color(0xFF2563EB)),
+            ),
           ),
         ],
       ),
     );
   }
 }
+
 
 class _RecentActivitiesCard extends StatelessWidget {
   const _RecentActivitiesCard({required this.activities});

@@ -48,9 +48,12 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen>
     final myCoursesAsync = ref.watch(myEnrolledCoursesProvider);
 
     // For "Enrolled" badges in ALL tab
-    final enrolledIds = myCoursesAsync.maybeWhen(
-      data: (list) => list.map((e) => e.course.id).toSet(),
-      orElse: () => <String>{},
+// Real progress for enrolled courses (used in ALL tab too)
+    final progressByCourseId = myCoursesAsync.maybeWhen(
+      data: (list) => <String, int>{
+        for (final e in list) e.course.id: e.enrollment.progress.clamp(0, 100),
+      },
+      orElse: () => <String, int>{},
     );
 
     return Container(
@@ -164,11 +167,13 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen>
                                     itemCount: courses.length,
                                     itemBuilder: (_, i) {
                                       final c = courses[i];
-                                      final isEnrolled = enrolledIds.contains(c.id);
+                                      final progress = progressByCourseId[c.id]; // null if not enrolled
+                                      final isEnrolled = progress != null;
 
                                       return _CourseCard(
                                         course: c,
                                         enrolled: isEnrolled,
+                                        enrolledProgress: progress,
                                         onOpen: () => context.push('/courses/${c.id}'),
                                       );
                                     },
@@ -361,10 +366,12 @@ class _CourseCard extends StatelessWidget {
     required this.course,
     required this.enrolled,
     required this.onOpen,
+    this.enrolledProgress,
   });
 
   final Course course;
   final bool enrolled;
+  final int? enrolledProgress;
   final VoidCallback onOpen;
 
   @override
@@ -434,6 +441,27 @@ class _CourseCard extends StatelessWidget {
                     _MetaChip(icon: Icons.access_time, text: course.duration ?? '—'),
                   ],
                 ),
+                  if (enrolledProgress != null) ...[
+                    const SizedBox(height: 10),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(999),
+                      child: LinearProgressIndicator(
+                        value: enrolledProgress!.clamp(0, 100) / 100,
+                        minHeight: 8,
+                        backgroundColor: const Color(0xFFE5E7EB),
+                        valueColor: const AlwaysStoppedAnimation(Color(0xFF2563EB)),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'İlerleme: %${enrolledProgress!.clamp(0, 100)}',
+                      style: const TextStyle(
+                        color: Color(0xFF6B7280),
+                        fontWeight: FontWeight.w800,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ]
               ],
             ),
           ),
@@ -446,7 +474,10 @@ class _CourseCard extends StatelessWidget {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
               elevation: 0,
             ),
-            child: const Text('Detay →', style: TextStyle(fontWeight: FontWeight.w900)),
+            child: Text(
+              enrolled ? 'Devam Et →' : 'Detay →',
+              style: const TextStyle(fontWeight: FontWeight.w900),
+            ),
           ),
         ],
       ),
