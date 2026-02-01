@@ -1,6 +1,10 @@
 import 'package:flutter/foundation.dart';
 
-int _asInt(dynamic v) => (v is int) ? v : (v as num?)?.toInt() ?? 0;
+int _asInt(dynamic v) {
+  if (v is int) return v;
+  if (v is num) return v.toInt();
+  return int.tryParse(v?.toString() ?? '') ?? 0;
+}
 
 @immutable
 class LeaderboardEntry {

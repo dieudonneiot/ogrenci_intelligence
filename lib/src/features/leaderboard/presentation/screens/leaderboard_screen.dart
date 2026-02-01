@@ -34,7 +34,12 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
     final asyncVm = ref.watch(leaderboardProvider);
 
     return asyncVm.when(
-      loading: () => const Center(child: Padding(padding: EdgeInsets.all(24), child: CircularProgressIndicator())),
+      loading: () => const Center(
+        child: Padding(
+          padding: EdgeInsets.all(24),
+          child: CircularProgressIndicator(),
+        ),
+      ),
       error: (e, _) => Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -43,9 +48,14 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
             children: [
               const Icon(Icons.error_outline, size: 48, color: Color(0xFFEF4444)),
               const SizedBox(height: 12),
-              const Text('Leaderboard yüklenemedi', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
+              const Text('Leaderboard yüklenemedi',
+                  style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
               const SizedBox(height: 8),
-              Text(e.toString(), textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFF6B7280))),
+              Text(
+                e.toString(),
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Color(0xFF6B7280)),
+              ),
               const SizedBox(height: 14),
               SizedBox(
                 height: 44,
@@ -59,6 +69,9 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
         ),
       ),
       data: (vm) {
+        final dept = (vm.department ?? '').trim();
+        final hasDept = dept.isNotEmpty;
+
         return Container(
           color: const Color(0xFFF9FAFB),
           child: RefreshIndicator(
@@ -77,7 +90,8 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                           children: const [
                             Icon(Icons.emoji_events, color: Color(0xFFF59E0B), size: 30),
                             SizedBox(width: 10),
-                            Text('Liderlik Tablosu', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900)),
+                            Text('Liderlik Tablosu',
+                                style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900)),
                           ],
                         ),
                         const SizedBox(height: 6),
@@ -87,7 +101,8 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                         ),
                         const SizedBox(height: 16),
 
-                        if (vm.totalPoints > 0) _UserStatsHero(vm: vm),
+                        // Always show hero (React-style), even if points are 0
+                        _UserStatsHero(vm: vm),
 
                         const SizedBox(height: 14),
 
@@ -124,13 +139,32 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                                 entries: vm.overall,
                                 emptyText: 'Henüz sıralama verisi yok.',
                               ),
-                              _LeaderboardList(
-                                meId: vm.meId,
-                                showDepartment: false,
-                                entries: vm.departmentList,
-                                emptyText: (vm.department == null || vm.department!.isEmpty)
-                                    ? 'Profilinde bölüm bilgisi yok.'
-                                    : 'Bu bölüm için sıralama verisi yok.',
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  if (hasDept) ...[
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 2, bottom: 10),
+                                      child: Text(
+                                        'Bölüm: $dept',
+                                        style: const TextStyle(
+                                          color: Color(0xFF6B7280),
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                  Expanded(
+                                    child: _LeaderboardList(
+                                      meId: vm.meId,
+                                      showDepartment: false,
+                                      entries: vm.departmentList,
+                                      emptyText: !hasDept
+                                          ? 'Profilinde bölüm bilgisi yok.'
+                                          : 'Bu bölüm için sıralama verisi yok.',
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
@@ -179,8 +213,8 @@ class _UserStatsHero extends StatelessWidget {
 
           final items = <Widget>[
             _HeroMetric(title: 'Toplam Puanın', value: '${vm.totalPoints}'),
-            if (vm.overallRank != null) _HeroMetric(title: 'Genel Sıralama', value: '${vm.overallRank}.'),
-            if (vm.departmentRank != null) _HeroMetric(title: 'Bölüm Sıralaması', value: '${vm.departmentRank}.'),
+            _HeroMetric(title: 'Genel Sıralama', value: vm.overallRank != null ? '${vm.overallRank}.' : '—'),
+            _HeroMetric(title: 'Bölüm Sıralaması', value: vm.departmentRank != null ? '${vm.departmentRank}.' : '—'),
           ];
 
           if (wide) {
@@ -221,9 +255,11 @@ class _HeroMetric extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Text(title, style: const TextStyle(color: Color(0xCCFFFFFF), fontWeight: FontWeight.w800, fontSize: 12)),
+          Text(title,
+              style: const TextStyle(color: Color(0xCCFFFFFF), fontWeight: FontWeight.w800, fontSize: 12)),
           const SizedBox(height: 6),
-          Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 18)),
+          Text(value,
+              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 18)),
         ],
       ),
     );
@@ -249,7 +285,10 @@ class _LeaderboardList extends StatelessWidget {
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
-          child: Text(emptyText, style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700)),
+          child: Text(
+            emptyText,
+            style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
+          ),
         ),
       );
     }
@@ -276,7 +315,6 @@ class _LeaderboardList extends StatelessWidget {
               _RankBadge(rank: e.rank),
               const SizedBox(width: 12),
 
-              // Avatar + name
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -303,8 +341,10 @@ class _LeaderboardList extends StatelessWidget {
                                     color: const Color(0xFF7C3AED),
                                     borderRadius: BorderRadius.circular(999),
                                   ),
-                                  child: const Text('Sen',
-                                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 12)),
+                                  child: const Text(
+                                    'Sen',
+                                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 12),
+                                  ),
                                 ),
                               ],
                             ],
@@ -325,7 +365,6 @@ class _LeaderboardList extends StatelessWidget {
 
               const SizedBox(width: 10),
 
-              // Points + level
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
@@ -369,7 +408,10 @@ class _RankBadge extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             '$rank',
-            style: TextStyle(fontWeight: FontWeight.w900, color: (rank <= 3) ? const Color(0xFF111827) : const Color(0xFF6B7280)),
+            style: TextStyle(
+              fontWeight: FontWeight.w900,
+              color: (rank <= 3) ? const Color(0xFF111827) : const Color(0xFF6B7280),
+            ),
           ),
         ],
       ),
@@ -418,8 +460,13 @@ class _LevelPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final label =
-        points >= 1000 ? 'Uzman' : points >= 500 ? 'İleri' : points >= 100 ? 'Orta' : 'Başlangıç';
+    final label = points >= 1000
+        ? 'Uzman'
+        : points >= 500
+            ? 'İleri'
+            : points >= 100
+                ? 'Orta'
+                : 'Başlangıç';
 
     final bg = rank <= 3 ? const Color(0xFFFEF3C7) : const Color(0xFFF3F4F6);
     final fg = rank <= 3 ? const Color(0xFF92400E) : const Color(0xFF374151);
@@ -456,8 +503,10 @@ class _InfoCard extends StatelessWidget {
               children: [
                 const Text('Nasıl puan kazanırım?', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
                 const SizedBox(height: 8),
-                const Text('• Kurs tamamla: +50 puan\n• Kursa kayıt ol: +10 puan\n• Günlük giriş: +2 puan\n• 7 gün seri: +15 puan',
-                    style: TextStyle(color: Color(0xFF4B5563), fontWeight: FontWeight.w600)),
+                const Text(
+                  '• Kurs tamamla: +50 puan\n• Kursa kayıt ol: +10 puan\n• Günlük giriş: +2 puan\n• 7 gün seri: +15 puan',
+                  style: TextStyle(color: Color(0xFF4B5563), fontWeight: FontWeight.w600),
+                ),
                 const SizedBox(height: 12),
                 Align(
                   alignment: Alignment.centerLeft,

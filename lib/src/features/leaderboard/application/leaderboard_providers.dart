@@ -4,6 +4,12 @@ import '../../auth/presentation/controllers/auth_controller.dart';
 import '../data/leaderboard_repository.dart';
 import '../domain/leaderboard_models.dart';
 
+int _asInt(dynamic v) {
+  if (v is int) return v;
+  if (v is num) return v.toInt();
+  return int.tryParse(v?.toString() ?? '') ?? 0;
+}
+
 final leaderboardRepositoryProvider = Provider<LeaderboardRepository>((ref) {
   return const LeaderboardRepository();
 });
@@ -16,6 +22,10 @@ final leaderboardProvider =
 class LeaderboardController extends AutoDisposeAsyncNotifier<LeaderboardViewModel> {
   @override
   Future<LeaderboardViewModel> build() async {
+    return _load();
+  }
+
+  Future<LeaderboardViewModel> _load() async {
     final auth = ref.watch(authViewStateProvider).value;
     final uid = auth?.user?.id;
 
@@ -23,16 +33,17 @@ class LeaderboardController extends AutoDisposeAsyncNotifier<LeaderboardViewMode
       throw Exception('Not authenticated (leaderboardProvider)');
     }
 
-    final repo = ref.watch(leaderboardRepositoryProvider);
+    final repo = ref.read(leaderboardRepositoryProvider);
 
     final myProfile = await repo.fetchMyProfile(userId: uid);
     final myDept = (myProfile?['department'] as String?)?.trim();
-    final myTotal = (myProfile?['total_points'] as int?) ?? 0;
+    final myTotal = _asInt(myProfile?['total_points']);
 
-    // Fetch both lists in parallel (so tabs feel instant)
+    // Fetch lists in parallel (tabs feel instant)
     final futures = await Future.wait<List<LeaderboardEntry>>([
       repo.fetchOverall(limit: 50),
-      if (myDept != null && myDept.isNotEmpty) repo.fetchByDepartment(department: myDept, limit: 50),
+      if (myDept != null && myDept.isNotEmpty)
+        repo.fetchByDepartment(department: myDept, limit: 50),
     ]);
 
     final overall = futures[0];
@@ -54,7 +65,7 @@ class LeaderboardController extends AutoDisposeAsyncNotifier<LeaderboardViewMode
 
   Future<void> refresh() async {
     state = const AsyncLoading();
-    state = await AsyncValue.guard(build);
+    state = await AsyncValue.guard(_load);
   }
 }
 
