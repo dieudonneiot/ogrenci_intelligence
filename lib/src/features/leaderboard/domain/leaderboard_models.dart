@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 
+int _asInt(dynamic v) => (v is int) ? v : (v as num?)?.toInt() ?? 0;
+
 @immutable
 class LeaderboardEntry {
   const LeaderboardEntry({
@@ -34,7 +36,7 @@ class LeaderboardEntry {
       userId: (map['id'] ?? '').toString(),
       displayName: displayNameFromProfile(map),
       department: (map['department'] as String?)?.trim(),
-      totalPoints: (map['total_points'] as int?) ?? 0,
+      totalPoints: _asInt(map['total_points']),
       rank: rank,
     );
   }

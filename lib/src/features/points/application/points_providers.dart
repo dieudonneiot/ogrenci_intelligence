@@ -6,7 +6,7 @@ import '../data/points_repository.dart';
 import '../domain/points_models.dart';
 
 final pointsRepositoryProvider = Provider<PointsRepository>((ref) {
-  return const PointsRepository();
+  return PointsRepository(onPointsAwarded: () => invalidatePointsProviders(ref));
 });
 
 String? _uid(Ref ref) => ref.read(authViewStateProvider).value?.user?.id;
@@ -36,3 +36,10 @@ final myBadgesProvider = FutureProvider.autoDispose<List<UserBadge>>((ref) async
   if (uid == null || uid.isEmpty) return const <UserBadge>[];
   return ref.read(pointsRepositoryProvider).fetchBadges(userId: uid);
 });
+
+void invalidatePointsProviders(Ref ref) {
+  ref.invalidate(myTotalPointsProvider);
+  ref.invalidate(myPointsHistoryProvider);
+  ref.invalidate(myBadgesProvider);
+  ref.invalidate(rewardsProvider);
+}

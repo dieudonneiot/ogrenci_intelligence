@@ -1,5 +1,13 @@
 import 'package:flutter/foundation.dart';
 
+int _asInt(dynamic v) => (v is int) ? v : (v as num?)?.toInt() ?? 0;
+
+DateTime _asDate(dynamic v) {
+  if (v == null) return DateTime.now();
+  if (v is DateTime) return v;
+  return DateTime.tryParse(v.toString()) ?? DateTime.now();
+}
+
 @immutable
 class UserPoint {
   const UserPoint({
@@ -21,8 +29,8 @@ class UserPoint {
       id: map['id'] as String,
       source: (map['source'] ?? '') as String,
       description: (map['description'] ?? '') as String,
-      points: (map['points'] ?? 0) as int,
-      createdAt: DateTime.tryParse((map['created_at'] ?? '') as String) ?? DateTime.now(),
+      points: _asInt(map['points']),
+      createdAt: _asDate(map['created_at']),
     );
   }
 }
@@ -50,7 +58,7 @@ class Reward {
       id: map['id'] as String,
       title: (map['title'] ?? '') as String,
       description: (map['description'] ?? '') as String,
-      requiredPoints: (map['required_points'] ?? 0) as int,
+      requiredPoints: _asInt(map['required_points']),
       department: map['department'] as String?,
       icon: map['icon'] as String?,
     );
@@ -84,8 +92,8 @@ class UserBadge {
       badgeTitle: (map['badge_title'] ?? '') as String,
       badgeDescription: map['badge_description'] as String?,
       icon: map['icon'] as String?,
-      earnedAt: DateTime.tryParse((map['earned_at'] ?? '') as String) ?? DateTime.now(),
-      pointsAwarded: (map['points_awarded'] ?? 0) as int,
+      earnedAt: _asDate(map['earned_at']),
+      pointsAwarded: _asInt(map['points_awarded']),
     );
   }
 }

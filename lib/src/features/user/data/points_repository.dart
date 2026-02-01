@@ -2,7 +2,9 @@ import '../../../core/supabase/supabase_service.dart';
 import '../../points/domain/points_models.dart';
 
 class PointsRepository {
-  const PointsRepository();
+  const PointsRepository({this.onPointsAwarded});
+
+  final void Function()? onPointsAwarded;
 
   /* --------------------------- READ METHODS --------------------------- */
 
@@ -10,7 +12,7 @@ class PointsRepository {
     final res = await SupabaseService.client
         .from('profiles')
         .select('total_points')
-        .eq('id', userId)
+        .eq('user_id', userId)
         .maybeSingle();
 
     if (res == null) return 0;
@@ -90,8 +92,10 @@ class PointsRepository {
       await SupabaseService.client
           .from('profiles')
           .update({'total_points': before + points})
-          .eq('id', userId);
+          .eq('user_id', userId);
     }
+
+    onPointsAwarded?.call();
   }
 
   /* ------------------------- DASHBOARD BONUSES ------------------------ */
