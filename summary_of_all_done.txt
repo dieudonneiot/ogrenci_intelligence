@@ -6010,9 +6010,9 @@ class StudentDashboardRepository {
   Future<int?> getLatestDepartmentRank(String uid) async {
     final rows = await _client
         .from('leaderboard_snapshots')
-        .select('rank_department,period_end')
+        .select('rank_department,period_date') // ✅ period_date exists
         .eq('user_id', uid)
-        .order('period_end', ascending: false)
+        .order('period_date', ascending: false) // ✅ order by existing column
         .limit(1) as List<dynamic>;
 
     if (rows.isEmpty) return null;
@@ -6221,6 +6221,54 @@ class StudentDashboardRepository {
     items.sort((a, b) => b.createdAt.compareTo(a.createdAt));
     if (items.length > limit) return items.take(limit).toList();
     return items;
+  }
+
+  Future<StudentDashboardViewModel> fetchDashboard({
+    required String uid,
+    String? fallbackName,
+  }) async {
+    final profile = await getProfile(uid);
+
+    final now = DateTime.now().toUtc();
+    final startToday = DateTime.utc(now.year, now.month, now.day);
+
+    // Monday-based week start
+    final startWeek = startToday.subtract(Duration(days: startToday.weekday - 1));
+
+    final countsF = getCounts(uid);
+    final rankF = getLatestDepartmentRank(uid);
+    final todayF = sumPointsSince(uid, startToday);
+    final weekF = sumPointsSince(uid, startWeek);
+    final ongoingCoursesF = listOngoingCourses(uid: uid, limit: 3);
+    final activitiesF = listActivities(uid: uid, limit: 8);
+
+    final counts = await countsF;
+    final rank = await rankF;
+    final todayPts = await todayF;
+    final weekPts = await weekF;
+    final ongoingCourses = await ongoingCoursesF;
+    final activities = await activitiesF;
+
+    final displayFallback =
+        (fallbackName == null || fallbackName.isEmpty) ? 'Ã–ÄŸrenci' : fallbackName;
+    final displayName = (profile.fullName == null || profile.fullName!.isEmpty)
+        ? displayFallback
+        : profile.fullName!;
+
+    return StudentDashboardViewModel(
+      displayName: displayName,
+      stats: StudentDashboardStats(
+        totalPoints: profile.totalPoints,
+        coursesCompleted: counts.coursesCompleted,
+        activeApplications: counts.activeApplications,
+        ongoingCourses: counts.ongoingCourses,
+        departmentRank: rank,
+      ),
+      todayPoints: todayPts,
+      weekPoints: weekPts,
+      enrolledCourses: ongoingCourses,
+      activities: activities,
+    );
   }
 
   static ActivityCategory _mapEventType(String eventType) {
@@ -6870,7 +6918,6 @@ class _EnrolledCourseTile extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Title + Level chip
           Row(
             children: [
               Expanded(
@@ -6884,12 +6931,26 @@ class _EnrolledCourseTile extends StatelessWidget {
                 ),
                 child: Text(
                   course.level,
-                  style: const TextStyle(color: Color(0xFF1D4ED8), fontWeight: FontWeight.w900, fontSize: 12),
+                  style: const TextStyle(
+                    color: Color(0xFF1D4ED8),
+                    fontWeight: FontWeight.w900,
+                    fontSize: 12,
+                  ),
                 ),
+              ),
+              const SizedBox(width: 10),
+              ElevatedButton(
+                onPressed: () => context.push('/courses/${course.courseId}'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF6D28D9),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  elevation: 0,
+                ),
+                child: const Text('Devam →', style: TextStyle(fontWeight: FontWeight.w900)),
               ),
             ],
           ),
-
           const SizedBox(height: 6),
           Text(
             course.description,
@@ -6897,12 +6958,8 @@ class _EnrolledCourseTile extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
           ),
-
           const SizedBox(height: 10),
-
-          // Duration + progress + Continue button
           Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const Icon(Icons.access_time, size: 16, color: Color(0xFF6B7280)),
               const SizedBox(width: 6),
@@ -6911,37 +6968,29 @@ class _EnrolledCourseTile extends StatelessWidget {
                 style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700, fontSize: 12),
               ),
               const Spacer(),
-              Text(
-                '%$p',
-                style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w800, fontSize: 12),
-              ),
-              const SizedBox(width: 10),
               SizedBox(
-                height: 36,
-                child: ElevatedButton.icon(
-                  onPressed: onContinue,
-                  icon: const Icon(Icons.play_arrow_rounded),
-                  label: const Text('Devam Et', style: TextStyle(fontWeight: FontWeight.w900)),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF2563EB),
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
+                width: 150,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(999),
+                      child: LinearProgressIndicator(
+                        value: p / 100,
+                        minHeight: 8,
+                        backgroundColor: const Color(0xFFE5E7EB),
+                        valueColor: const AlwaysStoppedAnimation(Color(0xFF2563EB)),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '%$p tamamlandı',
+                      style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700, fontSize: 12),
+                    ),
+                  ],
                 ),
               ),
             ],
-          ),
-
-          const SizedBox(height: 10),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(999),
-            child: LinearProgressIndicator(
-              value: p / 100,
-              minHeight: 8,
-              backgroundColor: const Color(0xFFE5E7EB),
-              valueColor: const AlwaysStoppedAnimation(Color(0xFF2563EB)),
-            ),
           ),
         ],
       ),
@@ -7072,8 +7121,6 @@ class _ActStyle {
   final Color fg;
   final Color bg;
 }
-
-
 
 
 ✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
@@ -8370,6 +8417,7 @@ class _ErrorBlock extends StatelessWidget {
     );
   }
 }
+
 
 
 

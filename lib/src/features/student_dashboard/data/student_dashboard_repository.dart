@@ -32,9 +32,9 @@ class StudentDashboardRepository {
   Future<int?> getLatestDepartmentRank(String uid) async {
     final rows = await _client
         .from('leaderboard_snapshots')
-        .select('rank_department,period_end')
+        .select('rank_department,period_date') // ✅ period_date exists
         .eq('user_id', uid)
-        .order('period_end', ascending: false)
+        .order('period_date', ascending: false) // ✅ order by existing column
         .limit(1) as List<dynamic>;
 
     if (rows.isEmpty) return null;

@@ -563,7 +563,6 @@ class _EnrolledCourseTile extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Title + Level chip
           Row(
             children: [
               Expanded(
@@ -577,12 +576,26 @@ class _EnrolledCourseTile extends StatelessWidget {
                 ),
                 child: Text(
                   course.level,
-                  style: const TextStyle(color: Color(0xFF1D4ED8), fontWeight: FontWeight.w900, fontSize: 12),
+                  style: const TextStyle(
+                    color: Color(0xFF1D4ED8),
+                    fontWeight: FontWeight.w900,
+                    fontSize: 12,
+                  ),
                 ),
+              ),
+              const SizedBox(width: 10),
+              ElevatedButton(
+                onPressed: () => context.push('/courses/${course.courseId}'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF6D28D9),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  elevation: 0,
+                ),
+                child: const Text('Devam →', style: TextStyle(fontWeight: FontWeight.w900)),
               ),
             ],
           ),
-
           const SizedBox(height: 6),
           Text(
             course.description,
@@ -590,12 +603,8 @@ class _EnrolledCourseTile extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
           ),
-
           const SizedBox(height: 10),
-
-          // Duration + progress + Continue button
           Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const Icon(Icons.access_time, size: 16, color: Color(0xFF6B7280)),
               const SizedBox(width: 6),
@@ -604,37 +613,29 @@ class _EnrolledCourseTile extends StatelessWidget {
                 style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700, fontSize: 12),
               ),
               const Spacer(),
-              Text(
-                '%$p',
-                style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w800, fontSize: 12),
-              ),
-              const SizedBox(width: 10),
               SizedBox(
-                height: 36,
-                child: ElevatedButton.icon(
-                  onPressed: onContinue,
-                  icon: const Icon(Icons.play_arrow_rounded),
-                  label: const Text('Devam Et', style: TextStyle(fontWeight: FontWeight.w900)),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF2563EB),
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
+                width: 150,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(999),
+                      child: LinearProgressIndicator(
+                        value: p / 100,
+                        minHeight: 8,
+                        backgroundColor: const Color(0xFFE5E7EB),
+                        valueColor: const AlwaysStoppedAnimation(Color(0xFF2563EB)),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '%$p tamamlandı',
+                      style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700, fontSize: 12),
+                    ),
+                  ],
                 ),
               ),
             ],
-          ),
-
-          const SizedBox(height: 10),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(999),
-            child: LinearProgressIndicator(
-              value: p / 100,
-              minHeight: 8,
-              backgroundColor: const Color(0xFFE5E7EB),
-              valueColor: const AlwaysStoppedAnimation(Color(0xFF2563EB)),
-            ),
           ),
         ],
       ),
