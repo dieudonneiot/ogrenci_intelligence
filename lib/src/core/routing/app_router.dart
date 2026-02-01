@@ -16,6 +16,8 @@ import '../../features/auth/presentation/screens/reset_password_screen.dart';
 import '../../features/courses/presentation/screens/course_detail_screen.dart';
 import '../../features/courses/presentation/screens/courses_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
+import '../../features/internships/presentation/screens/internship_detail_screen.dart';
+import '../../features/internships/presentation/screens/internships_screen.dart';
 import '../../features/jobs/presentation/screens/job_detail_screen.dart';
 import '../../features/jobs/presentation/screens/jobs_screen.dart';
 import '../../features/leaderboard/presentation/screens/leaderboard_screen.dart';
@@ -115,12 +117,12 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       // -----------------------------
       GoRoute(
         path: Routes.adminLogin,
-        builder: (_context, _) =>
+        builder: (context, _) =>
             const PlaceholderScreen(title: 'Admin Login', showAppBar: true),
       ),
       GoRoute(
         path: Routes.adminSetup,
-        builder: (_context, _) =>
+        builder: (context, _) =>
             const PlaceholderScreen(title: 'Admin Setup', showAppBar: true),
       ),
 
@@ -132,40 +134,40 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(
             path: Routes.adminDashboard,
-            builder: (_context, _) => const PlaceholderView(title: 'Admin Dashboard'),
+            builder: (context, _) => const PlaceholderView(title: 'Admin Dashboard'),
           ),
           GoRoute(
             path: Routes.adminCompanies,
-            builder: (_context, _) => const PlaceholderView(title: 'Admin Companies'),
+            builder: (context, _) => const PlaceholderView(title: 'Admin Companies'),
           ),
           GoRoute(
             path: Routes.adminUsers,
-            builder: (_context, _) => const PlaceholderView(title: 'Admin Users'),
+            builder: (context, _) => const PlaceholderView(title: 'Admin Users'),
           ),
           GoRoute(
             path: Routes.adminJobs,
-            builder: (_context, _) => const PlaceholderView(title: 'Admin Jobs'),
+            builder: (context, _) => const PlaceholderView(title: 'Admin Jobs'),
           ),
           GoRoute(
             path: Routes.adminSubscriptions,
-            builder: (_context, _) =>
+            builder: (context, _) =>
                 const PlaceholderView(title: 'Admin Subscriptions'),
           ),
           GoRoute(
             path: Routes.adminReports,
-            builder: (_context, _) => const PlaceholderView(title: 'Admin Reports'),
+            builder: (context, _) => const PlaceholderView(title: 'Admin Reports'),
           ),
           GoRoute(
             path: Routes.adminSettings,
-            builder: (_context, _) => const PlaceholderView(title: 'Admin Settings'),
+            builder: (context, _) => const PlaceholderView(title: 'Admin Settings'),
           ),
           GoRoute(
             path: Routes.adminLogs,
-            builder: (_context, _) => const PlaceholderView(title: 'Admin Logs'),
+            builder: (context, _) => const PlaceholderView(title: 'Admin Logs'),
           ),
           GoRoute(
             path: Routes.adminProfile,
-            builder: (_context, _) => const PlaceholderView(title: 'Admin Profile'),
+            builder: (context, _) => const PlaceholderView(title: 'Admin Profile'),
           ),
         ],
       ),
@@ -179,7 +181,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           // Public
           GoRoute(
             path: Routes.home,
-            builder: (_context, _) => const HomeScreen(),
+            builder: (context, _) => const HomeScreen(),
           ),
 
           // Auth screens
@@ -191,11 +193,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: Routes.register,
-            builder: (_context, _) => const RegisterScreen(),
+            builder: (context, _) => const RegisterScreen(),
           ),
           GoRoute(
             path: Routes.forgotPassword,
-            builder: (_context, _) => const ForgotPasswordScreen(),
+            builder: (context, _) => const ForgotPasswordScreen(),
           ),
           GoRoute(
             path: Routes.emailVerification,
@@ -205,17 +207,18 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: Routes.resetPassword,
-            builder: (_context, _) => const ResetPasswordScreen(),
+            builder: (context, _) => const ResetPasswordScreen(),
           ),
 
           // Company auth
           GoRoute(
             path: Routes.companyAuth,
-            builder: (_context, _) => const CompanyAuthScreen(),
+            builder: (context, _) => const CompanyAuthScreen(),
           ),
           GoRoute(
             path: Routes.companyRegister,
-            builder: (_context, _) => const CompanyAuthScreen(initialIsLogin: false),
+            builder: (context, _) =>
+                const CompanyAuthScreen(initialIsLogin: false),
           ),
 
            GoRoute(
@@ -226,39 +229,42 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           // Footer pages (public)
           GoRoute(
             path: Routes.howItWorks,
-            builder: (_context, _) => const PlaceholderView(title: 'How It Works'),
+            builder: (context, _) =>
+                const PlaceholderView(title: 'How It Works'),
           ),
           GoRoute(
             path: Routes.about,
-            builder: (_context, _) => const PlaceholderView(title: 'About'),
+            builder: (context, _) => const PlaceholderView(title: 'About'),
           ),
           GoRoute(
             path: Routes.contact,
-            builder: (_context, _) => const PlaceholderView(title: 'Contact'),
+            builder: (context, _) => const PlaceholderView(title: 'Contact'),
           ),
           GoRoute(
             path: Routes.privacy,
-            builder: (_context, _) => const PlaceholderView(title: 'Privacy Policy'),
+            builder: (context, _) =>
+                const PlaceholderView(title: 'Privacy Policy'),
           ),
           GoRoute(
             path: Routes.terms,
-            builder: (_context, _) => const PlaceholderView(title: 'Terms of Service'),
+            builder: (context, _) =>
+                const PlaceholderView(title: 'Terms of Service'),
           ),
           GoRoute(
             path: Routes.pointsSystem,
-            builder: (_context, _) => const PointsSystemScreen(),
+            builder: (context, _) => const PointsSystemScreen(),
           ),
           GoRoute(
             path: Routes.profile,
-            builder: (_context, _) => const PlaceholderView(title: 'Profile'),
+            builder: (context, _) => const PlaceholderView(title: 'Profile'),
           ),
           GoRoute(
             path: Routes.settings,
-            builder: (_context, _) => const PlaceholderView(title: 'Settings'),
+            builder: (context, _) => const PlaceholderView(title: 'Settings'),
           ),
           GoRoute(
             path: Routes.courses,
-            builder: (_context, _) => const CoursesScreen(),
+            builder: (context, _) => const CoursesScreen(),
           ),
           GoRoute(
             path: Routes.courseDetail,
@@ -269,53 +275,59 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: Routes.jobs,
-            builder: (_context, _) => const JobsScreen(),          ),
+            builder: (context, _) => const JobsScreen(),
+          ),
           GoRoute(
             path: Routes.jobDetail,
             builder: (_, state) => JobDetailScreen(jobId: state.pathParameters['id']!),          ),
           GoRoute(
             path: Routes.internships,
-            builder: (_context, _) => const PlaceholderView(title: 'Internships'),
+            builder: (_, __) => const InternshipsScreen(),
           ),
           GoRoute(
             path: Routes.internshipDetail,
-            builder: (_, s) => PlaceholderView(
-              title: 'Internship Detail',
-              subtitle: 'id=${s.pathParameters['id']}',
+            builder: (_, state) => InternshipDetailScreen(
+              internshipId: state.pathParameters['id']!,
             ),
           ),
           GoRoute(
             path: Routes.applications,
-            builder: (_context, _) => const PlaceholderView(title: 'Applications'),
+            builder: (context, _) =>
+                const PlaceholderView(title: 'Applications'),
           ),
           GoRoute(
             path: Routes.favorites,
-            builder: (_context, _) => const PlaceholderView(title: 'Favorites'),
+            builder: (context, _) => const PlaceholderView(title: 'Favorites'),
           ),
           GoRoute(
             path: Routes.notifications,
-            builder: (_context, _) => const PlaceholderView(title: 'Notifications'),
+            builder: (context, _) =>
+                const PlaceholderView(title: 'Notifications'),
           ),
           GoRoute(
             path: Routes.leaderboard,
-            builder: (_context, _) => const LeaderboardScreen(),          ),
+            builder: (context, _) => const LeaderboardScreen(),
+          ),
           GoRoute(
             path: Routes.debug,
-            builder: (_context, _) => const PlaceholderView(title: 'Database Debug'),
+            builder: (context, _) =>
+                const PlaceholderView(title: 'Database Debug'),
           ),
 
           // Company protected
           GoRoute(
             path: Routes.companyDashboard,
-            builder: (_context, _) => const PlaceholderView(title: 'Company Dashboard'),
+            builder: (context, _) =>
+                const PlaceholderView(title: 'Company Dashboard'),
           ),
           GoRoute(
             path: Routes.companyJobs,
-            builder: (_context, _) => const PlaceholderView(title: 'Company Jobs'),
+            builder: (context, _) =>
+                const PlaceholderView(title: 'Company Jobs'),
           ),
           GoRoute(
             path: Routes.companyJobsCreate,
-            builder: (_context, _) => const PlaceholderView(title: 'Create Job'),
+            builder: (context, _) => const PlaceholderView(title: 'Create Job'),
           ),
           GoRoute(
             path: Routes.companyJobsEdit,
@@ -333,12 +345,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: Routes.companyInternships,
-            builder: (_context, _) =>
+            builder: (context, _) =>
                 const PlaceholderView(title: 'Internship Management'),
           ),
           GoRoute(
             path: Routes.companyInternshipsCreate,
-            builder: (_context, _) => const PlaceholderView(title: 'Create Internship'),
+            builder: (context, _) =>
+                const PlaceholderView(title: 'Create Internship'),
           ),
           GoRoute(
             path: Routes.companyInternshipsEdit,
@@ -356,20 +369,21 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: Routes.companyProfile,
-            builder: (_context, _) => const PlaceholderView(title: 'Company Profile'),
+            builder: (context, _) =>
+                const PlaceholderView(title: 'Company Profile'),
           ),
           GoRoute(
             path: Routes.companyReports,
-            builder: (_context, _) => const PlaceholderView(title: 'Reports'),
+            builder: (context, _) => const PlaceholderView(title: 'Reports'),
           ),
           GoRoute(
             path: Routes.companyApplications,
-            builder: (_context, _) =>
+            builder: (context, _) =>
                 const PlaceholderView(title: 'Company Applications'),
           ),
           GoRoute(
             path: Routes.companyPricing,
-            builder: (_context, _) => const PlaceholderView(title: 'Pricing'),
+            builder: (context, _) => const PlaceholderView(title: 'Pricing'),
           ),
         ],
       ),
