@@ -6,11 +6,65 @@ import '../../../../core/routing/routes.dart';
 import '../../application/student_dashboard_providers.dart';
 import '../../domain/student_dashboard_models.dart';
 
-class StudentDashboardScreen extends ConsumerWidget {
+class StudentDashboardScreen extends ConsumerStatefulWidget {
   const StudentDashboardScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<StudentDashboardScreen> createState() => _StudentDashboardScreenState();
+
+  static int nextTarget(int points) {
+    if (points < 100) return 100;
+    if (points < 500) return 500;
+    if (points < 1000) return 1000;
+    if (points < 5000) return 5000;
+    return 10000;
+  }
+}
+
+class _StudentDashboardScreenState extends ConsumerState<StudentDashboardScreen> {
+  bool _bonusChecked = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _runBonuses());
+  }
+
+  Future<void> _runBonuses() async {
+    if (_bonusChecked) return;
+    _bonusChecked = true;
+
+    try {
+      final result = await ref.read(dashboardBonusesProvider.future);
+      if (!mounted) return;
+
+      if (result.anyAwarded) {
+        final messenger = ScaffoldMessenger.of(context);
+        messenger.clearSnackBars();
+
+        final text = (result.dailyAwarded && result.weeklyAwarded)
+            ? 'Harika! Günlük bonus (+2) ve 7 günlük seri (+15) kazandın!'
+            : result.weeklyAwarded
+                ? 'Tebrikler! 7 günlük seri tamamlandı: +15 puan'
+                : 'Günlük giriş bonusu kazandın: +2 puan';
+
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text(text),
+            duration: const Duration(seconds: 5),
+          ),
+        );
+
+        // Refresh dashboard so UI reflects new totals immediately
+        await ref.read(studentDashboardProvider.notifier).refresh();
+      }
+    } catch (_) {
+      // Bonuses should never break dashboard UI.
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final dashAsync = ref.watch(studentDashboardProvider);
 
     return dashAsync.when(
@@ -142,7 +196,7 @@ class StudentDashboardScreen extends ConsumerWidget {
                           todayPoints: vm.todayPoints,
                           weekPoints: vm.weekPoints,
                           coursesCompleted: stats.coursesCompleted,
-                          nextTarget: _nextTarget(stats.totalPoints),
+                          nextTarget: StudentDashboardScreen.nextTarget(stats.totalPoints),
                         ),
 
                         const SizedBox(height: 18),
@@ -155,7 +209,6 @@ class StudentDashboardScreen extends ConsumerWidget {
                               enrolledCourses: vm.enrolledCourses,
                               onSeeAll: () => context.go(Routes.courses),
                             );
-
 
                             final right = _RecentActivitiesCard(activities: vm.activities);
 
@@ -189,14 +242,6 @@ class StudentDashboardScreen extends ConsumerWidget {
         );
       },
     );
-  }
-
-  static int _nextTarget(int points) {
-    if (points < 100) return 100;
-    if (points < 500) return 500;
-    if (points < 1000) return 1000;
-    if (points < 5000) return 5000;
-    return 10000;
   }
 }
 
@@ -588,8 +633,7 @@ class _EnrolledCourseTile extends StatelessWidget {
                 style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700, fontSize: 12),
               ),
               const Spacer(),
-
-                            SizedBox(
+              SizedBox(
                 height: 36,
                 child: ElevatedButton(
                   onPressed: () => context.go('/courses/${course.courseId}'),
@@ -629,7 +673,6 @@ class _EnrolledCourseTile extends StatelessWidget {
   }
 }
 
-
 class _RecentActivitiesCard extends StatelessWidget {
   const _RecentActivitiesCard({required this.activities});
   final List<ActivityItem> activities;
@@ -666,7 +709,15 @@ class _RecentActivitiesCard extends StatelessWidget {
               ),
             )
           else
-            Column(children: activities.map((a) => _ActivityRow(activity: a)).toList()),
+            SizedBox(
+              height: 380, // ✅ React-like scroll area
+              child: Scrollbar(
+                child: ListView.builder(
+                  itemCount: activities.length,
+                  itemBuilder: (_, i) => _ActivityRow(activity: activities[i]),
+                ),
+              ),
+            ),
         ],
       ),
     );
