@@ -6,7 +6,6 @@ import '../../domain/internship_models.dart';
 
 class InternshipDetailScreen extends ConsumerWidget {
   const InternshipDetailScreen({super.key, required this.internshipId});
-
   final String internshipId;
 
   @override
@@ -15,10 +14,14 @@ class InternshipDetailScreen extends ConsumerWidget {
 
     return asyncVm.when(
       loading: () => const Scaffold(
-        body: Center(child: Padding(padding: EdgeInsets.all(24), child: CircularProgressIndicator())),
+        body: Center(
+          child: Padding(
+            padding: EdgeInsets.all(24),
+            child: CircularProgressIndicator(),
+          ),
+        ),
       ),
       error: (e, _) => Scaffold(
-        appBar: AppBar(title: const Text('Staj Detayı')),
         body: Center(
           child: Padding(
             padding: const EdgeInsets.all(24),
@@ -27,9 +30,11 @@ class InternshipDetailScreen extends ConsumerWidget {
               children: [
                 const Icon(Icons.error_outline, size: 48, color: Color(0xFFEF4444)),
                 const SizedBox(height: 10),
-                const Text('Detay yüklenemedi', style: TextStyle(fontWeight: FontWeight.w900)),
-                const SizedBox(height: 8),
-                Text(e.toString(), textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFF6B7280))),
+                Text(
+                  'Detay yuklenemedi: $e',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Color(0xFF6B7280)),
+                ),
                 const SizedBox(height: 12),
                 SizedBox(
                   height: 44,
@@ -43,214 +48,65 @@ class InternshipDetailScreen extends ConsumerWidget {
           ),
         ),
       ),
-      data: (vm) {
-        final item = vm.item;
-        final i = item.internship;
-        final myStatus = item.myApplication?.status;
-
-        return Scaffold(
-          backgroundColor: const Color(0xFFF9FAFB),
-          appBar: AppBar(
-            title: const Text('Staj Detayı'),
-            actions: [
-              IconButton(
-                tooltip: 'Favori',
-                onPressed: () => ref.read(internshipDetailProvider(internshipId).notifier).toggleFavorite(),
-                icon: Icon(item.isFavorite ? Icons.favorite : Icons.favorite_border),
-                color: item.isFavorite ? const Color(0xFFEF4444) : null,
-              ),
-            ],
-          ),
-          body: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 980),
-              child: ListView(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 28),
-                children: [
-                  _Card(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(i.title, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900)),
-                            ),
-                            if (myStatus != null) _StatusPill(status: myStatus),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            const Icon(Icons.apartment, size: 18, color: Color(0xFF6B7280)),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(i.companyName,
-                                  style: const TextStyle(color: Color(0xFF4B5563), fontWeight: FontWeight.w800)),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: [
-                            _Meta(icon: Icons.location_on_outlined, text: i.location ?? 'Belirtilmemiş'),
-                            _Meta(icon: Icons.schedule, text: '${i.durationMonths} ay'),
-                            if (i.isRemote) const _Meta(icon: Icons.wifi, text: 'Remote'),
-                            _Meta(icon: Icons.paid_outlined, text: i.isPaid ? 'Ücretli' : 'Ücretsiz'),
-                            if (i.deadline != null)
-                              _Meta(icon: Icons.event_outlined, text: 'Son: ${_fmtDate(i.deadline!)}'),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 14),
-
-                  _Card(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('Açıklama', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
-                        const SizedBox(height: 8),
-                        Text(
-                          i.description.isNotEmpty ? i.description : 'Açıklama yok.',
-                          style: const TextStyle(color: Color(0xFF374151), fontWeight: FontWeight.w600),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  if (i.requirements.isNotEmpty) ...[
-                    const SizedBox(height: 14),
-                    _Card(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text('Gereksinimler', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
-                          const SizedBox(height: 8),
-                          for (final r in i.requirements) _Bullet(r),
-                        ],
-                      ),
-                    ),
-                  ],
-
-                  if (i.benefits.isNotEmpty) ...[
-                    const SizedBox(height: 14),
-                    _Card(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text('Faydalar', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
-                          const SizedBox(height: 8),
-                          for (final b in i.benefits) _Bullet(b),
-                        ],
-                      ),
-                    ),
-                  ],
-
-                  const SizedBox(height: 16),
-
-                  if (item.myApplication == null)
-                    SizedBox(
-                      height: 52,
-                      child: ElevatedButton.icon(
-                        onPressed: () => _openApplySheet(context, ref, internshipId),
-                        icon: const Icon(Icons.send_outlined),
-                        label: const Text('Başvur', style: TextStyle(fontWeight: FontWeight.w900)),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF6D28D9),
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                          elevation: 0,
-                        ),
-                      ),
-                    )
-                  else
-                    _Card(
-                      child: Row(
-                        children: [
-                          const Icon(Icons.verified_outlined, color: Color(0xFF16A34A)),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Text(
-                              'Bu staja zaten başvurdun.',
-                              style: const TextStyle(fontWeight: FontWeight.w800),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
+      data: (vm) => _InternshipDetailBody(vm: vm),
     );
   }
+}
 
-  static String _fmtDate(DateTime d) => '${d.day.toString().padLeft(2, '0')}.${d.month.toString().padLeft(2, '0')}.${d.year}';
+class _InternshipDetailBody extends ConsumerWidget {
+  const _InternshipDetailBody({required this.vm});
+  final InternshipDetailViewModel vm;
 
-  static Future<void> _openApplySheet(BuildContext context, WidgetRef ref, String internshipId) async {
-    final controller = TextEditingController();
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final item = vm.item;
+    final i = item.internship;
+    final app = item.myApplication;
 
-    await showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(22))),
-      builder: (_) {
-        return Padding(
-          padding: EdgeInsets.only(
-            left: 16,
-            right: 16,
-            top: 14,
-            bottom: 16 + MediaQuery.of(context).viewInsets.bottom,
+    final req = i.requirements;
+    final ben = i.benefits;
+    final hasApplied = app != null;
+
+    return Scaffold(
+      backgroundColor: const Color(0xFFF9FAFB),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFFF9FAFB),
+        elevation: 0,
+        title: const Text('Staj Detayi', style: TextStyle(fontWeight: FontWeight.w900)),
+        actions: [
+          IconButton(
+            onPressed: () => ref.read(internshipDetailProvider(i.id).notifier).toggleFavorite(),
+            icon: Icon(item.isFavorite ? Icons.favorite : Icons.favorite_border),
+            color: item.isFavorite ? const Color(0xFFEF4444) : const Color(0xFF6B7280),
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('Motivasyon Mektubu', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
-              const SizedBox(height: 6),
-              const Text(
-                'Kısaca neden bu staja uygun olduğunu anlat. (En az 100 karakter)',
-                style: TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: controller,
-                maxLines: 6,
-                decoration: InputDecoration(
-                  hintText: 'Örn: Bu staj, ...',
-                  filled: true,
-                  fillColor: const Color(0xFFF9FAFB),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
-                ),
-              ),
-              const SizedBox(height: 12),
-              SizedBox(
-                height: 48,
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () async {
-                    final text = controller.text.trim();
-                    if (text.length < 100) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('En az 100 karakter yazmalısın.')),
-                      );
-                      return;
-                    }
+        ],
+      ),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1120),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+            child: LayoutBuilder(
+              builder: (_, c) {
+                final wide = c.maxWidth >= 980;
 
+                final left = _MainDetail(
+                  internship: i,
+                  status: app?.status,
+                  requirements: req,
+                  benefits: ben,
+                );
+
+                final right = _ApplyCard(
+                  internshipId: i.id,
+                  hasApplied: hasApplied,
+                  status: app?.status,
+                  onApply: (motivation) async {
                     try {
-                      await ref.read(internshipDetailProvider(internshipId).notifier).apply(text);
-                      if (context.mounted) Navigator.of(context).pop();
+                      await ref.read(internshipDetailProvider(i.id).notifier).apply(motivation);
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Başvurun alındı ✅')),
+                          const SnackBar(content: Text('Basvurun alindi')),
                         );
                       }
                     } catch (e) {
@@ -261,16 +117,278 @@ class InternshipDetailScreen extends ConsumerWidget {
                       }
                     }
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF6D28D9),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                    elevation: 0,
-                  ),
-                  child: const Text('Gönder', style: TextStyle(fontWeight: FontWeight.w900)),
-                ),
+                );
+
+                if (!wide) {
+                  return Column(
+                    children: [
+                      left,
+                      const SizedBox(height: 14),
+                      right,
+                    ],
+                  );
+                }
+
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(flex: 2, child: left),
+                    const SizedBox(width: 16),
+                    SizedBox(width: 380, child: right),
+                  ],
+                );
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _MainDetail extends StatelessWidget {
+  const _MainDetail({
+    required this.internship,
+    required this.status,
+    required this.requirements,
+    required this.benefits,
+  });
+
+  final Internship internship;
+  final InternshipApplicationStatus? status;
+  final List<String> requirements;
+  final List<String> benefits;
+
+  @override
+  Widget build(BuildContext context) {
+    final i = internship;
+    final location = i.isRemote ? 'Remote' : (i.location ?? 'Belirtilmemis');
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
+        boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 18, offset: Offset(0, 8))],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(i.title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
               ),
+              if (status != null) _StatusPill(status: status!),
             ],
+          ),
+          const SizedBox(height: 6),
+          Text(i.companyName, style: const TextStyle(color: Color(0xFF4B5563), fontWeight: FontWeight.w800)),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              _Chip(icon: Icons.place_outlined, text: location),
+              _Chip(icon: Icons.timelapse, text: '${i.durationMonths} ay'),
+              if (i.deadline != null) _Chip(icon: Icons.event_outlined, text: _fmtDate(i.deadline!)),
+              if (i.isPaid)
+                _Chip(
+                  icon: Icons.payments_outlined,
+                  text: i.monthlyStipend != null
+                      ? '${i.monthlyStipend!.toStringAsFixed(0)} TL/ay'
+                      : 'Ucretli',
+                  fg: const Color(0xFF16A34A),
+                  bg: const Color(0xFFDCFCE7),
+                ),
+              if (i.providesCertificate) const _Chip(icon: Icons.verified_outlined, text: 'Sertifika'),
+              if (i.possibilityOfEmployment) const _Chip(icon: Icons.trending_up, text: 'Ise alim sansi'),
+            ],
+          ),
+          const SizedBox(height: 14),
+          const _SectionTitle('Staj Hakkinda'),
+          const SizedBox(height: 8),
+          Text(
+            i.description.isNotEmpty ? i.description : 'Aciklama yok.',
+            style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 14),
+          const _SectionTitle('Saglanan Faydalar'),
+          const SizedBox(height: 8),
+          if (benefits.isEmpty)
+            const Text('Belirtilmemis', style: TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600))
+          else
+            _Bullets(items: benefits),
+          const SizedBox(height: 14),
+          const _SectionTitle('Aranan Nitelikler'),
+          const SizedBox(height: 8),
+          if (requirements.isEmpty)
+            const Text('Belirtilmemis', style: TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600))
+          else
+            _Bullets(items: requirements),
+          const SizedBox(height: 14),
+          const _SectionTitle('Staj Sureci'),
+          const SizedBox(height: 8),
+          const _Bullets(items: [
+            'Basvurunu gonder',
+            'Degerlendirme sureci',
+            'Mulakat (gerekirse)',
+            'Sonuc bildirimi',
+          ]),
+        ],
+      ),
+    );
+  }
+
+  static String _fmtDate(DateTime d) =>
+      '${d.day.toString().padLeft(2, '0')}.${d.month.toString().padLeft(2, '0')}.${d.year}';
+}
+
+class _ApplyCard extends StatelessWidget {
+  const _ApplyCard({
+    required this.internshipId,
+    required this.hasApplied,
+    required this.status,
+    required this.onApply,
+  });
+
+  final String internshipId;
+  final bool hasApplied;
+  final InternshipApplicationStatus? status;
+  final Future<void> Function(String motivation) onApply;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = status ?? InternshipApplicationStatus.pending;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
+        boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 18, offset: Offset(0, 8))],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Basvuru', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+          const SizedBox(height: 10),
+          if (hasApplied) ...[
+            _StatusLine(status: s),
+            const SizedBox(height: 10),
+            const Text(
+              'Bu staja zaten basvurdun. Durum guncellendiginde burada gorunecek.',
+              style: TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
+            ),
+          ] else ...[
+            const Text(
+              'Motivasyonunu yaz ve basvurunu gonder. (en az 100 karakter)',
+              style: TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              height: 46,
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => _openApplySheet(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF6D28D9),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  elevation: 0,
+                ),
+                child: const Text('Basvuru Yap', style: TextStyle(fontWeight: FontWeight.w900)),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  void _openApplySheet(BuildContext context) {
+    final ctrl = TextEditingController();
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
+      ),
+      builder: (_) {
+        return Padding(
+          padding: EdgeInsets.only(
+            left: 16,
+            right: 16,
+            top: 14,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+          ),
+          child: StatefulBuilder(
+            builder: (context, setState) {
+              final len = ctrl.text.trim().length;
+              final ok = len >= 100;
+
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Motivasyon Mektubu',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: ctrl,
+                    maxLines: 7,
+                    onChanged: (_) => setState(() {}),
+                    decoration: InputDecoration(
+                      hintText: 'Neden bu staj? Neler katacaksin? Hedeflerin ne?',
+                      filled: true,
+                      fillColor: const Color(0xFFF9FAFB),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    '$len/100',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w900,
+                      color: ok ? const Color(0xFF16A34A) : const Color(0xFFDC2626),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    height: 46,
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: ok
+                          ? () async {
+                              final text = ctrl.text.trim();
+                              Navigator.of(context).pop();
+                              await onApply(text);
+                            }
+                          : null,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF6D28D9),
+                        foregroundColor: Colors.white,
+                        disabledBackgroundColor: const Color(0xFFE5E7EB),
+                        disabledForegroundColor: const Color(0xFF9CA3AF),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        elevation: 0,
+                      ),
+                      child: const Text('Gonder', style: TextStyle(fontWeight: FontWeight.w900)),
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
         );
       },
@@ -278,70 +396,60 @@ class InternshipDetailScreen extends ConsumerWidget {
   }
 }
 
-/* -------- UI bits -------- */
-
-class _Card extends StatelessWidget {
-  const _Card({required this.child});
-  final Widget child;
+class _StatusLine extends StatelessWidget {
+  const _StatusLine({required this.status});
+  final InternshipApplicationStatus status;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 18, offset: Offset(0, 8))],
-      ),
-      child: child,
+    final label = _statusLabel(status);
+    final color = _statusColor(status);
+
+    return Row(
+      children: [
+        Icon(Icons.verified, color: color),
+        const SizedBox(width: 8),
+        Text(label, style: TextStyle(fontWeight: FontWeight.w900, color: color)),
+      ],
     );
   }
 }
 
-class _Meta extends StatelessWidget {
-  const _Meta({required this.icon, required this.text});
-  final IconData icon;
+class _SectionTitle extends StatelessWidget {
+  const _SectionTitle(this.text);
   final String text;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF3F4F6),
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 14, color: const Color(0xFF4B5563)),
-          const SizedBox(width: 6),
-          Text(text, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12, color: Color(0xFF374151))),
-        ],
-      ),
-    );
+    return Text(text, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16));
   }
 }
 
-class _Bullet extends StatelessWidget {
-  const _Bullet(this.text);
-  final String text;
+class _Bullets extends StatelessWidget {
+  const _Bullets({required this.items});
+  final List<String> items;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Icon(Icons.check_circle_outline, size: 18, color: Color(0xFF16A34A)),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(text, style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF374151))),
-          ),
-        ],
-      ),
+    return Column(
+      children: items
+          .map(
+            (t) => Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(Icons.check_circle_outline, size: 18, color: Color(0xFF16A34A)),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(t,
+                        style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600)),
+                  ),
+                ],
+              ),
+            ),
+          )
+          .toList(),
     );
   }
 }
@@ -352,32 +460,77 @@ class _StatusPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String label;
-    Color bg;
-    Color fg;
-
-    switch (status) {
-      case InternshipApplicationStatus.pending:
-        label = 'Beklemede';
-        bg = const Color(0xFFDBEAFE);
-        fg = const Color(0xFF1D4ED8);
-        break;
-      case InternshipApplicationStatus.accepted:
-        label = 'Kabul';
-        bg = const Color(0xFFDCFCE7);
-        fg = const Color(0xFF16A34A);
-        break;
-      case InternshipApplicationStatus.rejected:
-        label = 'Red';
-        bg = const Color(0xFFFEE2E2);
-        fg = const Color(0xFFDC2626);
-        break;
-    }
+    final label = _statusLabel(status);
+    final bg = _statusBg(status);
+    final fg = _statusColor(status);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(999)),
       child: Text(label, style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: fg)),
     );
+  }
+}
+
+class _Chip extends StatelessWidget {
+  const _Chip({
+    required this.icon,
+    required this.text,
+    this.bg = const Color(0xFFF3F4F6),
+    this.fg = const Color(0xFF374151),
+  });
+
+  final IconData icon;
+  final String text;
+  final Color bg;
+  final Color fg;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(999)),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: fg),
+          const SizedBox(width: 6),
+          Text(text, style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: fg)),
+        ],
+      ),
+    );
+  }
+}
+
+String _statusLabel(InternshipApplicationStatus status) {
+  switch (status) {
+    case InternshipApplicationStatus.accepted:
+      return 'Kabul Edildi';
+    case InternshipApplicationStatus.rejected:
+      return 'Reddedildi';
+    case InternshipApplicationStatus.pending:
+      return 'Basvuru Gonderildi';
+  }
+}
+
+Color _statusColor(InternshipApplicationStatus status) {
+  switch (status) {
+    case InternshipApplicationStatus.accepted:
+      return const Color(0xFF16A34A);
+    case InternshipApplicationStatus.rejected:
+      return const Color(0xFFDC2626);
+    case InternshipApplicationStatus.pending:
+      return const Color(0xFFD97706);
+  }
+}
+
+Color _statusBg(InternshipApplicationStatus status) {
+  switch (status) {
+    case InternshipApplicationStatus.accepted:
+      return const Color(0xFFDCFCE7);
+    case InternshipApplicationStatus.rejected:
+      return const Color(0xFFFEE2E2);
+    case InternshipApplicationStatus.pending:
+      return const Color(0xFFFEF3C7);
   }
 }

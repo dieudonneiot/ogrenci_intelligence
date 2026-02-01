@@ -10,8 +10,10 @@ final internshipsRepositoryProvider = Provider<InternshipsRepository>((ref) {
 
 // Filters (match React)
 final internshipsSearchProvider = StateProvider.autoDispose<String>((ref) => '');
-final internshipsLocationProvider = StateProvider.autoDispose<String>((ref) => 'all'); // all, İstanbul, Ankara, İzmir, Bursa
-final internshipsDurationProvider = StateProvider.autoDispose<String>((ref) => 'all'); // all, 1-3, 3-6, 6-12, 12+
+final internshipsLocationProvider =
+    StateProvider.autoDispose<String>((ref) => 'all'); // all, İstanbul, Ankara, İzmir, Bursa, remote
+final internshipsDurationProvider =
+    StateProvider.autoDispose<String>((ref) => 'all'); // all, 1-3, 3-6, 6-12, 12+, 6+
 
 String? _uid(Ref ref) => ref.read(authViewStateProvider).value?.user?.id;
 
@@ -23,7 +25,8 @@ final internshipsProvider =
 class InternshipsController extends AutoDisposeAsyncNotifier<InternshipsViewModel> {
   @override
   Future<InternshipsViewModel> build() async {
-    final uid = _uid(ref);
+    final auth = ref.watch(authViewStateProvider).value;
+    final uid = auth?.user?.id;
     if (uid == null || uid.isEmpty) {
       throw Exception('Not authenticated (internshipsProvider)');
     }
@@ -42,32 +45,43 @@ class InternshipsController extends AutoDisposeAsyncNotifier<InternshipsViewMode
 
     final futures = await Future.wait([
       repo.fetchInternships(
+        userId: uid,
         department: dept,
         search: search,
-        selectedLocation: loc,
-        selectedDuration: dur,
+        locationFilter: loc,
+        durationFilter: dur,
       ),
-      repo.fetchFavoriteInternshipIds(userId: uid),
-      repo.fetchMyApplicationsByInternshipId(userId: uid),
+      repo.fetchMyFavoriteInternshipIds(userId: uid),
+      repo.fetchMyApplicationStatusByInternshipId(userId: uid),
     ]);
 
     final internships = futures[0] as List<Internship>;
     final favoriteIds = futures[1] as Set<String>;
-    final appsByInternshipId = futures[2] as Map<String, InternshipApplication>;
+    final statusByInternshipId = futures[2] as Map<String, String>;
 
     final items = internships
-        .map((i) => InternshipCardItem(
-              internship: i,
-              isFavorite: favoriteIds.contains(i.id),
-              myApplication: appsByInternshipId[i.id],
-            ))
+        .map((i) {
+          final status = statusByInternshipId[i.id];
+          final app = status == null
+              ? null
+              : InternshipApplication.fromMap({
+                  'id': 'local',
+                  'internship_id': i.id,
+                  'status': status,
+                });
+          return InternshipCardItem(
+            internship: i,
+            isFavorite: favoriteIds.contains(i.id),
+            myApplication: app,
+          );
+        })
         .toList(growable: false);
 
     return InternshipsViewModel(
       department: dept,
       departmentMissing: false,
       items: items,
-      appliedCount: appsByInternshipId.length,
+      appliedCount: statusByInternshipId.length,
     );
   }
 
@@ -98,8 +112,8 @@ class InternshipsController extends AutoDisposeAsyncNotifier<InternshipsViewMode
     try {
       await repo.toggleFavorite(userId: uid, internshipId: internshipId);
     } catch (e) {
-      // rollback
-      state = AsyncData(current);
+      // rollback by reloading
+      await refresh();
       rethrow;
     }
   }
@@ -117,9 +131,9 @@ class InternshipsController extends AutoDisposeAsyncNotifier<InternshipsViewMode
 
     final newItems = [...current.items];
     newItems[idx] = before.copyWith(
-      myApplication: const InternshipApplication(
+      myApplication: InternshipApplication(
         id: 'local',
-        internshipId: '',
+        internshipId: internshipId,
         status: InternshipApplicationStatus.pending,
         appliedAt: null,
       ),
@@ -138,7 +152,8 @@ class InternshipDetailController
     extends AutoDisposeFamilyAsyncNotifier<InternshipDetailViewModel, String> {
   @override
   Future<InternshipDetailViewModel> build(String internshipId) async {
-    final uid = _uid(ref);
+    final auth = ref.watch(authViewStateProvider).value;
+    final uid = auth?.user?.id;
     if (uid == null || uid.isEmpty) {
       throw Exception('Not authenticated (internshipDetailProvider)');
     }
@@ -151,8 +166,7 @@ class InternshipDetailController
       repo.fetchMyApplication(userId: uid, internshipId: internshipId),
     ]);
 
-    final internship = futures[0] as Internship?;
-    if (internship == null) throw Exception('Staj bulunamadı');
+    final internship = futures[0] as Internship;
 
     final isFav = futures[1] as bool;
     final myApp = futures[2] as InternshipApplication?;
@@ -188,9 +202,9 @@ class InternshipDetailController
       await repo.toggleFavorite(userId: uid, internshipId: internshipId);
 
       // keep list in sync
-      ref.read(internshipsProvider.notifier).toggleFavorite(internshipId);
+      ref.invalidate(internshipsProvider);
     } catch (e) {
-      state = AsyncData(current);
+      await refresh();
       rethrow;
     }
   }
@@ -205,14 +219,28 @@ class InternshipDetailController
 
     final internshipId = current.item.internship.id;
 
-    await repo.applyToInternship(
+    await repo.apply(
       userId: uid,
       internshipId: internshipId,
-      motivationLetter: motivation,
+      motivation: motivation,
     );
 
-    // refresh detail + list
+    // optimistic list update
+    ref.read(internshipsProvider.notifier).markApplied(internshipId);
+
+    // re-fetch application, show status pill
+    final app = await repo.fetchMyApplication(
+      userId: uid,
+      internshipId: internshipId,
+    );
+
+    state = AsyncData(
+      InternshipDetailViewModel(
+        item: current.item.copyWith(myApplication: app),
+      ),
+    );
+
+    // keep list badges in sync
     ref.invalidate(internshipsProvider);
-    await refresh();
   }
 }

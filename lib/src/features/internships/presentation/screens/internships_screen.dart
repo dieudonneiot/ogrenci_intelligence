@@ -25,6 +25,7 @@ class _InternshipsScreenState extends ConsumerState<InternshipsScreen> {
     {'value': 'Ankara', 'label': 'Ankara'},
     {'value': 'İzmir', 'label': 'İzmir'},
     {'value': 'Bursa', 'label': 'Bursa'},
+    {'value': 'remote', 'label': 'Remote'},
   ];
 
   static const _durations = <Map<String, String>>[
@@ -32,6 +33,7 @@ class _InternshipsScreenState extends ConsumerState<InternshipsScreen> {
     {'value': '1-3', 'label': '1-3 Ay'},
     {'value': '3-6', 'label': '3-6 Ay'},
     {'value': '6-12', 'label': '6-12 Ay'},
+    {'value': '6+', 'label': '6+ Ay'},
     {'value': '12+', 'label': '12+ Ay'},
   ];
 
@@ -44,7 +46,7 @@ class _InternshipsScreenState extends ConsumerState<InternshipsScreen> {
 
   void _onSearchChanged(String v) {
     _debounce?.cancel();
-    _debounce = Timer(const Duration(milliseconds: 250), () {
+    _debounce = Timer(const Duration(milliseconds: 220), () {
       ref.read(internshipsSearchProvider.notifier).state = v;
     });
   }
@@ -131,7 +133,7 @@ class _InternshipsScreenState extends ConsumerState<InternshipsScreen> {
                                 onChanged: _onSearchChanged,
                                 decoration: InputDecoration(
                                   prefixIcon: const Icon(Icons.search),
-                                  hintText: 'Staj veya şirket ara...',
+                                  hintText: 'Ara: baslik, sirket, aciklama...',
                                   filled: true,
                                   fillColor: const Color(0xFFF9FAFB),
                                   border: OutlineInputBorder(
@@ -145,24 +147,61 @@ class _InternshipsScreenState extends ConsumerState<InternshipsScreen> {
                                 ),
                               ),
                               const SizedBox(height: 10),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: _Drop(
-                                      value: selectedLoc,
-                                      items: _locations,
-                                      onChanged: (v) => ref.read(internshipsLocationProvider.notifier).state = v,
+                              LayoutBuilder(
+                                builder: (_, c) {
+                                  final wide = c.maxWidth >= 760;
+                                  final left = _Drop(
+                                    value: selectedLoc,
+                                    items: _locations,
+                                    onChanged: (v) =>
+                                        ref.read(internshipsLocationProvider.notifier).state = v,
+                                  );
+                                  final right = _Drop(
+                                    value: selectedDur,
+                                    items: _durations,
+                                    onChanged: (v) =>
+                                        ref.read(internshipsDurationProvider.notifier).state = v,
+                                  );
+                                  final clearBtn = SizedBox(
+                                    height: 44,
+                                    child: OutlinedButton.icon(
+                                      onPressed: () {
+                                        _debounce?.cancel();
+                                        _search.clear();
+                                        ref.read(internshipsSearchProvider.notifier).state = '';
+                                        ref.read(internshipsLocationProvider.notifier).state = 'all';
+                                        ref.read(internshipsDurationProvider.notifier).state = 'all';
+                                      },
+                                      icon: const Icon(Icons.refresh),
+                                      label: const Text(
+                                        'Sifirla',
+                                        style: TextStyle(fontWeight: FontWeight.w900),
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Expanded(
-                                    child: _Drop(
-                                      value: selectedDur,
-                                      items: _durations,
-                                      onChanged: (v) => ref.read(internshipsDurationProvider.notifier).state = v,
-                                    ),
-                                  ),
-                                ],
+                                  );
+
+                                  if (!wide) {
+                                    return Column(
+                                      children: [
+                                        left,
+                                        const SizedBox(height: 10),
+                                        right,
+                                        const SizedBox(height: 10),
+                                        Align(alignment: Alignment.centerLeft, child: clearBtn),
+                                      ],
+                                    );
+                                  }
+
+                                  return Row(
+                                    children: [
+                                      Expanded(child: left),
+                                      const SizedBox(width: 10),
+                                      Expanded(child: right),
+                                      const SizedBox(width: 10),
+                                      clearBtn,
+                                    ],
+                                  );
+                                },
                               ),
                             ],
                           ),
@@ -483,6 +522,17 @@ class _InternshipCard extends StatelessWidget {
               _Meta(icon: Icons.location_on_outlined, text: i.location ?? 'Belirtilmemiş'),
               _Meta(icon: Icons.schedule, text: '${i.durationMonths} ay'),
               if (i.isRemote) const _Meta(icon: Icons.wifi, text: 'Remote'),
+              if (i.deadline != null)
+                _Meta(icon: Icons.event_outlined, text: _fmtDate(i.deadline!)),
+              if (i.isPaid)
+                _Meta(
+                  icon: Icons.payments_outlined,
+                  text: i.monthlyStipend != null
+                      ? '${i.monthlyStipend!.toStringAsFixed(0)} TL/ay'
+                      : 'Ucretli',
+                  fg: const Color(0xFF16A34A),
+                  bg: const Color(0xFFDCFCE7),
+                ),
             ],
           ),
           const Spacer(),
@@ -503,27 +553,34 @@ class _InternshipCard extends StatelessWidget {
       ),
     );
   }
+
+  static String _fmtDate(DateTime d) =>
+      '${d.day.toString().padLeft(2, '0')}.${d.month.toString().padLeft(2, '0')}.${d.year}';
 }
 
 class _Meta extends StatelessWidget {
-  const _Meta({required this.icon, required this.text});
+  const _Meta({
+    required this.icon,
+    required this.text,
+    this.bg = const Color(0xFFF3F4F6),
+    this.fg = const Color(0xFF374151),
+  });
   final IconData icon;
   final String text;
+  final Color bg;
+  final Color fg;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF3F4F6),
-        borderRadius: BorderRadius.circular(999),
-      ),
+      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(999)),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14, color: const Color(0xFF4B5563)),
+          Icon(icon, size: 14, color: fg),
           const SizedBox(width: 6),
-          Text(text, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12, color: Color(0xFF374151))),
+          Text(text, style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12, color: fg)),
         ],
       ),
     );

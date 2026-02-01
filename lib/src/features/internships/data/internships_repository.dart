@@ -11,42 +11,55 @@ class InternshipsRepository {
         .eq('id', userId)
         .maybeSingle();
 
-    return (row?['department'] as String?)?.trim();
+    final dept = (row?['department'] as String?)?.trim();
+    return (dept == null || dept.isEmpty) ? null : dept;
   }
 
   Future<List<Internship>> fetchInternships({
-    required String department,
+    required String userId,
+    String? department,
     required String search,
-    required String selectedLocation,
-    required String selectedDuration,
-    int limit = 100,
+    required String locationFilter,
+    required String durationFilter,
+    int limit = 80,
   }) async {
+    // Reserved for future user-scoped queries (keeps API parity with React).
+    final _ = userId;
     var q = SupabaseService.client
         .from('internships')
         .select(
-          'id,title,description,department,company_name,location,duration_months,is_remote,deadline,is_paid,monthly_stipend,provides_certificate,possibility_of_employment,requirements,benefits,created_at',
+          'id,title,description,department,company_name,location,duration_months,is_remote,deadline,is_paid,monthly_stipend,provides_certificate,possibility_of_employment,requirements,benefits,created_at,is_active',
         )
-        .eq('is_active', true)
-        .eq('department', department);
+        .eq('is_active', true);
+
+    final dept = department?.trim();
+    if (dept != null && dept.isNotEmpty) {
+      q = q.eq('department', dept);
+    }
 
     final s = search.trim();
     if (s.isNotEmpty) {
-      // title/company/location ilike
+      final esc = s.replaceAll('%', '').replaceAll(',', ' ');
+      // title/company/description ilike (match React)
       q = q.or(
-        'title.ilike.%$s%,company_name.ilike.%$s%,location.ilike.%$s%',
+        'title.ilike.%$esc%,company_name.ilike.%$esc%,description.ilike.%$esc%',
       );
     }
 
-    if (selectedLocation != 'all') {
-      q = q.eq('location', selectedLocation);
+    if (locationFilter == 'remote') {
+      q = q.eq('is_remote', true);
+    } else if (locationFilter != 'all') {
+      q = q.eq('location', locationFilter);
     }
 
-    if (selectedDuration != 'all') {
+    if (durationFilter != 'all') {
       // React: 1-3, 3-6, 6-12, 12+
-      if (selectedDuration == '12+') {
+      if (durationFilter == '12+') {
         q = q.gte('duration_months', 12);
+      } else if (durationFilter == '6+') {
+        q = q.gte('duration_months', 6);
       } else {
-        final parts = selectedDuration.split('-');
+        final parts = durationFilter.split('-');
         final min = int.tryParse(parts.first.trim()) ?? 0;
         final max = int.tryParse(parts.last.trim()) ?? 999;
         q = q.gte('duration_months', min).lte('duration_months', max);
@@ -60,7 +73,7 @@ class InternshipsRepository {
         .toList(growable: false);
   }
 
-  Future<Set<String>> fetchFavoriteInternshipIds({required String userId}) async {
+  Future<Set<String>> fetchMyFavoriteInternshipIds({required String userId}) async {
     final rows = await SupabaseService.client
         .from('favorites')
         .select('internship_id')
@@ -68,24 +81,28 @@ class InternshipsRepository {
         .eq('type', 'internship');
 
     return (rows as List)
-        .map((e) => (e as Map<String, dynamic>)['internship_id']?.toString() ?? '')
+        .map((e) => (e as Map<String, dynamic>)['internship_id']?.toString())
+        .whereType<String>()
         .where((id) => id.isNotEmpty)
         .toSet();
   }
 
-  Future<Map<String, InternshipApplication>> fetchMyApplicationsByInternshipId({
+  Future<Map<String, String>> fetchMyApplicationStatusByInternshipId({
     required String userId,
   }) async {
     final rows = await SupabaseService.client
         .from('internship_applications')
-        .select('id, internship_id, status, applied_at')
+        .select('internship_id, status')
         .eq('user_id', userId);
 
-    final apps = (rows as List)
-        .map((e) => InternshipApplication.fromMap(e as Map<String, dynamic>))
-        .toList(growable: false);
-
-    return {for (final a in apps) a.internshipId: a};
+    final map = <String, String>{};
+    for (final r in (rows as List)) {
+      final m = r as Map<String, dynamic>;
+      final id = (m['internship_id'] ?? '').toString();
+      if (id.isEmpty) continue;
+      map[id] = (m['status'] ?? 'pending').toString();
+    }
+    return map;
   }
 
   Future<void> toggleFavorite({
@@ -112,19 +129,22 @@ class InternshipsRepository {
       'user_id': userId,
       'type': 'internship',
       'internship_id': internshipId,
+      'created_at': DateTime.now().toIso8601String(),
     });
   }
 
-  Future<Internship?> fetchInternshipById({required String internshipId}) async {
+  Future<Internship> fetchInternshipById({required String internshipId}) async {
     final row = await SupabaseService.client
         .from('internships')
         .select(
-          'id,title,description,department,company_name,location,duration_months,is_remote,deadline,is_paid,monthly_stipend,provides_certificate,possibility_of_employment,requirements,benefits,created_at',
+          'id,title,description,department,company_name,location,duration_months,is_remote,deadline,is_paid,monthly_stipend,provides_certificate,possibility_of_employment,requirements,benefits,created_at,is_active',
         )
         .eq('id', internshipId)
         .maybeSingle();
 
-    if (row == null) return null;
+    if (row == null) {
+      throw Exception('Internship not found: $internshipId');
+    }
     return Internship.fromMap(row);
   }
 
@@ -134,7 +154,7 @@ class InternshipsRepository {
   }) async {
     final row = await SupabaseService.client
         .from('internship_applications')
-        .select('id, internship_id, status, applied_at')
+        .select('id, user_id, internship_id, status, applied_at, motivation_letter')
         .eq('user_id', userId)
         .eq('internship_id', internshipId)
         .maybeSingle();
@@ -157,11 +177,16 @@ class InternshipsRepository {
     return row != null;
   }
 
-  Future<void> applyToInternship({
+  Future<void> apply({
     required String userId,
     required String internshipId,
-    required String motivationLetter,
+    required String motivation,
   }) async {
+    final text = motivation.trim();
+    if (text.length < 100) {
+      throw Exception('Motivasyon metni en az 100 karakter olmalı.');
+    }
+
     // prevent duplicates
     final existing = await SupabaseService.client
         .from('internship_applications')
@@ -177,8 +202,9 @@ class InternshipsRepository {
     await SupabaseService.client.from('internship_applications').insert({
       'user_id': userId,
       'internship_id': internshipId,
-      'motivation_letter': motivationLetter,
-      // status defaults to 'pending'
+      'motivation_letter': text,
+      'status': 'pending',
+      'applied_at': DateTime.now().toIso8601String(),
     });
   }
 }

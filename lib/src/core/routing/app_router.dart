@@ -285,10 +285,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             builder: (_, __) => const InternshipsScreen(),
           ),
           GoRoute(
-            path: Routes.internshipDetail,
-            builder: (_, state) => InternshipDetailScreen(
-              internshipId: state.pathParameters['id']!,
-            ),
+            path: Routes.internshipDetail, // /internships/:id
+            builder: (context, state) {
+              final id = state.pathParameters['id']!;
+              return InternshipDetailScreen(internshipId: id);
+            },
           ),
           GoRoute(
             path: Routes.applications,
