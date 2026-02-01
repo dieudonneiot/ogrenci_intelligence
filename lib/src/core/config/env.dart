@@ -30,4 +30,7 @@ class Env {
                 '$deepLinkScheme://reset-password')
             .trim(),
       );
+
+  static String get adminSetupKey =>
+      (dotenv.env['ADMIN_SETUP_KEY'] ?? 'default-setup-key-2024').trim();
 }

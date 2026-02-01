@@ -5,6 +5,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/admin/presentation/screens/admin_companies_screen.dart';
+import '../../features/admin/presentation/screens/admin_dashboard_screen.dart';
+import '../../features/admin/presentation/screens/admin_jobs_screen.dart';
+import '../../features/admin/presentation/screens/admin_login_screen.dart';
+import '../../features/admin/presentation/screens/admin_logs_screen.dart';
+import '../../features/admin/presentation/screens/admin_profile_screen.dart';
+import '../../features/admin/presentation/screens/admin_reports_screen.dart';
+import '../../features/admin/presentation/screens/admin_settings_screen.dart';
+import '../../features/admin/presentation/screens/admin_setup_screen.dart';
+import '../../features/admin/presentation/screens/admin_subscriptions_screen.dart';
+import '../../features/admin/presentation/screens/admin_users_screen.dart';
+import '../../features/admin/presentation/widgets/admin_layout.dart';
 import '../../features/applications/presentation/screens/applications_screen.dart';
 import '../../features/auth/domain/auth_models.dart';
 import '../../features/auth/presentation/controllers/auth_controller.dart';
@@ -122,13 +134,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       // -----------------------------
       GoRoute(
         path: Routes.adminLogin,
-        builder: (context, _) =>
-            const PlaceholderScreen(title: 'Admin Login', showAppBar: true),
+        builder: (context, _) => const AdminLoginScreen(),
       ),
       GoRoute(
         path: Routes.adminSetup,
-        builder: (context, _) =>
-            const PlaceholderScreen(title: 'Admin Setup', showAppBar: true),
+        builder: (context, _) => const AdminSetupScreen(),
       ),
 
       // -------------
@@ -139,40 +149,39 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(
             path: Routes.adminDashboard,
-            builder: (context, _) => const PlaceholderView(title: 'Admin Dashboard'),
+            builder: (context, _) => const AdminDashboardScreen(),
           ),
           GoRoute(
             path: Routes.adminCompanies,
-            builder: (context, _) => const PlaceholderView(title: 'Admin Companies'),
+            builder: (context, _) => const AdminCompaniesScreen(),
           ),
           GoRoute(
             path: Routes.adminUsers,
-            builder: (context, _) => const PlaceholderView(title: 'Admin Users'),
+            builder: (context, _) => const AdminUsersScreen(),
           ),
           GoRoute(
             path: Routes.adminJobs,
-            builder: (context, _) => const PlaceholderView(title: 'Admin Jobs'),
+            builder: (context, _) => const AdminJobsScreen(),
           ),
           GoRoute(
             path: Routes.adminSubscriptions,
-            builder: (context, _) =>
-                const PlaceholderView(title: 'Admin Subscriptions'),
+            builder: (context, _) => const AdminSubscriptionsScreen(),
           ),
           GoRoute(
             path: Routes.adminReports,
-            builder: (context, _) => const PlaceholderView(title: 'Admin Reports'),
+            builder: (context, _) => const AdminReportsScreen(),
           ),
           GoRoute(
             path: Routes.adminSettings,
-            builder: (context, _) => const PlaceholderView(title: 'Admin Settings'),
+            builder: (context, _) => const AdminSettingsScreen(),
           ),
           GoRoute(
             path: Routes.adminLogs,
-            builder: (context, _) => const PlaceholderView(title: 'Admin Logs'),
+            builder: (context, _) => const AdminLogsScreen(),
           ),
           GoRoute(
             path: Routes.adminProfile,
-            builder: (context, _) => const PlaceholderView(title: 'Admin Profile'),
+            builder: (context, _) => const AdminProfileScreen(),
           ),
         ],
       ),
@@ -443,8 +452,8 @@ class AdminShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Admin')),
-      body: child,
+      backgroundColor: const Color(0xFFF9FAFB),
+      body: AdminLayout(child: child),
     );
   }
 }

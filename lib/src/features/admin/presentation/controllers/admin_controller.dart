@@ -37,28 +37,29 @@ class AdminActionController extends StateNotifier<bool> {
   final Ref _ref;
 
   Future<String?> logAction({
-  required String actionType,
-  required String targetType,
-  String? targetId,
-  Map<String, dynamic> details = const {},
-}) async {
-  try {
-    state = true;
+    required String actionType,
+    required String targetType,
+    String? targetId,
+    Map<String, dynamic> details = const {},
+  }) async {
+    try {
+      state = true;
 
-    final admin = await _ref.read(activeAdminProvider.future);
-    if (admin == null) return 'Not an admin';
+      final admin = await _ref.read(activeAdminProvider.future);
+      if (admin == null) return 'Not an admin';
 
-    await _repo.logAdminAction(
-      adminId: admin.id,
-      actionType: actionType,
-      targetType: targetType,
-      targetId: targetId,
-      details: details,
-    );
-    return null;
-  } catch (e) {
-    return e.toString();
-  } finally {
-    state = false;
-  }}
+      await _repo.logAdminAction(
+        adminId: admin.id,
+        actionType: actionType,
+        targetType: targetType,
+        targetId: targetId,
+        details: details,
+      );
+      return null;
+    } catch (e) {
+      return e.toString();
+    } finally {
+      state = false;
+    }
+  }
 }
