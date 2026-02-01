@@ -1,220 +1,265 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../auth/presentation/controllers/auth_controller.dart';
 import '../../application/jobs_providers.dart';
+import '../../domain/job_models.dart';
 
-class JobDetailScreen extends ConsumerStatefulWidget {
+class JobDetailScreen extends ConsumerWidget {
   const JobDetailScreen({super.key, required this.jobId});
   final String jobId;
 
   @override
-  ConsumerState<JobDetailScreen> createState() => _JobDetailScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final asyncVm = ref.watch(jobDetailViewProvider(jobId));
 
-class _JobDetailScreenState extends ConsumerState<JobDetailScreen> {
-  bool _logged = false;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (_logged) return;
-    _logged = true;
-
-    // best-effort view log (analytics)
-    Future.microtask(() async {
-      try {
-        final repo = ref.read(jobsRepositoryProvider);
-        final uid = ref.read(authViewStateProvider).value?.user?.id;
-        await repo.logView(userId: uid, jobId: widget.jobId);
-      } catch (_) {}
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final asyncVm = ref.watch(jobDetailProvider(widget.jobId));
-
-    return Container(
-      color: const Color(0xFFF9FAFB),
-      child: asyncVm.when(
-        loading: () => const Center(child: CircularProgressIndicator(strokeWidth: 2.5)),
-        error: (e, _) => Center(
+    return asyncVm.when(
+      loading: () => const Scaffold(
+        body: Center(child: Padding(padding: EdgeInsets.all(24), child: CircularProgressIndicator())),
+      ),
+      error: (e, _) => Scaffold(
+        body: Center(
           child: Padding(
-            padding: const EdgeInsets.all(18),
+            padding: const EdgeInsets.all(24),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.error_outline, size: 52, color: Color(0xFFEF4444)),
-                const SizedBox(height: 10),
-                const Text('İlan yüklenemedi', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
-                const SizedBox(height: 6),
+                const Icon(Icons.error_outline, size: 48, color: Color(0xFFEF4444)),
+                const SizedBox(height: 12),
+                const Text('Ilan yuklenemedi', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
+                const SizedBox(height: 8),
                 Text(e.toString(), textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFF6B7280))),
-                const SizedBox(height: 10),
-                ElevatedButton(
-                  onPressed: () => ref.read(jobDetailProvider(widget.jobId).notifier).refresh(),
-                  child: const Text('Tekrar dene'),
+                const SizedBox(height: 14),
+                SizedBox(
+                  height: 44,
+                  child: ElevatedButton(
+                    onPressed: () => ref.read(jobDetailViewProvider(jobId).notifier).refresh(),
+                    child: const Text('Tekrar dene'),
+                  ),
                 ),
               ],
             ),
           ),
         ),
-        data: (vm) {
-          final j = vm.job;
+      ),
+      data: (vm) => _Body(vm: vm),
+    );
+  }
+}
 
-          return SingleChildScrollView(
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 1120),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 22, 16, 28),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _HeaderCard(
-                        title: j.title,
-                        company: j.company,
-                        location: j.location ?? '',
-                        workType: j.workType ?? '',
-                        remote: j.isRemote,
-                        favorited: vm.isFavorited,
-                        applied: vm.hasApplied,
-                        onToggleFav: () async {
-                          try {
-                            await ref.read(jobDetailProvider(widget.jobId).notifier).toggleFavorite();
-                          } catch (_) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Favori güncellenemedi')),
-                            );
-                          }
-                        },
-                        onApply: vm.hasApplied
-                            ? null
-                            : () => _openApply(context),
-                      ),
+class _Body extends ConsumerWidget {
+  const _Body({required this.vm});
+  final JobDetailViewModel vm;
 
-                      const SizedBox(height: 14),
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final j = vm.job;
+    final applied = vm.applicationStatus != null;
 
-                      _Section(
-                        title: 'Açıklama',
-                        body: (j.description ?? '').trim().isEmpty ? 'Açıklama eklenmemiş.' : j.description!.trim(),
-                      ),
-                      const SizedBox(height: 12),
-
-                      _Section(
-                        title: 'Gereksinimler',
-                        body: (j.requirements ?? '').trim().isEmpty ? 'Belirtilmemiş.' : j.requirements!.trim(),
-                      ),
-                      const SizedBox(height: 12),
-
-                      _Section(
-                        title: 'Avantajlar',
-                        body: (j.benefits ?? '').trim().isEmpty ? 'Belirtilmemiş.' : j.benefits!.trim(),
-                      ),
-
-                      const SizedBox(height: 14),
-
-                      _MetaCard(
-                        salary: j.salary,
-                        deadline: j.deadline,
-                        views: j.viewsCount,
-                        applications: j.applicationCount,
-                        contactEmail: j.contactEmail,
-                        onCopyEmail: (email) async {
-                          await Clipboard.setData(ClipboardData(text: email));
-                          if (!mounted) return;
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('E-posta kopyalandı')),
-                          );
-                        },
-                      ),
-                    ],
+    return Scaffold(
+      backgroundColor: const Color(0xFFF9FAFB),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        foregroundColor: const Color(0xFF111827),
+        elevation: 0,
+        title: const Text('Is Detayi', style: TextStyle(fontWeight: FontWeight.w900)),
+        actions: [
+          IconButton(
+            onPressed: () async {
+              try {
+                await ref.read(jobDetailViewProvider(j.id).notifier).toggleFavorite();
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Favori guncellenemedi: $e')),
+                );
+              }
+            },
+            icon: Icon(vm.isFavorite ? Icons.favorite : Icons.favorite_border, color: const Color(0xFFEF4444)),
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 920),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 28),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(color: const Color(0xFFE5E7EB)),
+                      boxShadow: const [BoxShadow(color: Color(0x07000000), blurRadius: 14, offset: Offset(0, 8))],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Text(j.title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
+                            ),
+                            if (applied) _StatusPill(status: vm.applicationStatus!),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          '${j.companyName} - ${j.location}',
+                          style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
+                        ),
+                        const SizedBox(height: 10),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            _Chip(text: j.department, bg: const Color(0xFFEDE9FE), fg: const Color(0xFF6D28D9)),
+                            _Chip(text: j.workType, bg: const Color(0xFFF3F4F6), fg: const Color(0xFF374151)),
+                            if (j.isRemote)
+                              _Chip(text: 'Remote', bg: const Color(0xFFDCFCE7), fg: const Color(0xFF16A34A)),
+                            if (j.deadline != null)
+                              _Chip(
+                                text: 'Son: ${_fmtDate(j.deadline!)}',
+                                bg: const Color(0xFFFFF7ED),
+                                fg: const Color(0xFFB45309),
+                              ),
+                            if ((j.salaryMin ?? 0) > 0 || (j.salaryMax ?? 0) > 0)
+                              _Chip(
+                                text: _salaryText(j.salaryMin, j.salaryMax),
+                                bg: const Color(0xFFDBEAFE),
+                                fg: const Color(0xFF1D4ED8),
+                              ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 14),
+                  _Section(title: 'Aciklama', text: j.description),
+                  const SizedBox(height: 12),
+                  _Section(title: 'Gereksinimler', text: j.requirements),
+                  const SizedBox(height: 18),
+                  if (!applied)
+                    SizedBox(
+                      height: 48,
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: () => _openApplySheet(context, ref, j.id),
+                        icon: const Icon(Icons.send_outlined),
+                        label: const Text('Basvur', style: TextStyle(fontWeight: FontWeight.w900)),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF6D28D9),
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          elevation: 0,
+                        ),
+                      ),
+                    )
+                  else
+                    Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF5F3FF),
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(color: const Color(0xFFE9D5FF)),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.verified_outlined, color: Color(0xFF6D28D9)),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              'Bu ilana basvurdun. Durum: ${vm.applicationStatus}',
+                              style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF4B5563)),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
               ),
             ),
-          );
-        },
+          ),
+        ),
       ),
     );
   }
 
-  Future<void> _openApply(BuildContext context) async {
-    final cover = TextEditingController();
-    final cv = TextEditingController();
+  static String _fmtDate(DateTime d) =>
+      '${d.day.toString().padLeft(2, '0')}.${d.month.toString().padLeft(2, '0')}.${d.year}';
+
+  static String _salaryText(int? min, int? max) {
+    final a = min ?? 0;
+    final b = max ?? 0;
+    if (a > 0 && b > 0) return '$a - $b';
+    if (a > 0) return 'Min $a';
+    if (b > 0) return 'Max $b';
+    return '';
+  }
+
+  static Future<void> _openApplySheet(BuildContext context, WidgetRef ref, String jobId) async {
+    final ctrl = TextEditingController();
 
     await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) {
-        return Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
-          ),
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) {
+        return Padding(
           padding: EdgeInsets.only(
             left: 16,
             right: 16,
             top: 14,
-            bottom: 16 + MediaQuery.of(context).viewInsets.bottom,
+            bottom: MediaQuery.of(ctx).viewInsets.bottom + 16,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  const Expanded(
-                    child: Text('Başvuru', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
-                  ),
-                  IconButton(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.close)),
-                ],
+              const Text('Basvuru', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+              const SizedBox(height: 6),
+              const Text(
+                'Istersen kisa bir cover letter ekle (opsiyonel).',
+                style: TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 12),
               TextField(
-                controller: cover,
+                controller: ctrl,
                 maxLines: 6,
-                decoration: const InputDecoration(
-                  labelText: 'Cover letter (opsiyonel)',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  hintText: 'Motivasyonun / kisa tanitimin...',
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
                 ),
               ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: cv,
-                decoration: const InputDecoration(
-                  labelText: 'CV URL (opsiyonel)',
-                  hintText: 'https://...',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 12),
               SizedBox(
+                height: 46,
                 width: double.infinity,
-                height: 48,
-                child: ElevatedButton.icon(
+                child: ElevatedButton(
                   onPressed: () async {
                     try {
-                      await ref.read(jobDetailProvider(widget.jobId).notifier).apply(
-                            coverLetter: cover.text,
-                            cvUrl: cv.text,
-                          );
-                      if (!mounted) return;
-                      Navigator.pop(context);
+                      await ref.read(jobDetailViewProvider(jobId).notifier).apply(ctrl.text);
+                      if (ctx.mounted) Navigator.pop(ctx);
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Başvuru gönderildi ✅')),
+                        const SnackBar(content: Text('Basvuru gonderildi')),
                       );
-                    } catch (_) {
-                      if (!mounted) return;
+                    } catch (e) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Başvuru gönderilemedi')),
+                        SnackBar(content: Text('Basvuru gonderilemedi: $e')),
                       );
                     }
                   },
-                  icon: const Icon(Icons.send),
-                  label: const Text('Başvur'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF6D28D9),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    elevation: 0,
+                  ),
+                  child: const Text('Gonder', style: TextStyle(fontWeight: FontWeight.w900)),
                 ),
               ),
             ],
@@ -225,204 +270,85 @@ class _JobDetailScreenState extends ConsumerState<JobDetailScreen> {
   }
 }
 
-/* ---------------- UI ---------------- */
-
-class _HeaderCard extends StatelessWidget {
-  const _HeaderCard({
-    required this.title,
-    required this.company,
-    required this.location,
-    required this.workType,
-    required this.remote,
-    required this.favorited,
-    required this.applied,
-    required this.onToggleFav,
-    required this.onApply,
-  });
-
+class _Section extends StatelessWidget {
+  const _Section({required this.title, required this.text});
   final String title;
-  final String company;
-  final String location;
-  final String workType;
-  final bool remote;
-  final bool favorited;
-  final bool applied;
-  final VoidCallback onToggleFav;
-  final VoidCallback? onApply;
+  final String text;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
+        color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        gradient: const LinearGradient(
-          colors: [Color(0xFF1D4ED8), Color(0xFF6D28D9)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        boxShadow: const [BoxShadow(color: Color(0x22000000), blurRadius: 22, offset: Offset(0, 10))],
+        border: Border.all(color: const Color(0xFFE5E7EB)),
+        boxShadow: const [BoxShadow(color: Color(0x07000000), blurRadius: 14, offset: Offset(0, 8))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  title,
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 18),
-                ),
-              ),
-              IconButton(
-                onPressed: onToggleFav,
-                icon: Icon(
-                  favorited ? Icons.bookmark : Icons.bookmark_border,
-                  color: Colors.white,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Text(company, style: const TextStyle(color: Color(0xCCFFFFFF), fontWeight: FontWeight.w800)),
+          Text(title, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
           const SizedBox(height: 10),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              _pill(remote ? 'Remote' : 'On-site'),
-              if (workType.trim().isNotEmpty) _pill(workType.trim()),
-              if (location.trim().isNotEmpty) _pill(location.trim()),
-            ],
-          ),
-          const SizedBox(height: 14),
-          SizedBox(
-            height: 46,
-            child: ElevatedButton.icon(
-              onPressed: onApply,
-              icon: Icon(applied ? Icons.check_circle : Icons.send),
-              label: Text(applied ? 'Başvuruldu' : 'Başvur'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: applied ? const Color(0xFF16A34A) : Colors.white,
-                foregroundColor: applied ? Colors.white : const Color(0xFF111827),
-              ),
-            ),
+          Text(
+            text.isEmpty ? '-' : text,
+            style: const TextStyle(color: Color(0xFF374151), fontWeight: FontWeight.w600, height: 1.4),
           ),
         ],
       ),
     );
   }
+}
 
-  static Widget _pill(String text) {
+class _Chip extends StatelessWidget {
+  const _Chip({required this.text, required this.bg, required this.fg});
+  final String text;
+  final Color bg;
+  final Color fg;
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: const Color(0x1AFFFFFF),
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: const Color(0x22FFFFFF)),
-      ),
-      child: Text(text, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 12)),
+      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(999)),
+      child: Text(text, style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: fg)),
     );
   }
 }
 
-class _Section extends StatelessWidget {
-  const _Section({required this.title, required this.body});
-  final String title;
-  final String body;
+class _StatusPill extends StatelessWidget {
+  const _StatusPill({required this.status});
+  final String status;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(title, style: const TextStyle(fontWeight: FontWeight.w900)),
-          const SizedBox(height: 8),
-          Text(body, style: const TextStyle(color: Color(0xFF374151), fontWeight: FontWeight.w600)),
-        ],
-      ),
-    );
-  }
-}
+    final s = status.toLowerCase().trim();
+    Color bg;
+    Color fg;
+    String label;
 
-class _MetaCard extends StatelessWidget {
-  const _MetaCard({
-    required this.salary,
-    required this.deadline,
-    required this.views,
-    required this.applications,
-    required this.contactEmail,
-    required this.onCopyEmail,
-  });
-
-  final String? salary;
-  final DateTime? deadline;
-  final int views;
-  final int applications;
-  final String? contactEmail;
-  final Future<void> Function(String email) onCopyEmail;
-
-  @override
-  Widget build(BuildContext context) {
-    final dl = deadline == null
-        ? '—'
-        : '${deadline!.day.toString().padLeft(2, '0')}.${deadline!.month.toString().padLeft(2, '0')}.${deadline!.year}';
+    switch (s) {
+      case 'accepted':
+        bg = const Color(0xFFDCFCE7);
+        fg = const Color(0xFF16A34A);
+        label = 'Kabul';
+        break;
+      case 'rejected':
+        bg = const Color(0xFFFEE2E2);
+        fg = const Color(0xFFDC2626);
+        label = 'Red';
+        break;
+      default:
+        bg = const Color(0xFFFEF3C7);
+        fg = const Color(0xFFB45309);
+        label = 'Basvuruldu';
+        break;
+    }
 
     return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text('Detaylar', style: TextStyle(fontWeight: FontWeight.w900)),
-          const SizedBox(height: 10),
-          _kv('Maaş', (salary ?? '').trim().isEmpty ? '—' : salary!.trim()),
-          _kv('Son başvuru', dl),
-          _kv('Görüntülenme', '$views'),
-          _kv('Başvuru', '$applications'),
-          if ((contactEmail ?? '').trim().isNotEmpty) ...[
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  child: _kv('İletişim', contactEmail!.trim()),
-                ),
-                IconButton(
-                  onPressed: () => onCopyEmail(contactEmail!.trim()),
-                  icon: const Icon(Icons.copy),
-                  tooltip: 'Kopyala',
-                ),
-              ],
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _kv(String k, String v) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 6),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 120,
-            child: Text(k, style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700)),
-          ),
-          Expanded(child: Text(v, style: const TextStyle(fontWeight: FontWeight.w800))),
-        ],
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(999)),
+      child: Text(label, style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: fg)),
     );
   }
 }

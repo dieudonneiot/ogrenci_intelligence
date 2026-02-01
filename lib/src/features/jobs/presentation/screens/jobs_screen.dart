@@ -16,263 +16,275 @@ class JobsScreen extends ConsumerStatefulWidget {
 }
 
 class _JobsScreenState extends ConsumerState<JobsScreen> {
-  final _search = TextEditingController();
+  final _searchCtrl = TextEditingController();
   Timer? _debounce;
 
   @override
   void dispose() {
     _debounce?.cancel();
-    _search.dispose();
+    _searchCtrl.dispose();
     super.dispose();
   }
 
-  void _onSearchChanged(String v) {
+  void _applySearch(String v) {
     _debounce?.cancel();
-    _debounce = Timer(const Duration(milliseconds: 320), () {
-      final cur = ref.read(jobFiltersProvider);
-      ref.read(jobFiltersProvider.notifier).state = cur.copyWith(query: v);
+    _debounce = Timer(const Duration(milliseconds: 350), () {
+      final f = ref.read(jobsFiltersProvider);
+      ref.read(jobsFiltersProvider.notifier).state = f.copyWith(query: v.trim());
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final asyncVm = ref.watch(jobsListProvider);
-    final filters = ref.watch(jobFiltersProvider);
+    final filters = ref.watch(jobsFiltersProvider);
+    final asyncVm = ref.watch(jobsProvider);
 
-    return Container(
-      color: const Color(0xFFF9FAFB),
-      child: RefreshIndicator(
-        onRefresh: () => ref.read(jobsListProvider.notifier).refresh(),
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 1120),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 22, 16, 28),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: const [
-                        Icon(Icons.work_outline, color: Color(0xFF2563EB), size: 28),
-                        SizedBox(width: 10),
-                        Text('İş İlanları', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900)),
-                      ],
-                    ),
-                    const SizedBox(height: 6),
-                    const Text(
-                      'Sana uygun işleri bul, kaydet ve hızlıca başvur.',
-                      style: TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
-                    ),
-                    const SizedBox(height: 14),
+    if (_searchCtrl.text != filters.query) {
+      // keep UI synced (without infinite loops)
+      _searchCtrl.text = filters.query;
+      _searchCtrl.selection = TextSelection.fromPosition(
+        TextPosition(offset: _searchCtrl.text.length),
+      );
+    }
 
-                    // Search + Filters
-                    _Card(
-                      child: Column(
-                        children: [
-                          TextField(
-                            controller: _search,
-                            onChanged: _onSearchChanged,
-                            decoration: InputDecoration(
-                              prefixIcon: const Icon(Icons.search),
-                              hintText: 'Ara: title, şirket, bölüm, lokasyon...',
-                              filled: true,
-                              fillColor: const Color(0xFFF9FAFB),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(14),
-                                borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(14),
-                                borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                              ),
-                              contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Wrap(
-                                  spacing: 8,
-                                  runSpacing: 8,
-                                  children: [
-                                    if (filters.remoteOnly)
-                                      _Chip(label: 'Remote', icon: Icons.wifi_tethering, onClear: () {
-                                        ref.read(jobFiltersProvider.notifier).state =
-                                            filters.copyWith(remoteOnly: false);
-                                      }),
-                                    if ((filters.department ?? '').isNotEmpty)
-                                      _Chip(label: filters.department!, icon: Icons.school, onClear: () {
-                                        ref.read(jobFiltersProvider.notifier).state =
-                                            filters.copyWith(department: null);
-                                      }),
-                                    if ((filters.workType ?? '').isNotEmpty)
-                                      _Chip(label: filters.workType!, icon: Icons.schedule, onClear: () {
-                                        ref.read(jobFiltersProvider.notifier).state =
-                                            filters.copyWith(workType: null);
-                                      }),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              SizedBox(
-                                height: 44,
-                                child: OutlinedButton.icon(
-                                  onPressed: () => _openFilters(context, filters),
-                                  icon: const Icon(Icons.tune),
-                                  label: const Text('Filtrele'),
-                                ),
-                              ),
+    return asyncVm.when(
+      loading: () => const Center(
+        child: Padding(
+          padding: EdgeInsets.all(24),
+          child: CircularProgressIndicator(),
+        ),
+      ),
+      error: (e, _) => Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.error_outline, size: 48, color: Color(0xFFEF4444)),
+              const SizedBox(height: 12),
+              const Text('İş ilanları yüklenemedi',
+                  style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
+              const SizedBox(height: 8),
+              Text(e.toString(),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Color(0xFF6B7280))),
+              const SizedBox(height: 14),
+              SizedBox(
+                height: 44,
+                child: ElevatedButton(
+                  onPressed: () => ref.read(jobsProvider.notifier).refresh(),
+                  child: const Text('Tekrar dene'),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      data: (vm) {
+        return Container(
+          color: const Color(0xFFF9FAFB),
+          child: RefreshIndicator(
+            onRefresh: () => ref.read(jobsProvider.notifier).refresh(),
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 1120),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 22, 16, 28),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('İş İlanları',
+                            style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900)),
+                        const SizedBox(height: 6),
+                        const Text(
+                          'Arama yap, filtrele, favorile ve başvur. React ile aynı akış.',
+                          style:
+                              TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
+                        ),
+                        const SizedBox(height: 14),
+
+                        // Search
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: const Color(0xFFE5E7EB)),
+                            boxShadow: const [
+                              BoxShadow(color: Color(0x07000000), blurRadius: 14, offset: Offset(0, 8))
                             ],
                           ),
-                        ],
-                      ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.search, color: Color(0xFF6B7280)),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: TextField(
+                                  controller: _searchCtrl,
+                                  onChanged: _applySearch,
+                                  decoration: const InputDecoration(
+                                    border: InputBorder.none,
+                                    hintText: 'Başlık, şirket, bölüm, konum...',
+                                  ),
+                                ),
+                              ),
+                              if (filters.query.isNotEmpty)
+                                IconButton(
+                                  onPressed: () {
+                                    _searchCtrl.clear();
+                                    _applySearch('');
+                                  },
+                                  icon: const Icon(Icons.close),
+                                ),
+                            ],
+                          ),
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        // Filters
+                        _FiltersRow(
+                          vm: vm,
+                          filters: filters,
+                          onChange: (next) => ref.read(jobsFiltersProvider.notifier).state = next,
+                        ),
+
+                        const SizedBox(height: 14),
+
+                        if (vm.items.isEmpty)
+                          const _Empty(text: 'Sonuç bulunamadı.')
+                        else
+                          ListView.separated(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: vm.items.length,
+                            separatorBuilder: (_, __) => const SizedBox(height: 10),
+                            itemBuilder: (_, i) => _JobCard(item: vm.items[i]),
+                          ),
+                      ],
                     ),
-
-                    const SizedBox(height: 14),
-
-                    asyncVm.when(
-                      loading: () => const Padding(
-                        padding: EdgeInsets.all(20),
-                        child: Center(child: CircularProgressIndicator(strokeWidth: 2.5)),
-                      ),
-                      error: (e, _) => _ErrorBlock(
-                        title: 'İş ilanları yüklenemedi',
-                        message: e.toString(),
-                        onRetry: () => ref.read(jobsListProvider.notifier).refresh(),
-                      ),
-                      data: (vm) {
-                        if (vm.items.isEmpty) {
-                          return const _EmptyBlock(
-                            icon: Icons.search_off,
-                            title: 'Sonuç yok',
-                            message: 'Filtreleri değiştirip tekrar deneyebilirsin.',
-                          );
-                        }
-
-                        return ListView.separated(
-                          itemCount: vm.items.length,
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          separatorBuilder: (_, __) => const SizedBox(height: 10),
-                          itemBuilder: (_, i) {
-                            final j = vm.items[i];
-                            final isFav = vm.favoriteJobIds.contains(j.id);
-                            return _JobCard(
-                              job: j,
-                              isFavorited: isFav,
-                              onOpen: () => context.go('${Routes.jobs}/${j.id}'),
-                              onToggleFav: () async {
-                                try {
-                                  await ref.read(jobsListProvider.notifier).toggleFavorite(j.id);
-                                } catch (_) {
-                                  if (!mounted) return;
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('Favori güncellenemedi')),
-                                  );
-                                }
-                              },
-                            );
-                          },
-                        );
-                      },
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Future<void> _openFilters(BuildContext context, JobFilters filters) async {
-    await showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => _FiltersSheet(filters: filters),
+        );
+      },
     );
   }
 }
 
 /* ---------------- UI ---------------- */
 
-class _Card extends StatelessWidget {
-  const _Card({required this.child});
-  final Widget child;
+class _FiltersRow extends StatelessWidget {
+  const _FiltersRow({
+    required this.vm,
+    required this.filters,
+    required this.onChange,
+  });
+
+  final JobsViewModel vm;
+  final JobsFilters filters;
+  final ValueChanged<JobsFilters> onChange;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 18, offset: Offset(0, 8))],
-      ),
-      child: child,
+    return Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: [
+        FilterChip(
+          selected: filters.remoteOnly,
+          onSelected: (v) => onChange(filters.copyWith(remoteOnly: v)),
+          label: const Text('Remote'),
+          selectedColor: const Color(0xFFEDE9FE),
+          checkmarkColor: const Color(0xFF6D28D9),
+        ),
+        _DropdownFilter(
+          label: 'Bölüm',
+          value: filters.department,
+          items: vm.availableDepartments,
+          onChanged: (v) => onChange(filters.copyWith(department: v)),
+          onClear: () => onChange(filters.copyWith(clearDepartment: true)),
+        ),
+        _DropdownFilter(
+          label: 'Çalışma',
+          value: filters.workType,
+          items: vm.availableWorkTypes,
+          onChanged: (v) => onChange(filters.copyWith(workType: v)),
+          onClear: () => onChange(filters.copyWith(clearWorkType: true)),
+        ),
+      ],
     );
   }
 }
 
-class _Chip extends StatelessWidget {
-  const _Chip({required this.label, required this.icon, required this.onClear});
+class _DropdownFilter extends StatelessWidget {
+  const _DropdownFilter({
+    required this.label,
+    required this.value,
+    required this.items,
+    required this.onChanged,
+    required this.onClear,
+  });
+
   final String label;
-  final IconData icon;
+  final String? value;
+  final List<String> items;
+  final ValueChanged<String?> onChanged;
   final VoidCallback onClear;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
-        color: const Color(0xFFF3F4F6),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 16, color: const Color(0xFF374151)),
-          const SizedBox(width: 6),
-          Text(label, style: const TextStyle(fontWeight: FontWeight.w800)),
-          const SizedBox(width: 6),
-          InkWell(
-            onTap: onClear,
-            child: const Icon(Icons.close, size: 16, color: Color(0xFF6B7280)),
+          Text(label, style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF6B7280))),
+          const SizedBox(width: 8),
+          DropdownButton<String>(
+            value: (value != null && value!.isNotEmpty && items.contains(value)) ? value : null,
+            hint: const Text('Seç'),
+            underline: const SizedBox.shrink(),
+            items: items
+                .map((e) => DropdownMenuItem<String>(value: e, child: Text(e)))
+                .toList(growable: false),
+            onChanged: onChanged,
           ),
+          if (value != null && value!.isNotEmpty)
+            IconButton(
+              onPressed: onClear,
+              icon: const Icon(Icons.close, size: 18),
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+            ),
         ],
       ),
     );
   }
 }
 
-class _JobCard extends StatelessWidget {
-  const _JobCard({
-    required this.job,
-    required this.isFavorited,
-    required this.onOpen,
-    required this.onToggleFav,
-  });
-
-  final JobSummary job;
-  final bool isFavorited;
-  final VoidCallback onOpen;
-  final VoidCallback onToggleFav;
+class _JobCard extends ConsumerWidget {
+  const _JobCard({required this.item});
+  final JobCardVM item;
 
   @override
-  Widget build(BuildContext context) {
-    final remote = job.isRemote ? 'Remote' : 'On-site';
-    final wt = (job.workType ?? '').trim();
-    final loc = (job.location ?? '').trim();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final j = item.job;
+    final applied = item.applicationStatus != null;
 
     return InkWell(
-      onTap: onOpen,
       borderRadius: BorderRadius.circular(18),
+      onTap: () => context.go('${Routes.jobs}/${j.id}'),
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
@@ -288,8 +300,8 @@ class _JobCard extends StatelessWidget {
               width: 46,
               height: 46,
               decoration: BoxDecoration(
-                color: const Color(0xFFEFF6FF),
-                borderRadius: BorderRadius.circular(16),
+                color: const Color(0xFFDBEAFE),
+                borderRadius: BorderRadius.circular(14),
               ),
               child: const Icon(Icons.work_outline, color: Color(0xFF2563EB)),
             ),
@@ -301,35 +313,56 @@ class _JobCard extends StatelessWidget {
                   Row(
                     children: [
                       Expanded(
-                        child: Text(job.title, style: const TextStyle(fontWeight: FontWeight.w900)),
-                      ),
-                      IconButton(
-                        onPressed: onToggleFav,
-                        icon: Icon(
-                          isFavorited ? Icons.bookmark : Icons.bookmark_border,
-                          color: isFavorited ? const Color(0xFF6D28D9) : const Color(0xFF6B7280),
+                        child: Text(
+                          j.title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(fontWeight: FontWeight.w900),
                         ),
                       ),
+                      if (applied) _StatusPill(status: item.applicationStatus!),
                     ],
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 4),
                   Text(
-                    job.company,
+                    '${j.companyName} • ${j.location}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 8),
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
                     children: [
-                      _pill(remote, job.isRemote ? const Color(0xFF16A34A) : const Color(0xFF374151)),
-                      if (wt.isNotEmpty) _pill(wt, const Color(0xFF2563EB)),
-                      if (loc.isNotEmpty) _pill(loc, const Color(0xFF6B7280)),
-                      if ((job.salary ?? '').trim().isNotEmpty) _pill(job.salary!.trim(), const Color(0xFF92400E)),
+                      _Chip(text: j.department, bg: const Color(0xFFEDE9FE), fg: const Color(0xFF6D28D9)),
+                      _Chip(text: j.workType, bg: const Color(0xFFF3F4F6), fg: const Color(0xFF374151)),
+                      if (j.isRemote)
+                        _Chip(text: 'Remote', bg: const Color(0xFFDCFCE7), fg: const Color(0xFF16A34A)),
+                      if (j.deadline != null)
+                        _Chip(
+                          text: 'Son: ${_fmtDate(j.deadline!)}',
+                          bg: const Color(0xFFFFF7ED),
+                          fg: const Color(0xFFB45309),
+                        ),
                     ],
                   ),
                 ],
               ),
+            ),
+            const SizedBox(width: 10),
+            IconButton(
+              tooltip: item.isFavorite ? 'Favoriden çıkar' : 'Favorile',
+              onPressed: () async {
+                try {
+                  await ref.read(jobsProvider.notifier).toggleFavorite(j.id);
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Favori güncellenemedi: $e')),
+                  );
+                }
+              },
+              icon: Icon(item.isFavorite ? Icons.favorite : Icons.favorite_border, color: const Color(0xFFEF4444)),
             ),
           ],
         ),
@@ -337,163 +370,73 @@ class _JobCard extends StatelessWidget {
     );
   }
 
-  Widget _pill(String text, Color color) {
+  static String _fmtDate(DateTime d) =>
+      '${d.day.toString().padLeft(2, '0')}.${d.month.toString().padLeft(2, '0')}.${d.year}';
+}
+
+class _Chip extends StatelessWidget {
+  const _Chip({required this.text, required this.bg, required this.fg});
+  final String text;
+  final Color bg;
+  final Color fg;
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.10),
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Text(text, style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: color)),
+      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(999)),
+      child: Text(text, style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: fg)),
     );
   }
 }
 
-class _FiltersSheet extends ConsumerWidget {
-  const _FiltersSheet({required this.filters});
-  final JobFilters filters;
+class _StatusPill extends StatelessWidget {
+  const _StatusPill({required this.status});
+  final String status;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final deptCtrl = TextEditingController(text: filters.department ?? '');
-    final wtCtrl = TextEditingController(text: filters.workType ?? '');
+  Widget build(BuildContext context) {
+    final s = status.toLowerCase().trim();
+    Color bg;
+    Color fg;
+    String label;
+
+    switch (s) {
+      case 'accepted':
+        bg = const Color(0xFFDCFCE7);
+        fg = const Color(0xFF16A34A);
+        label = 'Kabul';
+        break;
+      case 'rejected':
+        bg = const Color(0xFFFEE2E2);
+        fg = const Color(0xFFDC2626);
+        label = 'Red';
+        break;
+      default:
+        bg = const Color(0xFFFEF3C7);
+        fg = const Color(0xFFB45309);
+        label = 'Başvuruldu';
+        break;
+    }
 
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
-      ),
-      padding: EdgeInsets.only(
-        left: 16,
-        right: 16,
-        top: 14,
-        bottom: 16 + MediaQuery.of(context).viewInsets.bottom,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Expanded(
-                child: Text('Filtreler', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
-              ),
-              IconButton(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.close)),
-            ],
-          ),
-          const SizedBox(height: 10),
-          SwitchListTile(
-            value: filters.remoteOnly,
-            onChanged: (v) => ref.read(jobFiltersProvider.notifier).state = filters.copyWith(remoteOnly: v),
-            title: const Text('Sadece Remote'),
-          ),
-          const SizedBox(height: 10),
-          TextField(
-            controller: deptCtrl,
-            decoration: const InputDecoration(
-              labelText: 'Bölüm (department)',
-              border: OutlineInputBorder(),
-            ),
-            onChanged: (v) => ref.read(jobFiltersProvider.notifier).state =
-                filters.copyWith(department: v.trim().isEmpty ? null : v.trim()),
-          ),
-          const SizedBox(height: 10),
-          TextField(
-            controller: wtCtrl,
-            decoration: const InputDecoration(
-              labelText: 'Çalışma tipi (work_type)',
-              hintText: 'full-time, part-time, ...',
-              border: OutlineInputBorder(),
-            ),
-            onChanged: (v) => ref.read(jobFiltersProvider.notifier).state =
-                filters.copyWith(workType: v.trim().isEmpty ? null : v.trim()),
-          ),
-          const SizedBox(height: 14),
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () {
-                    ref.read(jobFiltersProvider.notifier).state = const JobFilters();
-                    Navigator.pop(context);
-                  },
-                  child: const Text('Sıfırla'),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Uygula'),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(999)),
+      child: Text(label, style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: fg)),
     );
   }
 }
 
-class _EmptyBlock extends StatelessWidget {
-  const _EmptyBlock({required this.icon, required this.title, required this.message});
-
-  final IconData icon;
-  final String title;
-  final String message;
+class _Empty extends StatelessWidget {
+  const _Empty({required this.text});
+  final String text;
 
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 520),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, size: 56, color: const Color(0xFFD1D5DB)),
-              const SizedBox(height: 10),
-              Text(title, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
-              const SizedBox(height: 6),
-              Text(message,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600)),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _ErrorBlock extends StatelessWidget {
-  const _ErrorBlock({required this.title, required this.message, required this.onRetry});
-
-  final String title;
-  final String message;
-  final VoidCallback onRetry;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 620),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.error_outline, size: 54, color: Color(0xFFEF4444)),
-              const SizedBox(height: 10),
-              Text(title, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
-              const SizedBox(height: 6),
-              Text(message, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFF6B7280))),
-              const SizedBox(height: 10),
-              ElevatedButton(onPressed: onRetry, child: const Text('Tekrar dene')),
-            ],
-          ),
-        ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 32),
+        child: Text(text, style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w800)),
       ),
     );
   }

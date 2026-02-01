@@ -279,7 +279,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             builder: (context, _) => const JobsScreen(),
           ),
           GoRoute(
-            path: Routes.jobDetail,
+            path: Routes.jobDetail, // '/jobs/:id'
             builder: (_, state) => JobDetailScreen(jobId: state.pathParameters['id']!),          ),
           GoRoute(
             path: Routes.internships,

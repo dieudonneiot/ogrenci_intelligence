@@ -1,12 +1,105 @@
 import 'package:flutter/foundation.dart';
 
-int _asInt(dynamic v) => (v is int) ? v : (v as num?)?.toInt() ?? 0;
-bool _asBool(dynamic v) => (v is bool) ? v : (v as bool?) ?? false;
+int _asInt(dynamic v) {
+  if (v is int) return v;
+  if (v is num) return v.toInt();
+  if (v is String) return int.tryParse(v.trim()) ?? 0;
+  return 0;
+}
 
-DateTime _asDate(dynamic v) {
-  if (v == null) return DateTime.fromMillisecondsSinceEpoch(0);
+bool _asBool(dynamic v) {
+  if (v is bool) return v;
+  if (v is num) return v != 0;
+  if (v is String) {
+    final s = v.trim().toLowerCase();
+    if (s == 'true' || s == 't' || s == '1' || s == 'yes') return true;
+    if (s == 'false' || s == 'f' || s == '0' || s == 'no') return false;
+  }
+  return false;
+}
+
+DateTime? _asDate(dynamic v) {
+  if (v == null) return null;
   if (v is DateTime) return v;
-  return DateTime.tryParse(v.toString()) ?? DateTime.fromMillisecondsSinceEpoch(0);
+  final s = v.toString().trim();
+  if (s.isEmpty) return null;
+  return DateTime.tryParse(s);
+}
+
+@immutable
+class Job {
+  const Job({
+    required this.id,
+    required this.title,
+    required this.companyId,
+    required this.companyName,
+    required this.department,
+    required this.location,
+    required this.description,
+    required this.requirements,
+    required this.type,
+    required this.workType,
+    required this.isRemote,
+    required this.isActive,
+    this.salaryMin,
+    this.salaryMax,
+    this.deadline,
+    this.minYear,
+    this.maxYear,
+    required this.createdAt,
+  });
+
+  final String id;
+  final String companyId;
+  final String companyName;
+
+  final String title;
+  final String department;
+  final String location;
+
+  final String description;
+  final String requirements;
+
+  /// job type (in your schema: `type` text)
+  final String type;
+
+  /// work type (in your schema: `work_type` text)
+  final String workType;
+
+  final bool isRemote;
+  final bool isActive;
+
+  final int? salaryMin;
+  final int? salaryMax;
+
+  final DateTime? deadline;
+  final int? minYear;
+  final int? maxYear;
+
+  final DateTime createdAt;
+
+  factory Job.fromMap(Map<String, dynamic> map) {
+    return Job(
+      id: (map['id'] ?? '').toString(),
+      companyId: (map['company_id'] ?? '').toString(),
+      companyName: (map['company_name'] ?? '').toString(),
+      title: (map['title'] ?? '').toString(),
+      department: (map['department'] ?? '').toString(),
+      location: (map['location'] ?? '').toString(),
+      description: (map['description'] ?? '').toString(),
+      requirements: (map['requirements'] ?? '').toString(),
+      salaryMin: map['salary_min'] == null ? null : _asInt(map['salary_min']),
+      salaryMax: map['salary_max'] == null ? null : _asInt(map['salary_max']),
+      type: (map['type'] ?? '').toString(),
+      isRemote: _asBool(map['is_remote']),
+      workType: (map['work_type'] ?? '').toString(),
+      deadline: _asDate(map['deadline']),
+      isActive: _asBool(map['is_active']),
+      minYear: map['min_year'] == null ? null : _asInt(map['min_year']),
+      maxYear: map['max_year'] == null ? null : _asInt(map['max_year']),
+      createdAt: _asDate(map['created_at']) ?? DateTime.now(),
+    );
+  }
 }
 
 @immutable
@@ -52,8 +145,8 @@ class JobSummary {
       type: (map['type'] as String?)?.trim(),
       isRemote: _asBool(map['is_remote']),
       isActive: _asBool(map['is_active']),
-      createdAt: _asDate(map['created_at']),
-      deadline: map['deadline'] == null ? null : _asDate(map['deadline']),
+      createdAt: _asDate(map['created_at']) ?? DateTime.now(),
+      deadline: _asDate(map['deadline']),
       salary: (map['salary'] as String?)?.trim(),
       applicationCount: _asInt(map['application_count']),
     );
@@ -117,11 +210,42 @@ class JobDetail extends JobSummary {
       requirements: (map['requirements'] as String?)?.trim(),
       benefits: (map['benefits'] as String?)?.trim(),
       contactEmail: (map['contact_email'] as String?)?.trim(),
-      minYear: (map['min_year'] as int?),
-      maxYear: (map['max_year'] as int?),
+      minYear: map['min_year'] == null ? null : _asInt(map['min_year']),
+      maxYear: map['max_year'] == null ? null : _asInt(map['max_year']),
       viewsCount: _asInt(map['views_count']),
       companyId: (map['company_id'] as String?)?.trim(),
       createdBy: (map['created_by'] as String?)?.trim(),
+    );
+  }
+}
+
+@immutable
+class JobsFilters {
+  const JobsFilters({
+    this.query = '',
+    this.department,
+    this.workType,
+    this.remoteOnly = false,
+  });
+
+  final String query;
+  final String? department;
+  final String? workType;
+  final bool remoteOnly;
+
+  JobsFilters copyWith({
+    String? query,
+    String? department,
+    String? workType,
+    bool? remoteOnly,
+    bool clearDepartment = false,
+    bool clearWorkType = false,
+  }) {
+    return JobsFilters(
+      query: query ?? this.query,
+      department: clearDepartment ? null : (department ?? this.department),
+      workType: clearWorkType ? null : (workType ?? this.workType),
+      remoteOnly: remoteOnly ?? this.remoteOnly,
     );
   }
 }
@@ -145,12 +269,14 @@ class JobFilters {
     String? department,
     bool? remoteOnly,
     String? workType,
+    bool clearDepartment = false,
+    bool clearWorkType = false,
   }) {
     return JobFilters(
       query: query ?? this.query,
-      department: department ?? this.department,
+      department: clearDepartment ? null : (department ?? this.department),
       remoteOnly: remoteOnly ?? this.remoteOnly,
-      workType: workType ?? this.workType,
+      workType: clearWorkType ? null : (workType ?? this.workType),
     );
   }
 
@@ -180,6 +306,34 @@ class JobsListVm {
 }
 
 @immutable
+class JobCardVM {
+  const JobCardVM({
+    required this.job,
+    required this.isFavorite,
+    required this.applicationStatus,
+  });
+
+  final Job job;
+  final bool isFavorite;
+
+  /// null if not applied, else: pending/accepted/rejected...
+  final String? applicationStatus;
+}
+
+@immutable
+class JobsViewModel {
+  const JobsViewModel({
+    required this.items,
+    required this.availableDepartments,
+    required this.availableWorkTypes,
+  });
+
+  final List<JobCardVM> items;
+  final List<String> availableDepartments;
+  final List<String> availableWorkTypes;
+}
+
+@immutable
 class JobDetailVm {
   const JobDetailVm({
     required this.job,
@@ -202,4 +356,17 @@ class JobDetailVm {
       hasApplied: hasApplied ?? this.hasApplied,
     );
   }
+}
+
+@immutable
+class JobDetailViewModel {
+  const JobDetailViewModel({
+    required this.job,
+    required this.isFavorite,
+    required this.applicationStatus,
+  });
+
+  final Job job;
+  final bool isFavorite;
+  final String? applicationStatus;
 }
