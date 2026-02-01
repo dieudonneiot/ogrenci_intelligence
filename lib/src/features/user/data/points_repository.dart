@@ -8,27 +8,33 @@ class PointsRepository {
 
   /* --------------------------- READ METHODS --------------------------- */
 
+  /// profiles.id == auth.users.id
   Future<int> fetchTotalPoints({required String userId}) async {
     final res = await SupabaseService.client
         .from('profiles')
         .select('total_points')
-        .eq('user_id', userId)
+        .eq('id', userId)
         .maybeSingle();
 
     if (res == null) return 0;
     final v = res['total_points'];
-    return (v is int) ? v : (v as num?)?.toInt() ?? 0;
+    if (v is int) return v;
+    if (v is num) return v.toInt();
+    return 0;
   }
 
+  /// user_points.user_id -> auth.users.id
   Future<List<UserPoint>> fetchUserPoints({required String userId, int limit = 80}) async {
     final rows = await SupabaseService.client
         .from('user_points')
-        .select('id, user_id, source, description, points, created_at')
-        .eq('user_id', userId) // FIX (was eq('id', userId))
+        .select('id, source, description, points, created_at')
+        .eq('user_id', userId) // user_points has user_id
         .order('created_at', ascending: false)
         .limit(limit);
 
-    return (rows as List).map((e) => UserPoint.fromMap(e as Map<String, dynamic>)).toList();
+    return (rows as List)
+        .map((e) => UserPoint.fromMap(e as Map<String, dynamic>))
+        .toList(growable: false);
   }
 
   Future<List<Reward>> fetchRewards() async {
@@ -37,17 +43,22 @@ class PointsRepository {
         .select('id, title, description, required_points, department, icon')
         .order('required_points', ascending: true);
 
-    return (rows as List).map((e) => Reward.fromMap(e as Map<String, dynamic>)).toList();
+    return (rows as List)
+        .map((e) => Reward.fromMap(e as Map<String, dynamic>))
+        .toList(growable: false);
   }
 
+  /// user_badges.user_id -> auth.users.id
   Future<List<UserBadge>> fetchBadges({required String userId}) async {
     final rows = await SupabaseService.client
         .from('user_badges')
-        .select('id, user_id, badge_type, badge_title, badge_description, icon, earned_at, points_awarded')
-        .eq('user_id', userId) // FIX (was eq('id', userId))
+        .select('id, badge_type, badge_title, badge_description, icon, earned_at, points_awarded')
+        .eq('user_id', userId) // user_badges has user_id
         .order('earned_at', ascending: false);
 
-    return (rows as List).map((e) => UserBadge.fromMap(e as Map<String, dynamic>)).toList();
+    return (rows as List)
+        .map((e) => UserBadge.fromMap(e as Map<String, dynamic>))
+        .toList(growable: false);
   }
 
   /* ----------------------- WRITE / AWARD METHODS ---------------------- */
@@ -92,7 +103,7 @@ class PointsRepository {
       await SupabaseService.client
           .from('profiles')
           .update({'total_points': before + points})
-          .eq('user_id', userId);
+          .eq('id', userId);
     }
 
     onPointsAwarded?.call();
