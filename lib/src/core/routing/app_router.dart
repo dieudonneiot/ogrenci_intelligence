@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/applications/presentation/screens/applications_screen.dart';
 import '../../features/auth/domain/auth_models.dart';
 import '../../features/auth/presentation/controllers/auth_controller.dart';
 import '../../features/auth/presentation/screens/company_auth_screen.dart';
@@ -282,7 +283,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             builder: (_, state) => JobDetailScreen(jobId: state.pathParameters['id']!),          ),
           GoRoute(
             path: Routes.internships,
-            builder: (_, __) => const InternshipsScreen(),
+            builder: (context, _) => const InternshipsScreen(),
           ),
           GoRoute(
             path: Routes.internshipDetail, // /internships/:id
@@ -293,8 +294,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: Routes.applications,
-            builder: (context, _) =>
-                const PlaceholderView(title: 'Applications'),
+            builder: (context, state) => const ApplicationsScreen(),
           ),
           GoRoute(
             path: Routes.favorites,
