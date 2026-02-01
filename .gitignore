@@ -33,8 +33,11 @@
 
 
 .env
-*.txt
-summary_of_all_done.txt
+# Ignore all .txt files in root directory only
+/*.txt
+
+# But keep CMakeLists.txt files
+!**/CMakeLists.txt
 # This file, on the master branch, should never exist or be checked-in.
 #
 # On a *final* release branch, that is, what will ship to stable or beta, the
