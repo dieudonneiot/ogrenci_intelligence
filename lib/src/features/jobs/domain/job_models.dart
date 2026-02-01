@@ -43,6 +43,7 @@ class Job {
     required this.isActive,
     this.salaryMin,
     this.salaryMax,
+    this.salaryText,
     this.deadline,
     this.minYear,
     this.maxYear,
@@ -71,6 +72,7 @@ class Job {
 
   final int? salaryMin;
   final int? salaryMax;
+  final String? salaryText;
 
   final DateTime? deadline;
   final int? minYear;
@@ -90,6 +92,9 @@ class Job {
       requirements: (map['requirements'] ?? '').toString(),
       salaryMin: map['salary_min'] == null ? null : _asInt(map['salary_min']),
       salaryMax: map['salary_max'] == null ? null : _asInt(map['salary_max']),
+      salaryText: (map['salary'] ?? '').toString().trim().isEmpty
+          ? null
+          : (map['salary'] ?? '').toString().trim(),
       type: (map['type'] ?? '').toString(),
       isRemote: _asBool(map['is_remote']),
       workType: (map['work_type'] ?? '').toString(),

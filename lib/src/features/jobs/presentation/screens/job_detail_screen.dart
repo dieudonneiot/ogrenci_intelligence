@@ -126,9 +126,11 @@ class _Body extends ConsumerWidget {
                                 bg: const Color(0xFFFFF7ED),
                                 fg: const Color(0xFFB45309),
                               ),
-                            if ((j.salaryMin ?? 0) > 0 || (j.salaryMax ?? 0) > 0)
+                            if ((j.salaryText?.trim().isNotEmpty ?? false) ||
+                                (j.salaryMin ?? 0) > 0 ||
+                                (j.salaryMax ?? 0) > 0)
                               _Chip(
-                                text: _salaryText(j.salaryMin, j.salaryMax),
+                                text: _salaryText(j.salaryText, j.salaryMin, j.salaryMax),
                                 bg: const Color(0xFFDBEAFE),
                                 fg: const Color(0xFF1D4ED8),
                               ),
@@ -191,7 +193,9 @@ class _Body extends ConsumerWidget {
   static String _fmtDate(DateTime d) =>
       '${d.day.toString().padLeft(2, '0')}.${d.month.toString().padLeft(2, '0')}.${d.year}';
 
-  static String _salaryText(int? min, int? max) {
+  static String _salaryText(String? salaryText, int? min, int? max) {
+    final s = (salaryText ?? '').trim();
+    if (s.isNotEmpty) return s;
     final a = min ?? 0;
     final b = max ?? 0;
     if (a > 0 && b > 0) return '$a - $b';

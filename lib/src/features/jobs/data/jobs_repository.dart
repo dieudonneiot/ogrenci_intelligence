@@ -68,7 +68,7 @@ class JobsRepository {
         .from('jobs')
         .select(
           'id, company_id, company, title, department, location, description, requirements, '
-          'salary_min, salary_max, type, is_remote, work_type, deadline, is_active, min_year, max_year, created_at',
+          'salary, type, is_remote, work_type, deadline, is_active, min_year, max_year, created_at',
         )
         .eq('is_active', true);
 
@@ -126,7 +126,7 @@ class JobsRepository {
         .from('jobs')
         .select(
           'id, company_id, company, title, department, location, description, requirements, '
-          'salary_min, salary_max, type, is_remote, work_type, deadline, is_active, min_year, max_year, created_at',
+          'salary, type, is_remote, work_type, deadline, is_active, min_year, max_year, created_at',
         )
         .eq('id', jobId)
         .maybeSingle();
