@@ -13,14 +13,15 @@ class PointsRepository {
         .maybeSingle();
 
     if (res == null) return 0;
-    return (res['total_points'] ?? 0) as int;
+    final v = res['total_points'];
+    return (v is int) ? v : (v as num?)?.toInt() ?? 0;
   }
 
   Future<List<UserPoint>> fetchUserPoints({required String userId, int limit = 80}) async {
     final rows = await SupabaseService.client
         .from('user_points')
-        .select('id, source, description, points, created_at')
-        .eq('id', userId)
+        .select('id, user_id, source, description, points, created_at')
+        .eq('user_id', userId)
         .order('created_at', ascending: false)
         .limit(limit);
 
@@ -39,8 +40,8 @@ class PointsRepository {
   Future<List<UserBadge>> fetchBadges({required String userId}) async {
     final rows = await SupabaseService.client
         .from('user_badges')
-        .select('id, badge_type, badge_title, badge_description, icon, earned_at, points_awarded')
-        .eq('id', userId)
+        .select('id, user_id, badge_type, badge_title, badge_description, icon, earned_at, points_awarded')
+        .eq('user_id', userId)
         .order('earned_at', ascending: false);
 
     return (rows as List).map((e) => UserBadge.fromMap(e as Map<String, dynamic>)).toList();

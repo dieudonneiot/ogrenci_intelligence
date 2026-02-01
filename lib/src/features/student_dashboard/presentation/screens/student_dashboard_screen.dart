@@ -3,8 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/routing/routes.dart';
+import '../../../auth/presentation/controllers/auth_controller.dart';
+import '../../../user/data/points_service.dart';
 import '../../application/student_dashboard_providers.dart';
 import '../../domain/student_dashboard_models.dart';
+
+final _didCheckBonusesProvider = StateProvider.autoDispose<bool>((ref) => false);
 
 class StudentDashboardScreen extends ConsumerStatefulWidget {
   const StudentDashboardScreen({super.key});
@@ -22,50 +26,41 @@ class StudentDashboardScreen extends ConsumerStatefulWidget {
 }
 
 class _StudentDashboardScreenState extends ConsumerState<StudentDashboardScreen> {
-  bool _bonusChecked = false;
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _runBonuses());
-  }
-
-  Future<void> _runBonuses() async {
-    if (_bonusChecked) return;
-    _bonusChecked = true;
-
-    try {
-      final result = await ref.read(dashboardBonusesProvider.future);
-      if (!mounted) return;
-
-      if (result.anyAwarded) {
-        final messenger = ScaffoldMessenger.of(context);
-        messenger.clearSnackBars();
-
-        final text = (result.dailyAwarded && result.weeklyAwarded)
-            ? 'Harika! Günlük bonus (+2) ve 7 günlük seri (+15) kazandın!'
-            : result.weeklyAwarded
-                ? 'Tebrikler! 7 günlük seri tamamlandı: +15 puan'
-                : 'Günlük giriş bonusu kazandın: +2 puan';
-
-        messenger.showSnackBar(
-          SnackBar(
-            content: Text(text),
-            duration: const Duration(seconds: 5),
-          ),
-        );
-
-        // Refresh dashboard so UI reflects new totals immediately
-        await ref.read(studentDashboardProvider.notifier).refresh();
-      }
-    } catch (_) {
-      // Bonuses should never break dashboard UI.
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final dashAsync = ref.watch(studentDashboardProvider);
+
+    ref.listen(studentDashboardProvider, (prev, next) async {
+      final did = ref.read(_didCheckBonusesProvider);
+      if (did) return;
+
+      next.whenData((_) async {
+        ref.read(_didCheckBonusesProvider.notifier).state = true;
+
+        final auth = ref.read(authViewStateProvider).value;
+        final uid = auth?.user?.id;
+        if (uid == null || uid.isEmpty) return;
+
+        final result = await ref.read(pointsServiceProvider).checkLoginBonuses(userId: uid);
+
+        if (!context.mounted) return;
+
+        if (result.dailyAwarded) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Günlük giriş bonusu kazandınız! +2 puan')),
+          );
+        }
+        if (result.weeklyAwarded) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('7 günlük seri tamamlandı! +15 puan')),
+          );
+        }
+
+        if (result.dailyAwarded || result.weeklyAwarded) {
+          await ref.read(studentDashboardProvider.notifier).refresh();
+        }
+      });
+    });
 
     return dashAsync.when(
       loading: () => const _DashboardLoading(),

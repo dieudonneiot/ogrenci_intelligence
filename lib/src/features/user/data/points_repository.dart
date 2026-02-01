@@ -14,7 +14,8 @@ class PointsRepository {
         .maybeSingle();
 
     if (res == null) return 0;
-    return (res['total_points'] ?? 0) as int;
+    final v = res['total_points'];
+    return (v is int) ? v : (v as num?)?.toInt() ?? 0;
   }
 
   Future<List<UserPoint>> fetchUserPoints({required String userId, int limit = 80}) async {
