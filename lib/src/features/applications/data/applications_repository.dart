@@ -4,6 +4,25 @@ import '../domain/applications_models.dart';
 class ApplicationsRepository {
   const ApplicationsRepository();
 
+  Future<List<ApplicationListItem>> fetchMyJobApplications({
+    required String userId,
+    int limit = 80,
+  }) async {
+    final rows = await SupabaseService.client
+        .from('job_applications')
+        .select(
+          'id, job_id, status, applied_at, '
+          'job:jobs(id, title, company, location)',
+        )
+        .eq('user_id', userId)
+        .order('applied_at', ascending: false)
+        .limit(limit);
+
+    return (rows as List)
+        .map((e) => ApplicationListItem.fromJobApplicationMap(e as Map<String, dynamic>))
+        .toList();
+  }
+
   Future<List<ApplicationListItem>> fetchMyInternshipApplications({
     required String userId,
     int limit = 80,
@@ -12,7 +31,7 @@ class ApplicationsRepository {
         .from('internship_applications')
         .select(
           'id, internship_id, status, applied_at, motivation_letter, '
-          'internship:internships(id, title, company_name, department, location, is_remote, work_type, duration_months)',
+          'internship:internships(id, title, company_name, location)',
         )
         .eq('user_id', userId)
         .order('applied_at', ascending: false)
@@ -32,7 +51,7 @@ class ApplicationsRepository {
         .from('course_enrollments')
         .select(
           'id, course_id, enrolled_at, progress, '
-          'course:courses(id, title, department, level, duration)',
+          'course:courses(id, title)',
         )
         .eq('user_id', userId)
         .order('enrolled_at', ascending: false)

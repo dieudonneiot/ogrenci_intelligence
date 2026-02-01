@@ -31,7 +31,14 @@ class StudentDashboardNotifier extends AsyncNotifier<StudentDashboardViewModel> 
     final auth = ref.read(authViewStateProvider).value;
     final uid = auth?.user?.id;
 
-    final fallbackName = (auth?.user?.email ?? 'Öğrenci').split('@').first;
+    final user = auth?.user;
+    final meta = user?.userMetadata;
+    final metaName = (meta is Map<String, dynamic>)
+        ? (meta['full_name'] ?? meta['name'])?.toString().trim()
+        : null;
+    final emailPrefix = (user?.email ?? 'Öğrenci').split('@').first;
+    final fallbackName =
+        (metaName != null && metaName.isNotEmpty) ? metaName : emailPrefix;
 
     if (uid == null || uid.isEmpty) {
       return StudentDashboardViewModel.empty(displayName: fallbackName);

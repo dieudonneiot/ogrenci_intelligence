@@ -96,7 +96,6 @@ class _StudentDashboardScreenState extends ConsumerState<StudentDashboardScreen>
       ),
       data: (vm) {
         final stats = vm.stats;
-        final ongoingCount = vm.enrolledCourses.length;
 
         return Container(
           color: const Color(0xFFF9FAFB),
@@ -159,7 +158,7 @@ class _StudentDashboardScreenState extends ConsumerState<StudentDashboardScreen>
                                 iconBg: const Color(0xFFFEF3C7),
                                 iconColor: const Color(0xFFD97706),
                                 title: 'Devam Eden Kurs',
-                                value: '$ongoingCount',
+                                value: '${stats.ongoingCourses}',
                               ),
                             ];
 
@@ -623,16 +622,14 @@ class _EnrolledCourseTile extends StatelessWidget {
           ),
           const SizedBox(height: 10),
 
-          Row(
-            children: [
-              const Icon(Icons.access_time, size: 16, color: Color(0xFF6B7280)),
-              const SizedBox(width: 6),
-              Text(
-                course.duration,
-                style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700, fontSize: 12),
-              ),
-              const Spacer(),
-              SizedBox(
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final width = constraints.maxWidth;
+              final isDesktop = width >= 1024;
+              final isTablet = width >= 768 && width < 1024;
+              final isMobile = width < 768;
+
+              final progress = SizedBox(
                 width: 128,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -653,8 +650,53 @@ class _EnrolledCourseTile extends StatelessWidget {
                     ),
                   ],
                 ),
-              ),
-            ],
+              );
+
+              final actionButton = SizedBox(
+                height: isTablet ? 32 : 40,
+                width: isMobile ? double.infinity : 128,
+                child: ElevatedButton(
+                  onPressed: () => context.go('/courses/${course.courseId}'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF6D28D9),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    elevation: 0,
+                  ),
+                  child: Text(
+                    'Devam Et →',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w900,
+                      fontSize: isTablet ? 12 : 14,
+                    ),
+                  ),
+                ),
+              );
+
+              final row = Row(
+                children: [
+                  const Icon(Icons.access_time, size: 16, color: Color(0xFF6B7280)),
+                  const SizedBox(width: 6),
+                  Text(
+                    course.duration,
+                    style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700, fontSize: 12),
+                  ),
+                  const Spacer(),
+                  progress,
+                ],
+              );
+
+              if (isDesktop) return row;
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  row,
+                  const SizedBox(height: 10),
+                  if (isMobile) actionButton else Align(alignment: Alignment.centerRight, child: actionButton),
+                ],
+              );
+            },
           ),
         ],
       ),
@@ -690,11 +732,17 @@ class _RecentActivitiesCard extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           if (activities.isEmpty)
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 22),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 22),
               child: Center(
-                child: Text('Henüz aktivite yok.',
-                    style: TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700)),
+                child: Column(
+                  children: const [
+                    Icon(Icons.local_activity_outlined, size: 42, color: Color(0xFFD1D5DB)),
+                    SizedBox(height: 8),
+                    Text('Henüz aktivite yok.',
+                        style: TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700)),
+                  ],
+                ),
               ),
             )
           else

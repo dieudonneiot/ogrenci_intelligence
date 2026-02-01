@@ -16,14 +16,18 @@ import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/auth/presentation/screens/reset_password_screen.dart';
 import '../../features/courses/presentation/screens/course_detail_screen.dart';
 import '../../features/courses/presentation/screens/courses_screen.dart';
+import '../../features/favorites/presentation/screens/favorites_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/internships/presentation/screens/internship_detail_screen.dart';
 import '../../features/internships/presentation/screens/internships_screen.dart';
 import '../../features/jobs/presentation/screens/job_detail_screen.dart';
 import '../../features/jobs/presentation/screens/jobs_screen.dart';
 import '../../features/leaderboard/presentation/screens/leaderboard_screen.dart';
+import '../../features/notifications/presentation/screens/notifications_screen.dart';
 import '../../features/points/presentation/screens/points_system_screen.dart';
 import '../../features/student_dashboard/presentation/screens/student_dashboard_screen.dart';
+import '../../features/user/presentation/screens/user_profile_screen.dart';
+import '../../features/user/presentation/screens/user_settings_screen.dart';
 import '../../shared/widgets/app_navbar.dart';
 import '../../shared/widgets/empty_state.dart';
 import 'route_guards.dart';
@@ -257,11 +261,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: Routes.profile,
-            builder: (context, _) => const PlaceholderView(title: 'Profile'),
+            builder: (context, _) => const UserProfileScreen(),
           ),
           GoRoute(
             path: Routes.settings,
-            builder: (context, _) => const PlaceholderView(title: 'Settings'),
+            builder: (context, _) => const UserSettingsScreen(),
           ),
           GoRoute(
             path: Routes.courses,
@@ -298,12 +302,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: Routes.favorites,
-            builder: (context, _) => const PlaceholderView(title: 'Favorites'),
+            builder: (context, _) => const FavoritesScreen(),
           ),
           GoRoute(
             path: Routes.notifications,
-            builder: (context, _) =>
-                const PlaceholderView(title: 'Notifications'),
+            builder: (context, _) => const NotificationsScreen(),
           ),
           GoRoute(
             path: Routes.leaderboard,

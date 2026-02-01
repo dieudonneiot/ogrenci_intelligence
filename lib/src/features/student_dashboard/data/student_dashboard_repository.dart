@@ -29,12 +29,30 @@ class StudentDashboardRepository {
     );
   }
 
-  // ✅ FIX: leaderboard_snapshots.period_date (NOT period_end)
-  Future<int?> getLatestDepartmentRank(String uid) async {
+  Future<int?> getDepartmentRank({required String uid, required String? department}) async {
+    final dept = department?.trim();
+    if (dept == null || dept.isEmpty) return null;
+
+    try {
+      final row = await _client
+          .from('department_leaderboard')
+          .select('rank_in_department')
+          .eq('user_id', uid)
+          .eq('department', dept)
+          .maybeSingle();
+
+      if (row != null) {
+        return (row['rank_in_department'] as num?)?.toInt();
+      }
+    } catch (_) {
+      // fallback below
+    }
+
     final rows = await _client
         .from('leaderboard_snapshots')
         .select('rank_department,period_date')
         .eq('user_id', uid)
+        .eq('department', dept)
         .order('period_date', ascending: false)
         .limit(1) as List<dynamic>;
 
@@ -79,22 +97,6 @@ class StudentDashboardRepository {
       ongoingCourses: ongoing,
       activeApplications: jobPending.length + internshipPending.length,
     );
-  }
-
-  Future<int> sumPointsSince(String uid, DateTime from) async {
-    final rows = await _client
-        .from('user_points')
-        .select('points,created_at')
-        .eq('user_id', uid)
-        .gte('created_at', from.toUtc().toIso8601String())
-        .order('created_at', ascending: false) as List<dynamic>;
-
-    var sum = 0;
-    for (final r in rows) {
-      final m = r as Map<String, dynamic>;
-      sum += (m['points'] as num?)?.toInt() ?? 0;
-    }
-    return sum;
   }
 
   Future<List<DashboardEnrolledCourse>> listOngoingCourses({
@@ -156,23 +158,17 @@ class StudentDashboardRepository {
   }) async {
     final profile = await getProfile(uid);
 
-    final nowLocal = DateTime.now();
-    final startTodayLocal = DateTime(nowLocal.year, nowLocal.month, nowLocal.day);
-    final startWeek = nowLocal.subtract(const Duration(days: 7));
-
     final countsF = getCounts(uid);
-    final rankF = getLatestDepartmentRank(uid);
-    final todayF = sumPointsSince(uid, startTodayLocal);
-    final weekF = sumPointsSince(uid, startWeek);
+    final rankF = getDepartmentRank(uid: uid, department: profile.department);
     final ongoingCoursesF = listOngoingCourses(uid: uid, limit: 3);
     final activitiesF = listActivities(uid: uid, limit: 10);
 
     final counts = await countsF;
     final rank = await rankF;
-    final todayPts = await todayF;
-    final weekPts = await weekF;
     final ongoingCourses = await ongoingCoursesF;
     final activities = await activitiesF;
+    final todayPts = _sumTodayPoints(activities);
+    final weekPts = _sumWeekPoints(activities);
 
     final displayFallback =
         (fallbackName == null || fallbackName.isEmpty) ? 'Öğrenci' : fallbackName;
@@ -194,6 +190,32 @@ class StudentDashboardRepository {
       enrolledCourses: ongoingCourses,
       activities: activities,
     );
+  }
+
+  static int _sumTodayPoints(List<ActivityItem> activities) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    var sum = 0;
+
+    for (final a in activities) {
+      final local = a.createdAt.toLocal();
+      final d = DateTime(local.year, local.month, local.day);
+      if (d == today) sum += a.points;
+    }
+
+    return sum;
+  }
+
+  static int _sumWeekPoints(List<ActivityItem> activities) {
+    final weekAgo = DateTime.now().subtract(const Duration(days: 7));
+    var sum = 0;
+
+    for (final a in activities) {
+      final local = a.createdAt.toLocal();
+      if (!local.isBefore(weekAgo)) sum += a.points;
+    }
+
+    return sum;
   }
 
   static ActivityCategory _mapCategory(String category) {

@@ -70,6 +70,18 @@ class ApplicationListItem {
     }
   }
 
+  static ApplicationStatus _statusFromJob(String? s) {
+    switch ((s ?? '').trim().toLowerCase()) {
+      case 'accepted':
+        return ApplicationStatus.accepted;
+      case 'rejected':
+        return ApplicationStatus.rejected;
+      case 'pending':
+      default:
+        return ApplicationStatus.pending;
+    }
+  }
+
   static ApplicationStatus _statusFromCourse({
     required int progress,
     required bool completed,
@@ -83,19 +95,9 @@ class ApplicationListItem {
 
     final title = (internship['title'] ?? '') as String;
     final company = (internship['company_name'] ?? '') as String;
-    final dept = (internship['department'] as String?)?.trim();
 
     final location = (internship['location'] as String?)?.trim();
-    final isRemote = (internship['is_remote'] == true);
-    final workType = (internship['work_type'] as String?)?.trim();
-    final durationMonths = internship['duration_months'];
-
-    final meta = <String>[
-      if (location != null && location.isNotEmpty) location,
-      if (isRemote) 'Remote',
-      if (workType != null && workType.isNotEmpty) workType,
-      if (durationMonths != null) '${_asInt(durationMonths)} ay',
-    ].where((e) => e.isNotEmpty).join(' • ');
+    final meta = (location != null && location.isNotEmpty) ? location : null;
 
     return ApplicationListItem(
       kind: ApplicationKind.internship,
@@ -103,9 +105,29 @@ class ApplicationListItem {
       refId: (map['internship_id'] ?? '').toString(),
       title: title.isNotEmpty ? title : 'Staj',
       subtitle: company.isNotEmpty ? company : null,
-      department: dept,
-      meta: meta.isNotEmpty ? meta : null,
+      meta: meta,
       status: _statusFromInternship(map['status'] as String?),
+      date: _asDate(map['applied_at']),
+    );
+  }
+
+  factory ApplicationListItem.fromJobApplicationMap(Map<String, dynamic> map) {
+    final job = (map['job'] as Map?)?.cast<String, dynamic>() ?? const <String, dynamic>{};
+
+    final title = (job['title'] ?? '') as String;
+    final company = (job['company'] ?? '') as String;
+
+    final location = (job['location'] as String?)?.trim();
+    final meta = (location != null && location.isNotEmpty) ? location : null;
+
+    return ApplicationListItem(
+      kind: ApplicationKind.job,
+      id: (map['id'] ?? '').toString(),
+      refId: (map['job_id'] ?? '').toString(),
+      title: title.isNotEmpty ? title : 'İş',
+      subtitle: company.isNotEmpty ? company : null,
+      meta: meta,
+      status: _statusFromJob(map['status'] as String?),
       date: _asDate(map['applied_at']),
     );
   }
@@ -117,26 +139,15 @@ class ApplicationListItem {
     final course = (map['course'] as Map?)?.cast<String, dynamic>() ?? const <String, dynamic>{};
 
     final title = (course['title'] ?? '') as String;
-    final dept = (course['department'] as String?)?.trim();
-    final level = (course['level'] as String?)?.trim();
-    final duration = (course['duration'] as String?)?.trim();
 
     final progress = _asInt(map['progress']);
     final status = _statusFromCourse(progress: progress, completed: completedAt != null);
-
-    final meta = <String>[
-      if (level != null && level.isNotEmpty) level,
-      if (duration != null && duration.isNotEmpty) duration,
-      'İlerleme: %$progress',
-    ].join(' • ');
 
     return ApplicationListItem(
       kind: ApplicationKind.course,
       id: (map['id'] ?? '').toString(),
       refId: (map['course_id'] ?? '').toString(),
       title: title.isNotEmpty ? title : 'Kurs',
-      department: dept,
-      meta: meta,
       progress: progress,
       status: status,
       date: completedAt ?? _asDate(map['enrolled_at']),
@@ -147,22 +158,24 @@ class ApplicationListItem {
 @immutable
 class ApplicationsBundle {
   const ApplicationsBundle({
+    required this.jobs,
     required this.internships,
     required this.courses,
   });
 
+  final List<ApplicationListItem> jobs;
   final List<ApplicationListItem> internships;
   final List<ApplicationListItem> courses;
 
-  factory ApplicationsBundle.empty() => const ApplicationsBundle(internships: [], courses: []);
+  factory ApplicationsBundle.empty() => const ApplicationsBundle(jobs: [], internships: [], courses: []);
 
   List<ApplicationListItem> get all {
-    final list = <ApplicationListItem>[...internships, ...courses];
+    final list = <ApplicationListItem>[...jobs, ...internships, ...courses];
     list.sort((a, b) => b.date.compareTo(a.date));
     return list;
   }
 
-  int get total => internships.length + courses.length;
+  int get total => jobs.length + internships.length + courses.length;
 
   int countStatus(ApplicationStatus s) => all.where((e) => e.status == s).length;
 }

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/routing/routes.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
 import '../../application/applications_providers.dart';
 import '../../domain/applications_models.dart';
@@ -49,9 +48,8 @@ class _ApplicationsScreenState extends ConsumerState<ApplicationsScreen> with Si
   ApplicationStatus? _sanitizeStatusFilter(int tabIndex, ApplicationStatus? current) {
     if (current == null) return null;
 
-    // tab 1 is jobs placeholder
-    if (tabIndex == 2) {
-      // internships
+    if (tabIndex == 1 || tabIndex == 2) {
+      // jobs or internships
       if (current == ApplicationStatus.active || current == ApplicationStatus.completed) return null;
     }
     if (tabIndex == 3) {
@@ -87,12 +85,17 @@ class _ApplicationsScreenState extends ConsumerState<ApplicationsScreen> with Si
       ),
       data: (bundle) {
         final all = bundle.all;
+        final jobsCount = bundle.jobs.length;
+        final internshipsCount = bundle.internships.length;
+        final coursesCount = bundle.courses.length;
+
+        final activeItems = _itemsForTab(bundle, _tabs.index);
 
         // Stats like React
-        final total = bundle.total;
-        final pending = bundle.countStatus(ApplicationStatus.pending);
-        final accepted = bundle.countStatus(ApplicationStatus.accepted);
-        final active = bundle.countStatus(ApplicationStatus.active);
+        final total = activeItems.length;
+        final pending = _countStatus(activeItems, ApplicationStatus.pending);
+        final accepted = _countStatus(activeItems, ApplicationStatus.accepted);
+        final active = _countStatus(activeItems, ApplicationStatus.active);
 
         return Container(
           color: const Color(0xFFF9FAFB),
@@ -117,7 +120,7 @@ class _ApplicationsScreenState extends ConsumerState<ApplicationsScreen> with Si
                         ),
                         const SizedBox(height: 6),
                         const Text(
-                          'Staj başvurularını ve kurs kayıtlarını tek yerden takip et.',
+                          'Tüm başvuru ve kayıtlarınızı buradan takip edebilirsiniz.',
                           style: TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
                         ),
                         const SizedBox(height: 16),
@@ -174,11 +177,11 @@ class _ApplicationsScreenState extends ConsumerState<ApplicationsScreen> with Si
                             labelStyle: const TextStyle(fontWeight: FontWeight.w900),
                             indicatorColor: const Color(0xFF6D28D9),
                             onTap: (i) => setState(() => _statusFilter = _sanitizeStatusFilter(i, _statusFilter)),
-                            tabs: const [
-                              Tab(text: 'Tümü'),
-                              Tab(text: 'İşler'),
-                              Tab(text: 'Stajlar'),
-                              Tab(text: 'Kurslar'),
+                            tabs: [
+                              Tab(child: _TabLabel(text: 'Tümü', count: all.length)),
+                              Tab(child: _TabLabel(text: 'İş İlanları', count: jobsCount)),
+                              Tab(child: _TabLabel(text: 'Stajlar', count: internshipsCount)),
+                              Tab(child: _TabLabel(text: 'Kurslar', count: coursesCount)),
                             ],
                           ),
                         ),
@@ -192,32 +195,28 @@ class _ApplicationsScreenState extends ConsumerState<ApplicationsScreen> with Si
                             children: [
                               _ListViewTab(
                                 items: _applyFilter(all),
-                                emptyText: 'Henüz başvuru/kayıt yok.',
+                                emptyText: 'Henüz başvurunuz bulunmuyor.',
                                 onOpen: _openItem,
                               ),
-                              const _ComingSoon(
-                                title: 'İş başvuruları',
-                                text: 'Jobs ekranlarını eklediğimizde burada otomatik görünecek.',
+                              _ListViewTab(
+                                items: _applyFilter(bundle.jobs),
+                                emptyText: 'Henüz başvurunuz bulunmuyor.',
+                                onOpen: _openItem,
                               ),
                               _ListViewTab(
                                 items: _applyFilter(bundle.internships),
-                                emptyText: 'Henüz staj başvurusu yok.',
+                                emptyText: 'Henüz başvurunuz bulunmuyor.',
                                 onOpen: _openItem,
                               ),
                               _ListViewTab(
                                 items: _applyFilter(bundle.courses),
-                                emptyText: 'Henüz kurs kaydı yok.',
+                                emptyText: 'Henüz başvurunuz bulunmuyor.',
                                 onOpen: _openItem,
                               ),
                             ],
                           ),
                         ),
 
-                        const SizedBox(height: 14),
-
-                        _InfoCard(
-                          onPointsSystem: () => context.go(Routes.pointsSystem),
-                        ),
                       ],
                     ),
                   ),
@@ -232,9 +231,10 @@ class _ApplicationsScreenState extends ConsumerState<ApplicationsScreen> with Si
 
   List<ApplicationStatus> _statusOptionsForTab(int tabIndex) {
     // 0 all, 1 jobs, 2 internships, 3 courses
-    if (tabIndex == 2) return const [ApplicationStatus.pending, ApplicationStatus.accepted, ApplicationStatus.rejected];
+    if (tabIndex == 1 || tabIndex == 2) {
+      return const [ApplicationStatus.pending, ApplicationStatus.accepted, ApplicationStatus.rejected];
+    }
     if (tabIndex == 3) return const [ApplicationStatus.active, ApplicationStatus.completed];
-    if (tabIndex == 1) return const [];
     return const [
       ApplicationStatus.pending,
       ApplicationStatus.accepted,
@@ -242,6 +242,23 @@ class _ApplicationsScreenState extends ConsumerState<ApplicationsScreen> with Si
       ApplicationStatus.active,
       ApplicationStatus.completed,
     ];
+  }
+
+  List<ApplicationListItem> _itemsForTab(ApplicationsBundle bundle, int tabIndex) {
+    switch (tabIndex) {
+      case 1:
+        return bundle.jobs;
+      case 2:
+        return bundle.internships;
+      case 3:
+        return bundle.courses;
+      default:
+        return bundle.all;
+    }
+  }
+
+  int _countStatus(List<ApplicationListItem> items, ApplicationStatus status) {
+    return items.where((e) => e.status == status).length;
   }
 
   List<ApplicationListItem> _applyFilter(List<ApplicationListItem> items) {
@@ -390,7 +407,7 @@ class _FiltersBar extends StatelessWidget {
           child: TextField(
             controller: controller,
             decoration: InputDecoration(
-              hintText: 'Ara (başlık, şirket, bölüm...)',
+              hintText: 'Başvuru ara...',
               prefixIcon: const Icon(Icons.search),
               filled: true,
               fillColor: Colors.white,
@@ -472,7 +489,49 @@ class _ListViewTab extends StatelessWidget {
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
-          child: Text(emptyText, style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700)),
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: const Color(0xFFE5E7EB)),
+              boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 16, offset: Offset(0, 8))],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.work_outline, size: 46, color: Color(0xFF9CA3AF)),
+                const SizedBox(height: 10),
+                Text(
+                  emptyText,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(height: 12),
+                Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 10,
+                  runSpacing: 6,
+                  children: [
+                    _EmptyCta(
+                      label: 'İş İlanlarına Göz At',
+                      onTap: () => context.go('/jobs'),
+                    ),
+                    const Text('•', style: TextStyle(color: Color(0xFF9CA3AF), fontWeight: FontWeight.w900)),
+                    _EmptyCta(
+                      label: 'Stajları Keşfet',
+                      onTap: () => context.go('/internships'),
+                    ),
+                    const Text('•', style: TextStyle(color: Color(0xFF9CA3AF), fontWeight: FontWeight.w900)),
+                    _EmptyCta(
+                      label: 'Kurslara Katıl',
+                      onTap: () => context.go('/courses'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
         ),
       );
     }
@@ -500,6 +559,12 @@ class _ApplicationCard extends StatelessWidget {
         : item.kind == ApplicationKind.course
             ? 'Kurs'
             : 'İş';
+
+    final detailText = [
+      if (item.subtitle != null && item.subtitle!.isNotEmpty) item.subtitle!,
+      if (item.department != null && item.department!.isNotEmpty) item.department!,
+      if (item.meta != null && item.meta!.isNotEmpty) item.meta!,
+    ].join(' • ');
 
     return Container(
       padding: const EdgeInsets.all(14),
@@ -545,17 +610,16 @@ class _ApplicationCard extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 6),
-                Text(
-                  [
-                    if (item.subtitle != null && item.subtitle!.isNotEmpty) item.subtitle!,
-                    if (item.department != null && item.department!.isNotEmpty) item.department!,
-                    if (item.meta != null && item.meta!.isNotEmpty) item.meta!,
-                  ].join(' • '),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
-                ),
-                const SizedBox(height: 10),
+                if (detailText.isNotEmpty) ...[
+                  Text(
+                    detailText,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 10),
+                ] else
+                  const SizedBox(height: 4),
                 Row(
                   children: [
                     Container(
@@ -585,6 +649,27 @@ class _ApplicationCard extends StatelessWidget {
                     ),
                   ],
                 ),
+                if (item.progress != null) ...[
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      const Text('İlerleme', style: TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700)),
+                      const Spacer(),
+                      Text('%${item.progress}',
+                          style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF111827))),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(999),
+                    child: LinearProgressIndicator(
+                      value: (item.progress ?? 0) / 100,
+                      minHeight: 6,
+                      backgroundColor: const Color(0xFFE5E7EB),
+                      valueColor: const AlwaysStoppedAnimation(Color(0xFF6D28D9)),
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
@@ -619,73 +704,49 @@ class _Pill {
   final Color bg;
 }
 
-class _ComingSoon extends StatelessWidget {
-  const _ComingSoon({required this.title, required this.text});
-  final String title;
-  final String text;
+class _EmptyCta extends StatelessWidget {
+  const _EmptyCta({required this.label, required this.onTap});
+  final String label;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.construction_outlined, size: 46, color: Color(0xFF6B7280)),
-            const SizedBox(height: 10),
-            Text(title, style: const TextStyle(fontWeight: FontWeight.w900)),
-            const SizedBox(height: 8),
-            Text(text, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700)),
-          ],
-        ),
+    return InkWell(
+      onTap: onTap,
+      child: Text(
+        label,
+        style: const TextStyle(color: Color(0xFF6D28D9), fontWeight: FontWeight.w800),
       ),
     );
   }
 }
 
-class _InfoCard extends StatelessWidget {
-  const _InfoCard({required this.onPointsSystem});
-  final VoidCallback onPointsSystem;
+class _TabLabel extends StatelessWidget {
+  const _TabLabel({required this.text, required this.count});
+  final String text;
+  final int count;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF5F3FF),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE9D5FF)),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Icon(Icons.tips_and_updates, color: Color(0xFF6D28D9), size: 28),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('Puan sistemi', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
-                const SizedBox(height: 8),
-                const Text(
-                  'Başvurular ve kurslar puanlarını etkiler. Durumunu takip etmeyi unutma.',
-                  style: TextStyle(color: Color(0xFF4B5563), fontWeight: FontWeight.w600),
-                ),
-                const SizedBox(height: 12),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: OutlinedButton.icon(
-                    onPressed: onPointsSystem,
-                    icon: const Icon(Icons.track_changes_outlined),
-                    label: const Text('Puan Sistemini Gör'),
-                  ),
-                ),
-              ],
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(text),
+        if (count > 0) ...[
+          const SizedBox(width: 6),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF3F4F6),
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: Text(
+              '$count',
+              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Color(0xFF6B7280)),
             ),
           ),
         ],
-      ),
+      ],
     );
   }
 }

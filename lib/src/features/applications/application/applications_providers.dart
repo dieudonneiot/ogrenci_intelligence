@@ -17,12 +17,14 @@ final myApplicationsBundleProvider = FutureProvider.autoDispose<ApplicationsBund
   final repo = ref.read(applicationsRepositoryProvider);
 
   final results = await Future.wait<List<ApplicationListItem>>([
+    repo.fetchMyJobApplications(userId: uid),
     repo.fetchMyInternshipApplications(userId: uid),
     repo.fetchMyCourseApplications(userId: uid),
   ]);
 
   return ApplicationsBundle(
-    internships: results[0],
-    courses: results[1],
+    jobs: results[0],
+    internships: results[1],
+    courses: results[2],
   );
 });
