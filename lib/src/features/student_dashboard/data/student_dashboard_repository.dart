@@ -44,7 +44,7 @@ class StudentDashboardRepository {
 
   Future<_Counts> getCounts(String uid) async {
     final completedRows = await _client
-        .from('completed_courses')
+        .from('completed_at')
         .select('id')
         .eq('user_id', uid) as List<dynamic>;
 
@@ -60,13 +60,13 @@ class StudentDashboardRepository {
     }).length;
 
     final jobPending = await _client
-        .from('job_applications')
+        .from('applied_at')
         .select('id')
         .eq('user_id', uid)
         .eq('status', 'pending') as List<dynamic>;
 
     final internshipPending = await _client
-        .from('internship_applications')
+        .from('applied_at')
         .select('id')
         .eq('user_id', uid)
         .eq('status', 'pending') as List<dynamic>;
@@ -132,7 +132,7 @@ class StudentDashboardRepository {
     // 1) Points ledger
     final pointsRows = await _client
         .from('user_points')
-        .select('points,event_type,description,created_at')
+        .select('points,source,description,created_at')
         .eq('user_id', uid)
         .order('created_at', ascending: false)
         .limit(10) as List<dynamic>;
@@ -140,7 +140,7 @@ class StudentDashboardRepository {
     for (final r in pointsRows) {
       final m = r as Map<String, dynamic>;
       final pts = (m['points'] as num?)?.toInt() ?? 0;
-      final type = (m['event_type'] as String?) ?? '';
+      final type = (m['source'] as String?) ?? '';
       final desc = (m['description'] as String?) ?? 'Puan kazanıldı';
       final created = DateTime.tryParse(m['created_at']?.toString() ?? '') ?? DateTime.now();
 
@@ -154,7 +154,7 @@ class StudentDashboardRepository {
 
     // 2) Course completions
     final completedRows = await _client
-        .from('completed_courses')
+        .from('completed_at')
         .select('created_at,courses(title)')
         .eq('user_id', uid)
         .order('created_at', ascending: false)
@@ -176,7 +176,7 @@ class StudentDashboardRepository {
 
     // 3) Job applications
     final jobRows = await _client
-        .from('job_applications')
+        .from('applied_at')
         .select('created_at,status,jobs(title)')
         .eq('user_id', uid)
         .order('created_at', ascending: false)
@@ -198,7 +198,7 @@ class StudentDashboardRepository {
 
     // 4) Internship applications
     final internRows = await _client
-        .from('internship_applications')
+        .from('applied_at')
         .select('created_at,status,internships(title)')
         .eq('user_id', uid)
         .order('created_at', ascending: false)
