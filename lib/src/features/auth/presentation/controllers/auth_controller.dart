@@ -150,10 +150,22 @@ class AuthActionController extends StateNotifier<bool> {
     }
   }
 
-  Future<String?> signUp(String email, String password, String fullName) async {
+  Future<String?> signUp({
+    required String email,
+    required String password,
+    required String fullName,
+    Map<String, dynamic>? metadata,
+    String? redirectTo,
+  }) async {
     try {
       state = true;
-      await _repo.signUp(email: email, password: password, fullName: fullName);
+      await _repo.signUp(
+        email: email,
+        password: password,
+        fullName: fullName,
+        metadata: metadata,
+        emailRedirectTo: redirectTo,
+      );
       return null;
     } on AuthException catch (e) {
       return e.message;

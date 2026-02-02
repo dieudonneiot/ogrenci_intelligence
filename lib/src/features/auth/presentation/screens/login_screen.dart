@@ -80,6 +80,11 @@ Future<void> _submit() async {
     setState(() => _error = 'Please fill in all fields.');
     return;
   }
+  final emailRegex = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
+  if (!emailRegex.hasMatch(email)) {
+    setState(() => _error = 'Please enter a valid email address.');
+    return;
+  }
 
   final err = await ref
       .read(authActionLoadingProvider.notifier)

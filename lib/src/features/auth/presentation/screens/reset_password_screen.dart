@@ -12,10 +12,12 @@ class ResetPasswordScreen extends ConsumerStatefulWidget {
 
 class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
   final _password = TextEditingController();
+  final _confirm = TextEditingController();
 
   @override
   void dispose() {
     _password.dispose();
+    _confirm.dispose();
     super.dispose();
   }
 
@@ -37,13 +39,38 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
               ),
             ),
             const SizedBox(height: 12),
+            TextField(
+              controller: _confirm,
+              obscureText: true,
+              decoration: const InputDecoration(
+                labelText: 'Confirm password',
+              ),
+            ),
+            const SizedBox(height: 12),
             ElevatedButton(
               onPressed: busy
                   ? null
                   : () async {
+                      final password = _password.text.trim();
+                      final confirm = _confirm.text.trim();
+
+                      if (password.length < 6) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Password must be at least 6 characters.')),
+                        );
+                        return;
+                      }
+
+                      if (password != confirm) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Passwords do not match.')),
+                        );
+                        return;
+                      }
+
                       final err = await ref
                           .read(authActionLoadingProvider.notifier)
-                          .updatePassword(_password.text.trim());
+                          .updatePassword(password);
                       if (!context.mounted) return;
 
                       ScaffoldMessenger.of(context).showSnackBar(

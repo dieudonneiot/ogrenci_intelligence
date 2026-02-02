@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../../core/config/env.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../../core/supabase/supabase_service.dart';
 import '../controllers/auth_controller.dart';
@@ -99,6 +101,11 @@ class _CompanyAuthScreenState extends ConsumerState<CompanyAuthScreen> {
       _snack('Lütfen tüm alanları doldurun', error: true);
       return;
     }
+    final emailRegex = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
+    if (!emailRegex.hasMatch(email)) {
+      _snack('Please enter a valid email address.', error: true);
+      return;
+    }
 
     setState(() {
       _error = null;
@@ -163,6 +170,12 @@ class _CompanyAuthScreenState extends ConsumerState<CompanyAuthScreen> {
       return;
     }
 
+    final emailRegex = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
+    if (!emailRegex.hasMatch(email)) {
+      _snack('Please enter a valid email address.', error: true);
+      return;
+    }
+
     if (pass.length < 6) {
       _snack('Şifre en az 6 karakter olmalıdır', error: true);
       return;
@@ -173,6 +186,7 @@ class _CompanyAuthScreenState extends ConsumerState<CompanyAuthScreen> {
       _loading = true;
     });
 
+    String? companyId;
     try {
       final client = SupabaseService.client;
 
@@ -189,27 +203,17 @@ class _CompanyAuthScreenState extends ConsumerState<CompanyAuthScreen> {
       }
 
       // 2) Create auth user (company user)
-      //
-      // React also sets user metadata user_type='company'.
-      // This is optional for our Flutter logic (we rely on company_users table),
-      // but we mirror it for parity.
-      final signUpRes = await client.auth.signUp(
+      final repo = ref.read(authRepositoryProvider);
+      final user = await repo.signUp(
         email: email,
         password: pass,
-        data: {
-          'full_name': companyName,
-          'user_type': 'company',
-        },
+        fullName: companyName,
+        metadata: const {'user_type': 'company'},
+        emailRedirectTo: Env.deepLinkCallback.toString(),
       );
 
-      final user = signUpRes.user;
-      if (user == null) {
-        _snack('Kullanıcı oluşturulamadı', error: true);
-        return;
-      }
-
       // 3) Create company row
-      final nowIso = DateTime.now().toIso8601String();
+      final nowIso = DateTime.now().toUtc().toIso8601String();
       final createdCompany = await client
           .from('companies')
           .insert({
@@ -219,6 +223,7 @@ class _CompanyAuthScreenState extends ConsumerState<CompanyAuthScreen> {
             'phone': phone,
             'city': city,
             'address': address.isEmpty ? null : address,
+            'email': email,
             'verified': false,
             'created_at': nowIso,
             'updated_at': nowIso,
@@ -226,16 +231,15 @@ class _CompanyAuthScreenState extends ConsumerState<CompanyAuthScreen> {
           .select('id')
           .single();
 
-      final companyId = createdCompany['id'] as String;
+      companyId = createdCompany['id'] as String;
 
-      // 4) Link user to company in company_users
-      await client.from('company_users').insert({
-        'company_id': companyId,
-        'user_id': user.id,
-        'role': 'owner',
-        'permissions': ['all'],
-        'created_at': nowIso,
-      });
+      // 4) Link user to company in company_users (retry on FK timing)
+      await _insertCompanyUserWithRetry(
+        client: client,
+        companyId: companyId,
+        userId: user.id,
+        createdAt: nowIso,
+      );
 
       _snack('Kayıt başarılı! Lütfen email adresinizi doğrulayın.');
       if (!mounted) return;
@@ -244,15 +248,61 @@ class _CompanyAuthScreenState extends ConsumerState<CompanyAuthScreen> {
       setState(() => _isLogin = true);
 
       // Optional: route to email verification page (recommended UX)
-      context.go(Uri(path: Routes.emailVerification, queryParameters: {'email': email}).toString());
+      context.go(
+        Uri(path: Routes.emailVerification, queryParameters: {'email': email})
+            .toString(),
+      );
+    } on PostgrestException catch (e) {
+      if (companyId != null) {
+        try {
+          await SupabaseService.client.from('companies').delete().eq('id', companyId);
+        } catch (_) {}
+      }
+
+      if (e.code == '23503') {
+        setState(() => _error =
+            'Account was created but not fully linked yet. Please verify your email and try again.');
+      } else {
+        setState(() => _error = 'Bir hata oluştu: ${e.message}');
+      }
     } catch (e) {
-      // Important note:
-      // React attempted supabase.auth.admin.deleteUser(...) on failure.
-      // That’s NOT safe/possible from a client without service_role.
-      // So here we show the error and leave cleanup to backend/admin tools.
+      if (companyId != null) {
+        try {
+          await SupabaseService.client.from('companies').delete().eq('id', companyId);
+        } catch (_) {}
+      }
       setState(() => _error = 'Bir hata oluştu: $e');
     } finally {
       if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _insertCompanyUserWithRetry({
+    required SupabaseClient client,
+    required String companyId,
+    required String userId,
+    required String createdAt,
+  }) async {
+    const maxAttempts = 3;
+    var attempt = 0;
+
+    while (true) {
+      try {
+        await client.from('company_users').insert({
+          'company_id': companyId,
+          'user_id': userId,
+          'role': 'owner',
+          'created_at': createdAt,
+        });
+        return;
+      } on PostgrestException catch (e) {
+        attempt += 1;
+        if (e.code == '23503' && attempt < maxAttempts) {
+          await Future.delayed(Duration(milliseconds: 300 * attempt));
+          continue;
+        }
+        rethrow;
+      }
     }
   }
 

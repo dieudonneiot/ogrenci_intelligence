@@ -55,28 +55,6 @@ class _AdminSetupScreenState extends State<AdminSetupScreen> {
         return;
       }
 
-      try {
-        final authUsers = await SupabaseService.client
-            .from('auth.users')
-            .select('raw_user_meta_data')
-            .eq('raw_user_meta_data->>user_type', 'admin');
-
-        if ((authUsers as List).isNotEmpty) {
-          _hasAdmins = true;
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Sistemde admin kullanıcı mevcut')),
-            );
-            context.go(Routes.home);
-          }
-          return;
-        }
-      } catch (_) {
-        if (mounted) {
-          context.go(Routes.home);
-        }
-        return;
-      }
     } catch (_) {
       if (mounted) {
         context.go(Routes.home);
@@ -128,6 +106,7 @@ class _AdminSetupScreenState extends State<AdminSetupScreen> {
         email: email,
         password: password,
         data: {'user_type': 'admin', 'name': name},
+        emailRedirectTo: Env.deepLinkCallback.toString(),
       );
 
       final user = res.user;
@@ -153,7 +132,7 @@ class _AdminSetupScreenState extends State<AdminSetupScreen> {
         });
       } catch (e) {
         try {
-          await SupabaseService.client.auth.admin.deleteUser(user.id);
+          await SupabaseService.client.auth.signOut();
         } catch (_) {}
         rethrow;
       }
@@ -162,6 +141,14 @@ class _AdminSetupScreenState extends State<AdminSetupScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Admin hesabı başarıyla oluşturuldu!')),
       );
+
+      if (user.emailConfirmedAt == null) {
+        context.go(
+          Uri(path: Routes.emailVerification, queryParameters: {'email': email})
+              .toString(),
+        );
+        return;
+      }
 
       final signInRes = await SupabaseService.client.auth.signInWithPassword(
         email: email,

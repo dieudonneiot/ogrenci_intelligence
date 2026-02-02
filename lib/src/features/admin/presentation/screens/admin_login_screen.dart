@@ -28,6 +28,19 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
   }
 
   Future<void> _submit() async {
+    final email = _emailCtrl.text.trim();
+    final password = _passwordCtrl.text.trim();
+    final emailRegex = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
+
+    if (email.isEmpty || password.isEmpty) {
+      setState(() => _error = 'Email and password are required.');
+      return;
+    }
+    if (!emailRegex.hasMatch(email)) {
+      setState(() => _error = 'Please enter a valid email address.');
+      return;
+    }
+
     setState(() {
       _loading = true;
       _error = null;
@@ -35,13 +48,19 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
 
     try {
       final res = await SupabaseService.client.auth.signInWithPassword(
-        email: _emailCtrl.text.trim(),
-        password: _passwordCtrl.text.trim(),
+        email: email,
+        password: password,
       );
 
       final user = res.user;
       if (user == null) {
         _error = 'Giriş başarısız';
+        return;
+      }
+
+      if (user.emailConfirmedAt == null) {
+        await SupabaseService.client.auth.signOut();
+        _error = 'Please verify your email address.';
         return;
       }
 

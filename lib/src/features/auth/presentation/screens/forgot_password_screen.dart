@@ -27,7 +27,15 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     setState(() => _error = null);
 
     final email = _email.text.trim();
-    if (email.isEmpty) return;
+    if (email.isEmpty) {
+      setState(() => _error = 'Email is required.');
+      return;
+    }
+    final emailRegex = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
+    if (!emailRegex.hasMatch(email)) {
+      setState(() => _error = 'Please enter a valid email address.');
+      return;
+    }
 
     final err = await ref.read(authActionLoadingProvider.notifier).resetPassword(email);
 

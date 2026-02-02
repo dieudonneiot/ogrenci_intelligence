@@ -423,7 +423,7 @@ class _ProfileInfoCard extends StatelessWidget {
                     children: [
                       Expanded(
                         child: DropdownButtonFormField<String>(
-                          value: tempDepartment.isEmpty ? null : tempDepartment,
+                          initialValue: tempDepartment.isEmpty ? null : tempDepartment,
                           decoration: InputDecoration(
                             hintText: 'Bölüm seçiniz',
                             contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),

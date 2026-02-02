@@ -39,11 +39,17 @@ class AuthRepository {
     required String email,
     required String password,
     required String fullName,
+    Map<String, dynamic>? metadata,
+    String? emailRedirectTo,
   }) async {
+    final data = <String, dynamic>{...?(metadata)};
+    data['full_name'] = fullName;
+
     final res = await _client.auth.signUp(
       email: email,
       password: password,
-      data: {'full_name': fullName},
+      data: data,
+      emailRedirectTo: emailRedirectTo,
     );
 
     final user = res.user;
@@ -103,7 +109,7 @@ class AuthRepository {
     final row = await _client
         .from('company_users')
         .select('company_id, role')
-        .eq('id', userId)
+        .eq('user_id', userId)
         .maybeSingle();
 
     if (row == null) return null;

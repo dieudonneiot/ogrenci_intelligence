@@ -721,7 +721,7 @@ class _PrefTile extends StatelessWidget {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeColor: const Color(0xFF6D28D9),
+            activeThumbColor: const Color(0xFF6D28D9),
           ),
         ],
       ),

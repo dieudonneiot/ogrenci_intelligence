@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/config/env.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../../core/supabase/supabase_service.dart';
 import '../controllers/auth_controller.dart';
@@ -61,6 +62,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   bool _validate() {
     setState(() => _error = null);
 
+    final email = _email.text.trim();
+    final emailRegex = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
+    if (email.isEmpty || !emailRegex.hasMatch(email)) {
+      setState(() => _error = 'Please enter a valid email address.');
+      return false;
+    }
     if (_password.text != _confirm.text) {
       setState(() => _error = 'Passwords do not match.');
       return false;
@@ -93,7 +100,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
     final err = await ref
         .read(authActionLoadingProvider.notifier)
-        .signUp(email, pass, fullName);
+        .signUp(
+          email: email,
+          password: pass,
+          fullName: fullName,
+          metadata: const {'user_type': 'student'},
+          redirectTo: Env.deepLinkCallback.toString(),
+        );
 
     if (!mounted) return;
 
