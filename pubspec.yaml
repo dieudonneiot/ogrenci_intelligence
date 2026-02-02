@@ -40,7 +40,7 @@ dependencies:
   go_router: ^17.0.0
   flutter_riverpod: ^2.6.1
   supabase_flutter: ^2.12.0
-  flutter_dotenv: ^5.2.1
+  flutter_dotenv: ^6.0.0
 
   # UI/UX helpers
   flutter_svg: ^2.0.10+1
@@ -59,7 +59,7 @@ dev_dependencies:
   freezed: ^3.2.0
   freezed_annotation: ^3.1.0
   json_serializable: ^6.8.0
-  json_annotation: ^4.9.0
+  json_annotation: ^4.10.0
 
   # Linting (Note: 'flutter_lints' is a DEV dependency)
   flutter_lints: ^6.0.0
