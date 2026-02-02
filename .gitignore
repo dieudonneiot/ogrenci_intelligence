@@ -175,3 +175,6 @@ app.*.symbols
 # Local SQL files and unzipped React reference
 docs/sql/
 React_src/
+
+# Supabase edge function (local only)
+supabase/functions/chatbot/

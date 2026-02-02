@@ -89,6 +89,7 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
       _NavItem('Kurslar', Routes.courses),
       _NavItem('İş İlanları', Routes.jobs),
       _NavItem('Stajlar', Routes.internships),
+      _NavItem('Chat', Routes.chat),
     ];
 
     final companyMenu = const <_NavItem>[
@@ -103,6 +104,7 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
     final studentDropdown = const <_NavItem>[
       _NavItem('Profilim', Routes.profile),
       _NavItem('Dashboard', Routes.dashboard),
+      _NavItem('Kariyer Asistani', Routes.chat),
       _NavItem('Başvurularım', Routes.applications),
       _NavItem('Favorilerim', Routes.favorites),
       _NavItem('Bildirimler', Routes.notifications),

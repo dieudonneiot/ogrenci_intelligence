@@ -197,6 +197,12 @@ class _StudentDashboardScreenState extends ConsumerState<StudentDashboardScreen>
 
                         const SizedBox(height: 18),
 
+                        _ChatAssistantCard(
+                          onStartChat: () => context.go(Routes.chat),
+                        ),
+
+                        const SizedBox(height: 18),
+
                         LayoutBuilder(
                           builder: (_, c) {
                             final isWide = c.maxWidth >= 1024;
@@ -479,6 +485,150 @@ class _PointsHero extends StatelessWidget {
                 children: items.map((e) => SizedBox(width: (c.maxWidth - 10) / 2, child: e)).toList(),
               );
             },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ChatAssistantCard extends StatelessWidget {
+  const _ChatAssistantCard({required this.onStartChat});
+
+  final VoidCallback onStartChat;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(18),
+        gradient: const LinearGradient(
+          colors: [Color(0xFF8B5CF6), Color(0xFF4F46E5)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        boxShadow: const [BoxShadow(color: Color(0x22000000), blurRadius: 18, offset: Offset(0, 10))],
+      ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final isWide = constraints.maxWidth >= 780;
+
+          final left = Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 52,
+                height: 52,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: const Icon(Icons.smart_toy_outlined, color: Colors.white, size: 30),
+              ),
+              const SizedBox(width: 14),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Kariyer Asistani',
+                      style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900),
+                    ),
+                    SizedBox(height: 6),
+                    Text(
+                      'CV, staj ve mulakat sorularinda hizli destek al.',
+                      style: TextStyle(color: Color(0xDDFFFFFF), fontWeight: FontWeight.w600),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          );
+
+          final bullets = Wrap(
+            spacing: 12,
+            runSpacing: 10,
+            children: const [
+              _ChatChip(icon: Icons.description_outlined, label: 'CV ozellestirme'),
+              _ChatChip(icon: Icons.work_outline, label: 'Staj basvurulari'),
+              _ChatChip(icon: Icons.mic_none, label: 'Mulakat hazirligi'),
+            ],
+          );
+
+          final button = SizedBox(
+            height: 44,
+            child: ElevatedButton.icon(
+              onPressed: onStartChat,
+              icon: const Icon(Icons.chat_bubble_outline),
+              label: const Text('Sohbete Basla', style: TextStyle(fontWeight: FontWeight.w900)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: const Color(0xFF5B21B6),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                elevation: 0,
+              ),
+            ),
+          );
+
+          if (!isWide) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                left,
+                const SizedBox(height: 14),
+                bullets,
+                const SizedBox(height: 14),
+                button,
+              ],
+            );
+          }
+
+          return Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    left,
+                    const SizedBox(height: 14),
+                    bullets,
+                  ],
+                ),
+              ),
+              const SizedBox(width: 16),
+              button,
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _ChatChip extends StatelessWidget {
+  const _ChatChip({required this.icon, required this.label});
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: Colors.white.withOpacity(0.25)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: Colors.white),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 12),
           ),
         ],
       ),

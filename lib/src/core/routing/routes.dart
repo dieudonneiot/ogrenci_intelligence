@@ -27,6 +27,7 @@ class Routes {
   static const notifications = '/notifications';
   static const leaderboard = '/leaderboard';
   static const pointsSystem = '/points-system';
+  static const chat = '/chat';
   static const debug = '/debug';
 
   // Footer pages (public)

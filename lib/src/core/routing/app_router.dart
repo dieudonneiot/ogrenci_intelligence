@@ -37,6 +37,7 @@ import '../../features/company/presentation/screens/company_profile_screen.dart'
 import '../../features/company/presentation/screens/company_reports_screen.dart';
 import '../../features/company/presentation/screens/register_company_screen.dart';
 import '../../features/company/presentation/widgets/company_status_check.dart';
+import '../../features/chat/presentation/screens/chat_screen.dart';
 import '../../features/courses/presentation/screens/course_detail_screen.dart';
 import '../../features/courses/presentation/screens/courses_screen.dart';
 import '../../features/favorites/presentation/screens/favorites_screen.dart';
@@ -256,6 +257,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             path: Routes.dashboard,
             builder: (context, state) => const StudentDashboardScreen(),
           ),
+          GoRoute(
+            path: Routes.chat,
+            builder: (context, _) => const ChatScreen(),
+          ),
 
           // Footer pages (public)
           GoRoute(
@@ -437,15 +442,15 @@ class GoRouterRefreshNotifier extends ChangeNotifier {
 }
 
 /// Main Shell (React-like Navbar + Footer)
-class MainShell extends StatefulWidget {
+class MainShell extends ConsumerStatefulWidget {
   const MainShell({super.key, required this.child});
   final Widget child;
 
   @override
-  State<MainShell> createState() => _MainShellState();
+  ConsumerState<MainShell> createState() => _MainShellState();
 }
 
-class _MainShellState extends State<MainShell> {
+class _MainShellState extends ConsumerState<MainShell> {
   bool _showFooter = false;
 
   double _footerHeightForWidth(double width) {
@@ -456,9 +461,14 @@ class _MainShellState extends State<MainShell> {
 
   @override
   Widget build(BuildContext context) {
+    final authAsync = ref.watch(authViewStateProvider);
+    final auth = authAsync.value;
+    final isStudent = auth?.isAuthenticated == true && auth?.userType == UserType.student;
+
     return LayoutBuilder(
       builder: (context, constraints) {
         final footerHeight = _footerHeightForWidth(constraints.maxWidth);
+        final chatBottom = _showFooter ? footerHeight + 18.0 : 18.0;
 
         return Scaffold(
           // ✅ No AppBar (we reproduce React navbar)
@@ -502,10 +512,63 @@ class _MainShellState extends State<MainShell> {
                   ),
                 ),
               ),
+              if (isStudent)
+                Positioned(
+                  right: 18,
+                  bottom: chatBottom,
+                  child: _ChatFab(
+                    onTap: () => context.go(Routes.chat),
+                  ),
+                ),
             ],
           ),
         );
       },
+    );
+  }
+}
+
+class _ChatFab extends StatefulWidget {
+  const _ChatFab({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  State<_ChatFab> createState() => _ChatFabState();
+}
+
+class _ChatFabState extends State<_ChatFab> {
+  bool _hover = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hover = true),
+      onExit: (_) => setState(() => _hover = false),
+      child: AnimatedScale(
+        duration: const Duration(milliseconds: 120),
+        scale: _hover ? 1.05 : 1.0,
+        child: InkWell(
+          onTap: widget.onTap,
+          borderRadius: BorderRadius.circular(999),
+          child: Container(
+            width: 58,
+            height: 58,
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                colors: [Color(0xFF7C3AED), Color(0xFF4F46E5)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              boxShadow: [
+                BoxShadow(color: Color(0x33000000), blurRadius: 16, offset: Offset(0, 8)),
+              ],
+            ),
+            child: const Icon(Icons.chat_bubble_outline, color: Colors.white),
+          ),
+        ),
+      ),
     );
   }
 }

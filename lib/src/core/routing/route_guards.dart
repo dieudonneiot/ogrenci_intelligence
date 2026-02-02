@@ -14,6 +14,7 @@ class RouteGuards {
     Routes.profile,
     Routes.dashboard,
     Routes.settings,
+    Routes.chat,
     Routes.debug,
   ];
 
