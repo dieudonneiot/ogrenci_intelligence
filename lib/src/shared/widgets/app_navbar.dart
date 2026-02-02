@@ -600,25 +600,25 @@ class _ProfileDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PopupMenuButton<_NavItem?>(
+    return PopupMenuButton<_MenuAction>(
       tooltip: 'Profil Menüsü',
       offset: const Offset(0, 12),
       onSelected: (selected) async {
-        if (selected == null) {
+        if (selected.isLogout) {
           await onLogout();
         } else {
-          onItemTap(selected.path);
+          onItemTap(selected.path!);
         }
       },
       itemBuilder: (context) => [
         for (final it in items)
-          PopupMenuItem<_NavItem?>(
-            value: it,
+          PopupMenuItem<_MenuAction>(
+            value: _MenuAction.nav(it.path),
             child: Text(it.label),
           ),
         const PopupMenuDivider(),
-        const PopupMenuItem<_NavItem?>(
-          value: null,
+        const PopupMenuItem<_MenuAction>(
+          value: _MenuAction.logout(),
           child: Text(
             'Çıkış Yap',
             style: TextStyle(color: Colors.red),
@@ -629,9 +629,13 @@ class _ProfileDropdown extends StatelessWidget {
         children: [
           Icon(isCompany ? Icons.apartment : Icons.person, size: 18, color: const Color(0xFF374151)),
           const SizedBox(width: 8),
-          Text(
-            userName,
-            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Color(0xFF374151)),
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 160),
+            child: Text(
+              userName,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Color(0xFF374151)),
+            ),
           ),
           if (isCompany) ...[
             const SizedBox(width: 8),
@@ -653,6 +657,16 @@ class _ProfileDropdown extends StatelessWidget {
       ),
     );
   }
+}
+
+class _MenuAction {
+  const _MenuAction._({this.path, required this.isLogout});
+
+  const _MenuAction.nav(String path) : this._(path: path, isLogout: false);
+  const _MenuAction.logout() : this._(isLogout: true);
+
+  final String? path;
+  final bool isLogout;
 }
 
 // --------------------

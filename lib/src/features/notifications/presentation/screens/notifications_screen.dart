@@ -70,19 +70,50 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.notifications, color: Color(0xFF6D28D9), size: 28),
-                      const SizedBox(width: 10),
-                      const Text('Bildirimler', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900)),
-                      const Spacer(),
-                      if (unreadCount > 0)
-                        TextButton.icon(
-                          onPressed: _markAllAsRead,
-                          icon: const Icon(Icons.check, size: 16),
-                          label: const Text('Tümünü Okundu İşaretle'),
-                        ),
-                    ],
+                  LayoutBuilder(
+                    builder: (_, c) {
+                      final stacked = c.maxWidth < 640;
+                      final titleRow = Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 10,
+                        children: const [
+                          Icon(Icons.notifications, color: Color(0xFF6D28D9), size: 28),
+                          Text(
+                            'Bildirimler',
+                            style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900),
+                          ),
+                        ],
+                      );
+
+                      final action = unreadCount > 0
+                          ? TextButton.icon(
+                              onPressed: _markAllAsRead,
+                              icon: const Icon(Icons.check, size: 16),
+                              label: const Text('Tümünü Okundu İşaretle'),
+                            )
+                          : const SizedBox.shrink();
+
+                      if (stacked) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            titleRow,
+                            if (unreadCount > 0) ...[
+                              const SizedBox(height: 8),
+                              action,
+                            ],
+                          ],
+                        );
+                      }
+
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          titleRow,
+                          action,
+                        ],
+                      );
+                    },
                   ),
                   const SizedBox(height: 10),
                   if (unreadCount > 0)
@@ -93,10 +124,11 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: const Color(0xFFE9D5FF)),
                       ),
-                      child: Row(
+                      child: Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 10,
                         children: [
                           const Icon(Icons.notifications_active, color: Color(0xFF6D28D9)),
-                          const SizedBox(width: 10),
                           Text(
                             '$unreadCount okunmamış bildirim',
                             style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF6D28D9)),
@@ -312,7 +344,9 @@ class _FilterTabs extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: const Color(0xFFE5E7EB)),
       ),
-      child: Row(
+      child: Wrap(
+        spacing: 6,
+        runSpacing: 6,
         children: [
           _TabButton(
             label: 'Tümü ($total)',

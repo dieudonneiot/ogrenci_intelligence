@@ -116,12 +116,13 @@ class _AuthedPointsView extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(color: const Color(0xFFE5E7EB)),
                 ),
-                child: const TabBar(
-                  labelColor: Color(0xFF111827),
-                  unselectedLabelColor: Color(0xFF6B7280),
-                  labelStyle: TextStyle(fontWeight: FontWeight.w900),
-                  indicatorColor: Color(0xFF6D28D9),
-                  tabs: [
+                child: TabBar(
+                  isScrollable: true,
+                  labelColor: const Color(0xFF111827),
+                  unselectedLabelColor: const Color(0xFF6B7280),
+                  labelStyle: const TextStyle(fontWeight: FontWeight.w900),
+                  indicatorColor: const Color(0xFF6D28D9),
+                  tabs: const [
                     Tab(text: 'Geçmiş'),
                     Tab(text: 'Ödüller'),
                     Tab(text: 'Rozetler'),

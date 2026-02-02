@@ -1,4 +1,6 @@
 // lib/src/features/auth/presentation/screens/forgot_password_screen.dart
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -16,11 +18,28 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   final _email = TextEditingController();
   bool _submitted = false;
   String? _error;
+  Timer? _timer;
+  int _cooldown = 0;
 
   @override
   void dispose() {
     _email.dispose();
+    _timer?.cancel();
     super.dispose();
+  }
+
+  void _startCooldown(int seconds) {
+    _timer?.cancel();
+    setState(() => _cooldown = seconds);
+    _timer = Timer.periodic(const Duration(seconds: 1), (t) {
+      if (!mounted) return;
+      if (_cooldown <= 1) {
+        t.cancel();
+        setState(() => _cooldown = 0);
+      } else {
+        setState(() => _cooldown -= 1);
+      }
+    });
   }
 
   Future<void> _submit() async {
@@ -36,14 +55,24 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
       setState(() => _error = 'Please enter a valid email address.');
       return;
     }
+    if (_cooldown > 0) {
+      setState(() => _error = 'Please wait $_cooldown seconds before requesting again.');
+      return;
+    }
 
     final err = await ref.read(authActionLoadingProvider.notifier).resetPassword(email);
 
     if (!mounted) return;
 
     if (err != null) {
-      setState(() => _error = err);
+      if (err.toLowerCase().contains('rate_limit')) {
+        _startCooldown(60);
+        setState(() => _error = 'Too many requests. Please wait a minute and try again.');
+      } else {
+        setState(() => _error = err);
+      }
     } else {
+      _startCooldown(60);
       setState(() => _submitted = true);
     }
   }
@@ -92,6 +121,13 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                           textAlign: TextAlign.center,
                         ),
                       ),
+                      if (_cooldown > 0) ...[
+                        const SizedBox(height: 12),
+                        Text(
+                          'You can request another email in $_cooldown seconds.',
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
                       const SizedBox(height: 14),
                       TextButton(
                         onPressed: () => context.go(Routes.login),

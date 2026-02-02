@@ -35,6 +35,7 @@
 .env
 # Ignore all .txt files in root directory only
 /*.txt
+/*.sql
 
 # But keep CMakeLists.txt files
 !**/CMakeLists.txt

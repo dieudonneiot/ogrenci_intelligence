@@ -172,6 +172,7 @@ class _ApplicationsScreenState extends ConsumerState<ApplicationsScreen> with Si
                           ),
                           child: TabBar(
                             controller: _tabs,
+                            isScrollable: true,
                             labelColor: const Color(0xFF111827),
                             unselectedLabelColor: const Color(0xFF6B7280),
                             labelStyle: const TextStyle(fontWeight: FontWeight.w900),

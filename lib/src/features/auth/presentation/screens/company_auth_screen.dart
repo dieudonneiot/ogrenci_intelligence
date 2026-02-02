@@ -132,7 +132,12 @@ class _CompanyAuthScreenState extends ConsumerState<CompanyAuthScreen> {
         return;
       }
 
-      final membership = await repo.fetchCompanyMembership(user.id);
+      var membership = await repo.fetchCompanyMembership(user.id);
+      if (membership == null) {
+        await _tryCreateCompanyFromMetadata();
+        membership = await repo.fetchCompanyMembership(user.id);
+      }
+
       if (membership == null) {
         await repo.signOut();
         setState(() => _error = 'Bu hesap bir işletme hesabı değil');
@@ -186,11 +191,10 @@ class _CompanyAuthScreenState extends ConsumerState<CompanyAuthScreen> {
       _loading = true;
     });
 
-    String? companyId;
     try {
       final client = SupabaseService.client;
 
-      // 1) Tax number uniqueness check
+      // 1) Tax number uniqueness check (early UX, final guard is RPC/DB)
       final existing = await client
           .from('companies')
           .select('id')
@@ -202,44 +206,26 @@ class _CompanyAuthScreenState extends ConsumerState<CompanyAuthScreen> {
         return;
       }
 
-      // 2) Create auth user (company user)
+      // 2) Create auth user + store company metadata in auth.users
       final repo = ref.read(authRepositoryProvider);
-      final user = await repo.signUp(
+      await repo.signUp(
         email: email,
         password: pass,
         fullName: companyName,
-        metadata: const {'user_type': 'company'},
+        metadata: {
+          'user_type': 'company',
+          'company_name': companyName,
+          'company_sector': sector,
+          'company_city': city,
+          'company_tax_number': tax,
+          'company_phone': phone,
+          'company_address': address,
+        },
         emailRedirectTo: Env.deepLinkCallback.toString(),
       );
 
-      // 3) Create company row
-      final nowIso = DateTime.now().toUtc().toIso8601String();
-      final createdCompany = await client
-          .from('companies')
-          .insert({
-            'name': companyName,
-            'sector': sector,
-            'tax_number': tax,
-            'phone': phone,
-            'city': city,
-            'address': address.isEmpty ? null : address,
-            'email': email,
-            'verified': false,
-            'created_at': nowIso,
-            'updated_at': nowIso,
-          })
-          .select('id')
-          .single();
-
-      companyId = createdCompany['id'] as String;
-
-      // 4) Link user to company in company_users (retry on FK timing)
-      await _insertCompanyUserWithRetry(
-        client: client,
-        companyId: companyId,
-        userId: user.id,
-        createdAt: nowIso,
-      );
+      // 3) Try to create company via RPC (only if session exists)
+      await _tryCreateCompanyFromMetadata();
 
       _snack('Kayıt başarılı! Lütfen email adresinizi doğrulayın.');
       if (!mounted) return;
@@ -253,12 +239,6 @@ class _CompanyAuthScreenState extends ConsumerState<CompanyAuthScreen> {
             .toString(),
       );
     } on PostgrestException catch (e) {
-      if (companyId != null) {
-        try {
-          await SupabaseService.client.from('companies').delete().eq('id', companyId);
-        } catch (_) {}
-      }
-
       if (e.code == '23503') {
         setState(() => _error =
             'Account was created but not fully linked yet. Please verify your email and try again.');
@@ -266,43 +246,21 @@ class _CompanyAuthScreenState extends ConsumerState<CompanyAuthScreen> {
         setState(() => _error = 'Bir hata oluştu: ${e.message}');
       }
     } catch (e) {
-      if (companyId != null) {
-        try {
-          await SupabaseService.client.from('companies').delete().eq('id', companyId);
-        } catch (_) {}
-      }
       setState(() => _error = 'Bir hata oluştu: $e');
     } finally {
       if (mounted) setState(() => _loading = false);
     }
   }
 
-  Future<void> _insertCompanyUserWithRetry({
-    required SupabaseClient client,
-    required String companyId,
-    required String userId,
-    required String createdAt,
-  }) async {
-    const maxAttempts = 3;
-    var attempt = 0;
+  Future<void> _tryCreateCompanyFromMetadata() async {
+    final client = SupabaseService.client;
+    final session = client.auth.currentSession;
+    if (session == null) return;
 
-    while (true) {
-      try {
-        await client.from('company_users').insert({
-          'company_id': companyId,
-          'user_id': userId,
-          'role': 'owner',
-          'created_at': createdAt,
-        });
-        return;
-      } on PostgrestException catch (e) {
-        attempt += 1;
-        if (e.code == '23503' && attempt < maxAttempts) {
-          await Future.delayed(Duration(milliseconds: 300 * attempt));
-          continue;
-        }
-        rethrow;
-      }
+    try {
+      await client.rpc('create_company_for_current_user');
+    } catch (_) {
+      // Ignore here: we attempt again after login if needed.
     }
   }
 
@@ -514,28 +472,55 @@ class _CompanyAuthScreenState extends ConsumerState<CompanyAuthScreen> {
           hint: 'Şirket adınız',
         ),
         const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: _DarkDropdown(
-                label: 'Sektör *',
-                value: _regSector,
-                items: _sectors,
-                icon: Icons.work_outline,
-                onChanged: (v) => setState(() => _regSector = v),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _DarkDropdown(
-                label: 'Şehir *',
-                value: _regCity,
-                items: _cities,
-                icon: Icons.location_on_outlined,
-                onChanged: (v) => setState(() => _regCity = v),
-              ),
-            ),
-          ],
+        LayoutBuilder(
+          builder: (_, c) {
+            final stacked = c.maxWidth < 520;
+            if (stacked) {
+              return Column(
+                children: [
+                  _DarkDropdown(
+                    label: 'Sektör *',
+                    value: _regSector,
+                    items: _sectors,
+                    icon: Icons.work_outline,
+                    onChanged: (v) => setState(() => _regSector = v),
+                  ),
+                  const SizedBox(height: 12),
+                  _DarkDropdown(
+                    label: 'Şehir *',
+                    value: _regCity,
+                    items: _cities,
+                    icon: Icons.location_on_outlined,
+                    onChanged: (v) => setState(() => _regCity = v),
+                  ),
+                ],
+              );
+            }
+
+            return Row(
+              children: [
+                Expanded(
+                  child: _DarkDropdown(
+                    label: 'Sektör *',
+                    value: _regSector,
+                    items: _sectors,
+                    icon: Icons.work_outline,
+                    onChanged: (v) => setState(() => _regSector = v),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _DarkDropdown(
+                    label: 'Şehir *',
+                    value: _regCity,
+                    items: _cities,
+                    icon: Icons.location_on_outlined,
+                    onChanged: (v) => setState(() => _regCity = v),
+                  ),
+                ),
+              ],
+            );
+          },
         ),
         const SizedBox(height: 12),
         _DarkField(
