@@ -35,6 +35,8 @@ import '../../features/company/presentation/screens/company_jobs_screen.dart';
 import '../../features/company/presentation/screens/company_pricing_screen.dart';
 import '../../features/company/presentation/screens/company_profile_screen.dart';
 import '../../features/company/presentation/screens/company_reports_screen.dart';
+import '../../features/company/presentation/screens/register_company_screen.dart';
+import '../../features/company/presentation/widgets/company_status_check.dart';
 import '../../features/courses/presentation/screens/course_detail_screen.dart';
 import '../../features/courses/presentation/screens/courses_screen.dart';
 import '../../features/favorites/presentation/screens/favorites_screen.dart';
@@ -46,9 +48,16 @@ import '../../features/jobs/presentation/screens/jobs_screen.dart';
 import '../../features/leaderboard/presentation/screens/leaderboard_screen.dart';
 import '../../features/notifications/presentation/screens/notifications_screen.dart';
 import '../../features/points/presentation/screens/points_system_screen.dart';
+import '../../features/static_pages/presentation/screens/about_screen.dart';
+import '../../features/static_pages/presentation/screens/contact_screen.dart';
+import '../../features/static_pages/presentation/screens/how_it_works_screen.dart';
+import '../../features/static_pages/presentation/screens/privacy_policy_screen.dart';
+import '../../features/static_pages/presentation/screens/terms_of_service_screen.dart';
 import '../../features/student_dashboard/presentation/screens/student_dashboard_screen.dart';
+import '../../features/user/presentation/screens/database_debug_screen.dart';
 import '../../features/user/presentation/screens/user_profile_screen.dart';
 import '../../features/user/presentation/screens/user_settings_screen.dart';
+import '../../shared/widgets/app_footer.dart';
 import '../../shared/widgets/app_navbar.dart';
 import '../../shared/widgets/empty_state.dart';
 import 'route_guards.dart';
@@ -118,7 +127,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         Routes.forgotPassword,
         Routes.emailVerification,
         Routes.companyAuth,
-        Routes.companyRegister,
         Routes.adminLogin,
         Routes.adminSetup,
       };
@@ -241,8 +249,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: Routes.companyRegister,
-            builder: (context, _) =>
-                const CompanyAuthScreen(initialIsLogin: false),
+            builder: (context, _) => const RegisterCompanyScreen(),
           ),
 
           GoRoute(
@@ -253,26 +260,23 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           // Footer pages (public)
           GoRoute(
             path: Routes.howItWorks,
-            builder: (context, _) =>
-                const PlaceholderView(title: 'How It Works'),
+            builder: (context, _) => const HowItWorksScreen(),
           ),
           GoRoute(
             path: Routes.about,
-            builder: (context, _) => const PlaceholderView(title: 'About'),
+            builder: (context, _) => const AboutScreen(),
           ),
           GoRoute(
             path: Routes.contact,
-            builder: (context, _) => const PlaceholderView(title: 'Contact'),
+            builder: (context, _) => const ContactScreen(),
           ),
           GoRoute(
             path: Routes.privacy,
-            builder: (context, _) =>
-                const PlaceholderView(title: 'Privacy Policy'),
+            builder: (context, _) => const PrivacyPolicyScreen(),
           ),
           GoRoute(
             path: Routes.terms,
-            builder: (context, _) =>
-                const PlaceholderView(title: 'Terms of Service'),
+            builder: (context, _) => const TermsOfServiceScreen(),
           ),
           GoRoute(
             path: Routes.pointsSystem,
@@ -335,8 +339,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: Routes.debug,
-            builder: (context, _) =>
-                const PlaceholderView(title: 'Database Debug'),
+            builder: (context, _) => const DatabaseDebugScreen(),
           ),
 
           // Company protected
@@ -350,11 +353,15 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: Routes.companyJobsCreate,
-            builder: (context, _) => const CompanyJobFormScreen(),
+            builder: (context, _) => const CompanyStatusCheck(
+              child: CompanyJobFormScreen(),
+            ),
           ),
           GoRoute(
             path: Routes.companyJobsEdit,
-            builder: (_, s) => CompanyJobFormScreen(jobId: s.pathParameters['id']),
+            builder: (_, s) => CompanyStatusCheck(
+              child: CompanyJobFormScreen(jobId: s.pathParameters['id']),
+            ),
           ),
           GoRoute(
             path: Routes.companyJobApplications,
@@ -367,12 +374,15 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: Routes.companyInternshipsCreate,
-            builder: (context, _) => const CompanyInternshipFormScreen(),
+            builder: (context, _) => const CompanyStatusCheck(
+              child: CompanyInternshipFormScreen(),
+            ),
           ),
           GoRoute(
             path: Routes.companyInternshipsEdit,
-            builder: (_, s) =>
-                CompanyInternshipFormScreen(internshipId: s.pathParameters['id']),
+            builder: (_, s) => CompanyStatusCheck(
+              child: CompanyInternshipFormScreen(internshipId: s.pathParameters['id']),
+            ),
           ),
           GoRoute(
             path: Routes.companyInternshipApplications,
@@ -427,21 +437,75 @@ class GoRouterRefreshNotifier extends ChangeNotifier {
 }
 
 /// Main Shell (React-like Navbar + Footer)
-class MainShell extends StatelessWidget {
+class MainShell extends StatefulWidget {
   const MainShell({super.key, required this.child});
   final Widget child;
 
   @override
+  State<MainShell> createState() => _MainShellState();
+}
+
+class _MainShellState extends State<MainShell> {
+  bool _showFooter = false;
+
+  double _footerHeightForWidth(double width) {
+    if (width < 820) return 320;
+    if (width < 1100) return 260;
+    return 220;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      // ✅ No AppBar (we reproduce React navbar)
-      body: Column(
-        children: [
-          const AppNavbar(), // sticky-like top
-          Expanded(child: child),
-          const _Footer(),
-        ],
-      ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final footerHeight = _footerHeightForWidth(constraints.maxWidth);
+
+        return Scaffold(
+          // ✅ No AppBar (we reproduce React navbar)
+          body: Stack(
+            children: [
+              Positioned.fill(
+                child: Column(
+                  children: [
+                    const AppNavbar(), // sticky-like top
+                    Expanded(
+                      child: NotificationListener<ScrollNotification>(
+                        onNotification: (notification) {
+                          if (notification.metrics.axis != Axis.vertical) return false;
+                          final atBottom = notification.metrics.extentAfter <= 24;
+                          if (atBottom != _showFooter) {
+                            setState(() => _showFooter = atBottom);
+                          }
+                          return false;
+                        },
+                        child: AnimatedPadding(
+                          duration: const Duration(milliseconds: 180),
+                          curve: Curves.easeOut,
+                          padding: EdgeInsets.only(bottom: _showFooter ? footerHeight : 0),
+                          child: widget.child,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: IgnorePointer(
+                  ignoring: !_showFooter,
+                  child: AnimatedOpacity(
+                    duration: const Duration(milliseconds: 180),
+                    opacity: _showFooter ? 1 : 0,
+                    child: const AppFooter(),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
@@ -460,20 +524,3 @@ class AdminShell extends StatelessWidget {
   }
 }
 
-class _Footer extends StatelessWidget {
-  const _Footer();
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      top: false,
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Text(
-          '© ${DateTime.now().year} Öğrenci Intelligence',
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
-      ),
-    );
-  }
-}

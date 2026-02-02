@@ -1,0 +1,275 @@
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../core/routing/routes.dart';
+
+class AppFooter extends StatefulWidget {
+  const AppFooter({super.key});
+
+  @override
+  State<AppFooter> createState() => _AppFooterState();
+}
+
+class _AppFooterState extends State<AppFooter> {
+  final _emailCtrl = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailCtrl.dispose();
+    super.dispose();
+  }
+
+  void _subscribe() {
+    final email = _emailCtrl.text.trim();
+    if (email.isEmpty || !email.contains('@')) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Lütfen geçerli bir e-posta girin.')),
+      );
+      return;
+    }
+
+    _emailCtrl.clear();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Bültene başarıyla kayıt oldunuz.')),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final year = DateTime.now().year;
+
+    return Container(
+      color: const Color(0xFF111827),
+      padding: const EdgeInsets.symmetric(vertical: 22),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1100),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                LayoutBuilder(
+                  builder: (context, c) {
+                    final isNarrow = c.maxWidth < 820;
+                    final sectionWidth = isNarrow ? c.maxWidth : 220.0;
+
+                    return Wrap(
+                      spacing: 18,
+                      runSpacing: 18,
+                      children: [
+                        SizedBox(
+                          width: sectionWidth,
+                          child: _FooterSection(
+                            title: 'Öğrenci Platformu',
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Kariyerine yön ver, potansiyelini keşfet. Türkiye\'nin en kapsamlı öğrenci kariyer platformu.',
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: const Color(0xFF9CA3AF),
+                                    height: 1.35,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                Wrap(
+                                  spacing: 10,
+                                  children: const [
+                                    _SocialIcon(icon: Icons.facebook, tooltip: 'Facebook'),
+                                    _SocialIcon(icon: Icons.alternate_email, tooltip: 'X / Twitter'),
+                                    _SocialIcon(icon: Icons.camera_alt, tooltip: 'Instagram'),
+                                    _SocialIcon(icon: Icons.business_center, tooltip: 'LinkedIn'),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          width: sectionWidth,
+                          child: _FooterSection(
+                            title: 'Hızlı Linkler',
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _FooterLink(label: 'Kurslar', route: Routes.courses),
+                                _FooterLink(label: 'İş İlanları', route: Routes.jobs),
+                                _FooterLink(label: 'Staj İlanları', route: Routes.internships),
+                                _FooterLink(label: 'Liderlik Tablosu', route: Routes.leaderboard),
+                              ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          width: sectionWidth,
+                          child: _FooterSection(
+                            title: 'Daha Fazla',
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _FooterLink(label: 'Nasıl Çalışır?', route: Routes.howItWorks),
+                                _FooterLink(label: 'Hakkımızda', route: Routes.about),
+                                _FooterLink(label: 'İletişim', route: Routes.contact),
+                                _FooterLink(label: 'Gizlilik Politikası', route: Routes.privacy),
+                                _FooterLink(label: 'Kullanım Şartları', route: Routes.terms),
+                              ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          width: isNarrow ? c.maxWidth : 280,
+                          child: _FooterSection(
+                            title: 'Bülten',
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Yeni fırsatlardan haberdar olmak için e-posta listemize katılın.',
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: const Color(0xFF9CA3AF),
+                                    height: 1.35,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: TextField(
+                                        controller: _emailCtrl,
+                                        style: const TextStyle(color: Colors.white),
+                                        decoration: InputDecoration(
+                                          hintText: 'E-posta adresiniz',
+                                          hintStyle: const TextStyle(color: Color(0xFF9CA3AF)),
+                                          filled: true,
+                                          fillColor: const Color(0xFF1F2937),
+                                          border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(12),
+                                            borderSide: BorderSide.none,
+                                          ),
+                                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    IconButton(
+                                      onPressed: _subscribe,
+                                      icon: const Icon(Icons.send, color: Colors.white),
+                                      style: IconButton.styleFrom(
+                                        backgroundColor: const Color(0xFF7C3AED),
+                                        padding: const EdgeInsets.all(10),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+                const SizedBox(height: 14),
+                const Divider(color: Color(0xFF1F2937)),
+                const SizedBox(height: 10),
+                Center(
+                  child: Text(
+                    '© $year Öğrenci Platformu. Tüm hakları saklıdır.',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: const Color(0xFF9CA3AF),
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _FooterSection extends StatelessWidget {
+  const _FooterSection({required this.title, required this.child});
+
+  final String title;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w800,
+            fontSize: 15,
+          ),
+        ),
+        const SizedBox(height: 10),
+        child,
+      ],
+    );
+  }
+}
+
+class _FooterLink extends StatelessWidget {
+  const _FooterLink({required this.label, required this.route});
+
+  final String label;
+  final String route;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () => context.go(route),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Text(
+          label,
+          style: const TextStyle(
+            color: Color(0xFF9CA3AF),
+            fontWeight: FontWeight.w600,
+            fontSize: 13,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SocialIcon extends StatelessWidget {
+  const _SocialIcon({required this.icon, required this.tooltip});
+
+  final IconData icon;
+  final String tooltip;
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: tooltip,
+      child: InkWell(
+        onTap: () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('$tooltip bağlantısı yakında.')),
+          );
+        },
+        child: Container(
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1F2937),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(icon, color: Colors.white, size: 16),
+        ),
+      ),
+    );
+  }
+}

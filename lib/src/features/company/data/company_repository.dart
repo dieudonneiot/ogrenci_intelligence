@@ -53,6 +53,38 @@ class CompanyRepository {
     await _client.from('companies').update(updates).eq('id', companyId);
   }
 
+  Future<CompanyStatus> fetchCompanyStatus({required String companyId}) async {
+    final row = await _client
+        .from('companies')
+        .select('approval_status, rejection_reason, banned_at, company_subscriptions(is_active, ends_at)')
+        .eq('id', companyId)
+        .maybeSingle();
+
+    if (row == null) {
+      throw Exception('Company not found.');
+    }
+
+    final subs = (row['company_subscriptions'] as List?)?.cast<dynamic>() ?? const [];
+    final now = DateTime.now();
+    bool hasActiveSubscription = false;
+
+    for (final entry in subs) {
+      final map = Map<String, dynamic>.from(entry as Map);
+      if (map['is_active'] != true) continue;
+      final endsAt = _asDate(map['ends_at']);
+      if (endsAt != null && endsAt.isBefore(now)) continue;
+      hasActiveSubscription = true;
+      break;
+    }
+
+    return CompanyStatus(
+      approvalStatus: (row['approval_status'] ?? 'pending').toString(),
+      rejectionReason: (row['rejection_reason'] as String?)?.trim(),
+      isBanned: row['banned_at'] != null,
+      hasActiveSubscription: hasActiveSubscription,
+    );
+  }
+
   Future<CompanyStats> fetchStats({required String companyId}) async {
     // Jobs
     final jobs = await _client

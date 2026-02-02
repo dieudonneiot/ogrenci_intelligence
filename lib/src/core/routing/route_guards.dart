@@ -42,7 +42,6 @@ class RouteGuards {
 
       // Company auth (public)
       Routes.companyAuth,
-      Routes.companyRegister, // alias to open CompanyAuth in register mode
 
       // Admin auth (public)
       Routes.adminLogin,

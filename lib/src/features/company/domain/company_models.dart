@@ -40,6 +40,21 @@ String? _asTrimmedString(dynamic v) {
 }
 
 @immutable
+class CompanyStatus {
+  const CompanyStatus({
+    required this.approvalStatus,
+    required this.rejectionReason,
+    required this.isBanned,
+    required this.hasActiveSubscription,
+  });
+
+  final String approvalStatus;
+  final String? rejectionReason;
+  final bool isBanned;
+  final bool hasActiveSubscription;
+}
+
+@immutable
 class CompanyStats {
   const CompanyStats({
     required this.totalJobs,
