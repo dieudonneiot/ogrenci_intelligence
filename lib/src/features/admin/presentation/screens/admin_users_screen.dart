@@ -47,10 +47,9 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
           .toList();
     } catch (e) {
       _error = e.toString();
-    } finally {
-      if (!mounted) return;
-      setState(() => _loading = false);
     }
+    if (!mounted) return;
+    setState(() => _loading = false);
   }
 
   Future<void> _showUserDetail(_AdminUser user) async {

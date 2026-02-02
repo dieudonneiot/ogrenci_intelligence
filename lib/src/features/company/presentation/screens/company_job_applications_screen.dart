@@ -5,31 +5,28 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/routing/routes.dart';
-import '../../../../core/utils/csv_export.dart';
 import '../../../auth/domain/auth_models.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
 import '../../../company/application/company_providers.dart';
 import '../../../company/domain/company_models.dart';
 
-String _formatDate(DateTime d) {
-  final day = d.day.toString().padLeft(2, '0');
-  final month = d.month.toString().padLeft(2, '0');
-  return '$day.$month.${d.year}';
-}
+class CompanyJobApplicationsScreen extends ConsumerStatefulWidget {
+  const CompanyJobApplicationsScreen({super.key, required this.jobId});
 
-class CompanyApplicationsScreen extends ConsumerStatefulWidget {
-  const CompanyApplicationsScreen({super.key});
+  final String jobId;
 
   @override
-  ConsumerState<CompanyApplicationsScreen> createState() => _CompanyApplicationsScreenState();
+  ConsumerState<CompanyJobApplicationsScreen> createState() =>
+      _CompanyJobApplicationsScreenState();
 }
 
-class _CompanyApplicationsScreenState extends ConsumerState<CompanyApplicationsScreen> {
+class _CompanyJobApplicationsScreenState
+    extends ConsumerState<CompanyJobApplicationsScreen> {
   bool _loading = true;
-  List<CompanyApplication> _apps = const [];
   String _search = '';
-  String _statusFilter = 'all';
-  String _typeFilter = 'all';
+  String _filter = 'all';
+  String _jobTitle = '';
+  List<CompanyApplication> _apps = const [];
   late final TextEditingController _searchCtrl;
 
   @override
@@ -49,12 +46,17 @@ class _CompanyApplicationsScreenState extends ConsumerState<CompanyApplicationsS
     final auth = ref.read(authViewStateProvider).value;
     final companyId = auth?.companyId;
     if (companyId == null || companyId.isEmpty) return;
+
     setState(() => _loading = true);
     try {
       final repo = ref.read(companyRepositoryProvider);
-      final list = await repo.listCompanyApplications(companyId: companyId);
+      final job = await repo.getJobById(jobId: widget.jobId, companyId: companyId);
+      final list = await repo.listJobApplications(jobId: widget.jobId);
       if (!mounted) return;
-      setState(() => _apps = list);
+      setState(() {
+        _jobTitle = (job?['title'] ?? '').toString();
+        _apps = list;
+      });
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -62,11 +64,7 @@ class _CompanyApplicationsScreenState extends ConsumerState<CompanyApplicationsS
 
   Future<void> _updateStatus(CompanyApplication app, String status) async {
     final repo = ref.read(companyRepositoryProvider);
-    if (app.type == 'job') {
-      await repo.updateJobApplicationStatus(applicationId: app.id, status: status);
-    } else {
-      await repo.updateInternshipApplicationStatus(applicationId: app.id, status: status);
-    }
+    await repo.updateJobApplicationStatus(applicationId: app.id, status: status);
     if (!mounted) return;
     setState(() {
       _apps = [
@@ -74,36 +72,6 @@ class _CompanyApplicationsScreenState extends ConsumerState<CompanyApplicationsS
           if (a.id == app.id) a.copyWith(status: status) else a,
       ];
     });
-  }
-
-  Future<void> _exportCsv(List<CompanyApplication> list) async {
-    final buffer = StringBuffer();
-    buffer.writeln(
-      'Ad Soyad,E-posta,Telefon,Tip,İlan,Departman,Durum,Başvuru Tarihi',
-    );
-    for (final app in list) {
-      buffer.writeln(
-        [
-          _escape(app.profileName ?? ''),
-          _escape(app.profileEmail ?? ''),
-          _escape(app.profilePhone ?? ''),
-          _escape(app.type == 'job' ? 'İş' : 'Staj'),
-          _escape(app.title ?? ''),
-          _escape(app.department ?? ''),
-          _escape(_statusText(app.status)),
-          _escape(_formatDate(app.appliedAt)),
-        ].join(','),
-      );
-    }
-
-    final now = DateTime.now();
-    final fileName =
-        'basvurular-${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}.csv';
-    await downloadCsv(buffer.toString(), fileName);
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('CSV indirildi.')),
-    );
   }
 
   @override
@@ -119,82 +87,51 @@ class _CompanyApplicationsScreenState extends ConsumerState<CompanyApplicationsS
     }
 
     final filtered = _apps.where((a) {
-      if (_statusFilter != 'all' && a.status != _statusFilter) return false;
-      if (_typeFilter != 'all' && a.type != _typeFilter) return false;
+      if (_filter != 'all' && a.status != _filter) return false;
       if (_search.trim().isEmpty) return true;
       final q = _search.toLowerCase();
       return (a.profileName ?? '').toLowerCase().contains(q) ||
           (a.profileEmail ?? '').toLowerCase().contains(q) ||
-          (a.title ?? '').toLowerCase().contains(q);
+          (a.profileDepartment ?? '').toLowerCase().contains(q);
     }).toList();
 
     final total = _apps.length;
     final pending = _apps.where((e) => e.status == 'pending').length;
     final accepted = _apps.where((e) => e.status == 'accepted').length;
     final rejected = _apps.where((e) => e.status == 'rejected').length;
-    final jobCount = _apps.where((e) => e.type == 'job').length;
-    final internshipCount = _apps.where((e) => e.type == 'internship').length;
 
     return Container(
       color: const Color(0xFFF9FAFB),
       child: SingleChildScrollView(
         child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 1120),
+            constraints: const BoxConstraints(maxWidth: 1100),
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 22, 16, 28),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  LayoutBuilder(
-                    builder: (_, c) {
-                      final isNarrow = c.maxWidth < 640;
-                      final titleRow = Row(
-                        children: const [
-                          Icon(Icons.people_outline, color: Color(0xFF6D28D9), size: 28),
-                          SizedBox(width: 10),
-                          Text('Tüm Başvurular',
-                              style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900)),
-                        ],
-                      );
-                      final actions = Wrap(
-                        spacing: 8,
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: [
-                          IconButton(
-                            onPressed: _load,
-                            icon: const Icon(Icons.refresh),
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.arrow_back),
+                        onPressed: () => context.go(Routes.companyJobs),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          _jobTitle.isEmpty
+                              ? 'Başvurular'
+                              : 'Başvurular • $_jobTitle',
+                          style: const TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w900,
                           ),
-                          ElevatedButton.icon(
-                            onPressed: () => _exportCsv(filtered),
-                            icon: const Icon(Icons.download_outlined),
-                            label: const Text('CSV İndir'),
-                            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6D28D9)),
-                          ),
-                        ],
-                      );
-
-                      if (isNarrow) {
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            titleRow,
-                            const SizedBox(height: 8),
-                            actions,
-                          ],
-                        );
-                      }
-
-                      return Row(
-                        children: [
-                          titleRow,
-                          const Spacer(),
-                          actions,
-                        ],
-                      );
-                    },
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 12),
                   Wrap(
                     spacing: 12,
                     runSpacing: 12,
@@ -203,22 +140,23 @@ class _CompanyApplicationsScreenState extends ConsumerState<CompanyApplicationsS
                       _MiniStat(label: 'Beklemede', value: pending),
                       _MiniStat(label: 'Kabul', value: accepted),
                       _MiniStat(label: 'Red', value: rejected),
-                      _MiniStat(label: 'İş', value: jobCount),
-                      _MiniStat(label: 'Staj', value: internshipCount),
                     ],
                   ),
                   const SizedBox(height: 16),
                   _FiltersBar(
                     controller: _searchCtrl,
-                    statusFilter: _statusFilter,
-                    typeFilter: _typeFilter,
+                    filter: _filter,
                     onSearch: (v) => setState(() => _search = v),
-                    onStatus: (v) => setState(() => _statusFilter = v),
-                    onType: (v) => setState(() => _typeFilter = v),
+                    onFilter: (v) => setState(() => _filter = v),
                   ),
                   const SizedBox(height: 16),
                   if (_loading)
-                    const Center(child: Padding(padding: EdgeInsets.all(24), child: CircularProgressIndicator()))
+                    const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(24),
+                        child: CircularProgressIndicator(),
+                      ),
+                    )
                   else if (filtered.isEmpty)
                     const _EmptyState()
                   else
@@ -238,22 +176,6 @@ class _CompanyApplicationsScreenState extends ConsumerState<CompanyApplicationsS
         ),
       ),
     );
-  }
-
-  String _statusText(String status) {
-    switch (status) {
-      case 'accepted':
-        return 'Kabul';
-      case 'rejected':
-        return 'Reddedildi';
-      default:
-        return 'Beklemede';
-    }
-  }
-
-  String _escape(String input) {
-    final escaped = input.replaceAll('"', '""');
-    return '"$escaped"';
   }
 }
 
@@ -284,19 +206,15 @@ extension on CompanyApplication {
 class _FiltersBar extends StatelessWidget {
   const _FiltersBar({
     required this.controller,
-    required this.statusFilter,
-    required this.typeFilter,
+    required this.filter,
     required this.onSearch,
-    required this.onStatus,
-    required this.onType,
+    required this.onFilter,
   });
 
   final TextEditingController controller;
-  final String statusFilter;
-  final String typeFilter;
+  final String filter;
   final ValueChanged<String> onSearch;
-  final ValueChanged<String> onStatus;
-  final ValueChanged<String> onType;
+  final ValueChanged<String> onFilter;
 
   @override
   Widget build(BuildContext context) {
@@ -310,54 +228,40 @@ class _FiltersBar extends StatelessWidget {
       child: Wrap(
         spacing: 12,
         runSpacing: 12,
+        crossAxisAlignment: WrapCrossAlignment.center,
         children: [
           SizedBox(
-            width: 280,
+            width: 260,
             child: TextField(
               controller: controller,
               onChanged: onSearch,
               decoration: InputDecoration(
                 prefixIcon: const Icon(Icons.search),
-                hintText: 'Ad, e-posta veya ilan ara...',
+                hintText: 'Aday ara...',
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 isDense: true,
               ),
             ),
           ),
           _FilterChip(
-            label: 'Tüm Durumlar',
-            active: statusFilter == 'all',
-            onTap: () => onStatus('all'),
+            label: 'Tümü',
+            active: filter == 'all',
+            onTap: () => onFilter('all'),
           ),
           _FilterChip(
             label: 'Beklemede',
-            active: statusFilter == 'pending',
-            onTap: () => onStatus('pending'),
+            active: filter == 'pending',
+            onTap: () => onFilter('pending'),
           ),
           _FilterChip(
             label: 'Kabul',
-            active: statusFilter == 'accepted',
-            onTap: () => onStatus('accepted'),
+            active: filter == 'accepted',
+            onTap: () => onFilter('accepted'),
           ),
           _FilterChip(
             label: 'Red',
-            active: statusFilter == 'rejected',
-            onTap: () => onStatus('rejected'),
-          ),
-          _FilterChip(
-            label: 'Tüm Tipler',
-            active: typeFilter == 'all',
-            onTap: () => onType('all'),
-          ),
-          _FilterChip(
-            label: 'İş',
-            active: typeFilter == 'job',
-            onTap: () => onType('job'),
-          ),
-          _FilterChip(
-            label: 'Staj',
-            active: typeFilter == 'internship',
-            onTap: () => onType('internship'),
+            active: filter == 'rejected',
+            onTap: () => onFilter('rejected'),
           ),
         ],
       ),
@@ -437,7 +341,6 @@ class _ApplicationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isJob = app.type == 'job';
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
@@ -458,17 +361,10 @@ class _ApplicationCard extends StatelessWidget {
                   style: const TextStyle(fontWeight: FontWeight.w900),
                 ),
               ),
-              _TypePill(type: app.type),
-              const SizedBox(width: 8),
               _StatusPill(status: app.status),
             ],
           ),
-          const SizedBox(height: 6),
-          Text(
-            '${app.title ?? '-'} • ${app.department ?? '-'}',
-            style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 8),
           Wrap(
             spacing: 12,
             runSpacing: 6,
@@ -481,16 +377,12 @@ class _ApplicationCard extends StatelessWidget {
                   icon: Icons.school_outlined,
                   text: '${app.profileDepartment}${app.profileYear != null ? ' • ${app.profileYear}. sınıf' : ''}',
                 ),
-              _InfoLine(icon: Icons.event, text: _formatDate(app.appliedAt)),
+              _InfoLine(icon: Icons.event, text: _fmtDate(app.appliedAt)),
             ],
           ),
           if ((app.coverLetter ?? '').isNotEmpty) ...[
             const SizedBox(height: 10),
             _ExpandableText(title: 'Ön Yazı', text: app.coverLetter!),
-          ],
-          if ((app.motivationLetter ?? '').isNotEmpty) ...[
-            const SizedBox(height: 10),
-            _ExpandableText(title: 'Motivasyon Mektubu', text: app.motivationLetter!),
           ],
           if ((app.cvUrl ?? '').isNotEmpty) ...[
             const SizedBox(height: 10),
@@ -500,41 +392,39 @@ class _ApplicationCard extends StatelessWidget {
               label: const Text('CV aç'),
             ),
           ],
-          const SizedBox(height: 6),
-          Row(
-            children: [
-              TextButton.icon(
-                onPressed: () {
-                  if (isJob && app.jobId != null) {
-                    context.go('${Routes.companyJobs}/${app.jobId}/applications');
-                  } else if (!isJob && app.internshipId != null) {
-                    context.go('${Routes.companyInternships}/${app.internshipId}/applications');
-                  }
-                },
-                icon: const Icon(Icons.visibility_outlined),
-                label: const Text('Detaylar'),
-              ),
-              const Spacer(),
-              if (app.status == 'pending') ...[
-                ElevatedButton.icon(
-                  onPressed: () => onUpdateStatus('accepted'),
-                  icon: const Icon(Icons.check_circle_outline),
-                  label: const Text('Kabul'),
-                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF16A34A)),
+          if (app.status == 'pending') ...[
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () => onUpdateStatus('accepted'),
+                    icon: const Icon(Icons.check_circle_outline),
+                    label: const Text('Kabul Et'),
+                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF16A34A)),
+                  ),
                 ),
                 const SizedBox(width: 10),
-                ElevatedButton.icon(
-                  onPressed: () => onUpdateStatus('rejected'),
-                  icon: const Icon(Icons.cancel_outlined),
-                  label: const Text('Reddet'),
-                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFDC2626)),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () => onUpdateStatus('rejected'),
+                    icon: const Icon(Icons.cancel_outlined),
+                    label: const Text('Reddet'),
+                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFDC2626)),
+                  ),
                 ),
               ],
-            ],
-          ),
+            ),
+          ],
         ],
       ),
     );
+  }
+
+  String _fmtDate(DateTime d) {
+    final day = d.day.toString().padLeft(2, '0');
+    final month = d.month.toString().padLeft(2, '0');
+    return '$day.$month.${d.year}';
   }
 
   Future<void> _openCv(BuildContext context, String url) async {
@@ -607,31 +497,6 @@ class _StatusPill extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(999)),
       child: Text(label, style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: fg)),
-    );
-  }
-}
-
-class _TypePill extends StatelessWidget {
-  const _TypePill({required this.type});
-  final String type;
-
-  @override
-  Widget build(BuildContext context) {
-    final isJob = type == 'job';
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: isJob ? const Color(0xFFE0F2FE) : const Color(0xFFEDE9FE),
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Text(
-        isJob ? 'İş' : 'Staj',
-        style: TextStyle(
-          fontWeight: FontWeight.w900,
-          fontSize: 12,
-          color: isJob ? const Color(0xFF0369A1) : const Color(0xFF6D28D9),
-        ),
-      ),
     );
   }
 }

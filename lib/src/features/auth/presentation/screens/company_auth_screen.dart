@@ -194,15 +194,15 @@ class _CompanyAuthScreenState extends ConsumerState<CompanyAuthScreen> {
     try {
       final client = SupabaseService.client;
 
-      // 1) Tax number uniqueness check (early UX, final guard is RPC/DB)
-      final existing = await client
-          .from('companies')
-          .select('id')
-          .eq('tax_number', tax)
-          .maybeSingle();
+      // 1) Tax number uniqueness check (secure RPC)
+      final exists = await client.rpc(
+        'company_tax_exists',
+        params: {'p_tax': tax},
+      );
+      final alreadyExists = exists == true;
 
-      if (existing != null) {
-        _snack('Bu vergi numarası ile kayıtlı bir şirket zaten var', error: true);
+      if (alreadyExists) {
+        _snack('Bu vergi numaras?? ile kay??tl?? bir ??irket zaten var', error: true);
         return;
       }
 
@@ -354,9 +354,9 @@ class _CompanyAuthScreenState extends ConsumerState<CompanyAuthScreen> {
                             Container(
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: Colors.red.withOpacity(0.12),
+                                color: Colors.red.withValues(alpha: 0.12),
                                 borderRadius: BorderRadius.circular(14),
-                                border: Border.all(color: Colors.red.withOpacity(0.25)),
+                                border: Border.all(color: Colors.red.withValues(alpha: 0.25)),
                               ),
                               child: Text(
                                 _error!,
@@ -594,8 +594,8 @@ class _LeftPanel extends StatelessWidget {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  Colors.blue.withOpacity(0.20),
-                  Colors.purple.withOpacity(0.18),
+                  Colors.blue.withValues(alpha: 0.20),
+                  Colors.purple.withValues(alpha: 0.18),
                 ],
               ),
             ),
@@ -635,9 +635,9 @@ class _LeftPanel extends StatelessWidget {
                       margin: const EdgeInsets.only(bottom: 14),
                       padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.10),
+                        color: Colors.white.withValues(alpha: 0.10),
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: Colors.white.withOpacity(0.18)),
+                        border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
                       ),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -693,9 +693,9 @@ class _GlassCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.10),
+        color: Colors.white.withValues(alpha: 0.10),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.18)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
         boxShadow: const [
           BoxShadow(blurRadius: 28, offset: Offset(0, 14), color: Colors.black38),
         ],
@@ -742,10 +742,10 @@ class _DarkField extends StatelessWidget {
         prefixIcon: Icon(icon, color: Colors.white70),
         suffixIcon: suffix,
         filled: true,
-        fillColor: Colors.white.withOpacity(0.10),
+        fillColor: Colors.white.withValues(alpha: 0.10),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: Colors.white.withOpacity(0.18)),
+          borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.18)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
@@ -789,10 +789,10 @@ class _DarkDropdown extends StatelessWidget {
         labelStyle: const TextStyle(color: Colors.white70),
         prefixIcon: Icon(icon, color: Colors.white70),
         filled: true,
-        fillColor: Colors.white.withOpacity(0.10),
+        fillColor: Colors.white.withValues(alpha: 0.10),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: Colors.white.withOpacity(0.18)),
+          borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.18)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),

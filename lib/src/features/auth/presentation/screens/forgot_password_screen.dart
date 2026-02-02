@@ -112,9 +112,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.amber.withOpacity(0.15),
+                          color: Colors.amber.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.amber.withOpacity(0.35)),
+                          border: Border.all(color: Colors.amber.withValues(alpha: 0.35)),
                         ),
                         child: const Text(
                           'If you don’t see it, check your spam/junk folder.',
@@ -201,9 +201,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.red.withOpacity(0.10),
+                          color: Colors.red.withValues(alpha: 0.10),
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.red.withOpacity(0.25)),
+                          border: Border.all(color: Colors.red.withValues(alpha: 0.25)),
                         ),
                         child: Text(
                           _error!,

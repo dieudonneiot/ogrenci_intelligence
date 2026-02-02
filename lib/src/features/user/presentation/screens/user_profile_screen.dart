@@ -328,7 +328,7 @@ class _ProfileHeader extends StatelessWidget {
             width: 72,
             height: 72,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(999),
             ),
             child: const Icon(Icons.person, color: Colors.white, size: 36),

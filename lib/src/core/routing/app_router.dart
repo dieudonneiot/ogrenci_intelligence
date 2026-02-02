@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -26,6 +24,17 @@ import '../../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/auth/presentation/screens/reset_password_screen.dart';
+import '../../features/company/presentation/screens/company_applications_screen.dart';
+import '../../features/company/presentation/screens/company_dashboard_screen.dart';
+import '../../features/company/presentation/screens/company_internship_applications_screen.dart';
+import '../../features/company/presentation/screens/company_internship_form_screen.dart';
+import '../../features/company/presentation/screens/company_internships_screen.dart';
+import '../../features/company/presentation/screens/company_job_applications_screen.dart';
+import '../../features/company/presentation/screens/company_job_form_screen.dart';
+import '../../features/company/presentation/screens/company_jobs_screen.dart';
+import '../../features/company/presentation/screens/company_pricing_screen.dart';
+import '../../features/company/presentation/screens/company_profile_screen.dart';
+import '../../features/company/presentation/screens/company_reports_screen.dart';
 import '../../features/courses/presentation/screens/course_detail_screen.dart';
 import '../../features/courses/presentation/screens/courses_screen.dart';
 import '../../features/favorites/presentation/screens/favorites_screen.dart';
@@ -46,7 +55,8 @@ import 'route_guards.dart';
 import 'routes.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
-  final authStream = ref.watch(authViewStateProvider.stream);
+  final refreshNotifier = GoRouterRefreshNotifier(ref);
+  ref.onDispose(refreshNotifier.dispose);
 
   // ✅ IMPORTANT (Web): use the real browser URL, not defaultRouteName "/"
   final String initialLocation = () {
@@ -69,7 +79,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
 
   return GoRouter(
     initialLocation: initialLocation,
-    refreshListenable: GoRouterRefreshStream(authStream),
+    refreshListenable: refreshNotifier,
 
     redirect: (context, state) {
       final location = state.uri.path;
@@ -235,7 +245,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                 const CompanyAuthScreen(initialIsLogin: false),
           ),
 
-           GoRoute(
+          GoRoute(
             path: Routes.dashboard,
             builder: (context, state) => const StudentDashboardScreen(),
           ),
@@ -293,7 +303,9 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: Routes.jobDetail, // '/jobs/:id'
-            builder: (_, state) => JobDetailScreen(jobId: state.pathParameters['id']!),          ),
+            builder: (_, state) =>
+                JobDetailScreen(jobId: state.pathParameters['id']!),
+          ),
           GoRoute(
             path: Routes.internships,
             builder: (context, _) => const InternshipsScreen(),
@@ -330,73 +342,59 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           // Company protected
           GoRoute(
             path: Routes.companyDashboard,
-            builder: (context, _) =>
-                const PlaceholderView(title: 'Company Dashboard'),
+            builder: (context, _) => const CompanyDashboardScreen(),
           ),
           GoRoute(
             path: Routes.companyJobs,
-            builder: (context, _) =>
-                const PlaceholderView(title: 'Company Jobs'),
+            builder: (context, _) => const CompanyJobsScreen(),
           ),
           GoRoute(
             path: Routes.companyJobsCreate,
-            builder: (context, _) => const PlaceholderView(title: 'Create Job'),
+            builder: (context, _) => const CompanyJobFormScreen(),
           ),
           GoRoute(
             path: Routes.companyJobsEdit,
-            builder: (_, s) => PlaceholderView(
-              title: 'Edit Job',
-              subtitle: 'id=${s.pathParameters['id']}',
-            ),
+            builder: (_, s) => CompanyJobFormScreen(jobId: s.pathParameters['id']),
           ),
           GoRoute(
             path: Routes.companyJobApplications,
-            builder: (_, s) => PlaceholderView(
-              title: 'Job Applications',
-              subtitle: 'id=${s.pathParameters['id']}',
-            ),
+            builder: (_, s) =>
+                CompanyJobApplicationsScreen(jobId: s.pathParameters['id']!),
           ),
           GoRoute(
             path: Routes.companyInternships,
-            builder: (context, _) =>
-                const PlaceholderView(title: 'Internship Management'),
+            builder: (context, _) => const CompanyInternshipsScreen(),
           ),
           GoRoute(
             path: Routes.companyInternshipsCreate,
-            builder: (context, _) =>
-                const PlaceholderView(title: 'Create Internship'),
+            builder: (context, _) => const CompanyInternshipFormScreen(),
           ),
           GoRoute(
             path: Routes.companyInternshipsEdit,
-            builder: (_, s) => PlaceholderView(
-              title: 'Edit Internship',
-              subtitle: 'id=${s.pathParameters['id']}',
-            ),
+            builder: (_, s) =>
+                CompanyInternshipFormScreen(internshipId: s.pathParameters['id']),
           ),
           GoRoute(
             path: Routes.companyInternshipApplications,
-            builder: (_, s) => PlaceholderView(
-              title: 'Internship Applications',
-              subtitle: 'id=${s.pathParameters['id']}',
+            builder: (_, s) => CompanyInternshipApplicationsScreen(
+              internshipId: s.pathParameters['id']!,
             ),
           ),
           GoRoute(
             path: Routes.companyProfile,
-            builder: (context, _) =>
-                const PlaceholderView(title: 'Company Profile'),
+            builder: (context, _) => const CompanyProfileScreen(),
           ),
           GoRoute(
             path: Routes.companyReports,
-            builder: (context, _) => const PlaceholderView(title: 'Reports'),
+            builder: (context, _) => const CompanyReportsScreen(),
           ),
           GoRoute(
             path: Routes.companyApplications,
-            builder: (context, _) =>
-                const PlaceholderView(title: 'Company Applications'),
+            builder: (context, _) => const CompanyApplicationsScreen(),
           ),
           GoRoute(
             path: Routes.companyPricing,
-            builder: (context, _) => const PlaceholderView(title: 'Pricing'),
+            builder: (context, _) => const CompanyPricingScreen(),
           ),
         ],
       ),
@@ -410,16 +408,20 @@ final goRouterProvider = Provider<GoRouter>((ref) {
   );
 });
 
-class GoRouterRefreshStream extends ChangeNotifier {
-  GoRouterRefreshStream(Stream<dynamic> stream) {
-    _sub = stream.listen((_) => notifyListeners());
+class GoRouterRefreshNotifier extends ChangeNotifier {
+  GoRouterRefreshNotifier(this._ref) {
+    _sub = _ref.listen<AsyncValue<AuthViewState>>(
+      authViewStateProvider,
+      (_, unused) => notifyListeners(),
+    );
   }
 
-  late final StreamSubscription _sub;
+  final Ref _ref;
+  late final ProviderSubscription<AsyncValue<AuthViewState>> _sub;
 
   @override
   void dispose() {
-    _sub.cancel();
+    _sub.close();
     super.dispose();
   }
 }

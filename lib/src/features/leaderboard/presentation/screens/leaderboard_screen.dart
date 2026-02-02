@@ -297,7 +297,7 @@ class _LeaderboardList extends StatelessWidget {
     return ListView.separated(
       itemCount: entries.length,
       padding: const EdgeInsets.only(bottom: 12),
-      separatorBuilder: (_, __) => const SizedBox(height: 10),
+      separatorBuilder: (_, index) => const SizedBox(height: 10),
       itemBuilder: (_, i) {
         final e = entries[i];
         final isMe = e.userId == meId;
@@ -398,7 +398,7 @@ class _RankBadge extends StatelessWidget {
       width: 54,
       height: 54,
       decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
+        color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFE5E7EB)),
       ),

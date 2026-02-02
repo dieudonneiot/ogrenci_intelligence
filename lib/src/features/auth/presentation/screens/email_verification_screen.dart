@@ -248,9 +248,9 @@ class _EmailVerificationScreenState extends ConsumerState<EmailVerificationScree
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Colors.amber.withOpacity(0.15),
+                        color: Colors.amber.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.amber.withOpacity(0.35)),
+                        border: Border.all(color: Colors.amber.withValues(alpha: 0.35)),
                       ),
                       child: const Text(
                         'Didn’t receive the email? Check spam/junk, or try resending.',

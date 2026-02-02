@@ -75,10 +75,9 @@ class _AdminCompaniesScreenState extends ConsumerState<AdminCompaniesScreen> {
       _companies = list;
     } catch (e) {
       _error = e.toString();
-    } finally {
-      if (!mounted) return;
-      setState(() => _loading = false);
     }
+    if (!mounted) return;
+    setState(() => _loading = false);
   }
 
   void _updateStatusFilter(String status) {
@@ -674,7 +673,7 @@ class _CompanyAvatar extends StatelessWidget {
           width: size,
           height: size,
           fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) => _fallback(),
+          errorBuilder: (_, error, stackTrace) => _fallback(),
         ),
       );
     }

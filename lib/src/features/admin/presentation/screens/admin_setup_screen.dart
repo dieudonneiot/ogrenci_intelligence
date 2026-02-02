@@ -42,8 +42,8 @@ class _AdminSetupScreenState extends State<AdminSetupScreen> {
 
   Future<void> _checkExistingAdmins() async {
     try {
-      final rows = await SupabaseService.client.from('admins').select('id').limit(1);
-      final hasAdmins = (rows as List).isNotEmpty;
+      final exists = await SupabaseService.client.rpc('admin_exists');
+      final hasAdmins = exists == true;
       if (hasAdmins) {
         _hasAdmins = true;
         if (mounted) {
@@ -60,10 +60,9 @@ class _AdminSetupScreenState extends State<AdminSetupScreen> {
         context.go(Routes.home);
       }
       return;
-    } finally {
-      if (!mounted) return;
-      setState(() => _loading = false);
     }
+    if (!mounted) return;
+    setState(() => _loading = false);
   }
 
   Future<void> _submit() async {
@@ -163,10 +162,9 @@ class _AdminSetupScreenState extends State<AdminSetupScreen> {
       }
     } catch (e) {
       _showError(e.toString());
-    } finally {
-      if (!mounted) return;
-      setState(() => _creating = false);
     }
+    if (!mounted) return;
+    setState(() => _creating = false);
   }
 
   void _showError(String message) {

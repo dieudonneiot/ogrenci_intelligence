@@ -75,8 +75,9 @@ class PointsService {
 
       final dayKey = DateFormat('yyyy-MM-dd');
       final uniqueDays = <String>{};
-      for (final row in (logs as List)) {
-        final dt = DateTime.tryParse(row['created_at'].toString());
+      for (final entry in (logs as List)) {
+        final row = entry as Map<String, dynamic>;
+        final dt = DateTime.tryParse(row['created_at']?.toString() ?? '');
         if (dt != null) uniqueDays.add(dayKey.format(dt.toUtc()));
       }
 

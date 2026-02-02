@@ -156,7 +156,7 @@ class _AdminNavbarState extends ConsumerState<AdminNavbar> {
 
   Future<void> _handleLogout(BuildContext context) async {
     final err = await ref.read(authActionLoadingProvider.notifier).signOut();
-    if (!mounted) return;
+    if (!context.mounted) return;
     if (err != null && err.isNotEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Çıkış yapılamadı: $err')),

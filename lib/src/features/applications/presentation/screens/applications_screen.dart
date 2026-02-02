@@ -540,7 +540,7 @@ class _ListViewTab extends StatelessWidget {
     return ListView.separated(
       itemCount: items.length,
       padding: const EdgeInsets.only(bottom: 12),
-      separatorBuilder: (_, __) => const SizedBox(height: 10),
+      separatorBuilder: (_, index) => const SizedBox(height: 10),
       itemBuilder: (_, i) => _ApplicationCard(item: items[i], onOpen: onOpen),
     );
   }

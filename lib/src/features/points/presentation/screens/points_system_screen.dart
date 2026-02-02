@@ -94,7 +94,7 @@ class _AuthedPointsView extends ConsumerWidget {
             data: (total) {
               return rewardsAsync.when(
                 loading: () => _Summary(totalPoints: total, next: null),
-                error: (_, __) => _Summary(totalPoints: total, next: null),
+                error: (error, stackTrace) => _Summary(totalPoints: total, next: null),
                 data: (rewards) {
                   final next = _findNextReward(total, rewards);
                   return _Summary(totalPoints: total, next: next);

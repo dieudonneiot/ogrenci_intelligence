@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -104,14 +106,24 @@ Future<void> _submit() async {
     return;
   }
 
-  // ✅ Otherwise wait a bit for the auth stream to emit (but never hang forever).
+  // ✅ Otherwise wait a bit for auth to update (but never hang forever).
+  final completer = Completer<void>();
+  final sub = ref.listenManual<AsyncValue<AuthViewState>>(
+    authViewStateProvider,
+    (_, next) {
+      final value = next.valueOrNull;
+      if (value?.isAuthenticated == true && !completer.isCompleted) {
+        completer.complete();
+      }
+    },
+  );
+
   try {
-    await ref
-        .read(authViewStateProvider.stream)
-        .firstWhere((s) => s.isAuthenticated)
-        .timeout(const Duration(seconds: 2));
+    await completer.future.timeout(const Duration(seconds: 2));
   } catch (_) {
     // ignore timeout; router redirect will handle if needed
+  } finally {
+    sub.close();
   }
 
   if (!mounted) return;
@@ -215,9 +227,9 @@ Future<void> _submit() async {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.red.withOpacity(0.10),
+                          color: Colors.red.withValues(alpha: 0.10),
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.red.withOpacity(0.25)),
+                          border: Border.all(color: Colors.red.withValues(alpha: 0.25)),
                         ),
                         child: Text(
                           _error!,

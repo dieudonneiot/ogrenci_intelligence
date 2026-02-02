@@ -138,6 +138,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       queryParameters: {'email': email},
     ).toString();
 
+    if (!mounted) return;
     context.go(uri);
   }
 
@@ -309,9 +310,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.red.withOpacity(0.10),
+                          color: Colors.red.withValues(alpha: 0.10),
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.red.withOpacity(0.25)),
+                          border: Border.all(color: Colors.red.withValues(alpha: 0.25)),
                         ),
                         child: Text(_error!, style: const TextStyle(color: Colors.red)),
                       ),

@@ -151,9 +151,9 @@ class _CourseDetailBody extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.orange.withOpacity(0.10),
+              color: Colors.orange.withValues(alpha: 0.10),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.orange.withOpacity(0.25)),
+              border: Border.all(color: Colors.orange.withValues(alpha: 0.25)),
             ),
             child: Text(warning!, style: const TextStyle(color: Colors.orange)),
           ),

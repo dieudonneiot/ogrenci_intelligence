@@ -130,10 +130,9 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
       _activities = activities;
     } catch (e) {
       _error = e.toString();
-    } finally {
-      if (!mounted) return;
-      setState(() => _loading = false);
     }
+    if (!mounted) return;
+    setState(() => _loading = false);
   }
 
   @override

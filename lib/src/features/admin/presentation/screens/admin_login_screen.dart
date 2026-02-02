@@ -78,10 +78,9 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
       context.go(Routes.adminDashboard);
     } catch (e) {
       _error = e.toString();
-    } finally {
-      if (!mounted) return;
-      setState(() => _loading = false);
     }
+    if (!mounted) return;
+    setState(() => _loading = false);
   }
 
   @override

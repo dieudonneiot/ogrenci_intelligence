@@ -187,7 +187,8 @@ class _HowStepCardState extends State<_HowStepCard> {
         children: [
           AnimatedContainer(
             duration: const Duration(milliseconds: 180),
-            transform: Matrix4.identity()..translate(0.0, _hover ? -4.0 : 0.0),
+            transform: Matrix4.identity()
+              ..translateByDouble(0.0, _hover ? -4.0 : 0.0, 0.0, 1.0),
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
               color: widget.step.bgColor,

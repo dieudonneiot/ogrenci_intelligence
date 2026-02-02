@@ -62,7 +62,7 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
             children: [
               const Icon(Icons.error_outline, size: 48, color: Color(0xFFEF4444)),
               const SizedBox(height: 12),
-              const Text('İş ilanları yüklenemedi',
+              const Text('Ä°ÅŸ ilanlarÄ± yÃ¼klenemedi',
                   style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
               const SizedBox(height: 8),
               Text(e.toString(),
@@ -95,11 +95,11 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('İş İlanları',
+                        const Text('Ä°ÅŸ Ä°lanlarÄ±',
                             style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900)),
                         const SizedBox(height: 6),
                         const Text(
-                          'Arama yap, filtrele, favorile ve başvur. React ile aynı akış.',
+                          'Arama yap, filtrele, favorile ve baÅŸvur. React ile aynÄ± akÄ±ÅŸ.',
                           style:
                               TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
                         ),
@@ -126,7 +126,7 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
                                   onChanged: _applySearch,
                                   decoration: const InputDecoration(
                                     border: InputBorder.none,
-                                    hintText: 'Başlık, şirket, bölüm, konum...',
+                                    hintText: 'BaÅŸlÄ±k, ÅŸirket, bÃ¶lÃ¼m, konum...',
                                   ),
                                 ),
                               ),
@@ -154,13 +154,13 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
                         const SizedBox(height: 14),
 
                         if (vm.items.isEmpty)
-                          const _Empty(text: 'Sonuç bulunamadı.')
+                          const _Empty(text: 'SonuÃ§ bulunamadÄ±.')
                         else
                           ListView.separated(
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
                             itemCount: vm.items.length,
-                            separatorBuilder: (_, __) => const SizedBox(height: 10),
+                            separatorBuilder: (_, index) => const SizedBox(height: 10),
                             itemBuilder: (_, i) => _JobCard(item: vm.items[i]),
                           ),
                       ],
@@ -204,14 +204,14 @@ class _FiltersRow extends StatelessWidget {
           checkmarkColor: const Color(0xFF6D28D9),
         ),
         _DropdownFilter(
-          label: 'Bölüm',
+          label: 'BÃ¶lÃ¼m',
           value: filters.department,
           items: vm.availableDepartments,
           onChanged: (v) => onChange(filters.copyWith(department: v)),
           onClear: () => onChange(filters.copyWith(clearDepartment: true)),
         ),
         _DropdownFilter(
-          label: 'Çalışma',
+          label: 'Ã‡alÄ±ÅŸma',
           value: filters.workType,
           items: vm.availableWorkTypes,
           onChanged: (v) => onChange(filters.copyWith(workType: v)),
@@ -253,7 +253,7 @@ class _DropdownFilter extends StatelessWidget {
           const SizedBox(width: 8),
           DropdownButton<String>(
             value: (value != null && value!.isNotEmpty && items.contains(value)) ? value : null,
-            hint: const Text('Seç'),
+            hint: const Text('SeÃ§'),
             underline: const SizedBox.shrink(),
             items: items
                 .map((e) => DropdownMenuItem<String>(value: e, child: Text(e)))
@@ -325,7 +325,7 @@ class _JobCard extends ConsumerWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${j.companyName} • ${j.location}',
+                    '${j.companyName} â€¢ ${j.location}',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
@@ -352,13 +352,14 @@ class _JobCard extends ConsumerWidget {
             ),
             const SizedBox(width: 10),
             IconButton(
-              tooltip: item.isFavorite ? 'Favoriden çıkar' : 'Favorile',
+              tooltip: item.isFavorite ? 'Favoriden Ã§Ä±kar' : 'Favorile',
               onPressed: () async {
                 try {
                   await ref.read(jobsProvider.notifier).toggleFavorite(j.id);
                 } catch (e) {
+                  if (!context.mounted) return;
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Favori güncellenemedi: $e')),
+                    SnackBar(content: Text('Favori gÃ¼ncellenemedi: $e')),
                   );
                 }
               },
@@ -415,7 +416,7 @@ class _StatusPill extends StatelessWidget {
       default:
         bg = const Color(0xFFFEF3C7);
         fg = const Color(0xFFB45309);
-        label = 'Başvuruldu';
+        label = 'BaÅŸvuruldu';
         break;
     }
 

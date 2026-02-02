@@ -8,18 +8,18 @@ import '../../../auth/presentation/controllers/auth_controller.dart';
 import '../../../company/application/company_providers.dart';
 import '../../../company/domain/company_models.dart';
 
-class CompanyJobsScreen extends ConsumerStatefulWidget {
-  const CompanyJobsScreen({super.key});
+class CompanyInternshipsScreen extends ConsumerStatefulWidget {
+  const CompanyInternshipsScreen({super.key});
 
   @override
-  ConsumerState<CompanyJobsScreen> createState() => _CompanyJobsScreenState();
+  ConsumerState<CompanyInternshipsScreen> createState() => _CompanyInternshipsScreenState();
 }
 
-class _CompanyJobsScreenState extends ConsumerState<CompanyJobsScreen> {
+class _CompanyInternshipsScreenState extends ConsumerState<CompanyInternshipsScreen> {
   bool _loading = true;
   String _search = '';
   String _filter = 'all';
-  List<CompanyJobItem> _jobs = const [];
+  List<CompanyInternshipItem> _internships = const [];
   late final TextEditingController _searchCtrl;
 
   @override
@@ -47,17 +47,17 @@ class _CompanyJobsScreenState extends ConsumerState<CompanyJobsScreen> {
     setState(() => _loading = true);
     try {
       final repo = ref.read(companyRepositoryProvider);
-      final list = await repo.listJobs(companyId: companyId);
+      final list = await repo.listInternships(companyId: companyId);
       if (!mounted) return;
-      setState(() => _jobs = list);
+      setState(() => _internships = list);
     } finally {
       if (mounted) setState(() => _loading = false);
     }
   }
 
-  Future<void> _toggleStatus(CompanyJobItem job, bool next) async {
+  Future<void> _toggleStatus(CompanyInternshipItem item, bool next) async {
     final repo = ref.read(companyRepositoryProvider);
-    await repo.setJobActive(job.id, next);
+    await repo.setInternshipActive(item.id, next);
     await _load();
   }
 
@@ -73,19 +73,19 @@ class _CompanyJobsScreenState extends ConsumerState<CompanyJobsScreen> {
       return const Center(child: Text('Şirket panelini görmek için giriş yapmalısınız.'));
     }
 
-    final filtered = _jobs.where((j) {
-      if (_filter == 'active' && !j.isActive) return false;
-      if (_filter == 'inactive' && j.isActive) return false;
+    final filtered = _internships.where((i) {
+      if (_filter == 'active' && !i.isActive) return false;
+      if (_filter == 'inactive' && i.isActive) return false;
       if (_search.trim().isEmpty) return true;
       final q = _search.toLowerCase();
-      return j.title.toLowerCase().contains(q) ||
-          (j.department ?? '').toLowerCase().contains(q) ||
-          (j.location ?? '').toLowerCase().contains(q);
+      return i.title.toLowerCase().contains(q) ||
+          (i.department ?? '').toLowerCase().contains(q) ||
+          (i.location ?? '').toLowerCase().contains(q);
     }).toList();
 
-    final activeCount = _jobs.where((j) => j.isActive).length;
-    final inactiveCount = _jobs.length - activeCount;
-    final totalApps = _jobs.fold<int>(0, (sum, j) => sum + j.applicationsCount);
+    final activeCount = _internships.where((i) => i.isActive).length;
+    final inactiveCount = _internships.length - activeCount;
+    final totalApps = _internships.fold<int>(0, (sum, i) => sum + i.applicationsCount);
 
     return Container(
       color: const Color(0xFFF9FAFB),
@@ -100,14 +100,15 @@ class _CompanyJobsScreenState extends ConsumerState<CompanyJobsScreen> {
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.work_outline, color: Color(0xFF6D28D9)),
+                      const Icon(Icons.school_outlined, color: Color(0xFF6D28D9)),
                       const SizedBox(width: 8),
-                      const Text('İş İlanlarım', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900)),
+                      const Text('Staj İlanlarım',
+                          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900)),
                       const Spacer(),
                       ElevatedButton.icon(
-                        onPressed: () => context.go(Routes.companyJobsCreate),
+                        onPressed: () => context.go(Routes.companyInternshipsCreate),
                         icon: const Icon(Icons.add),
-                        label: const Text('Yeni İlan'),
+                        label: const Text('Yeni Staj'),
                         style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6D28D9)),
                       ),
                     ],
@@ -117,10 +118,10 @@ class _CompanyJobsScreenState extends ConsumerState<CompanyJobsScreen> {
                     spacing: 12,
                     runSpacing: 12,
                     children: [
-                      _MiniStat(label: 'Toplam', value: _jobs.length),
+                      _MiniStat(label: 'Toplam', value: _internships.length),
                       _MiniStat(label: 'Aktif', value: activeCount),
                       _MiniStat(label: 'Pasif', value: inactiveCount),
-                      _MiniStat(label: 'Basvuru', value: totalApps),
+                      _MiniStat(label: 'Başvuru', value: totalApps),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -136,18 +137,19 @@ class _CompanyJobsScreenState extends ConsumerState<CompanyJobsScreen> {
                     const Center(child: Padding(padding: EdgeInsets.all(24), child: CircularProgressIndicator()))
                   else if (filtered.isEmpty)
                     _EmptyState(
-                      onCreate: () => context.go(Routes.companyJobsCreate),
+                      onCreate: () => context.go(Routes.companyInternshipsCreate),
                       hasSearch: _search.trim().isNotEmpty || _filter != 'all',
                     )
                   else
                     Column(
                       children: [
-                        for (final job in filtered)
-                          _JobCard(
-                            job: job,
-                            onEdit: () => context.go('${Routes.companyJobs}/${job.id}/edit'),
-                            onApplications: () => context.go('${Routes.companyJobs}/${job.id}/applications'),
-                            onToggle: (v) => _toggleStatus(job, v),
+                        for (final item in filtered)
+                          _InternshipCard(
+                            item: item,
+                            onEdit: () => context.go('${Routes.companyInternships}/${item.id}/edit'),
+                            onApplications: () =>
+                                context.go('${Routes.companyInternships}/${item.id}/applications'),
+                            onToggle: (v) => _toggleStatus(item, v),
                           ),
                       ],
                     ),
@@ -195,7 +197,7 @@ class _FiltersBar extends StatelessWidget {
             child: TextField(
               decoration: InputDecoration(
                 prefixIcon: const Icon(Icons.search),
-                hintText: 'İlan ara...',
+                hintText: 'Staj ara...',
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 isDense: true,
               ),
@@ -285,24 +287,24 @@ class _MiniStat extends StatelessWidget {
   }
 }
 
-class _JobCard extends StatelessWidget {
-  const _JobCard({
-    required this.job,
+class _InternshipCard extends StatelessWidget {
+  const _InternshipCard({
+    required this.item,
     required this.onEdit,
     required this.onApplications,
     required this.onToggle,
   });
 
-  final CompanyJobItem job;
+  final CompanyInternshipItem item;
   final VoidCallback onEdit;
   final VoidCallback onApplications;
   final ValueChanged<bool> onToggle;
 
   @override
   Widget build(BuildContext context) {
-    final deadline = job.deadline == null
+    final deadline = item.deadline == null
         ? '—'
-        : '${job.deadline!.day.toString().padLeft(2, '0')}.${job.deadline!.month.toString().padLeft(2, '0')}.${job.deadline!.year}';
+        : '${item.deadline!.day.toString().padLeft(2, '0')}.${item.deadline!.month.toString().padLeft(2, '0')}.${item.deadline!.year}';
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -319,10 +321,10 @@ class _JobCard extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: Text(job.title, style: const TextStyle(fontWeight: FontWeight.w900)),
+                child: Text(item.title, style: const TextStyle(fontWeight: FontWeight.w900)),
               ),
               Switch(
-                value: job.isActive,
+                value: item.isActive,
                 onChanged: onToggle,
                 activeThumbColor: const Color(0xFF6D28D9),
               ),
@@ -330,16 +332,15 @@ class _JobCard extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            '${job.department ?? '—'} • ${job.location ?? '—'}',
+            '${item.department ?? '—'} • ${item.location ?? '—'}',
             style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 10),
           Wrap(
             spacing: 12,
             children: [
-              _InfoChip(icon: Icons.people_outline, text: '${job.applicationsCount} basvuru'),
-              _InfoChip(icon: Icons.check_circle_outline, text: '${job.acceptedCount} kabul'),
-              _InfoChip(icon: Icons.visibility_outlined, text: '${job.viewsCount} görüntüleme'),
+              _InfoChip(icon: Icons.people_outline, text: '${item.applicationsCount} başvuru'),
+              _InfoChip(icon: Icons.check_circle_outline, text: '${item.acceptedCount} kabul'),
               _InfoChip(icon: Icons.event_outlined, text: 'Son tarih: $deadline'),
             ],
           ),
@@ -349,7 +350,7 @@ class _JobCard extends StatelessWidget {
               TextButton.icon(
                 onPressed: onApplications,
                 icon: const Icon(Icons.people_outline),
-                label: const Text('Basvurular'),
+                label: const Text('Başvurular'),
               ),
               const SizedBox(width: 8),
               TextButton.icon(
@@ -401,10 +402,10 @@ class _EmptyState extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const Icon(Icons.work_outline, size: 44, color: Color(0xFFD1D5DB)),
+          const Icon(Icons.school_outlined, size: 44, color: Color(0xFFD1D5DB)),
           const SizedBox(height: 10),
           Text(
-            hasSearch ? 'Aradiginiz ilan bulunamadi.' : 'Henüz ilaniniz yok.',
+            hasSearch ? 'Aradığınız staj bulunamadı.' : 'Henüz staj ilanınız yok.',
             style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF6B7280)),
           ),
           const SizedBox(height: 10),
@@ -412,7 +413,7 @@ class _EmptyState extends StatelessWidget {
             ElevatedButton.icon(
               onPressed: onCreate,
               icon: const Icon(Icons.add),
-              label: const Text('İlan Oluştur'),
+              label: const Text('Staj İlanı Oluştur'),
               style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6D28D9)),
             ),
         ],
@@ -420,4 +421,3 @@ class _EmptyState extends StatelessWidget {
     );
   }
 }
-

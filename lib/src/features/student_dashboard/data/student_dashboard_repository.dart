@@ -9,7 +9,7 @@ class StudentDashboardRepository {
 
   final SupabaseClient _client;
 
-  Future<_ProfileInfo> getProfile(String uid) async {
+  Future<_ProfileInfo> _getProfile(String uid) async {
     final rows = await _client
         .from('profiles')
         .select('id,full_name,department,total_points')
@@ -29,7 +29,7 @@ class StudentDashboardRepository {
     );
   }
 
-  Future<int?> getDepartmentRank({required String uid, required String? department}) async {
+  Future<int?> _getDepartmentRank({required String uid, required String? department}) async {
     final dept = department?.trim();
     if (dept == null || dept.isEmpty) return null;
 
@@ -61,7 +61,7 @@ class StudentDashboardRepository {
     return (m['rank_department'] as num?)?.toInt();
   }
 
-  Future<_Counts> getCounts(String uid) async {
+  Future<_Counts> _getCounts(String uid) async {
     final completedRows = await _client
         .from('completed_courses')
         .select('id')
@@ -156,10 +156,10 @@ class StudentDashboardRepository {
     required String uid,
     String? fallbackName,
   }) async {
-    final profile = await getProfile(uid);
+    final profile = await _getProfile(uid);
 
-    final countsF = getCounts(uid);
-    final rankF = getDepartmentRank(uid: uid, department: profile.department);
+    final countsF = _getCounts(uid);
+    final rankF = _getDepartmentRank(uid: uid, department: profile.department);
     final ongoingCoursesF = listOngoingCourses(uid: uid, limit: 3);
     final activitiesF = listActivities(uid: uid, limit: 10);
 

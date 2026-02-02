@@ -226,7 +226,7 @@ class InternshipDetailController
     );
 
     // optimistic list update
-    ref.read(internshipsProvider.notifier).markApplied(internshipId);
+    await ref.read(internshipsProvider.notifier).markApplied(internshipId);
 
     // re-fetch application, show status pill
     final app = await repo.fetchMyApplication(

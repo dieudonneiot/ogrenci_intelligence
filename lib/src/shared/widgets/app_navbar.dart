@@ -52,7 +52,7 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
     final err = await ref.read(authActionLoadingProvider.notifier).signOut();
     _closeMobile();
 
-    if (!mounted) return;
+    if (!context.mounted) return;
 
     if (err != null && err.isNotEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -188,7 +188,7 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
                                   'assets/logo.png',
                                   height: 40,
                                   fit: BoxFit.contain,
-                                  errorBuilder: (_, __, ___) => const Icon(
+                                  errorBuilder: (_, error, stackTrace) => const Icon(
                                     Icons.school,
                                     size: 34,
                                     color: Color(0xFF6D28D9),

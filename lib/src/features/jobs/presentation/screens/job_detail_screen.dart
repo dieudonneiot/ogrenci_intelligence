@@ -68,6 +68,7 @@ class _Body extends ConsumerWidget {
               try {
                 await ref.read(jobDetailViewProvider(j.id).notifier).toggleFavorite();
               } catch (e) {
+                if (!context.mounted) return;
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text('Favori guncellenemedi: $e')),
                 );
@@ -248,10 +249,12 @@ class _Body extends ConsumerWidget {
                     try {
                       await ref.read(jobDetailViewProvider(jobId).notifier).apply(ctrl.text);
                       if (ctx.mounted) Navigator.pop(ctx);
+                      if (!context.mounted) return;
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Basvuru gonderildi')),
                       );
                     } catch (e) {
+                      if (!context.mounted) return;
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('Basvuru gonderilemedi: $e')),
                       );
