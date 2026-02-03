@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/routing/routes.dart';
+import '../../../auth/domain/auth_models.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
 import '../../../company/application/company_providers.dart';
 import '../../../company/domain/company_models.dart';
@@ -52,6 +54,7 @@ class _CompanyDashboardScreenState extends ConsumerState<CompanyDashboardScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final authAsync = ref.watch(authViewStateProvider);
     if (authAsync.isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -59,7 +62,7 @@ class _CompanyDashboardScreenState extends ConsumerState<CompanyDashboardScreen>
 
     final auth = authAsync.value;
     final user = auth?.user;
-    if (auth == null || !auth.isAuthenticated || auth.userType.name != 'company') {
+    if (auth == null || !auth.isAuthenticated || auth.userType != UserType.company) {
       return const _GuestView();
     }
 
@@ -83,8 +86,8 @@ class _CompanyDashboardScreenState extends ConsumerState<CompanyDashboardScreen>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _Header(
-                    companyName: companyName.isEmpty ? 'Sirket Paneli' : companyName,
-                    userLabel: user?.email ?? 'Hos geldiniz',
+                    companyName: companyName.isEmpty ? l10n.t(AppText.companyPanel) : companyName,
+                    userLabel: user?.email ?? l10n.t(AppText.user),
                   ),
                   const SizedBox(height: 16),
                   if (approvalStatus.isNotEmpty || isBanned)
@@ -110,25 +113,25 @@ class _CompanyDashboardScreenState extends ConsumerState<CompanyDashboardScreen>
                         childAspectRatio: 1.25,
                         children: [
                           _StatCard(
-                            title: 'Aktif Is Ilani',
+                            title: l10n.t(AppText.companyDashboardActiveJobs),
                             value: _stats.activeJobs.toString(),
                             color: const Color(0xFF7C3AED),
                             icon: Icons.work_outline,
                           ),
                           _StatCard(
-                            title: 'Aktif Staj Ilani',
+                            title: l10n.t(AppText.companyDashboardActiveInternships),
                             value: _stats.activeInternships.toString(),
                             color: const Color(0xFF2563EB),
                             icon: Icons.school_outlined,
                           ),
                           _StatCard(
-                            title: 'Bekleyen Basvuru',
+                            title: l10n.t(AppText.companyDashboardPendingApplications),
                             value: _stats.pendingApplications.toString(),
                             color: const Color(0xFFF59E0B),
                             icon: Icons.pending_actions,
                           ),
                           _StatCard(
-                            title: 'Toplam Basvuru',
+                            title: l10n.t(AppText.companyDashboardTotalApplications),
                             value: _stats.totalApplications.toString(),
                             color: const Color(0xFF16A34A),
                             icon: Icons.people_outline,
@@ -162,6 +165,7 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -195,7 +199,7 @@ class _Header extends StatelessWidget {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'Hos geldiniz, $userLabel',
+                  l10n.companyDashboardWelcome(userLabel),
                   style: const TextStyle(color: Color(0xCCFFFFFF), fontWeight: FontWeight.w600),
                 ),
               ],
@@ -220,12 +224,13 @@ class _StatusBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     if (isBanned) {
       return _banner(
         icon: Icons.block,
         color: const Color(0xFFB91C1C),
         bg: const Color(0xFFFFF1F2),
-        text: 'Hesabiniz devre disi birakildi. Destek ile iletisime geçin.',
+        text: l10n.t(AppText.companyDashboardStatusBanned),
       );
     }
 
@@ -234,14 +239,14 @@ class _StatusBanner extends StatelessWidget {
         icon: Icons.hourglass_bottom,
         color: const Color(0xFFB45309),
         bg: const Color(0xFFFFFBEB),
-        text: 'Hesabiniz onay bekliyor. Onay sonrasi ilanlariniz yayinlanacaktir.',
+        text: l10n.t(AppText.companyDashboardStatusPending),
       );
     }
 
     if (status == 'rejected') {
       final msg = reason.isEmpty
-          ? 'Sirket basvurunuz reddedildi. Lütfen profilinizi güncelleyin.'
-          : 'Reddetme nedeni: $reason';
+          ? l10n.t(AppText.companyDashboardStatusRejected)
+          : l10n.companyDashboardStatusRejectedWithReason(reason);
       return _banner(
         icon: Icons.error_outline,
         color: const Color(0xFFB91C1C),
@@ -255,7 +260,7 @@ class _StatusBanner extends StatelessWidget {
         icon: Icons.info_outline,
         color: const Color(0xFF2563EB),
         bg: const Color(0xFFEFF6FF),
-        text: 'Sirket durumunuz: $status',
+        text: l10n.companyDashboardStatusOther(status),
       );
     }
 
@@ -329,10 +334,14 @@ class _StatCard extends StatelessWidget {
 class _QuickActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Hizli Islemler', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+        Text(
+          l10n.t(AppText.companyDashboardQuickActionsTitle),
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+        ),
         const SizedBox(height: 10),
         Wrap(
           spacing: 10,
@@ -340,22 +349,22 @@ class _QuickActions extends StatelessWidget {
           children: [
             _ActionCard(
               icon: Icons.add_circle_outline,
-              label: 'Yeni Is Ilani',
+              label: l10n.t(AppText.companyDashboardQuickActionNewJob),
               onTap: () => context.go(Routes.companyJobsCreate),
             ),
             _ActionCard(
               icon: Icons.work_outline,
-              label: 'Ilanlarim',
+              label: l10n.t(AppText.companyJobsTitle),
               onTap: () => context.go(Routes.companyJobs),
             ),
             _ActionCard(
               icon: Icons.people_outline,
-              label: 'Basvurular',
+              label: l10n.t(AppText.companyApplicationsTitle),
               onTap: () => context.go(Routes.companyApplications),
             ),
             _ActionCard(
               icon: Icons.bar_chart_outlined,
-              label: 'Raporlar',
+              label: l10n.t(AppText.companyReportsTitle),
               onTap: () => context.go(Routes.companyReports),
             ),
           ],
@@ -374,6 +383,7 @@ class _PerformanceSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final viewRatio = _cap(report.totalViews / 500.0);
     final conversionRatio = _cap(report.conversionRate / 100);
     final responseRatio = _cap(1 - (report.avgResponseTimeHours / 72));
@@ -389,26 +399,28 @@ class _PerformanceSummary extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Performans Özeti (Son 30 Gün)',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
+          Text(
+            l10n.t(AppText.companyDashboardPerformanceSummaryTitle),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
+          ),
           const SizedBox(height: 12),
           _ProgressRow(
-            label: 'Görüntüleme',
+            label: l10n.t(AppText.companyReportsMetricTotalViews),
             value: report.totalViews.toString(),
             ratio: viewRatio,
             color: const Color(0xFF3B82F6),
           ),
           const SizedBox(height: 10),
           _ProgressRow(
-            label: 'Dönüsüm',
+            label: l10n.t(AppText.companyReportsMetricConversionRate),
             value: '%${report.conversionRate.toStringAsFixed(1)}',
             ratio: conversionRatio,
             color: const Color(0xFF7C3AED),
           ),
           const SizedBox(height: 10),
           _ProgressRow(
-            label: 'Ortalama Yanit Süresi',
-            value: '${report.avgResponseTimeHours.toStringAsFixed(1)} saat',
+            label: l10n.t(AppText.companyReportsMetricAvgResponseTime),
+            value: '${report.avgResponseTimeHours.toStringAsFixed(1)} ${l10n.t(AppText.companyReportsHoursUnit)}',
             ratio: responseRatio,
             color: const Color(0xFF10B981),
           ),
@@ -500,9 +512,8 @@ class _GuestView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text('Sirket panelini görmek için giris yapmalisiniz.'),
-    );
+    final l10n = AppLocalizations.of(context);
+    return Center(child: Text(l10n.t(AppText.companyPanelLoginRequired)));
   }
 }
 

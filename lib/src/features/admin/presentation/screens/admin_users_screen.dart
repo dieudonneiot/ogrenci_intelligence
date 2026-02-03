@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/supabase/supabase_service.dart';
 import '../../presentation/controllers/admin_controller.dart';
 import '../widgets/admin_layout.dart';
@@ -53,36 +54,41 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
   }
 
   Future<void> _showUserDetail(_AdminUser user) async {
+    final l10n = AppLocalizations.of(context);
     await showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Kullanıcı Detayları'),
+        title: Text(l10n.t(AppText.adminUserDetailsTitle)),
         content: SizedBox(
           width: 520,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _DetailRow(label: 'Ad Soyad', value: user.fullName ?? '-'),
-              _DetailRow(label: 'Email', value: user.email ?? '-'),
-              _DetailRow(label: 'Telefon', value: user.phone ?? '-'),
-              _DetailRow(label: 'Üniversite', value: user.university ?? '-'),
-              _DetailRow(label: 'Bölüm', value: user.department ?? '-'),
-              _DetailRow(label: 'Kayıt Tarihi', value: user.createdAtText),
+              _DetailRow(label: l10n.t(AppText.commonFullName), value: user.fullName ?? '-'),
+              _DetailRow(label: l10n.t(AppText.commonEmail), value: user.email ?? '-'),
+              _DetailRow(label: l10n.t(AppText.commonPhone), value: user.phone ?? '-'),
+              _DetailRow(label: l10n.t(AppText.commonUniversity), value: user.university ?? '-'),
+              _DetailRow(label: l10n.t(AppText.commonDepartment), value: user.department ?? '-'),
+              _DetailRow(label: l10n.t(AppText.adminUsersTableRegisteredAt), value: user.createdAtText),
             ],
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Kapat')),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(l10n.t(AppText.close)),
+          ),
         ],
       ),
     );
   }
 
   Future<void> _banUser(_AdminUser user) async {
+    final l10n = AppLocalizations.of(context);
     final ok = await _confirm(
-      title: 'Kullanıcıyı Engelle',
-      message: 'Bu kullanıcıyı engellemek istediğinizden emin misiniz?',
+      title: l10n.t(AppText.adminBanUserTitle),
+      message: l10n.t(AppText.adminBanUserConfirm),
     );
     if (!ok) return;
 
@@ -99,17 +105,20 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
           );
 
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Kullanıcı engellendi')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.t(AppText.adminBanUserSuccess))),
+      );
       await _fetchUsers();
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Kullanıcı engellenemedi: $e')),
+        SnackBar(content: Text(l10n.adminBanUserFailed(e.toString()))),
       );
     }
   }
 
   Future<void> _unbanUser(_AdminUser user) async {
+    final l10n = AppLocalizations.of(context);
     try {
       await SupabaseService.client.from('profiles').update({
         'is_banned': false,
@@ -123,12 +132,14 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
           );
 
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Engel kaldırıldı')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.t(AppText.adminUnbanUserSuccess))),
+      );
       await _fetchUsers();
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Engel kaldırılamadı: $e')),
+        SnackBar(content: Text(l10n.adminUnbanUserFailed(e.toString()))),
       );
     }
   }
@@ -140,11 +151,14 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
         title: Text(title),
         content: Text(message),
         actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Vazgeç')),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(AppLocalizations.of(ctx).t(AppText.commonCancel)),
+          ),
           ElevatedButton(
             onPressed: () => Navigator.of(ctx).pop(true),
             style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFDC2626)),
-            child: const Text('Onayla'),
+            child: Text(AppLocalizations.of(ctx).t(AppText.commonConfirm)),
           ),
         ],
       ),
@@ -154,6 +168,7 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final query = _searchCtrl.text.trim().toLowerCase();
     final filtered = _users.where((u) {
       if (query.isEmpty) return true;
@@ -165,8 +180,11 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
     return AdminPageScaffold(
       header: AdminPageHeader(
         icon: Icons.group_outlined,
-        title: 'Kullanıcı Yönetimi',
-        trailing: Text('Toplam: ${_users.length} kullanıcı', style: const TextStyle(color: Color(0xFF6B7280))),
+        title: l10n.t(AppText.adminUsersTitle),
+        trailing: Text(
+          l10n.adminUsersTotalCountWithCount(_users.length),
+          style: const TextStyle(color: Color(0xFF6B7280)),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -182,7 +200,7 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
               controller: _searchCtrl,
               onChanged: (_) => setState(() {}),
               decoration: InputDecoration(
-                hintText: 'Ad, email veya üniversite ara...',
+                hintText: l10n.t(AppText.adminUsersSearchHint),
                 prefixIcon: const Icon(Icons.search),
                 filled: true,
                 fillColor: const Color(0xFFF9FAFB),
@@ -228,6 +246,7 @@ class _UsersTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -237,12 +256,12 @@ class _UsersTable extends StatelessWidget {
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: DataTable(
-          columns: const [
-            DataColumn(label: Text('Kullanıcı')),
-            DataColumn(label: Text('Eğitim')),
-            DataColumn(label: Text('Başvurular')),
-            DataColumn(label: Text('Kayıt Tarihi')),
-            DataColumn(label: Text('İşlemler')),
+          columns: [
+            DataColumn(label: Text(l10n.t(AppText.adminUsersTableUser))),
+            DataColumn(label: Text(l10n.t(AppText.adminUsersTableEducation))),
+            DataColumn(label: Text(l10n.t(AppText.adminUsersTableApplications))),
+            DataColumn(label: Text(l10n.t(AppText.adminUsersTableRegisteredAt))),
+            DataColumn(label: Text(l10n.t(AppText.adminTableActions))),
           ],
           rows: users.map((user) {
             return DataRow(
@@ -251,7 +270,10 @@ class _UsersTable extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(user.fullName ?? 'İsimsiz', style: const TextStyle(fontWeight: FontWeight.w700)),
+                      Text(
+                        user.fullName ?? l10n.t(AppText.commonUnnamedCandidate),
+                        style: const TextStyle(fontWeight: FontWeight.w700),
+                      ),
                       Text(user.email ?? '-', style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280))),
                     ],
                   ),
@@ -265,7 +287,7 @@ class _UsersTable extends StatelessWidget {
                     ],
                   ),
                 ),
-                DataCell(Text('${user.applicationsCount} başvuru', style: const TextStyle(fontSize: 12))),
+                DataCell(Text('${user.applicationsCount}', style: const TextStyle(fontSize: 12))),
                 DataCell(Text(user.createdAtDate, style: const TextStyle(fontSize: 12))),
                 DataCell(
                   Row(
@@ -301,6 +323,7 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -309,10 +332,10 @@ class _EmptyState extends StatelessWidget {
         border: Border.all(color: const Color(0xFFE5E7EB)),
       ),
       child: Column(
-        children: const [
-          Icon(Icons.group_outlined, size: 56, color: Color(0xFF9CA3AF)),
-          SizedBox(height: 8),
-          Text('Kullanıcı bulunamadı', style: TextStyle(fontWeight: FontWeight.w800)),
+        children: [
+          const Icon(Icons.group_outlined, size: 56, color: Color(0xFF9CA3AF)),
+          const SizedBox(height: 8),
+          Text(l10n.t(AppText.noResults), style: const TextStyle(fontWeight: FontWeight.w800)),
         ],
       ),
     );
@@ -326,6 +349,7 @@ class _ErrorState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -336,7 +360,7 @@ class _ErrorState extends StatelessWidget {
             const SizedBox(height: 10),
             Text(text, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFF6B7280))),
             const SizedBox(height: 12),
-            ElevatedButton(onPressed: onRetry, child: const Text('Tekrar Dene')),
+            ElevatedButton(onPressed: onRetry, child: Text(l10n.t(AppText.retry))),
           ],
         ),
       ),

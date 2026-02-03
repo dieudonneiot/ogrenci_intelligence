@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/supabase/supabase_service.dart';
 import '../controllers/auth_controller.dart';
 
@@ -27,15 +28,16 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
   }
 
   Future<void> _applyLink() async {
+    final l10n = AppLocalizations.of(context);
     final raw = _linkCtrl.text.trim();
     if (raw.isEmpty) {
-      setState(() => _linkError = 'Paste the full reset link from your email.');
+      setState(() => _linkError = l10n.t(AppText.authLinkRequired));
       return;
     }
 
     final uri = Uri.tryParse(raw);
     if (uri == null) {
-      setState(() => _linkError = 'Invalid link format.');
+      setState(() => _linkError = l10n.t(AppText.authLinkInvalid));
       return;
     }
 
@@ -47,27 +49,28 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
         _linkError = null;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Link accepted. You can set a new password now.')),
+        SnackBar(content: Text(l10n.t(AppText.authLinkAccepted))),
       );
     } catch (e) {
-      setState(() => _linkError = 'Invalid or expired link.');
+      setState(() => _linkError = l10n.t(AppText.authLinkExpired));
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final busy = ref.watch(authActionLoadingProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Reset Password')),
+      appBar: AppBar(title: Text(l10n.t(AppText.authResetTitle))),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
             TextField(
               controller: _linkCtrl,
-              decoration: const InputDecoration(
-                labelText: 'Paste reset link (if not redirected automatically)',
+              decoration: InputDecoration(
+                labelText: l10n.t(AppText.authPasteResetLink),
               ),
             ),
             const SizedBox(height: 8),
@@ -75,13 +78,13 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
               children: [
                 ElevatedButton(
                   onPressed: _applyLink,
-                  child: const Text('Use reset link'),
+                  child: Text(l10n.t(AppText.authUseResetLink)),
                 ),
                 const SizedBox(width: 12),
                 if (_linkApplied)
-                  const Text(
-                    'Link applied',
-                    style: TextStyle(color: Colors.green),
+                  Text(
+                    l10n.t(AppText.authLinkApplied),
+                    style: const TextStyle(color: Colors.green),
                   ),
               ],
             ),
@@ -96,16 +99,16 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
             TextField(
               controller: _password,
               obscureText: true,
-              decoration: const InputDecoration(
-                labelText: 'New password',
+              decoration: InputDecoration(
+                labelText: l10n.t(AppText.authNewPasswordLabel),
               ),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: _confirm,
               obscureText: true,
-              decoration: const InputDecoration(
-                labelText: 'Confirm password',
+              decoration: InputDecoration(
+                labelText: l10n.t(AppText.commonConfirmPassword),
               ),
             ),
             const SizedBox(height: 12),
@@ -119,8 +122,8 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                       final session = SupabaseService.client.auth.currentSession;
                       if (session == null) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Open the reset link first (or paste it above).'),
+                          SnackBar(
+                            content: Text(l10n.t(AppText.authOpenResetLinkFirst)),
                           ),
                         );
                         return;
@@ -128,14 +131,14 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
 
                       if (password.length < 6) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Password must be at least 6 characters.')),
+                          SnackBar(content: Text(l10n.t(AppText.commonPasswordMin))),
                         );
                         return;
                       }
 
                       if (password != confirm) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Passwords do not match.')),
+                          SnackBar(content: Text(l10n.t(AppText.commonPasswordsNoMatch))),
                         );
                         return;
                       }
@@ -146,7 +149,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                       if (!context.mounted) return;
 
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(err ?? 'Password updated')),
+                        SnackBar(content: Text(err ?? l10n.t(AppText.authPasswordUpdated))),
                       );
                     },
               child: busy
@@ -155,7 +158,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                       width: 18,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : const Text('Update'),
+                  : Text(l10n.t(AppText.commonUpdate)),
             ),
           ],
         ),

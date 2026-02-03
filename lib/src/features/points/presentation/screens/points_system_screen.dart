@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/localization/app_localizations.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
 import '../../application/points_providers.dart';
 import '../../domain/points_models.dart';
@@ -35,27 +36,28 @@ class _GuestPointsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Puan Sistemi', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900)),
+        Text(l10n.t(AppText.pointsSystem), style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900)),
         const SizedBox(height: 6),
-        const Text(
-          'Kurslara kayıt ol, ilerleme kaydet, rozet kazan ve ödülleri aç.',
-          style: TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
+        Text(
+          l10n.t(AppText.pointsSystemGuestSubtitle),
+          style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
         ),
         const SizedBox(height: 16),
         _Card(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              _Bullet('Kurs kaydı → puan kazan'),
-              _Bullet('Kurs tamamla → ekstra puan + rozet'),
-              _Bullet('Toplanan puanlarla ödüllerin kilidini aç'),
-              SizedBox(height: 10),
+            children: [
+              _Bullet(l10n.t(AppText.pointsSystemGuestBullet1)),
+              _Bullet(l10n.t(AppText.pointsSystemGuestBullet2)),
+              _Bullet(l10n.t(AppText.pointsSystemGuestBullet3)),
+              const SizedBox(height: 10),
               Text(
-                'Giriş yaptıktan sonra puan geçmişini ve ödüllerini burada göreceksin.',
-                style: TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
+                l10n.t(AppText.pointsSystemGuestSignInHint),
+                style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
               ),
             ],
           ),
@@ -70,6 +72,7 @@ class _AuthedPointsView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final totalPointsAsync = ref.watch(myTotalPointsProvider);
     final rewardsAsync = ref.watch(rewardsProvider);
     final historyAsync = ref.watch(myPointsHistoryProvider);
@@ -78,11 +81,11 @@ class _AuthedPointsView extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Puan Sistemi', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900)),
+        Text(l10n.t(AppText.pointsSystem), style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900)),
         const SizedBox(height: 6),
-        const Text(
-          'Puanlarını takip et, ödülleri hedefle.',
-          style: TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
+        Text(
+          l10n.t(AppText.pointsSystemAuthedSubtitle),
+          style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
         ),
         const SizedBox(height: 14),
 
@@ -90,7 +93,7 @@ class _AuthedPointsView extends ConsumerWidget {
         _Card(
           child: totalPointsAsync.when(
             loading: () => const _MiniLoading(height: 84),
-            error: (e, _) => _MiniError('Puanlar yüklenemedi: $e'),
+            error: (e, _) => _MiniError(l10n.pointsSystemLoadFailed(e.toString())),
             data: (total) {
               return rewardsAsync.when(
                 loading: () => _Summary(totalPoints: total, next: null),
@@ -122,10 +125,10 @@ class _AuthedPointsView extends ConsumerWidget {
                   unselectedLabelColor: const Color(0xFF6B7280),
                   labelStyle: const TextStyle(fontWeight: FontWeight.w900),
                   indicatorColor: const Color(0xFF6D28D9),
-                  tabs: const [
-                    Tab(text: 'Geçmiş'),
-                    Tab(text: 'Ödüller'),
-                    Tab(text: 'Rozetler'),
+                  tabs: [
+                    Tab(text: l10n.t(AppText.pointsSystemTabHistory)),
+                    Tab(text: l10n.t(AppText.pointsSystemTabRewards)),
+                    Tab(text: l10n.t(AppText.pointsSystemTabBadges)),
                   ],
                 ),
               ),
@@ -135,23 +138,23 @@ class _AuthedPointsView extends ConsumerWidget {
                 child: TabBarView(
                   children: [
                     // History
-                    historyAsync.when(
-                      loading: () => const Center(child: CircularProgressIndicator(strokeWidth: 2.5)),
-                      error: (e, _) => _MiniError('Geçmiş yüklenemedi: $e'),
-                      data: (items) => items.isEmpty
-                          ? const _Empty(text: 'Henüz puan hareketi yok.')
-                          : ListView.builder(
-                              itemCount: items.length,
-                              itemBuilder: (_, i) => _PointRow(p: items[i]),
-                            ),
-                    ),
+                      historyAsync.when(
+                        loading: () => const Center(child: CircularProgressIndicator(strokeWidth: 2.5)),
+                        error: (e, _) => _MiniError(l10n.pointsSystemHistoryLoadFailed(e.toString())),
+                        data: (items) => items.isEmpty
+                            ? _Empty(text: l10n.t(AppText.pointsSystemHistoryEmpty))
+                            : ListView.builder(
+                                itemCount: items.length,
+                                itemBuilder: (_, i) => _PointRow(p: items[i]),
+                              ),
+                      ),
 
                     // Rewards
                     rewardsAsync.when(
                       loading: () => const Center(child: CircularProgressIndicator(strokeWidth: 2.5)),
-                      error: (e, _) => _MiniError('Ödüller yüklenemedi: $e'),
+                      error: (e, _) => _MiniError(l10n.pointsSystemRewardsLoadFailed(e.toString())),
                       data: (items) => items.isEmpty
-                          ? const _Empty(text: 'Ödül bulunamadı.')
+                          ? _Empty(text: l10n.t(AppText.pointsSystemRewardsEmpty))
                           : totalPointsAsync.maybeWhen(
                               data: (total) => ListView.builder(
                                 itemCount: items.length,
@@ -167,9 +170,9 @@ class _AuthedPointsView extends ConsumerWidget {
                     // Badges
                     badgesAsync.when(
                       loading: () => const Center(child: CircularProgressIndicator(strokeWidth: 2.5)),
-                      error: (e, _) => _MiniError('Rozetler yüklenemedi: $e'),
+                      error: (e, _) => _MiniError(l10n.pointsSystemBadgesLoadFailed(e.toString())),
                       data: (items) => items.isEmpty
-                          ? const _Empty(text: 'Henüz rozet yok. Kurs tamamlayınca rozetler gelir 😉')
+                          ? _Empty(text: l10n.t(AppText.pointsSystemBadgesEmpty))
                           : ListView.builder(
                               itemCount: items.length,
                               itemBuilder: (_, i) => _BadgeCard(b: items[i]),
@@ -221,6 +224,7 @@ class _Summary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final nextPoints = next?.requiredPoints;
     final progress = (nextPoints == null || nextPoints <= 0)
         ? 1.0
@@ -242,13 +246,13 @@ class _Summary extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Toplam Puan', style: TextStyle(fontWeight: FontWeight.w900)),
+              Text(l10n.t(AppText.dashboardTotalPoints), style: const TextStyle(fontWeight: FontWeight.w900)),
               const SizedBox(height: 2),
               Text('$totalPoints', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900)),
               const SizedBox(height: 8),
               if (next != null) ...[
                 Text(
-                  'Sonraki ödül: ${next!.title} (${next!.requiredPoints} puan)',
+                  l10n.pointsSystemNextReward(title: next!.title, points: next!.requiredPoints),
                   style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
                 ),
                 const SizedBox(height: 6),
@@ -262,9 +266,9 @@ class _Summary extends StatelessWidget {
                   ),
                 ),
               ] else ...[
-                const Text(
-                  'Tüm ödüller açılmış olabilir 🎉',
-                  style: TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
+                Text(
+                  l10n.t(AppText.pointsSystemAllRewardsUnlocked),
+                  style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
                 ),
               ],
             ],
@@ -342,6 +346,7 @@ class _RewardCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final unlocked = totalPoints >= reward.requiredPoints;
 
     return Container(
@@ -383,7 +388,7 @@ class _RewardCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(999),
                       ),
                       child: Text(
-                        unlocked ? 'Açıldı' : 'Kilitli',
+                        unlocked ? l10n.t(AppText.commonUnlocked) : l10n.t(AppText.commonLocked),
                         style: TextStyle(
                           fontWeight: FontWeight.w900,
                           fontSize: 12,
@@ -402,7 +407,7 @@ class _RewardCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  '${reward.requiredPoints} puan',
+                  l10n.pointsValue(reward.requiredPoints),
                   style: const TextStyle(fontWeight: FontWeight.w900),
                 ),
               ],
@@ -420,6 +425,7 @@ class _BadgeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final dateText = MaterialLocalizations.of(context).formatShortDate(b.earnedAt);
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(14),
@@ -452,7 +458,7 @@ class _BadgeCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  '+${b.pointsAwarded} • ${b.earnedAt.day.toString().padLeft(2, '0')}.${b.earnedAt.month.toString().padLeft(2, '0')}.${b.earnedAt.year}',
+                  '+${b.pointsAwarded} • $dateText',
                   style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w800, fontSize: 12),
                 ),
               ],

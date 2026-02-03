@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../../core/supabase/supabase_service.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
@@ -51,6 +52,7 @@ class _UserSettingsScreenState extends ConsumerState<UserSettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final authAsync = ref.watch(authViewStateProvider);
     if (authAsync.isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -62,7 +64,7 @@ class _UserSettingsScreenState extends ConsumerState<UserSettingsScreen> {
 
     if (!isLoggedIn || user == null) {
       return _GuestView(
-        title: 'Ayarları görmek için giriş yapmalısın.',
+        title: l10n.t(AppText.settingsLoginRequired),
       );
     }
 
@@ -184,6 +186,7 @@ class _UserSettingsScreenState extends ConsumerState<UserSettingsScreen> {
   }
 
   Future<void> _saveProfile() async {
+    final l10n = AppLocalizations.of(context);
     final user = ref.read(authViewStateProvider).value?.user;
     if (user == null) return;
 
@@ -200,12 +203,12 @@ class _UserSettingsScreenState extends ConsumerState<UserSettingsScreen> {
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Profil bilgileri güncellendi!')),
+        SnackBar(content: Text(l10n.t(AppText.settingsProfileUpdated))),
       );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Güncelleme başarısız: $e')),
+        SnackBar(content: Text(l10n.commonUpdateFailed(e.toString()))),
       );
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -213,19 +216,20 @@ class _UserSettingsScreenState extends ConsumerState<UserSettingsScreen> {
   }
 
   Future<void> _savePassword() async {
+    final l10n = AppLocalizations.of(context);
     final newPassword = _newPasswordCtrl.text;
     final confirm = _confirmPasswordCtrl.text;
 
     if (newPassword != confirm) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Yeni şifreler eşleşmiyor!')),
+        SnackBar(content: Text(l10n.t(AppText.commonPasswordsNoMatch))),
       );
       return;
     }
 
     if (newPassword.length < 6) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Şifre en az 6 karakter olmalıdır!')),
+        SnackBar(content: Text(l10n.t(AppText.commonPasswordMin))),
       );
       return;
     }
@@ -236,14 +240,14 @@ class _UserSettingsScreenState extends ConsumerState<UserSettingsScreen> {
 
     if (err != null && err.isNotEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Şifre güncellenemedi: $err')),
+        SnackBar(content: Text(l10n.settingsPasswordUpdateFailed(err))),
       );
     } else {
       _currentPasswordCtrl.clear();
       _newPasswordCtrl.clear();
       _confirmPasswordCtrl.clear();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Şifre güncellendi!')),
+        SnackBar(content: Text(l10n.t(AppText.settingsPasswordUpdated))),
       );
     }
 
@@ -251,6 +255,7 @@ class _UserSettingsScreenState extends ConsumerState<UserSettingsScreen> {
   }
 
   Future<void> _togglePref(_PrefKey key) async {
+    final l10n = AppLocalizations.of(context);
     final user = ref.read(authViewStateProvider).value?.user;
     if (user == null) return;
 
@@ -271,38 +276,36 @@ class _UserSettingsScreenState extends ConsumerState<UserSettingsScreen> {
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Bildirim tercihi güncellendi!')),
+        SnackBar(content: Text(l10n.t(AppText.settingsPreferencesUpdated))),
       );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Tercih güncellenemedi: $e')),
+        SnackBar(content: Text(l10n.commonUpdateFailed(e.toString()))),
       );
     }
   }
 
   Future<void> _confirmDeleteAccount() async {
+    final l10n = AppLocalizations.of(context);
     final user = ref.read(authViewStateProvider).value?.user;
     if (user == null) return;
 
     final ctrl = TextEditingController();
+    final phrase = l10n.t(AppText.settingsDeleteAccountConfirmPhrase);
     final confirm = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Hesabı Kalıcı Olarak Sil'),
+        title: Text(l10n.t(AppText.settingsDeleteAccountTitle)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Bu işlem geri alınamaz! Hesabınızı silerseniz:'),
+            Text(l10n.t(AppText.settingsDeleteAccountWarning)),
             const SizedBox(height: 10),
-            const Text('• Tüm kişisel bilgileriniz silinecek'),
-            const Text('• Kurs kayıtlarınız iptal olacak'),
-            const Text('• Başvurularınız silinecek'),
-            const Text('• Kazandığınız puanlar kaybolacak'),
-            const Text('• Bu e-posta ile tekrar kayıt olamayacaksınız'),
+            Text(l10n.t(AppText.settingsDeleteAccountConsequences)),
             const SizedBox(height: 12),
-            const Text('Onaylamak için HESABIMI SIL yazın:'),
+            Text(l10n.settingsDeleteAccountTypeToConfirm(phrase)),
             const SizedBox(height: 6),
             TextField(controller: ctrl),
           ],
@@ -310,12 +313,12 @@ class _UserSettingsScreenState extends ConsumerState<UserSettingsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('İptal'),
+            child: Text(l10n.t(AppText.commonCancel)),
           ),
           ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(ctrl.text.trim() == 'HESABIMI SIL'),
+            onPressed: () => Navigator.of(context).pop(ctrl.text.trim() == phrase),
             style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFEF4444)),
-            child: const Text('Hesabı Sil'),
+            child: Text(l10n.t(AppText.settingsDeleteAccountButton)),
           ),
         ],
       ),
@@ -326,6 +329,7 @@ class _UserSettingsScreenState extends ConsumerState<UserSettingsScreen> {
   }
 
   Future<void> _deleteAccount() async {
+    final l10n = AppLocalizations.of(context);
     setState(() => _loading = true);
     try {
       await SupabaseService.client.rpc('delete_user');
@@ -336,7 +340,7 @@ class _UserSettingsScreenState extends ConsumerState<UserSettingsScreen> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Hesap silinirken hata oluştu: $e')),
+        SnackBar(content: Text(l10n.settingsDeleteAccountFailed(e.toString()))),
       );
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -347,6 +351,7 @@ class _UserSettingsScreenState extends ConsumerState<UserSettingsScreen> {
 class _HeaderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -361,10 +366,13 @@ class _HeaderCard extends StatelessWidget {
         ],
       ),
       child: Row(
-        children: const [
-          Icon(Icons.settings, color: Colors.white, size: 28),
-          SizedBox(width: 10),
-          Text('Ayarlar', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900)),
+        children: [
+          const Icon(Icons.settings, color: Colors.white, size: 28),
+          const SizedBox(width: 10),
+          Text(
+            l10n.t(AppText.navSettings),
+            style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900),
+          ),
         ],
       ),
     );
@@ -382,6 +390,7 @@ class _SettingsSidebar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -394,28 +403,28 @@ class _SettingsSidebar extends StatelessWidget {
           _TabTile(
             id: 'profile',
             active: activeTab == 'profile',
-            label: 'Profil',
+            label: l10n.t(AppText.profile),
             icon: Icons.person_outline,
             onTap: onSelect,
           ),
           _TabTile(
             id: 'password',
             active: activeTab == 'password',
-            label: 'Şifre',
+            label: l10n.t(AppText.commonPassword),
             icon: Icons.lock_outline,
             onTap: onSelect,
           ),
           _TabTile(
             id: 'notifications',
             active: activeTab == 'notifications',
-            label: 'Bildirimler',
+            label: l10n.t(AppText.navNotifications),
             icon: Icons.notifications_none,
             onTap: onSelect,
           ),
           _TabTile(
             id: 'privacy',
             active: activeTab == 'privacy',
-            label: 'Gizlilik',
+            label: l10n.t(AppText.settingsPrivacy),
             icon: Icons.shield_outlined,
             onTap: onSelect,
           ),
@@ -514,6 +523,7 @@ class _SettingsContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -526,12 +536,13 @@ class _SettingsContent extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (activeTab == 'profile') ...[
-            const Text('Profil Bilgileri', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+            Text(l10n.t(AppText.settingsProfileInfoTitle),
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
             const SizedBox(height: 14),
             TextField(
               controller: fullNameCtrl,
               decoration: InputDecoration(
-                labelText: 'Ad Soyad',
+                labelText: l10n.t(AppText.commonFullName),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
               ),
             ),
@@ -540,7 +551,7 @@ class _SettingsContent extends StatelessWidget {
               initialValue: email,
               enabled: false,
               decoration: InputDecoration(
-                labelText: 'E-posta Adresi',
+                labelText: l10n.t(AppText.commonEmail),
                 filled: true,
                 fillColor: const Color(0xFFF3F4F6),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
@@ -550,30 +561,31 @@ class _SettingsContent extends StatelessWidget {
             ElevatedButton.icon(
               onPressed: loading ? null : onSaveProfile,
               icon: const Icon(Icons.save),
-              label: Text(loading ? 'Kaydediliyor...' : 'Değişiklikleri Kaydet'),
+              label: Text(loading ? l10n.t(AppText.commonSaving) : l10n.t(AppText.settingsSaveChanges)),
               style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6D28D9)),
             ),
           ],
           if (activeTab == 'password') ...[
-            const Text('Şifre Değiştir', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+            Text(l10n.t(AppText.settingsChangePasswordTitle),
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
             const SizedBox(height: 14),
             _PasswordField(
               controller: currentPasswordCtrl,
-              label: 'Mevcut Şifre',
+              label: l10n.t(AppText.settingsCurrentPassword),
               show: showCurrent,
               onToggle: onToggleCurrent,
             ),
             const SizedBox(height: 10),
             _PasswordField(
               controller: newPasswordCtrl,
-              label: 'Yeni Şifre',
+              label: l10n.t(AppText.settingsNewPassword),
               show: showNew,
               onToggle: onToggleNew,
             ),
             const SizedBox(height: 10),
             _PasswordField(
               controller: confirmPasswordCtrl,
-              label: 'Yeni Şifre (Tekrar)',
+              label: l10n.t(AppText.settingsNewPasswordRepeat),
               show: showConfirm,
               onToggle: onToggleConfirm,
             ),
@@ -581,68 +593,72 @@ class _SettingsContent extends StatelessWidget {
             ElevatedButton.icon(
               onPressed: loading ? null : onSavePassword,
               icon: const Icon(Icons.lock_outline),
-              label: Text(loading ? 'Güncelleniyor...' : 'Şifreyi Güncelle'),
+              label: Text(loading ? l10n.t(AppText.commonUpdating) : l10n.t(AppText.settingsUpdatePassword)),
               style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6D28D9)),
             ),
           ],
           if (activeTab == 'notifications') ...[
-            const Text('Bildirim Tercihleri', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+            Text(l10n.t(AppText.settingsNotificationPreferencesTitle),
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
             const SizedBox(height: 14),
             if (prefsLoading)
               const Center(child: CircularProgressIndicator())
             else ...[
               _PrefTile(
-                title: 'E-posta Bildirimleri',
-                subtitle: 'Önemli güncellemeler için e-posta al',
+                title: l10n.t(AppText.settingsPrefEmailTitle),
+                subtitle: l10n.t(AppText.settingsPrefEmailSubtitle),
                 value: prefs.email,
                 onChanged: (_) => onTogglePref(_PrefKey.email),
               ),
               _PrefTile(
-                title: 'Yeni Kurs Bildirimleri',
-                subtitle: 'Yeni kurslar eklendiğinde haberdar ol',
+                title: l10n.t(AppText.settingsPrefNewCoursesTitle),
+                subtitle: l10n.t(AppText.settingsPrefNewCoursesSubtitle),
                 value: prefs.newCourses,
                 onChanged: (_) => onTogglePref(_PrefKey.newCourses),
               ),
               _PrefTile(
-                title: 'İş İlanı Uyarıları',
-                subtitle: 'Profiline uygun iş ilanları için bildirim al',
+                title: l10n.t(AppText.settingsPrefJobAlertsTitle),
+                subtitle: l10n.t(AppText.settingsPrefJobAlertsSubtitle),
                 value: prefs.jobAlerts,
                 onChanged: (_) => onTogglePref(_PrefKey.jobAlerts),
               ),
               _PrefTile(
-                title: 'Haftalık Bülten',
-                subtitle: 'Haftalık özet ve öneriler al',
+                title: l10n.t(AppText.settingsPrefNewsletterTitle),
+                subtitle: l10n.t(AppText.settingsPrefNewsletterSubtitle),
                 value: prefs.newsletter,
                 onChanged: (_) => onTogglePref(_PrefKey.newsletter),
               ),
             ],
           ],
           if (activeTab == 'privacy') ...[
-            const Text('Gizlilik ve Güvenlik', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+            Text(l10n.t(AppText.settingsPrivacySecurityTitle),
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
             const SizedBox(height: 14),
             _InfoBox(
-              title: 'İki Faktörlü Doğrulama',
-              subtitle: 'Hesabınızı ekstra güvenlik katmanı ile koruyun',
-              actionLabel: 'Etkinleştir →',
+              title: l10n.t(AppText.settingsTwoFactorTitle),
+              subtitle: l10n.t(AppText.settingsTwoFactorSubtitle),
+              actionLabel: l10n.t(AppText.settingsEnableArrow),
             ),
             const SizedBox(height: 12),
             _VisibilityBox(),
             const SizedBox(height: 16),
-            const Text('Tehlike Bölgesi',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Color(0xFFEF4444))),
+            Text(
+              l10n.t(AppText.settingsDangerZoneTitle),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Color(0xFFEF4444)),
+            ),
             const SizedBox(height: 10),
             _DangerRow(
-              title: 'Hesabı Geçici Olarak Dondur',
-              subtitle: 'Hesabınız geçici olarak erişime kapatılır',
-              actionLabel: 'Dondur',
+              title: l10n.t(AppText.settingsFreezeAccountTitle),
+              subtitle: l10n.t(AppText.settingsFreezeAccountSubtitle),
+              actionLabel: l10n.t(AppText.settingsFreezeAccountButton),
               actionColor: const Color(0xFF374151),
               onTap: () {},
             ),
             const SizedBox(height: 8),
             _DangerRow(
-              title: 'Hesabı Kalıcı Olarak Sil',
-              subtitle: 'Bu işlem geri alınamaz!',
-              actionLabel: 'Hesabı Sil',
+              title: l10n.t(AppText.settingsDeleteAccountTitle),
+              subtitle: l10n.t(AppText.settingsDeleteAccountSubtitle),
+              actionLabel: l10n.t(AppText.settingsDeleteAccountButton),
               actionColor: const Color(0xFFEF4444),
               onTap: onDeleteAccount,
             ),
@@ -774,6 +790,7 @@ class _InfoBox extends StatelessWidget {
 class _VisibilityBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -783,12 +800,12 @@ class _VisibilityBox extends StatelessWidget {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
-          Text('Profil Görünürlüğü', style: TextStyle(fontWeight: FontWeight.w800)),
-          SizedBox(height: 8),
-          _RadioRow(label: 'Herkese açık', value: true),
-          _RadioRow(label: 'Sadece kayıtlı kullanıcılar', value: false),
-          _RadioRow(label: 'Gizli', value: false),
+        children: [
+          Text(l10n.t(AppText.settingsProfileVisibilityTitle), style: const TextStyle(fontWeight: FontWeight.w800)),
+          const SizedBox(height: 8),
+          _RadioRow(label: l10n.t(AppText.settingsVisibilityPublic), value: true),
+          _RadioRow(label: l10n.t(AppText.settingsVisibilityRegistered), value: false),
+          _RadioRow(label: l10n.t(AppText.settingsVisibilityHidden), value: false),
         ],
       ),
     );

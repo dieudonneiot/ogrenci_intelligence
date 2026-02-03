@@ -1,5 +1,5 @@
 import 'dart:async';
-// ✅ for unawaited
+// for unawaited
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -29,7 +29,7 @@ class AuthViewState {
 
   bool get isEmailVerified => user?.emailConfirmedAt != null;
 
-  // ✅ AUTHENTICATED = signed in + verified
+  // AUTHENTICATED = signed in + verified
   bool get isAuthenticated => user != null && session != null && isEmailVerified;
 }
 
@@ -53,7 +53,7 @@ final authViewStateProvider = StreamProvider<AuthViewState>((ref) {
     final verified = user != null && user.emailConfirmedAt != null;
 
     if (verified) {
-      userType = UserType.student; // ✅ default if verified
+      userType = UserType.student; // default if verified
 
       // Admin check (best-effort, must not break auth stream)
       try {
@@ -80,7 +80,7 @@ final authViewStateProvider = StreamProvider<AuthViewState>((ref) {
       }
     }
 
-    // ✅ ALWAYS emit a state (never skip)
+    // ALWAYS emit a state (never skip)
     controller.add(
       AuthViewState(
         user: user,

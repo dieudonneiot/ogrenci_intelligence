@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../core/localization/app_localizations.dart';
+
 class ContactScreen extends StatefulWidget {
   const ContactScreen({super.key});
 
@@ -24,11 +26,12 @@ class _ContactScreenState extends State<ContactScreen> {
   }
 
   Future<void> _send() async {
+    final l10n = AppLocalizations.of(context);
     if (_nameCtrl.text.trim().isEmpty ||
         _emailCtrl.text.trim().isEmpty ||
         _subject.trim().isEmpty ||
         _messageCtrl.text.trim().isEmpty) {
-      _snack('Lütfen tüm zorunlu alanları doldurun.', isError: true);
+      _snack(l10n.t(AppText.contactFillRequired), isError: true);
       return;
     }
 
@@ -42,7 +45,7 @@ class _ContactScreenState extends State<ContactScreen> {
     _messageCtrl.clear();
     _subject = '';
 
-    _snack('Mesajınız başarıyla gönderildi! En kısa sürede dönüş yapacağız.');
+    _snack(l10n.t(AppText.contactSendSuccess));
   }
 
   void _snack(String msg, {bool isError = false}) {
@@ -59,6 +62,7 @@ class _ContactScreenState extends State<ContactScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       color: const Color(0xFFF9FAFB),
       child: SingleChildScrollView(
@@ -85,7 +89,7 @@ class _ContactScreenState extends State<ContactScreen> {
                               _InfoCard(
                                 icon: Icons.mail_outline,
                                 color: const Color(0xFF7C3AED),
-                                title: 'E-posta',
+                                title: l10n.t(AppText.contactEmailTitle),
                                 child: InkWell(
                                   onTap: () => _launch('mailto:info@ogrenciintelligence.com'),
                                   child: const Text(
@@ -97,7 +101,7 @@ class _ContactScreenState extends State<ContactScreen> {
                               _InfoCard(
                                 icon: Icons.phone_outlined,
                                 color: const Color(0xFF16A34A),
-                                title: 'Telefon',
+                                title: l10n.t(AppText.contactPhoneTitle),
                                 child: InkWell(
                                   onTap: () => _launch('tel:+905524635992'),
                                   child: const Text(
@@ -106,23 +110,19 @@ class _ContactScreenState extends State<ContactScreen> {
                                   ),
                                 ),
                               ),
-                              const _InfoCard(
+                              _InfoCard(
                                 icon: Icons.location_on_outlined,
                                 color: Color(0xFF2563EB),
-                                title: 'Adres',
-                                child: Text(
-                                  'Teknokent, İnovasyon Cad. No:1234\nBeşiktaş, İstanbul',
-                                  style: TextStyle(color: Color(0xFF6B7280)),
-                                ),
+                                title: l10n.t(AppText.contactAddressTitle),
+                                child: Text(l10n.t(AppText.contactAddressBody),
+                                    style: const TextStyle(color: Color(0xFF6B7280))),
                               ),
-                              const _InfoCard(
+                              _InfoCard(
                                 icon: Icons.schedule,
                                 color: Color(0xFFF59E0B),
-                                title: 'Çalışma Saatleri',
-                                child: Text(
-                                  'Pazartesi - Cuma: 09:00 - 18:00\nCumartesi: 10:00 - 14:00',
-                                  style: TextStyle(color: Color(0xFF6B7280)),
-                                ),
+                                title: l10n.t(AppText.contactHoursTitle),
+                                child: Text(l10n.t(AppText.contactHoursBody),
+                                    style: const TextStyle(color: Color(0xFF6B7280))),
                               ),
                             ],
                           ),
@@ -165,6 +165,7 @@ class _Hero extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -192,13 +193,13 @@ class _Hero extends StatelessWidget {
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              Text('İletişim',
-                  style: TextStyle(fontSize: 32, fontWeight: FontWeight.w900, color: Colors.white)),
-              SizedBox(height: 10),
+            children: [
+              Text(l10n.t(AppText.contactHeroTitle),
+                  style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w900, color: Colors.white)),
+              const SizedBox(height: 10),
               Text(
-                'Sorularınız, önerileriniz veya iş birliği teklifleriniz için bizimle iletişime geçin.',
-                style: TextStyle(color: Color(0xFFCBD5F5), height: 1.4),
+                l10n.t(AppText.contactHeroSubtitle),
+                style: const TextStyle(color: Color(0xFFCBD5F5), height: 1.4),
               ),
             ],
           ),
@@ -296,6 +297,7 @@ class _FormCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
@@ -308,10 +310,10 @@ class _FormCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            children: const [
-              Icon(Icons.chat_bubble_outline, color: Color(0xFF6D28D9)),
-              SizedBox(width: 8),
-              Text('Bize Yazın', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
+            children: [
+              const Icon(Icons.chat_bubble_outline, color: Color(0xFF6D28D9)),
+              const SizedBox(width: 8),
+              Text(l10n.t(AppText.contactFormTitle), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
             ],
           ),
           const SizedBox(height: 16),
@@ -325,11 +327,19 @@ class _FormCard extends StatelessWidget {
                 children: [
                   SizedBox(
                     width: fieldWidth,
-                    child: _Field(label: 'Adınız Soyadınız *', controller: nameCtrl, hint: 'İsim Soyisim'),
+                    child: _Field(
+                      label: l10n.t(AppText.contactNameLabelRequired),
+                      controller: nameCtrl,
+                      hint: l10n.t(AppText.contactNameHint),
+                    ),
                   ),
                   SizedBox(
                     width: fieldWidth,
-                    child: _Field(label: 'E-posta Adresiniz *', controller: emailCtrl, hint: 'ornek@email.com'),
+                    child: _Field(
+                      label: l10n.t(AppText.contactEmailLabelRequired),
+                      controller: emailCtrl,
+                      hint: l10n.t(AppText.contactEmailHint),
+                    ),
                   ),
                 ],
               );
@@ -339,29 +349,29 @@ class _FormCard extends StatelessWidget {
           DropdownButtonFormField<String>(
             initialValue: subject.isEmpty ? null : subject,
             onChanged: onSubjectChanged,
-            items: const [
-              DropdownMenuItem(value: 'general', child: Text('Genel Bilgi')),
-              DropdownMenuItem(value: 'support', child: Text('Teknik Destek')),
-              DropdownMenuItem(value: 'partnership', child: Text('İş Ortaklığı')),
-              DropdownMenuItem(value: 'feedback', child: Text('Öneri ve Şikayet')),
-              DropdownMenuItem(value: 'other', child: Text('Diğer')),
+            items: [
+              DropdownMenuItem(value: 'general', child: Text(l10n.t(AppText.contactSubjectGeneral))),
+              DropdownMenuItem(value: 'support', child: Text(l10n.t(AppText.contactSubjectSupport))),
+              DropdownMenuItem(value: 'partnership', child: Text(l10n.t(AppText.contactSubjectPartnership))),
+              DropdownMenuItem(value: 'feedback', child: Text(l10n.t(AppText.contactSubjectFeedback))),
+              DropdownMenuItem(value: 'other', child: Text(l10n.t(AppText.contactSubjectOther))),
             ],
             decoration: InputDecoration(
-              labelText: 'Konu *',
+              labelText: l10n.t(AppText.contactSubjectLabelRequired),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             ),
           ),
           const SizedBox(height: 12),
           _Field(
-            label: 'Mesajınız *',
+            label: l10n.t(AppText.contactMessageLabelRequired),
             controller: messageCtrl,
-            hint: 'Mesajınızı buraya yazınız...',
+            hint: l10n.t(AppText.contactMessageHint),
             maxLines: 6,
           ),
           const SizedBox(height: 12),
           Row(
             children: [
-              const Text('* işaretli alanlar zorunludur', style: TextStyle(color: Color(0xFF6B7280))),
+              Text(l10n.t(AppText.contactRequiredNote), style: const TextStyle(color: Color(0xFF6B7280))),
               const Spacer(),
               ElevatedButton.icon(
                 onPressed: sending ? null : onSend,
@@ -372,7 +382,7 @@ class _FormCard extends StatelessWidget {
                         child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                       )
                     : const Icon(Icons.send),
-                label: Text(sending ? 'Gönderiliyor...' : 'Gönder'),
+                label: Text(sending ? l10n.t(AppText.commonSending) : l10n.t(AppText.commonSend)),
                 style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6D28D9)),
               ),
             ],
@@ -410,6 +420,7 @@ class _FaqCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -418,20 +429,20 @@ class _FaqCard extends StatelessWidget {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
-          Text('Sıkça Sorulan Sorular', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
-          SizedBox(height: 10),
+        children: [
+          Text(l10n.t(AppText.contactFaqTitle), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+          const SizedBox(height: 10),
           _FaqItem(
-            question: 'Platform kullanımı ücretli mi?',
-            answer: 'Hayır, platformumuz öğrenciler için tamamen ücretsizdir.',
+            question: l10n.t(AppText.contactFaqQ1),
+            answer: l10n.t(AppText.contactFaqA1),
           ),
           _FaqItem(
-            question: 'Hangi üniversite öğrencileri katılabilir?',
-            answer: "Türkiye'deki tüm üniversitelerin öğrencileri platformumuza üye olabilir.",
+            question: l10n.t(AppText.contactFaqQ2),
+            answer: l10n.t(AppText.contactFaqA2),
           ),
           _FaqItem(
-            question: 'İşveren olarak nasıl ilan verebilirim?',
-            answer: 'İş ortaklığı için bizimle iletişime geçebilir veya kurumsal üyelik başvurusu yapabilirsiniz.',
+            question: l10n.t(AppText.contactFaqQ3),
+            answer: l10n.t(AppText.contactFaqA3),
           ),
         ],
       ),
@@ -466,6 +477,7 @@ class _MapPlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       height: 260,
       decoration: BoxDecoration(
@@ -475,10 +487,10 @@ class _MapPlaceholder extends StatelessWidget {
       child: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          children: const [
-            Icon(Icons.location_on_outlined, size: 48, color: Color(0xFF9CA3AF)),
-            SizedBox(height: 8),
-            Text('Harita Alanı', style: TextStyle(color: Color(0xFF6B7280))),
+          children: [
+            const Icon(Icons.location_on_outlined, size: 48, color: Color(0xFF9CA3AF)),
+            const SizedBox(height: 8),
+            Text(l10n.t(AppText.contactMapPlaceholder), style: const TextStyle(color: Color(0xFF6B7280))),
           ],
         ),
       ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/localization/app_localizations.dart';
 import '../../../auth/domain/auth_models.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
 import '../../../company/application/company_providers.dart';
@@ -118,20 +119,21 @@ class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
     final companyId = auth?.companyId;
     if (auth == null || auth.userType != UserType.company || companyId == null) return;
 
+    final l10n = AppLocalizations.of(context);
     if (_nameCtrl.text.trim().isEmpty) {
-      _snack('Sirket adi zorunludur.', error: true);
+      _snack(l10n.t(AppText.companyProfileValidationNameRequired), error: true);
       return;
     }
     if (_sector == null || _sector!.trim().isEmpty) {
-      _snack('Sektör seçimi zorunludur.', error: true);
+      _snack(l10n.t(AppText.companyProfileValidationSectorRequired), error: true);
       return;
     }
     if (_phoneCtrl.text.trim().isEmpty) {
-      _snack('Telefon zorunludur.', error: true);
+      _snack(l10n.t(AppText.companyProfileValidationPhoneRequired), error: true);
       return;
     }
     if (_cityCtrl.text.trim().isEmpty) {
-      _snack('Sehir zorunludur.', error: true);
+      _snack(l10n.t(AppText.companyProfileValidationCityRequired), error: true);
       return;
     }
 
@@ -156,9 +158,9 @@ class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
         'updated_at': DateTime.now().toIso8601String(),
       });
       if (!mounted) return;
-      _snack('Sirket profili güncellendi.');
+      _snack(l10n.t(AppText.companyProfileUpdated));
     } catch (e) {
-      _snack('Güncelleme basarisiz: $e', error: true);
+      _snack(l10n.commonActionFailed('$e'), error: true);
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -172,6 +174,7 @@ class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     if (_loading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -187,72 +190,146 @@ class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Sirket Profili',
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900)),
+                  Text(
+                    l10n.t(AppText.companyProfileTitle),
+                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900),
+                  ),
                   const SizedBox(height: 8),
                   _StatusBanner(status: _approvalStatus, reason: _rejectionReason),
                   const SizedBox(height: 16),
                   _SectionCard(
-                    title: 'Temel Bilgiler',
+                    title: l10n.t(AppText.companyProfileSectionBasic),
                     child: Column(
                       children: [
-                        _Field(label: 'Sirket Adi *', controller: _nameCtrl),
+                        _Field(label: l10n.t(AppText.companyProfileFieldNameRequired), controller: _nameCtrl),
                         _DropdownField(
-                          label: 'Sektör *',
+                          label: l10n.t(AppText.companyProfileFieldSectorRequired),
                           value: _sector,
                           items: _sectors,
                           onChanged: (v) => setState(() => _sector = v),
                         ),
-                        Row(
-                          children: [
-                            Expanded(child: _Field(label: 'Telefon *', controller: _phoneCtrl)),
-                            const SizedBox(width: 12),
-                            Expanded(child: _Field(label: 'E-posta', controller: _emailCtrl)),
-                          ],
+                        LayoutBuilder(
+                          builder: (context, c) {
+                            final narrow = c.maxWidth < 520;
+                            if (narrow) {
+                              return Column(
+                                children: [
+                                  _Field(label: l10n.t(AppText.companyProfileFieldPhoneRequired), controller: _phoneCtrl),
+                                  _Field(label: l10n.t(AppText.companyProfileFieldEmail), controller: _emailCtrl),
+                                ],
+                              );
+                            }
+                            return Row(
+                              children: [
+                                Expanded(
+                                  child: _Field(
+                                    label: l10n.t(AppText.companyProfileFieldPhoneRequired),
+                                    controller: _phoneCtrl,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: _Field(
+                                    label: l10n.t(AppText.companyProfileFieldEmail),
+                                    controller: _emailCtrl,
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
                         ),
-                        Row(
-                          children: [
-                            Expanded(child: _Field(label: 'Web Sitesi', controller: _websiteCtrl)),
-                            const SizedBox(width: 12),
-                            Expanded(child: _Field(label: 'Sehir *', controller: _cityCtrl)),
-                          ],
+                        LayoutBuilder(
+                          builder: (context, c) {
+                            final narrow = c.maxWidth < 520;
+                            if (narrow) {
+                              return Column(
+                                children: [
+                                  _Field(label: l10n.t(AppText.companyProfileFieldWebsite), controller: _websiteCtrl),
+                                  _Field(label: l10n.t(AppText.companyProfileFieldCityRequired), controller: _cityCtrl),
+                                ],
+                              );
+                            }
+                            return Row(
+                              children: [
+                                Expanded(
+                                  child: _Field(
+                                    label: l10n.t(AppText.companyProfileFieldWebsite),
+                                    controller: _websiteCtrl,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: _Field(
+                                    label: l10n.t(AppText.companyProfileFieldCityRequired),
+                                    controller: _cityCtrl,
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
                         ),
-                        _Field(label: 'Adres', controller: _addressCtrl, maxLines: 2),
+                        _Field(label: l10n.t(AppText.companyProfileFieldAddress), controller: _addressCtrl, maxLines: 2),
                       ],
                     ),
                   ),
                   const SizedBox(height: 14),
                   _SectionCard(
-                    title: 'Sirket Detaylari',
+                    title: l10n.t(AppText.companyProfileSectionDetails),
                     child: Column(
                       children: [
-                        _Field(label: 'Sirket Hakkinda', controller: _descriptionCtrl, maxLines: 3),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _Field(
-                                label: 'Kurulus Yili',
-                                controller: _foundedYearCtrl,
-                                keyboardType: TextInputType.number,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: _DropdownField(
-                                label: 'Çalisan Sayisi',
-                                value: _employeeCount,
-                                items: _companySizes,
-                                onChanged: (v) => setState(() => _employeeCount = v),
-                              ),
-                            ),
-                          ],
+                        _Field(
+                          label: l10n.t(AppText.companyProfileFieldAbout),
+                          controller: _descriptionCtrl,
+                          maxLines: 3,
+                        ),
+                        LayoutBuilder(
+                          builder: (context, c) {
+                            final narrow = c.maxWidth < 520;
+                            if (narrow) {
+                              return Column(
+                                children: [
+                                  _Field(
+                                    label: l10n.t(AppText.companyProfileFieldFoundedYear),
+                                    controller: _foundedYearCtrl,
+                                    keyboardType: TextInputType.number,
+                                  ),
+                                  _DropdownField(
+                                    label: l10n.t(AppText.companyProfileFieldCompanySize),
+                                    value: _employeeCount,
+                                    items: _companySizes,
+                                    onChanged: (v) => setState(() => _employeeCount = v),
+                                  ),
+                                ],
+                              );
+                            }
+                            return Row(
+                              children: [
+                                Expanded(
+                                  child: _Field(
+                                    label: l10n.t(AppText.companyProfileFieldFoundedYear),
+                                    controller: _foundedYearCtrl,
+                                    keyboardType: TextInputType.number,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: _DropdownField(
+                                    label: l10n.t(AppText.companyProfileFieldCompanySize),
+                                    value: _employeeCount,
+                                    items: _companySizes,
+                                    onChanged: (v) => setState(() => _employeeCount = v),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 14),
                   _SectionCard(
-                    title: 'Sosyal Medya',
+                    title: l10n.t(AppText.companyProfileSectionSocial),
                     child: Column(
                       children: [
                         _Field(label: 'LinkedIn', controller: _linkedinCtrl),
@@ -274,7 +351,7 @@ class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
                           : const Icon(Icons.save),
-                      label: Text(_saving ? 'Kaydediliyor...' : 'Kaydet'),
+                      label: Text(_saving ? l10n.t(AppText.commonSaving) : l10n.t(AppText.commonSave)),
                       style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6D28D9)),
                     ),
                   ),
@@ -295,6 +372,7 @@ class _StatusBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     if (status.isEmpty || status == 'approved') return const SizedBox.shrink();
     Color bg;
     Color fg;
@@ -304,17 +382,19 @@ class _StatusBanner extends StatelessWidget {
       case 'pending':
         bg = const Color(0xFFFFFBEB);
         fg = const Color(0xFFB45309);
-        text = 'Profiliniz onay bekliyor.';
+        text = l10n.t(AppText.companyProfileStatusPending);
         break;
       case 'rejected':
         bg = const Color(0xFFFFF1F2);
         fg = const Color(0xFFB91C1C);
-        text = reason.isEmpty ? 'Profiliniz reddedildi.' : 'Reddetme nedeni: $reason';
+        text = reason.isEmpty
+            ? l10n.t(AppText.companyProfileStatusRejected)
+            : l10n.companyProfileStatusRejectedWithReason(reason);
         break;
       default:
         bg = const Color(0xFFEFF6FF);
         fg = const Color(0xFF2563EB);
-        text = 'Durum: $status';
+        text = l10n.companyProfileStatusOther(status);
         break;
     }
 

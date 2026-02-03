@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/routing/routes.dart';
 import '../../application/leaderboard_providers.dart';
 import '../../domain/leaderboard_models.dart';
@@ -31,6 +32,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final asyncVm = ref.watch(leaderboardProvider);
 
     return asyncVm.when(
@@ -48,8 +50,10 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
             children: [
               const Icon(Icons.error_outline, size: 48, color: Color(0xFFEF4444)),
               const SizedBox(height: 12),
-              const Text('Leaderboard yüklenemedi',
-                  style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
+              Text(
+                l10n.t(AppText.leaderboardLoadFailedTitle),
+                style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+              ),
               const SizedBox(height: 8),
               Text(
                 e.toString(),
@@ -61,7 +65,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                 height: 44,
                 child: ElevatedButton(
                   onPressed: () => ref.read(leaderboardProvider.notifier).refresh(),
-                  child: const Text('Tekrar dene'),
+                  child: Text(l10n.t(AppText.retry)),
                 ),
               ),
             ],
@@ -87,17 +91,19 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
-                          children: const [
-                            Icon(Icons.emoji_events, color: Color(0xFFF59E0B), size: 30),
-                            SizedBox(width: 10),
-                            Text('Liderlik Tablosu',
-                                style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900)),
+                          children: [
+                            const Icon(Icons.emoji_events, color: Color(0xFFF59E0B), size: 30),
+                            const SizedBox(width: 10),
+                            Text(
+                              l10n.t(AppText.linkLeaderboard),
+                              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900),
+                            ),
                           ],
                         ),
                         const SizedBox(height: 6),
-                        const Text(
-                          'En aktif öğrenciler arasında yerini al. Puan kazan, yüksel, ödüllere yaklaş.',
-                          style: TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
+                        Text(
+                          l10n.t(AppText.leaderboardSubtitle),
+                          style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
                         ),
                         const SizedBox(height: 16),
 
@@ -120,9 +126,9 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                             unselectedLabelColor: const Color(0xFF6B7280),
                             labelStyle: const TextStyle(fontWeight: FontWeight.w900),
                             indicatorColor: const Color(0xFF6D28D9),
-                            tabs: const [
-                              Tab(text: 'Genel'),
-                              Tab(text: 'Bölüm'),
+                            tabs: [
+                              Tab(text: l10n.t(AppText.leaderboardTabOverall)),
+                              Tab(text: l10n.t(AppText.leaderboardTabDepartment)),
                             ],
                           ),
                         ),
@@ -138,7 +144,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                                 meId: vm.meId,
                                 showDepartment: true,
                                 entries: vm.overall,
-                                emptyText: 'Henüz sıralama verisi yok.',
+                                emptyText: l10n.t(AppText.leaderboardEmpty),
                               ),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -147,7 +153,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                                     Padding(
                                       padding: const EdgeInsets.only(left: 2, bottom: 10),
                                       child: Text(
-                                        'Bölüm: $dept',
+                                        l10n.leaderboardDepartmentLabel(dept),
                                         style: const TextStyle(
                                           color: Color(0xFF6B7280),
                                           fontWeight: FontWeight.w800,
@@ -161,8 +167,8 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                                       showDepartment: false,
                                       entries: vm.departmentList,
                                       emptyText: !hasDept
-                                          ? 'Profilinde bölüm bilgisi yok.'
-                                          : 'Bu bölüm için sıralama verisi yok.',
+                                          ? l10n.t(AppText.leaderboardNoDepartment)
+                                          : l10n.t(AppText.leaderboardNoDepartmentData),
                                     ),
                                   ),
                                 ],
@@ -197,6 +203,7 @@ class _UserStatsHero extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -213,9 +220,13 @@ class _UserStatsHero extends StatelessWidget {
           final wide = c.maxWidth >= 860;
 
           final items = <Widget>[
-            _HeroMetric(title: 'Toplam Puanın', value: '${vm.totalPoints}'),
-            _HeroMetric(title: 'Genel Sıralama', value: vm.overallRank != null ? '${vm.overallRank}.' : '—'),
-            _HeroMetric(title: 'Bölüm Sıralaması', value: vm.departmentRank != null ? '${vm.departmentRank}.' : '—'),
+            _HeroMetric(title: l10n.t(AppText.leaderboardHeroMyPoints), value: '${vm.totalPoints}'),
+            _HeroMetric(
+                title: l10n.t(AppText.leaderboardHeroOverallRank),
+                value: vm.overallRank != null ? '${vm.overallRank}.' : '—'),
+            _HeroMetric(
+                title: l10n.t(AppText.leaderboardHeroDepartmentRank),
+                value: vm.departmentRank != null ? '${vm.departmentRank}.' : '—'),
           ];
 
           if (wide) {
@@ -282,6 +293,7 @@ class _LeaderboardList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     if (entries.isEmpty) {
       return Center(
         child: Padding(
@@ -342,9 +354,13 @@ class _LeaderboardList extends StatelessWidget {
                                     color: const Color(0xFF7C3AED),
                                     borderRadius: BorderRadius.circular(999),
                                   ),
-                                  child: const Text(
-                                    'Sen',
-                                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 12),
+                                  child: Text(
+                                    l10n.t(AppText.commonYou),
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w900,
+                                      fontSize: 12,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -356,7 +372,7 @@ class _LeaderboardList extends StatelessWidget {
                     if (showDepartment) ...[
                       const SizedBox(height: 8),
                       Text(
-                        e.department?.isNotEmpty == true ? e.department! : 'Belirtilmemiş',
+                        e.department?.isNotEmpty == true ? e.department! : l10n.t(AppText.commonNotSpecified),
                         style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700, fontSize: 12),
                       ),
                     ],
@@ -461,13 +477,14 @@ class _LevelPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final label = points >= 1000
-        ? 'Uzman'
+        ? l10n.t(AppText.leaderboardLevelExpert)
         : points >= 500
-            ? 'İleri'
+            ? l10n.t(AppText.leaderboardLevelAdvanced)
             : points >= 100
-                ? 'Orta'
-                : 'Başlangıç';
+                ? l10n.t(AppText.leaderboardLevelIntermediate)
+                : l10n.t(AppText.leaderboardLevelBeginner);
 
     final bg = rank <= 3 ? const Color(0xFFFEF3C7) : const Color(0xFFF3F4F6);
     final fg = rank <= 3 ? const Color(0xFF92400E) : const Color(0xFF374151);
@@ -486,6 +503,7 @@ class _InfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -502,11 +520,14 @@ class _InfoCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Nasıl puan kazanırım?', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
+                Text(
+                  l10n.t(AppText.dashboardHowToEarnPoints),
+                  style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+                ),
                 const SizedBox(height: 8),
-                const Text(
-                  '• Kurs tamamla: +50 puan\n• Kursa kayıt ol: +10 puan\n• Günlük giriş: +2 puan\n• 7 gün seri: +15 puan',
-                  style: TextStyle(color: Color(0xFF4B5563), fontWeight: FontWeight.w600),
+                Text(
+                  l10n.t(AppText.leaderboardHowToEarnPointsBullets),
+                  style: const TextStyle(color: Color(0xFF4B5563), fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 12),
                 Align(
@@ -514,7 +535,7 @@ class _InfoCard extends StatelessWidget {
                   child: OutlinedButton.icon(
                     onPressed: onPointsSystem,
                     icon: const Icon(Icons.track_changes_outlined),
-                    label: const Text('Puan Sistemini Gör'),
+                    label: Text(l10n.t(AppText.leaderboardViewPointsSystem)),
                   ),
                 ),
               ],

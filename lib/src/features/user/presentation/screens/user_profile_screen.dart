@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/supabase/supabase_service.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
 import '../../../points/application/points_providers.dart';
@@ -30,6 +31,7 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final authAsync = ref.watch(authViewStateProvider);
     if (authAsync.isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -41,7 +43,7 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
 
     if (!isLoggedIn || user == null) {
       return _GuestView(
-        title: 'Profilini görmek için giriş yapmalısın.',
+        title: l10n.t(AppText.profileLoginRequired),
       );
     }
 
@@ -56,7 +58,7 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
       );
     }
 
-    final displayName = _displayName(user, _profile);
+    final displayName = _displayName(user, _profile, fallback: l10n.t(AppText.commonStudent));
 
     return Container(
       color: const Color(0xFFF9FAFB),
@@ -133,7 +135,7 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Profil yüklenemedi: $e')),
+        SnackBar(content: Text(AppLocalizations.of(context).profileLoadFailed(e.toString()))),
       );
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -209,6 +211,7 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
   }
 
   Future<void> _saveDepartment() async {
+    final l10n = AppLocalizations.of(context);
     final user = ref.read(authViewStateProvider).value?.user;
     if (user == null) return;
 
@@ -230,7 +233,7 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Profil başarıyla güncellendi.')),
+        SnackBar(content: Text(l10n.t(AppText.profileUpdated))),
       );
 
       final updated = _profile;
@@ -240,7 +243,7 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Güncelleme başarısız: $e')),
+        SnackBar(content: Text(l10n.commonUpdateFailed(e.toString()))),
       );
     } finally {
       if (mounted) setState(() => _saving = false);
@@ -248,6 +251,7 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
   }
 
   Future<void> _checkProfileCompletion(_ProfileData profile, String uid) async {
+    final l10n = AppLocalizations.of(context);
     final completed = _isProfileComplete(profile);
     if (!completed) return;
 
@@ -266,13 +270,13 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
           action: 'profile_completion',
           points: _profileCompletionPoints,
           source: 'platform',
-          description: 'Profilinizi tamamladınız!',
+          description: l10n.t(AppText.profileCompletionDescription),
           metadata: {'code': 'profile_completion'},
         );
 
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Profil tamamlandı! +20 puan')),
+      SnackBar(content: Text(l10n.profileCompletionAwarded(_profileCompletionPoints))),
     );
   }
 
@@ -284,7 +288,7 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
     return hasName && hasDept && hasPhone && hasYear;
   }
 
-  static String _displayName(User user, _ProfileData? profile) {
+  static String _displayName(User user, _ProfileData? profile, {required String fallback}) {
     final meta = user.userMetadata;
     final metaName =
         (meta is Map<String, dynamic>) ? (meta['full_name'] as String?)?.trim() : null;
@@ -294,7 +298,7 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
     }
     final email = user.email;
     if (email != null && email.contains('@')) return email.split('@').first;
-    return 'Öğrenci';
+    return fallback;
   }
 }
 
@@ -386,6 +390,7 @@ class _ProfileInfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -398,15 +403,16 @@ class _ProfileInfoCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            children: const [
-              Icon(Icons.school_outlined, color: Color(0xFF6D28D9)),
-              SizedBox(width: 8),
-              Text('Profil Bilgileri', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+            children: [
+              const Icon(Icons.school_outlined, color: Color(0xFF6D28D9)),
+              const SizedBox(width: 8),
+              Text(l10n.t(AppText.profileInfoTitle),
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
             ],
           ),
           const SizedBox(height: 14),
           _LabeledRow(
-            label: 'E-posta Adresi',
+            label: l10n.t(AppText.profileEmailAddressLabel),
             child: Row(
               children: [
                 const Icon(Icons.mail_outline, size: 18, color: Color(0xFF9CA3AF)),
@@ -417,7 +423,7 @@ class _ProfileInfoCard extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           _LabeledRow(
-            label: 'Bölüm',
+            label: l10n.t(AppText.commonDepartment),
             child: editing
                 ? Row(
                     children: [
@@ -425,7 +431,7 @@ class _ProfileInfoCard extends StatelessWidget {
                         child: DropdownButtonFormField<String>(
                           initialValue: tempDepartment.isEmpty ? null : tempDepartment,
                           decoration: InputDecoration(
-                            hintText: 'Bölüm seçiniz',
+                            hintText: l10n.t(AppText.profileSelectDepartmentHint),
                             contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -437,9 +443,9 @@ class _ProfileInfoCard extends StatelessWidget {
                             ),
                           ),
                           items: [
-                            const DropdownMenuItem<String>(
+                            DropdownMenuItem<String>(
                               value: '',
-                              child: Text('Bölüm seçiniz'),
+                              child: Text(l10n.t(AppText.profileSelectDepartmentHint)),
                             ),
                             for (final dept in _departmentOptions)
                               DropdownMenuItem<String>(
@@ -469,7 +475,7 @@ class _ProfileInfoCard extends StatelessWidget {
                         child: Text(
                           profile.department?.isNotEmpty == true
                               ? profile.department!
-                              : 'Bölüm seçilmemiş',
+                              : l10n.t(AppText.profileDepartmentNotSelected),
                           style: TextStyle(
                             color: profile.department?.isNotEmpty == true
                                 ? const Color(0xFF374151)
@@ -496,6 +502,7 @@ class _BadgesCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -508,15 +515,16 @@ class _BadgesCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            children: const [
-              Icon(Icons.emoji_events_outlined, color: Color(0xFFF59E0B)),
-              SizedBox(width: 8),
-              Text('Rozetlerim', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+            children: [
+              const Icon(Icons.emoji_events_outlined, color: Color(0xFFF59E0B)),
+              const SizedBox(width: 8),
+              Text(l10n.t(AppText.profileBadgesTitle),
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
             ],
           ),
           const SizedBox(height: 12),
           if (badges.isEmpty)
-            const Text('Henüz rozetin yok.', style: TextStyle(color: Color(0xFF6B7280)))
+            Text(l10n.t(AppText.profileNoBadges), style: const TextStyle(color: Color(0xFF6B7280)))
           else
             LayoutBuilder(
               builder: (_, c) {
@@ -568,6 +576,7 @@ class _CompletedCoursesCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final count = completed.length;
 
     return Column(
@@ -578,7 +587,9 @@ class _CompletedCoursesCard extends StatelessWidget {
             const Icon(Icons.school, color: Color(0xFF6D28D9)),
             const SizedBox(width: 8),
             Text(
-              count == 0 ? 'Tamamlanan Kurslar' : 'Tamamlanan Kurslar ($count)',
+              count == 0
+                  ? l10n.t(AppText.profileCompletedCoursesTitle)
+                  : l10n.profileCompletedCoursesTitleWithCount(count),
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
             ),
           ],
@@ -593,14 +604,14 @@ class _CompletedCoursesCard extends StatelessWidget {
               border: Border.all(color: const Color(0xFFE5E7EB)),
             ),
             child: Column(
-              children: const [
-                Icon(Icons.menu_book_outlined, size: 44, color: Color(0xFFD1D5DB)),
-                SizedBox(height: 8),
-                Text('Henüz tamamladığın kurs yok.',
-                    style: TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600)),
-                SizedBox(height: 4),
-                Text('Kursları tamamladıkça burada görünecek!',
-                    style: TextStyle(color: Color(0xFF9CA3AF), fontSize: 12)),
+              children: [
+                const Icon(Icons.menu_book_outlined, size: 44, color: Color(0xFFD1D5DB)),
+                const SizedBox(height: 8),
+                Text(l10n.t(AppText.profileNoCompletedCoursesTitle),
+                    style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600)),
+                const SizedBox(height: 4),
+                Text(l10n.t(AppText.profileNoCompletedCoursesSubtitle),
+                    style: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 12)),
               ],
             ),
           )
@@ -654,23 +665,22 @@ class _CompletedCoursesCard extends StatelessWidget {
                                 color: const Color(0xFFDCFCE7),
                                 borderRadius: BorderRadius.circular(999),
                               ),
-                              child: const Text(
-                                'Tamamlandı',
-                                style: TextStyle(color: Color(0xFF16A34A), fontWeight: FontWeight.w900, fontSize: 11),
-                              ),
+                              child: Text(l10n.t(AppText.profileCourseCompleted),
+                                  style: const TextStyle(
+                                      color: Color(0xFF16A34A), fontWeight: FontWeight.w900, fontSize: 11)),
                             ),
                           ],
                         ),
                         const SizedBox(height: 10),
                         Text(
-                          course?.title ?? 'Kurs',
+                          course?.title ?? l10n.t(AppText.commonCourse),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(fontWeight: FontWeight.w800),
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          course?.description ?? 'Kurs bilgisi bulunamadı.',
+                          course?.description ?? l10n.t(AppText.profileCourseInfoNotFound),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600, fontSize: 12),
@@ -681,7 +691,7 @@ class _CompletedCoursesCard extends StatelessWidget {
                             const Icon(Icons.calendar_month, size: 14, color: Color(0xFF6B7280)),
                             const SizedBox(width: 6),
                             Text(
-                              _fmtDate(item.completedAt),
+                              _fmtDate(context, item.completedAt),
                               style: const TextStyle(color: Color(0xFF6B7280), fontSize: 12),
                             ),
                           ],
@@ -697,11 +707,8 @@ class _CompletedCoursesCard extends StatelessWidget {
     );
   }
 
-  static String _fmtDate(DateTime dt) {
-    final d = dt.toLocal();
-    return '${d.day.toString().padLeft(2, '0')}.'
-        '${d.month.toString().padLeft(2, '0')}.'
-        '${d.year}';
+  static String _fmtDate(BuildContext context, DateTime dt) {
+    return MaterialLocalizations.of(context).formatShortDate(dt.toLocal());
   }
 }
 

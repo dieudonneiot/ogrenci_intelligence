@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../auth/domain/auth_models.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
@@ -76,6 +77,7 @@ class _CompanyJobApplicationsScreenState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final authAsync = ref.watch(authViewStateProvider);
     if (authAsync.isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -83,7 +85,7 @@ class _CompanyJobApplicationsScreenState
 
     final auth = authAsync.value;
     if (auth == null || !auth.isAuthenticated || auth.userType != UserType.company) {
-      return const Center(child: Text('Şirket başvurularını görmek için giriş yapmalısınız.'));
+      return Center(child: Text(l10n.t(AppText.companyApplicationsLoginRequired)));
     }
 
     final filtered = _apps.where((a) {
@@ -121,8 +123,8 @@ class _CompanyJobApplicationsScreenState
                       Expanded(
                         child: Text(
                           _jobTitle.isEmpty
-                              ? 'Başvurular'
-                              : 'Başvurular • $_jobTitle',
+                              ? l10n.t(AppText.companyJobApplicationsTitle)
+                              : l10n.companyJobApplicationsTitleWithJob(_jobTitle),
                           style: const TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.w900,
@@ -136,10 +138,10 @@ class _CompanyJobApplicationsScreenState
                     spacing: 12,
                     runSpacing: 12,
                     children: [
-                      _MiniStat(label: 'Toplam', value: total),
-                      _MiniStat(label: 'Beklemede', value: pending),
-                      _MiniStat(label: 'Kabul', value: accepted),
-                      _MiniStat(label: 'Red', value: rejected),
+                      _MiniStat(label: l10n.t(AppText.commonTotal), value: total),
+                      _MiniStat(label: l10n.t(AppText.statusPending), value: pending),
+                      _MiniStat(label: l10n.t(AppText.statusAccepted), value: accepted),
+                      _MiniStat(label: l10n.t(AppText.statusRejected), value: rejected),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -218,6 +220,7 @@ class _FiltersBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -237,29 +240,29 @@ class _FiltersBar extends StatelessWidget {
               onChanged: onSearch,
               decoration: InputDecoration(
                 prefixIcon: const Icon(Icons.search),
-                hintText: 'Aday ara...',
+                hintText: l10n.t(AppText.companyApplicationsSearchHint),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 isDense: true,
               ),
             ),
           ),
           _FilterChip(
-            label: 'Tümü',
+            label: l10n.t(AppText.commonAll),
             active: filter == 'all',
             onTap: () => onFilter('all'),
           ),
           _FilterChip(
-            label: 'Beklemede',
+            label: l10n.t(AppText.statusPending),
             active: filter == 'pending',
             onTap: () => onFilter('pending'),
           ),
           _FilterChip(
-            label: 'Kabul',
+            label: l10n.t(AppText.statusAccepted),
             active: filter == 'accepted',
             onTap: () => onFilter('accepted'),
           ),
           _FilterChip(
-            label: 'Red',
+            label: l10n.t(AppText.statusRejected),
             active: filter == 'rejected',
             onTap: () => onFilter('rejected'),
           ),
@@ -341,6 +344,15 @@ class _ApplicationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final dateText = MaterialLocalizations.of(context).formatShortDate(app.appliedAt);
+
+    final dept = (app.profileDepartment ?? '').trim();
+    final year = app.profileYear;
+    final deptYear = dept.isEmpty
+        ? (year == null ? '' : l10n.companyApplicationsYearOfStudy(year))
+        : (year == null ? dept : '$dept • ${l10n.companyApplicationsYearOfStudy(year)}');
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
@@ -357,7 +369,7 @@ class _ApplicationCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  app.profileName ?? 'İsimsiz Aday',
+                  app.profileName ?? l10n.t(AppText.commonUnnamedCandidate),
                   style: const TextStyle(fontWeight: FontWeight.w900),
                 ),
               ),
@@ -369,27 +381,23 @@ class _ApplicationCard extends StatelessWidget {
             spacing: 12,
             runSpacing: 6,
             children: [
-              _InfoLine(icon: Icons.mail_outline, text: app.profileEmail ?? 'E-posta yok'),
+              _InfoLine(icon: Icons.mail_outline, text: app.profileEmail ?? l10n.t(AppText.commonNotSpecified)),
               if ((app.profilePhone ?? '').isNotEmpty)
                 _InfoLine(icon: Icons.phone, text: app.profilePhone!),
-              if ((app.profileDepartment ?? '').isNotEmpty)
-                _InfoLine(
-                  icon: Icons.school_outlined,
-                  text: '${app.profileDepartment}${app.profileYear != null ? ' • ${app.profileYear}. sınıf' : ''}',
-                ),
-              _InfoLine(icon: Icons.event, text: _fmtDate(app.appliedAt)),
+              if (deptYear.isNotEmpty) _InfoLine(icon: Icons.school_outlined, text: deptYear),
+              _InfoLine(icon: Icons.event, text: dateText),
             ],
           ),
           if ((app.coverLetter ?? '').isNotEmpty) ...[
             const SizedBox(height: 10),
-            _ExpandableText(title: 'Ön Yazı', text: app.coverLetter!),
+            _ExpandableText(title: l10n.t(AppText.companyApplicationsCoverLetterTitle), text: app.coverLetter!),
           ],
           if ((app.cvUrl ?? '').isNotEmpty) ...[
             const SizedBox(height: 10),
             TextButton.icon(
               onPressed: () => _openCv(context, app.cvUrl!),
               icon: const Icon(Icons.open_in_new),
-              label: const Text('CV aç'),
+              label: Text(l10n.t(AppText.companyApplicationsOpenCv)),
             ),
           ],
           if (app.status == 'pending') ...[
@@ -400,7 +408,7 @@ class _ApplicationCard extends StatelessWidget {
                   child: ElevatedButton.icon(
                     onPressed: () => onUpdateStatus('accepted'),
                     icon: const Icon(Icons.check_circle_outline),
-                    label: const Text('Kabul Et'),
+                    label: Text(l10n.t(AppText.commonAccept)),
                     style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF16A34A)),
                   ),
                 ),
@@ -409,7 +417,7 @@ class _ApplicationCard extends StatelessWidget {
                   child: ElevatedButton.icon(
                     onPressed: () => onUpdateStatus('rejected'),
                     icon: const Icon(Icons.cancel_outlined),
-                    label: const Text('Reddet'),
+                    label: Text(l10n.t(AppText.commonReject)),
                     style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFDC2626)),
                   ),
                 ),
@@ -421,17 +429,12 @@ class _ApplicationCard extends StatelessWidget {
     );
   }
 
-  String _fmtDate(DateTime d) {
-    final day = d.day.toString().padLeft(2, '0');
-    final month = d.month.toString().padLeft(2, '0');
-    return '$day.$month.${d.year}';
-  }
-
   Future<void> _openCv(BuildContext context, String url) async {
+    final l10n = AppLocalizations.of(context);
     final uri = Uri.tryParse(url);
     if (uri == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('CV bağlantısı geçersiz.')),
+        SnackBar(content: Text(l10n.t(AppText.companyApplicationsCvInvalid))),
       );
       return;
     }
@@ -440,7 +443,7 @@ class _ApplicationCard extends StatelessWidget {
       await Clipboard.setData(ClipboardData(text: url));
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Bağlantı açılamadı. CV linki kopyalandı.')),
+        SnackBar(content: Text(l10n.t(AppText.companyApplicationsCvOpenFailedCopied))),
       );
     }
   }
@@ -470,6 +473,7 @@ class _StatusPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final s = status.toLowerCase().trim();
     Color bg;
     Color fg;
@@ -479,17 +483,17 @@ class _StatusPill extends StatelessWidget {
       case 'accepted':
         bg = const Color(0xFFDCFCE7);
         fg = const Color(0xFF16A34A);
-        label = 'Kabul';
+        label = l10n.t(AppText.statusAccepted);
         break;
       case 'rejected':
         bg = const Color(0xFFFEE2E2);
         fg = const Color(0xFFDC2626);
-        label = 'Red';
+        label = l10n.t(AppText.statusRejected);
         break;
       default:
         bg = const Color(0xFFFEF3C7);
         fg = const Color(0xFFB45309);
-        label = 'Beklemede';
+        label = l10n.t(AppText.statusPending);
         break;
     }
 
@@ -533,6 +537,7 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -541,12 +546,12 @@ class _EmptyState extends StatelessWidget {
         border: Border.all(color: const Color(0xFFE5E7EB)),
       ),
       child: Column(
-        children: const [
-          Icon(Icons.people_outline, size: 44, color: Color(0xFFD1D5DB)),
-          SizedBox(height: 10),
+        children: [
+          const Icon(Icons.people_outline, size: 44, color: Color(0xFFD1D5DB)),
+          const SizedBox(height: 10),
           Text(
-            'Henüz başvuru yok.',
-            style: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF6B7280)),
+            l10n.t(AppText.companyApplicationsEmpty),
+            style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF6B7280)),
           ),
         ],
       ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../../core/supabase/supabase_service.dart';
 import '../../presentation/controllers/admin_controller.dart';
@@ -28,16 +29,17 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
   }
 
   Future<void> _submit() async {
+    final l10n = AppLocalizations.of(context);
     final email = _emailCtrl.text.trim();
     final password = _passwordCtrl.text.trim();
     final emailRegex = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
 
     if (email.isEmpty || password.isEmpty) {
-      setState(() => _error = 'Email and password are required.');
+      setState(() => _error = l10n.t(AppText.adminLoginErrorRequired));
       return;
     }
     if (!emailRegex.hasMatch(email)) {
-      setState(() => _error = 'Please enter a valid email address.');
+      setState(() => _error = l10n.t(AppText.adminLoginErrorInvalidEmail));
       return;
     }
 
@@ -54,26 +56,26 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
 
       final user = res.user;
       if (user == null) {
-        _error = 'Giriş başarısız';
+        _error = l10n.t(AppText.commonSomethingWentWrong);
         return;
       }
 
       if (user.emailConfirmedAt == null) {
         await SupabaseService.client.auth.signOut();
-        _error = 'Please verify your email address.';
+        _error = l10n.t(AppText.adminLoginErrorVerifyEmail);
         return;
       }
 
       final admin = await ref.read(adminRepositoryProvider).getActiveAdminByUserId(user.id);
       if (admin == null) {
         await SupabaseService.client.auth.signOut();
-        _error = 'Bu bir admin hesabı değil';
+        _error = l10n.t(AppText.adminLoginErrorNotAdmin);
         return;
       }
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Admin girişi başarılı!')),
+        SnackBar(content: Text(l10n.t(AppText.adminLoginSuccess))),
       );
       context.go(Routes.adminDashboard);
     } catch (e) {
@@ -85,6 +87,7 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAFB),
       body: Center(
@@ -104,14 +107,14 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
                 children: [
                   const Icon(Icons.security, size: 48, color: Color(0xFF7C3AED)),
                   const SizedBox(height: 12),
-                  const Text(
-                    'Admin Girişi',
+                  Text(
+                    l10n.t(AppText.adminLoginTitle),
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900),
                   ),
                   const SizedBox(height: 6),
-                  const Text(
-                    'Lütfen admin hesap bilgilerinizi girin',
+                  Text(
+                    l10n.t(AppText.adminLoginSubtitle),
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Color(0xFF6B7280)),
                   ),
@@ -137,16 +140,16 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
                   const SizedBox(height: 18),
                   _TextField(
                     controller: _emailCtrl,
-                    label: 'Email Adresi',
-                    hint: 'email@example.com',
+                    label: l10n.t(AppText.adminLoginEmailLabel),
+                    hint: l10n.t(AppText.adminLoginEmailHint),
                     icon: Icons.mail_outline,
                     keyboardType: TextInputType.emailAddress,
                   ),
                   const SizedBox(height: 12),
                   _TextField(
                     controller: _passwordCtrl,
-                    label: 'Şifre',
-                    hint: '••••••••',
+                    label: l10n.t(AppText.adminLoginPasswordLabel),
+                    hint: l10n.t(AppText.adminLoginPasswordHint),
                     icon: Icons.lock_outline,
                     obscure: true,
                   ),
@@ -157,11 +160,12 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
                         value: _remember,
                         onChanged: (v) => setState(() => _remember = v ?? false),
                       ),
-                      const Text('Beni hatırla', style: TextStyle(fontWeight: FontWeight.w600)),
+                      Text(l10n.t(AppText.adminLoginRememberMe),
+                          style: const TextStyle(fontWeight: FontWeight.w600)),
                       const Spacer(),
                       TextButton(
                         onPressed: () => context.go(Routes.forgotPassword),
-                        child: const Text('Şifremi unuttum'),
+                        child: Text(l10n.t(AppText.adminLoginForgotPassword)),
                       ),
                     ],
                   ),
@@ -177,7 +181,11 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
                               child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                             )
                           : const Icon(Icons.lock_outline),
-                      label: Text(_loading ? 'Giriş Yapılıyor...' : 'Giriş Yap'),
+                      label: Text(
+                        _loading
+                            ? l10n.t(AppText.adminLoginButtonLoading)
+                            : l10n.t(AppText.adminLoginButton),
+                      ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF7C3AED),
                         foregroundColor: Colors.white,

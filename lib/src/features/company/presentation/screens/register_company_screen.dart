@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../../core/supabase/supabase_service.dart';
 import '../../../auth/domain/auth_models.dart';
@@ -58,10 +59,11 @@ class _RegisterCompanyScreenState extends ConsumerState<RegisterCompanyScreen> {
   }
 
   Future<void> _submit() async {
+    final l10n = AppLocalizations.of(context);
     final auth = ref.read(authViewStateProvider).value;
     final user = auth?.user;
     if (auth == null || user == null || auth.userType != UserType.company) {
-      _snack('Şirket kaydı için giriş yapmalısınız.', error: true);
+      _snack(l10n.t(AppText.companyRegisterLoginRequired), error: true);
       return;
     }
 
@@ -70,7 +72,7 @@ class _RegisterCompanyScreenState extends ConsumerState<RegisterCompanyScreen> {
         _taxCtrl.text.trim().isEmpty ||
         _phoneCtrl.text.trim().isEmpty ||
         _city == null) {
-      _snack('Tüm alanları doldurun.', error: true);
+      _snack(l10n.t(AppText.commonFillAllFields), error: true);
       return;
     }
 
@@ -85,8 +87,9 @@ class _RegisterCompanyScreenState extends ConsumerState<RegisterCompanyScreen> {
           .eq('tax_number', _taxCtrl.text.trim())
           .maybeSingle();
 
+      if (!mounted) return;
       if (exists != null) {
-        _snack('Bu vergi numarası ile kayıtlı bir şirket zaten var.', error: true);
+        _snack(l10n.t(AppText.companyRegisterDuplicateTaxNumber), error: true);
         return;
       }
 
@@ -114,12 +117,14 @@ class _RegisterCompanyScreenState extends ConsumerState<RegisterCompanyScreen> {
       });
 
       if (!mounted) return;
-      _snack('Şirket kaydı başarılı!');
+      _snack(l10n.t(AppText.companyRegisterSuccess));
       context.go(Routes.companyDashboard);
     } on PostgrestException catch (e) {
-      _snack('Kayıt başarısız: ${e.message}', error: true);
+      if (!mounted) return;
+      _snack(l10n.commonActionFailed(e.message), error: true);
     } catch (e) {
-      _snack('Kayıt başarısız: $e', error: true);
+      if (!mounted) return;
+      _snack(l10n.commonActionFailed('$e'), error: true);
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -127,6 +132,7 @@ class _RegisterCompanyScreenState extends ConsumerState<RegisterCompanyScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final authAsync = ref.watch(authViewStateProvider);
     if (authAsync.isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -134,7 +140,7 @@ class _RegisterCompanyScreenState extends ConsumerState<RegisterCompanyScreen> {
 
     final auth = authAsync.value;
     if (auth == null || auth.userType != UserType.company) {
-      return const Center(child: Text('Şirket kaydı için giriş yapmalısınız.'));
+      return Center(child: Text(l10n.t(AppText.companyRegisterLoginRequired)));
     }
 
     return Container(
@@ -148,10 +154,13 @@ class _RegisterCompanyScreenState extends ConsumerState<RegisterCompanyScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
-                  children: const [
-                    Icon(Icons.apartment, color: Color(0xFF6D28D9)),
-                    SizedBox(width: 8),
-                    Text('Şirket Kaydı', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900)),
+                  children: [
+                    const Icon(Icons.apartment, color: Color(0xFF6D28D9)),
+                    const SizedBox(width: 8),
+                    Text(
+                      l10n.t(AppText.companyRegisterTitle),
+                      style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 16),
@@ -164,17 +173,17 @@ class _RegisterCompanyScreenState extends ConsumerState<RegisterCompanyScreen> {
                   ),
                   child: Column(
                     children: [
-                      _Field(label: 'Şirket Adı', controller: _nameCtrl),
+                      _Field(label: l10n.t(AppText.companyRegisterCompanyNameLabel), controller: _nameCtrl),
                       _DropdownField(
-                        label: 'Sektör',
+                        label: l10n.t(AppText.companyRegisterSectorLabel),
                         value: _sector,
                         items: _sectors,
                         onChanged: (v) => setState(() => _sector = v),
                       ),
-                      _Field(label: 'Vergi Numarası', controller: _taxCtrl),
-                      _Field(label: 'Telefon', controller: _phoneCtrl),
+                      _Field(label: l10n.t(AppText.companyRegisterTaxNumberLabel), controller: _taxCtrl),
+                      _Field(label: l10n.t(AppText.companyRegisterPhoneLabel), controller: _phoneCtrl),
                       _DropdownField(
-                        label: 'Şehir',
+                        label: l10n.t(AppText.companyRegisterCityLabel),
                         value: _city,
                         items: _cities,
                         onChanged: (v) => setState(() => _city = v),
@@ -191,7 +200,9 @@ class _RegisterCompanyScreenState extends ConsumerState<RegisterCompanyScreen> {
                                   child: CircularProgressIndicator(strokeWidth: 2),
                                 )
                               : const Icon(Icons.verified_outlined),
-                          label: Text(_loading ? 'Kaydediliyor...' : 'Kaydı Tamamla'),
+                          label: Text(
+                            _loading ? l10n.t(AppText.commonSaving) : l10n.t(AppText.companyRegisterSubmit),
+                          ),
                           style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6D28D9)),
                         ),
                       ),

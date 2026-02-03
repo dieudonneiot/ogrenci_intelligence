@@ -1,13 +1,15 @@
-﻿// lib/src/features/chat/presentation/screens/chat_screen.dart
+// lib/src/features/chat/presentation/screens/chat_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../../core/localization/app_localizations.dart';
+import '../../../../core/localization/locale_controller.dart';
 import '../../../../shared/widgets/empty_state.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
-import '../controllers/chat_controller.dart';
 import '../../domain/chat_models.dart';
+import '../controllers/chat_controller.dart';
 
 class ChatScreen extends ConsumerStatefulWidget {
   const ChatScreen({super.key});
@@ -42,9 +44,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with SingleTickerProvid
 
     final auth = authAsync.value;
     if (auth == null || !auth.isAuthenticated) {
-      return const PlaceholderView(
-        title: 'Sohbet icin giris yapmalisin',
-        subtitle: 'Kariyer asistanini kullanmak icin giris yap ve email dogrulamani tamamla.',
+      final l10n = AppLocalizations.of(context);
+      return PlaceholderView(
+        title: l10n.t(AppText.chatLoginRequiredTitle),
+        subtitle: l10n.t(AppText.chatLoginRequiredSubtitle),
         icon: Icons.lock_outline,
       );
     }
@@ -52,19 +55,31 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with SingleTickerProvid
     final user = auth.user;
     final userId = user?.id ?? '';
     if (userId.isEmpty) {
-      return const PlaceholderView(
-        title: 'Kullanici bulunamadi',
-        subtitle: 'Lutfen tekrar giris yapmayi deneyin.',
+      final l10n = AppLocalizations.of(context);
+      return PlaceholderView(
+        title: l10n.t(AppText.chatUserNotFoundTitle),
+        subtitle: l10n.t(AppText.chatUserNotFoundSubtitle),
         icon: Icons.error_outline,
       );
     }
+
+    final l10n = AppLocalizations.of(context);
+    final locale = ref.watch(appLocaleProvider);
+    final localeCode = (locale.countryCode == null || locale.countryCode!.isEmpty)
+        ? locale.languageCode
+        : '${locale.languageCode}-${locale.countryCode}';
+    final greeting = l10n.chatGreeting(_displayNameFromUser(user));
+    final suggestions = l10n.chatDefaultSuggestions();
 
     if (_loadedForUserId != userId) {
       _loadedForUserId = userId;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ref
             .read(chatControllerProvider(userId).notifier)
-            .loadHistory(userName: _displayNameFromUser(user));
+            .loadHistory(
+              greetingMessage: greeting,
+              suggestions: suggestions,
+            );
       });
     }
 
@@ -86,7 +101,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with SingleTickerProvid
             child: Column(
               children: [
                 _ChatHeader(
-                  onReset: () => controller.resetChat(userName: _displayNameFromUser(user)),
+                  onReset: () => controller.resetChat(
+                    greetingMessage: greeting,
+                    suggestions: suggestions,
+                  ),
                 ),
                 const SizedBox(height: 16),
                 Expanded(
@@ -139,7 +157,16 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with SingleTickerProvid
                             child: Align(
                               alignment: Alignment.centerLeft,
                               child: Text(
-                                state.error!,
+                                () {
+                                  final raw = state.error ?? '';
+                                  if (raw.startsWith('history|')) {
+                                    return l10n.chatHistoryLoadFailed(raw.substring('history|'.length));
+                                  }
+                                  if (raw.startsWith('reply|')) {
+                                    return l10n.chatReplyFailed(raw.substring('reply|'.length));
+                                  }
+                                  return raw;
+                                }(),
                                 style: const TextStyle(
                                   color: Color(0xFFEF4444),
                                   fontSize: 12,
@@ -152,8 +179,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with SingleTickerProvid
                           controller: _inputCtrl,
                           focusNode: _focusNode,
                           isTyping: state.isTyping,
-                          onSend: () => _handleSend(controller),
-                          onSubmit: () => _handleSend(controller),
+                          onSend: () => _handleSend(controller, localeCode, l10n),
+                          onSubmit: () => _handleSend(controller, localeCode, l10n),
                         ),
                       ],
                     ),
@@ -167,11 +194,15 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with SingleTickerProvid
     );
   }
 
-  void _handleSend(ChatController controller) {
+  void _handleSend(ChatController controller, String localeCode, AppLocalizations l10n) {
     final text = _inputCtrl.text.trim();
     if (text.isEmpty) return;
 
-    controller.sendMessage(text);
+    controller.sendMessage(
+      text,
+      locale: localeCode,
+      errorReplyMessage: l10n.t(AppText.chatBotUnavailable),
+    );
     _inputCtrl.clear();
     _focusNode.requestFocus();
   }
@@ -231,41 +262,66 @@ class _ChatHeader extends StatelessWidget {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.18),
+              color: Colors.white.withAlpha((0.18 * 255).round()),
               borderRadius: BorderRadius.circular(14),
             ),
             child: const Icon(Icons.smart_toy_outlined, color: Colors.white, size: 28),
           ),
           const SizedBox(width: 14),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Kariyer Asistani',
+                  AppLocalizations.of(context).t(AppText.chatHeaderTitle),
                   style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900),
                 ),
                 SizedBox(height: 4),
                 Text(
-                  'Staj, CV ve mulakat konularinda hizli destek',
+                  AppLocalizations.of(context).t(AppText.chatHeaderSubtitle),
                   style: TextStyle(color: Color(0xDDFFFFFF), fontWeight: FontWeight.w600),
                 ),
               ],
             ),
           ),
-          SizedBox(
-            height: 40,
-            child: ElevatedButton.icon(
-              onPressed: onReset,
-              icon: const Icon(Icons.restart_alt, size: 18),
-              label: const Text('Yeni Sohbet', style: TextStyle(fontWeight: FontWeight.w800)),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: const Color(0xFF6D28D9),
-                elevation: 0,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-            ),
+          const SizedBox(width: 10),
+          LayoutBuilder(
+            builder: (context, c) {
+              final l10n = AppLocalizations.of(context);
+              final isNarrow = c.maxWidth < 140;
+              if (isNarrow) {
+                return Tooltip(
+                  message: l10n.t(AppText.chatNewChat),
+                  child: IconButton(
+                    onPressed: onReset,
+                    icon: const Icon(Icons.restart_alt),
+                    style: IconButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: const Color(0xFF6D28D9),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                  ),
+                );
+              }
+
+              return SizedBox(
+                height: 40,
+                child: ElevatedButton.icon(
+                  onPressed: onReset,
+                  icon: const Icon(Icons.restart_alt, size: 18),
+                  label: Text(
+                    l10n.t(AppText.chatNewChat),
+                    style: const TextStyle(fontWeight: FontWeight.w800),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: const Color(0xFF6D28D9),
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                ),
+              );
+            },
           ),
         ],
       ),
@@ -285,7 +341,7 @@ class _MessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isUser = message.isUser;
-    final time = DateFormat('HH:mm').format(message.createdAt);
+    final time = DateFormat.Hm(Localizations.localeOf(context).toString()).format(message.createdAt);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
@@ -396,21 +452,21 @@ class _StreamingBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(999),
         border: Border.all(color: const Color(0xFFC4B5FD)),
       ),
-      child: const Row(
+      child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.bolt, size: 12, color: Color(0xFF6D28D9)),
-          SizedBox(width: 4),
+          const Icon(Icons.bolt, size: 12, color: Color(0xFF6D28D9)),
+          const SizedBox(width: 4),
           Text(
-            'Yaziyor',
-            style: TextStyle(
+            AppLocalizations.of(context).t(AppText.chatTyping),
+            style: const TextStyle(
               color: Color(0xFF5B21B6),
               fontWeight: FontWeight.w800,
               fontSize: 10,
             ),
           ),
-          SizedBox(width: 4),
-          _StreamingDots(),
+          const SizedBox(width: 4),
+          const _StreamingDots(),
         ],
       ),
     );
@@ -619,7 +675,7 @@ class _InputBar extends StatelessWidget {
               minLines: 1,
               maxLines: 4,
               decoration: InputDecoration(
-                hintText: 'Mesaj yazin... ',
+                hintText: AppLocalizations.of(context).t(AppText.chatInputHint),
                 filled: true,
                 fillColor: const Color(0xFFF9FAFB),
                 border: OutlineInputBorder(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/localization/app_localizations.dart';
 import '../widgets/admin_layout.dart';
 
 class AdminSubscriptionsScreen extends StatelessWidget {
@@ -7,15 +8,16 @@ class AdminSubscriptionsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return AdminPageScaffold(
-      header: const AdminPageHeader(
+      header: AdminPageHeader(
         icon: Icons.credit_card_outlined,
-        title: 'Abonelik Yönetimi',
+        title: l10n.t(AppText.adminNavSubscriptions),
       ),
-      child: const AdminPlaceholderCard(
+      child: AdminPlaceholderCard(
         icon: Icons.credit_card_outlined,
-        title: 'Abonelik Yönetimi',
-        subtitle: 'Bu sayfa yakında aktif olacak',
+        title: l10n.t(AppText.adminNavSubscriptions),
+        subtitle: l10n.t(AppText.commonComingSoonSubtitle),
       ),
     );
   }

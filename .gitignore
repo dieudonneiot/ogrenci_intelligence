@@ -36,6 +36,7 @@
 # Ignore all .txt files in root directory only
 /*.txt
 /*.sql
+/*.pdf
 
 # But keep CMakeLists.txt files
 !**/CMakeLists.txt

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/localization/app_localizations.dart';
 import '../../core/routing/routes.dart';
 
 class AppFooter extends StatefulWidget {
@@ -20,22 +21,24 @@ class _AppFooterState extends State<AppFooter> {
   }
 
   void _subscribe() {
+    final l10n = AppLocalizations.of(context);
     final email = _emailCtrl.text.trim();
     if (email.isEmpty || !email.contains('@')) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Lütfen geçerli bir e-posta girin.')),
+        SnackBar(content: Text(l10n.t(AppText.footerSubscribeInvalid))),
       );
       return;
     }
 
     _emailCtrl.clear();
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Bültene başarıyla kayıt oldunuz.')),
+      SnackBar(content: Text(l10n.t(AppText.footerSubscribeSuccess))),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final year = DateTime.now().year;
 
@@ -62,12 +65,12 @@ class _AppFooterState extends State<AppFooter> {
                         SizedBox(
                           width: sectionWidth,
                           child: _FooterSection(
-                            title: 'Öğrenci Platformu',
+                            title: l10n.t(AppText.footerPlatformTitle),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Kariyerine yön ver, potansiyelini keşfet. Türkiye\'nin en kapsamlı öğrenci kariyer platformu.',
+                                  l10n.t(AppText.footerPlatformDesc),
                                   style: theme.textTheme.bodySmall?.copyWith(
                                     color: const Color(0xFF9CA3AF),
                                     height: 1.35,
@@ -91,14 +94,20 @@ class _AppFooterState extends State<AppFooter> {
                         SizedBox(
                           width: sectionWidth,
                           child: _FooterSection(
-                            title: 'Hızlı Linkler',
+                            title: l10n.t(AppText.footerQuickLinks),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                _FooterLink(label: 'Kurslar', route: Routes.courses),
-                                _FooterLink(label: 'İş İlanları', route: Routes.jobs),
-                                _FooterLink(label: 'Staj İlanları', route: Routes.internships),
-                                _FooterLink(label: 'Liderlik Tablosu', route: Routes.leaderboard),
+                                _FooterLink(label: l10n.t(AppText.navCourses), route: Routes.courses),
+                                _FooterLink(label: l10n.t(AppText.navJobs), route: Routes.jobs),
+                                _FooterLink(
+                                  label: l10n.t(AppText.linkInternshipListings),
+                                  route: Routes.internships,
+                                ),
+                                _FooterLink(
+                                  label: l10n.t(AppText.linkLeaderboard),
+                                  route: Routes.leaderboard,
+                                ),
                               ],
                             ),
                           ),
@@ -106,15 +115,15 @@ class _AppFooterState extends State<AppFooter> {
                         SizedBox(
                           width: sectionWidth,
                           child: _FooterSection(
-                            title: 'Daha Fazla',
+                            title: l10n.t(AppText.footerMore),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                _FooterLink(label: 'Nasıl Çalışır?', route: Routes.howItWorks),
-                                _FooterLink(label: 'Hakkımızda', route: Routes.about),
-                                _FooterLink(label: 'İletişim', route: Routes.contact),
-                                _FooterLink(label: 'Gizlilik Politikası', route: Routes.privacy),
-                                _FooterLink(label: 'Kullanım Şartları', route: Routes.terms),
+                                _FooterLink(label: l10n.t(AppText.linkHowItWorks), route: Routes.howItWorks),
+                                _FooterLink(label: l10n.t(AppText.linkAbout), route: Routes.about),
+                                _FooterLink(label: l10n.t(AppText.linkContact), route: Routes.contact),
+                                _FooterLink(label: l10n.t(AppText.linkPrivacy), route: Routes.privacy),
+                                _FooterLink(label: l10n.t(AppText.linkTerms), route: Routes.terms),
                               ],
                             ),
                           ),
@@ -122,12 +131,12 @@ class _AppFooterState extends State<AppFooter> {
                         SizedBox(
                           width: isNarrow ? c.maxWidth : 280,
                           child: _FooterSection(
-                            title: 'Bülten',
+                            title: l10n.t(AppText.footerNewsletter),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Yeni fırsatlardan haberdar olmak için e-posta listemize katılın.',
+                                  l10n.t(AppText.footerNewsletterDesc),
                                   style: theme.textTheme.bodySmall?.copyWith(
                                     color: const Color(0xFF9CA3AF),
                                     height: 1.35,
@@ -142,7 +151,7 @@ class _AppFooterState extends State<AppFooter> {
                                         controller: _emailCtrl,
                                         style: const TextStyle(color: Colors.white),
                                         decoration: InputDecoration(
-                                          hintText: 'E-posta adresiniz',
+                                          hintText: l10n.t(AppText.footerEmailHint),
                                           hintStyle: const TextStyle(color: Color(0xFF9CA3AF)),
                                           filled: true,
                                           fillColor: const Color(0xFF1F2937),
@@ -178,7 +187,7 @@ class _AppFooterState extends State<AppFooter> {
                 const SizedBox(height: 10),
                 Center(
                   child: Text(
-                    '© $year Öğrenci Platformu. Tüm hakları saklıdır.',
+                    l10n.footerCopyright('$year'),
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: const Color(0xFF9CA3AF),
                       fontSize: 12,
@@ -253,12 +262,13 @@ class _SocialIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Tooltip(
       message: tooltip,
       child: InkWell(
         onTap: () {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('$tooltip bağlantısı yakında.')),
+            SnackBar(content: Text(l10n.linkComingSoon(tooltip))),
           );
         },
         child: Container(

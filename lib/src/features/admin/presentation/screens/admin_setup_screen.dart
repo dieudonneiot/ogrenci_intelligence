@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/config/env.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../../core/supabase/supabase_service.dart';
 
@@ -47,8 +48,9 @@ class _AdminSetupScreenState extends State<AdminSetupScreen> {
       if (hasAdmins) {
         _hasAdmins = true;
         if (mounted) {
+          final l10n = AppLocalizations.of(context);
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Bu sayfaya erişim yetkiniz yok')),
+            SnackBar(content: Text(l10n.t(AppText.adminSetupAccessDenied))),
           );
           context.go(Routes.home);
         }
@@ -66,9 +68,10 @@ class _AdminSetupScreenState extends State<AdminSetupScreen> {
   }
 
   Future<void> _submit() async {
+    final l10n = AppLocalizations.of(context);
     final setupKey = _setupKeyCtrl.text.trim();
     if (setupKey != Env.adminSetupKey) {
-      _showError('Geçersiz kurulum anahtarı');
+      _showError(l10n.t(AppText.adminSetupErrorInvalidKey));
       return;
     }
 
@@ -78,23 +81,23 @@ class _AdminSetupScreenState extends State<AdminSetupScreen> {
     final confirm = _confirmCtrl.text;
 
     if (name.isEmpty || email.isEmpty || password.isEmpty) {
-      _showError('Tüm alanları doldurun');
+      _showError(l10n.t(AppText.commonFillAllFields));
       return;
     }
 
     if (password.length < 8) {
-      _showError('Şifre en az 8 karakter olmalı');
+      _showError(l10n.t(AppText.adminSetupPasswordMin));
       return;
     }
 
     if (password != confirm) {
-      _showError('Şifreler eşleşmiyor');
+      _showError(l10n.t(AppText.commonPasswordsNoMatch));
       return;
     }
 
     final emailRegex = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
     if (!emailRegex.hasMatch(email)) {
-      _showError('Geçerli bir email adresi girin');
+      _showError(l10n.t(AppText.adminLoginErrorInvalidEmail));
       return;
     }
 
@@ -138,7 +141,7 @@ class _AdminSetupScreenState extends State<AdminSetupScreen> {
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Admin hesabı başarıyla oluşturuldu!')),
+        SnackBar(content: Text(l10n.t(AppText.adminSetupSuccess))),
       );
 
       if (user.emailConfirmedAt == null) {
@@ -175,6 +178,7 @@ class _AdminSetupScreenState extends State<AdminSetupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     if (_loading) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
@@ -214,14 +218,14 @@ class _AdminSetupScreenState extends State<AdminSetupScreen> {
                       child: Icon(Icons.security, size: 36, color: Color(0xFF7C3AED)),
                     ),
                     const SizedBox(height: 12),
-                    const Text(
-                      'İlk Admin Kurulumu',
+                    Text(
+                      l10n.t(AppText.adminSetupTitle),
                       textAlign: TextAlign.center,
                       style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900),
                     ),
                     const SizedBox(height: 6),
-                    const Text(
-                      'Platform için ilk admin hesabını oluşturun',
+                    Text(
+                      l10n.t(AppText.adminSetupSubtitle),
                       textAlign: TextAlign.center,
                       style: TextStyle(color: Color(0xFF6B7280)),
                     ),
@@ -234,14 +238,13 @@ class _AdminSetupScreenState extends State<AdminSetupScreen> {
                         border: Border.all(color: const Color(0xFFBAE6FD)),
                       ),
                       child: Row(
-                        children: const [
-                          Icon(Icons.info_outline, color: Color(0xFF2563EB)),
-                          SizedBox(width: 8),
+                        children: [
+                          const Icon(Icons.info_outline, color: Color(0xFF2563EB)),
+                          const SizedBox(width: 8),
                           Expanded(
                             child: Text(
-                              'Bu sayfa sadece sistemde hiç admin yokken görüntülenir. '
-                              'Oluşturacağınız hesap süper admin yetkilerine sahip olacaktır.',
-                              style: TextStyle(color: Color(0xFF1E40AF), fontSize: 12),
+                              l10n.t(AppText.adminSetupNotice),
+                              style: const TextStyle(color: Color(0xFF1E40AF), fontSize: 12),
                             ),
                           ),
                         ],
@@ -249,27 +252,27 @@ class _AdminSetupScreenState extends State<AdminSetupScreen> {
                     ),
                     const SizedBox(height: 16),
                     _Field(
-                      label: 'Kurulum Anahtarı',
+                      label: l10n.t(AppText.adminSetupKeyLabel),
                       controller: _setupKeyCtrl,
                       icon: Icons.key_outlined,
                       obscure: true,
-                      hint: 'Güvenlik anahtarını girin',
+                      hint: l10n.t(AppText.adminSetupKeyHint),
                     ),
                     const SizedBox(height: 6),
-                    const Text(
-                      'Bu anahtarı sistem yöneticisinden alın',
-                      style: TextStyle(color: Color(0xFF9CA3AF), fontSize: 12),
+                    Text(
+                      l10n.t(AppText.adminSetupKeyHelp),
+                      style: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 12),
                     ),
                     const SizedBox(height: 10),
                     _Field(
-                      label: 'Ad Soyad',
+                      label: l10n.t(AppText.adminSetupNameLabel),
                       controller: _nameCtrl,
                       icon: Icons.person_outline,
                       hint: 'Admin User',
                     ),
                     const SizedBox(height: 10),
                     _Field(
-                      label: 'E-posta Adresi',
+                      label: l10n.t(AppText.adminSetupEmailLabel),
                       controller: _emailCtrl,
                       icon: Icons.mail_outline,
                       hint: 'admin@platform.com',
@@ -277,18 +280,18 @@ class _AdminSetupScreenState extends State<AdminSetupScreen> {
                     ),
                     const SizedBox(height: 10),
                     _Field(
-                      label: 'Şifre',
+                      label: l10n.t(AppText.adminSetupPasswordLabel),
                       controller: _passwordCtrl,
                       icon: Icons.lock_outline,
-                      hint: 'En az 8 karakter',
+                      hint: l10n.t(AppText.adminSetupPasswordHint),
                       obscure: true,
                     ),
                     const SizedBox(height: 10),
                     _Field(
-                      label: 'Şifre Tekrar',
+                      label: l10n.t(AppText.commonConfirmPassword),
                       controller: _confirmCtrl,
                       icon: Icons.lock_outline,
-                      hint: 'Şifreyi tekrar girin',
+                      hint: l10n.t(AppText.adminLoginPasswordHint),
                       obscure: true,
                     ),
                     const SizedBox(height: 16),
@@ -303,7 +306,11 @@ class _AdminSetupScreenState extends State<AdminSetupScreen> {
                                 child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                               )
                             : const Icon(Icons.check_circle_outline),
-                        label: Text(_creating ? 'Admin oluşturuluyor...' : 'Admin Hesabı Oluştur'),
+                        label: Text(
+                          _creating
+                              ? l10n.t(AppText.adminSetupCreateButtonLoading)
+                              : l10n.t(AppText.adminSetupCreateButton),
+                        ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF7C3AED),
                           foregroundColor: Colors.white,

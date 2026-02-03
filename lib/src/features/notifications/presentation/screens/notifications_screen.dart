@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/supabase/supabase_service.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
 
@@ -32,6 +33,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final authAsync = ref.watch(authViewStateProvider);
     if (authAsync.isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -42,7 +44,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     final isLoggedIn = auth?.isAuthenticated ?? false;
 
     if (!isLoggedIn || user == null) {
-      return _GuestView(title: 'Bildirimleri görmek için giriş yapmalısın.');
+      return _GuestView(title: l10n.t(AppText.notificationsLoginRequired));
     }
 
     _ensureLoaded(user.id);
@@ -76,11 +78,11 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                       final titleRow = Wrap(
                         crossAxisAlignment: WrapCrossAlignment.center,
                         spacing: 10,
-                        children: const [
-                          Icon(Icons.notifications, color: Color(0xFF6D28D9), size: 28),
+                        children: [
+                          const Icon(Icons.notifications, color: Color(0xFF6D28D9), size: 28),
                           Text(
-                            'Bildirimler',
-                            style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900),
+                            l10n.t(AppText.navNotifications),
+                            style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900),
                           ),
                         ],
                       );
@@ -89,7 +91,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                           ? TextButton.icon(
                               onPressed: _markAllAsRead,
                               icon: const Icon(Icons.check, size: 16),
-                              label: const Text('Tümünü Okundu İşaretle'),
+                              label: Text(l10n.t(AppText.notificationsMarkAllRead)),
                             )
                           : const SizedBox.shrink();
 
@@ -130,7 +132,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                         children: [
                           const Icon(Icons.notifications_active, color: Color(0xFF6D28D9)),
                           Text(
-                            '$unreadCount okunmamış bildirim',
+                            l10n.notificationsUnreadCount(unreadCount),
                             style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF6D28D9)),
                           ),
                         ],
@@ -212,7 +214,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
             if (!mounted) return;
             setState(() => _items = [item, ..._items]);
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Yeni bildirim!')),
+              SnackBar(content: Text(AppLocalizations.of(context).t(AppText.notificationsNewSnack))),
             );
           },
         )
@@ -244,7 +246,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Bildirimler yüklenirken hata oluştu: $e')),
+        SnackBar(content: Text(AppLocalizations.of(context).notificationsLoadFailed(e.toString()))),
       );
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -268,7 +270,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('İşlem başarısız: $e')),
+        SnackBar(content: Text(AppLocalizations.of(context).commonActionFailed(e.toString()))),
       );
     } finally {
       if (mounted) setState(() => _markingId = null);
@@ -288,12 +290,12 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       if (!mounted) return;
       setState(() => _items = _items.map((e) => e.copyWith(isRead: true)).toList());
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Tüm bildirimler okundu olarak işaretlendi')),
+        SnackBar(content: Text(AppLocalizations.of(context).t(AppText.notificationsAllMarkedRead))),
       );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('İşlem başarısız: $e')),
+        SnackBar(content: Text(AppLocalizations.of(context).commonActionFailed(e.toString()))),
       );
     }
   }
@@ -304,12 +306,12 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       if (!mounted) return;
       setState(() => _items = _items.where((e) => e.id != id).toList());
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Bildirim silindi')),
+        SnackBar(content: Text(AppLocalizations.of(context).t(AppText.notificationsDeleted))),
       );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Silme işlemi başarısız: $e')),
+        SnackBar(content: Text(AppLocalizations.of(context).notificationsDeleteFailed(e.toString()))),
       );
     }
   }
@@ -337,6 +339,7 @@ class _FilterTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14),
       decoration: BoxDecoration(
@@ -349,17 +352,17 @@ class _FilterTabs extends StatelessWidget {
         runSpacing: 6,
         children: [
           _TabButton(
-            label: 'Tümü ($total)',
+            label: l10n.notificationsTabAll(total),
             active: filter == 'all',
             onTap: () => onTap('all'),
           ),
           _TabButton(
-            label: 'Okunmamış ($unread)',
+            label: l10n.notificationsTabUnread(unread),
             active: filter == 'unread',
             onTap: () => onTap('unread'),
           ),
           _TabButton(
-            label: 'Okunmuş ($read)',
+            label: l10n.notificationsTabRead(read),
             active: filter == 'read',
             onTap: () => onTap('read'),
           ),
@@ -409,6 +412,11 @@ class _NotificationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final date = item.createdAt.toLocal();
+    final material = MaterialLocalizations.of(context);
+    final dateText = material.formatShortDate(date);
+    final timeText =
+        material.formatTimeOfDay(TimeOfDay.fromDateTime(date), alwaysUse24HourFormat: MediaQuery.alwaysUse24HourFormatOf(context));
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(14),
@@ -434,7 +442,7 @@ class _NotificationCard extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      item.timeAgo,
+                      '$dateText $timeText',
                       style: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 12),
                     ),
                     if (item.actionUrl != null) ...[
@@ -443,7 +451,7 @@ class _NotificationCard extends StatelessWidget {
                       const SizedBox(width: 8),
                       TextButton(
                         onPressed: onOpen,
-                        child: const Text('Detayları Gör →'),
+                        child: Text(AppLocalizations.of(context).t(AppText.commonViewDetailsArrow)),
                       ),
                     ],
                   ],
@@ -500,11 +508,12 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final text = filter == 'unread'
-        ? 'Okunmamış bildiriminiz yok.'
+        ? l10n.t(AppText.notificationsEmptyUnread)
         : filter == 'read'
-            ? 'Okunmuş bildiriminiz yok.'
-            : 'Henüz bildiriminiz yok.';
+            ? l10n.t(AppText.notificationsEmptyRead)
+            : l10n.t(AppText.notificationsEmptyAll);
 
     return Container(
       padding: const EdgeInsets.all(18),
@@ -571,19 +580,6 @@ class _NotificationItem {
   final bool isRead;
   final DateTime createdAt;
   final String? actionUrl;
-
-  String get timeAgo {
-    final now = DateTime.now();
-    final diff = now.difference(createdAt).inHours;
-    if (diff < 1) return 'Az önce';
-    if (diff < 24) return '$diff saat önce';
-    if (diff < 48) return 'Dün';
-    if (diff < 168) return '${(diff / 24).floor()} gün önce';
-    final d = createdAt.toLocal();
-    return '${d.day.toString().padLeft(2, '0')}.'
-        '${d.month.toString().padLeft(2, '0')}.'
-        '${d.year}';
-  }
 
   _NotificationItem copyWith({bool? isRead}) {
     return _NotificationItem(

@@ -1,51 +1,54 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/routing/routes.dart';
 
 class HowItWorksScreen extends StatelessWidget {
   const HowItWorksScreen({super.key});
 
-  static const _steps = <_StepData>[
-    _StepData(
-      icon: Icons.person_add_alt,
-      title: '1. Üye Ol',
-      description: 'Hızlı ve ücretsiz kayıt ol, profilini tamamla.',
-      bg: Color(0xFFDBEAFE),
-      fg: Color(0xFF2563EB),
-    ),
-    _StepData(
-      icon: Icons.menu_book,
-      title: '2. Kurs Al',
-      description: 'İlgi alanına göre kursları keşfet ve kaydol.',
-      bg: Color(0xFFDCFCE7),
-      fg: Color(0xFF16A34A),
-    ),
-    _StepData(
-      icon: Icons.work_outline,
-      title: '3. Staj/İş Bul',
-      description: 'Sana uygun ilanlara başvur.',
-      bg: Color(0xFFEDE9FE),
-      fg: Color(0xFF6D28D9),
-    ),
-    _StepData(
-      icon: Icons.emoji_events,
-      title: '4. Puan Kazan',
-      description: 'Her aktivitede puan kazan, sıralamada yüksel.',
-      bg: Color(0xFFFEF3C7),
-      fg: Color(0xFFB45309),
-    ),
-    _StepData(
-      icon: Icons.card_giftcard,
-      title: '5. Ödül Kazan',
-      description: 'Puanlarını harika ödüllerle değiştir.',
-      bg: Color(0xFFFEE2E2),
-      fg: Color(0xFFDC2626),
-    ),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
+    final steps = <_StepData>[
+      _StepData(
+        icon: Icons.person_add_alt,
+        title: '1. ${l10n.t(AppText.howItWorksDetail1Title)}',
+        description: l10n.t(AppText.howItWorksDetail1Desc),
+        bg: const Color(0xFFDBEAFE),
+        fg: const Color(0xFF2563EB),
+      ),
+      _StepData(
+        icon: Icons.menu_book,
+        title: '2. ${l10n.t(AppText.howItWorksDetail2Title)}',
+        description: l10n.t(AppText.howItWorksDetail2Desc),
+        bg: const Color(0xFFDCFCE7),
+        fg: const Color(0xFF16A34A),
+      ),
+      _StepData(
+        icon: Icons.work_outline,
+        title: '3. ${l10n.t(AppText.howItWorksDetail3Title)}',
+        description: l10n.t(AppText.howItWorksDetail3Desc),
+        bg: const Color(0xFFEDE9FE),
+        fg: const Color(0xFF6D28D9),
+      ),
+      _StepData(
+        icon: Icons.emoji_events,
+        title: '4. ${l10n.t(AppText.howItWorksDetail4Title)}',
+        description: l10n.t(AppText.howItWorksDetail4Desc),
+        bg: const Color(0xFFFEF3C7),
+        fg: const Color(0xFFB45309),
+      ),
+      _StepData(
+        icon: Icons.card_giftcard,
+        title: '5. ${l10n.t(AppText.howItWorksStep5Title)}',
+        description: l10n.t(AppText.howItWorksStep5Desc),
+        bg: const Color(0xFFFEE2E2),
+        fg: const Color(0xFFDC2626),
+      ),
+    ];
+
     return Container(
       color: const Color(0xFFF9FAFB),
       child: SingleChildScrollView(
@@ -61,9 +64,9 @@ class HowItWorksScreen extends StatelessWidget {
                   onSecondary: () => context.go(Routes.courses),
                 ),
                 const SizedBox(height: 28),
-                const _SectionHeader(
-                  title: 'Adım Adım',
-                  subtitle: 'Beş basit adımla kariyer yolculuğunu başlat.',
+                _SectionHeader(
+                  title: l10n.t(AppText.howItWorksPageStepByStepTitle),
+                  subtitle: l10n.t(AppText.howItWorksPageStepByStepSubtitle),
                 ),
                 const SizedBox(height: 18),
                 LayoutBuilder(
@@ -78,7 +81,7 @@ class HowItWorksScreen extends StatelessWidget {
                       runSpacing: 16,
                       alignment: WrapAlignment.center,
                       children: [
-                        for (final step in _steps)
+                        for (final step in steps)
                           SizedBox(width: itemWidth, child: _StepCard(step: step)),
                       ],
                     );
@@ -86,64 +89,62 @@ class HowItWorksScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 28),
                 _SectionCard(
-                  title: 'Detaylı Adımlar',
+                  title: l10n.t(AppText.howItWorksDetailedStepsTitle),
                   child: Column(
-                    children: const [
+                    children: [
                       _DetailStep(
                         index: '1',
-                        title: 'Üyelik ve Profil',
-                        description:
-                            'E-posta adresinle hızlıca üye ol. Profilini doldurarak bölümünü ve ilgi alanlarını belirt.',
+                        title: l10n.t(AppText.howItWorksDetail1Title),
+                        description: l10n.t(AppText.howItWorksDetail1Desc),
                         bullets: [
-                          'Ad-soyad ve bölüm bilgilerini ekle',
-                          'İlgi alanlarını seç',
-                          'Kariyer hedeflerini belirt',
+                          l10n.t(AppText.howItWorksDetail1Bullet1),
+                          l10n.t(AppText.howItWorksDetail1Bullet2),
+                          l10n.t(AppText.howItWorksDetail1Bullet3),
                         ],
                       ),
                       _DetailStep(
                         index: '2',
-                        title: 'Eğitimler ve Kurslar',
-                        description:
-                            'Bölümüne ve ilgi alanlarına uygun kursları keşfet. Her kurs kaydında ve tamamlamada puan kazan.',
+                        title: l10n.t(AppText.howItWorksDetail2Title),
+                        description: l10n.t(AppText.howItWorksDetail2Desc),
                         bullets: [
-                          'Video içerikli eğitimler',
-                          'Pratik projeler ve ödevler',
-                          'Sertifika kazanma fırsatı',
+                          l10n.t(AppText.howItWorksDetail2Bullet1),
+                          l10n.t(AppText.howItWorksDetail2Bullet2),
+                          l10n.t(AppText.howItWorksDetail2Bullet3),
                         ],
                       ),
                       _DetailStep(
                         index: '3',
-                        title: 'Staj ve İş Başvuruları',
-                        description:
-                            'Sektördeki firmaların ilanlarına başvur. Kabul edildiğinde ekstra puanlar kazan.',
+                        title: l10n.t(AppText.howItWorksDetail3Title),
+                        description: l10n.t(AppText.howItWorksDetail3Desc),
                         bullets: [
-                          'Bölümüne özel ilanlar',
-                          'Uzaktan ve yerinde çalışma seçenekleri',
-                          'Değerlendirme ile ekstra puan',
+                          l10n.t(AppText.howItWorksDetail3Bullet1),
+                          l10n.t(AppText.howItWorksDetail3Bullet2),
+                          l10n.t(AppText.howItWorksDetail3Bullet3),
                         ],
                       ),
                       _DetailStep(
                         index: '4',
-                        title: 'Puan Sistemi',
-                        description:
-                            'Her gün giriş yap, aktivitelerini tamamla ve puan kazan. Bölüm ve genel sıralamada üst sıralara çık.',
+                        title: l10n.t(AppText.howItWorksDetail4Title),
+                        description: l10n.t(AppText.howItWorksDetail4Desc),
                         highlights: [
-                          _Highlight('Günlük Giriş', '+2 puan'),
-                          _Highlight('Haftalık Seri', '+15 puan'),
-                          _Highlight('Staj Tamamlama', '+100 puan'),
-                          _Highlight('İlk 10', '+50 puan'),
+                          _Highlight(l10n.t(AppText.howItWorksHighlightDailyLogin), l10n.pointsDelta(2)),
+                          _Highlight(l10n.t(AppText.howItWorksHighlightWeeklyStreak), l10n.pointsDelta(15)),
+                          _Highlight(l10n.t(AppText.howItWorksHighlightInternshipCompletion), l10n.pointsDelta(100)),
+                          _Highlight(l10n.t(AppText.howItWorksHighlightTop10), l10n.pointsDelta(50)),
                         ],
                       ),
                       _DetailStep(
                         index: '5',
-                        title: 'Ödüller',
-                        description:
-                            'Biriktirdiğin puanları harika ödüllerle değiştir! Teknoloji ürünleri ve eğitim paketleri seni bekliyor.',
+                        title: l10n.t(AppText.howItWorksDetail5Title),
+                        description: l10n.t(AppText.howItWorksDetail5Desc),
                         rewards: [
-                          _Reward('Ücretsiz Eğitim Paketleri', '1000 puandan başlayan ödüller'),
-                          _Reward('Teknoloji Ürünleri', '3000 puandan başlayan ödüller'),
-                          _Reward('Yurt Dışı Gezileri', '5000 puandan başlayan ödüller'),
-                          _Reward('Staj Garantisi', '1500 puandan başlayan ödüller'),
+                          _Reward(l10n.t(AppText.howItWorksRewardFreeTraining), l10n.howItWorksRewardFromPoints(1000)),
+                          _Reward(l10n.t(AppText.howItWorksRewardTechProducts), l10n.howItWorksRewardFromPoints(3000)),
+                          _Reward(l10n.t(AppText.howItWorksRewardAbroadTrips), l10n.howItWorksRewardFromPoints(5000)),
+                          _Reward(
+                            l10n.t(AppText.howItWorksRewardInternshipGuarantee),
+                            l10n.howItWorksRewardFromPoints(1500),
+                          ),
                         ],
                       ),
                     ],
@@ -171,6 +172,7 @@ class _Hero extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -214,20 +216,20 @@ class _Hero extends StatelessWidget {
                             color: Colors.white.withValues(alpha: 0.18),
                             borderRadius: BorderRadius.circular(999),
                           ),
-                          child: const Text(
-                            'Kariyer Yol Haritası',
-                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                          child: Text(
+                            l10n.t(AppText.howItWorksHeroChip),
+                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
                           ),
                         ),
                         const SizedBox(height: 12),
-                        const Text(
-                          'Nasıl Çalışır?',
-                          style: TextStyle(fontSize: 32, fontWeight: FontWeight.w900, color: Colors.white),
+                        Text(
+                          l10n.t(AppText.howItWorksTitle),
+                          style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w900, color: Colors.white),
                         ),
                         const SizedBox(height: 10),
-                        const Text(
-                          'Alanına özel kurslar, stajlar ve iş ilanları ile geleceğine sağlam adımlarla ilerle.',
-                          style: TextStyle(color: Color(0xFFE0E7FF), height: 1.4),
+                        Text(
+                          l10n.t(AppText.howItWorksSubtitle),
+                          style: const TextStyle(color: Color(0xFFE0E7FF), height: 1.4),
                         ),
                         const SizedBox(height: 18),
                         Wrap(
@@ -242,7 +244,8 @@ class _Hero extends StatelessWidget {
                                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                               ),
-                              child: const Text('Ücretsiz Kayıt Ol', style: TextStyle(fontWeight: FontWeight.w800)),
+                              child: Text(l10n.t(AppText.howItWorksHeroPrimary),
+                                  style: const TextStyle(fontWeight: FontWeight.w800)),
                             ),
                             OutlinedButton(
                               onPressed: onSecondary,
@@ -252,7 +255,8 @@ class _Hero extends StatelessWidget {
                                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                               ),
-                              child: const Text('Kursları Gör', style: TextStyle(fontWeight: FontWeight.w700)),
+                              child: Text(l10n.t(AppText.howItWorksHeroSecondary),
+                                  style: const TextStyle(fontWeight: FontWeight.w700)),
                             ),
                           ],
                         ),
@@ -270,13 +274,14 @@ class _Hero extends StatelessWidget {
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
-                          Text('Bu sayfada', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
-                          SizedBox(height: 10),
-                          _HeroBullet(text: 'Platform adımlarının özetini'),
-                          _HeroBullet(text: 'Puan ve ödül mantığını'),
-                          _HeroBullet(text: 'Başvuru sürecini'),
-                          _HeroBullet(text: 'Hızlı başlangıç ipuçlarını'),
+                        children: [
+                          Text(l10n.t(AppText.howItWorksHeroSidebarTitle),
+                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+                          const SizedBox(height: 10),
+                          _HeroBullet(text: l10n.t(AppText.howItWorksHeroBullet1)),
+                          _HeroBullet(text: l10n.t(AppText.howItWorksHeroBullet2)),
+                          _HeroBullet(text: l10n.t(AppText.howItWorksHeroBullet3)),
+                          _HeroBullet(text: l10n.t(AppText.howItWorksHeroBullet4)),
                         ],
                       ),
                     ),
@@ -391,9 +396,21 @@ class _StepCard extends StatelessWidget {
             child: Icon(step.icon, size: 32, color: step.fg),
           ),
           const SizedBox(height: 10),
-          Text(step.title, style: const TextStyle(fontWeight: FontWeight.w800)),
+          Text(
+            step.title,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontWeight: FontWeight.w800),
+          ),
           const SizedBox(height: 6),
-          Text(step.description, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFF6B7280))),
+          Text(
+            step.description,
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: Color(0xFF6B7280)),
+          ),
         ],
       ),
     );
@@ -598,6 +615,7 @@ class _CtaCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
@@ -606,11 +624,17 @@ class _CtaCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const Text('Hazır mısın?',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Colors.white)),
+          Text(
+            l10n.t(AppText.howItWorksCtaTitle),
+            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Colors.white),
+            textAlign: TextAlign.center,
+          ),
           const SizedBox(height: 6),
-          const Text('Hemen üye ol, kariyerine yön vermeye başla!',
-              textAlign: TextAlign.center, style: TextStyle(color: Color(0xFFE0E7FF))),
+          Text(
+            l10n.t(AppText.howItWorksCtaSubtitle),
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: Color(0xFFE0E7FF)),
+          ),
           const SizedBox(height: 14),
           Wrap(
             spacing: 12,
@@ -625,7 +649,8 @@ class _CtaCard extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                 ),
-                child: const Text('Ücretsiz Kayıt Ol', style: TextStyle(fontWeight: FontWeight.w800)),
+                child: Text(l10n.t(AppText.howItWorksCtaPrimary),
+                    style: const TextStyle(fontWeight: FontWeight.w800)),
               ),
               OutlinedButton(
                 onPressed: onSecondary,
@@ -635,7 +660,8 @@ class _CtaCard extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                 ),
-                child: const Text('İş İlanlarını Gör', style: TextStyle(fontWeight: FontWeight.w700)),
+                child: Text(l10n.t(AppText.howItWorksCtaSecondary),
+                    style: const TextStyle(fontWeight: FontWeight.w700)),
               ),
             ],
           ),

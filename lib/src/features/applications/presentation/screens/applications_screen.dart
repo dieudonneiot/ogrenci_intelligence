@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/localization/app_localizations.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
 import '../../application/applications_providers.dart';
 import '../../domain/applications_models.dart';
@@ -68,6 +69,7 @@ class _ApplicationsScreenState extends ConsumerState<ApplicationsScreen> with Si
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final authAsync = ref.watch(authViewStateProvider);
     final isLoggedIn = (!authAsync.isLoading) && (authAsync.value?.isAuthenticated ?? false);
 
@@ -80,7 +82,7 @@ class _ApplicationsScreenState extends ConsumerState<ApplicationsScreen> with Si
     return bundleAsync.when(
       loading: () => const Center(child: Padding(padding: EdgeInsets.all(24), child: CircularProgressIndicator())),
       error: (e, _) => _ErrorState(
-        text: 'Başvurular yüklenemedi: $e',
+        text: l10n.applicationsLoadFailed(e.toString()),
         onRetry: () => ref.invalidate(myApplicationsBundleProvider),
       ),
       data: (bundle) {
@@ -112,16 +114,17 @@ class _ApplicationsScreenState extends ConsumerState<ApplicationsScreen> with Si
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
-                          children: const [
-                            Icon(Icons.assignment_turned_in_outlined, color: Color(0xFF6D28D9), size: 30),
-                            SizedBox(width: 10),
-                            Text('Başvurularım', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900)),
+                          children: [
+                            const Icon(Icons.assignment_turned_in_outlined, color: Color(0xFF6D28D9), size: 30),
+                            const SizedBox(width: 10),
+                            Text(l10n.t(AppText.navMyApplications),
+                                style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900)),
                           ],
                         ),
                         const SizedBox(height: 6),
-                        const Text(
-                          'Tüm başvuru ve kayıtlarınızı buradan takip edebilirsiniz.',
-                          style: TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
+                        Text(
+                          l10n.t(AppText.applicationsSubtitle),
+                          style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
                         ),
                         const SizedBox(height: 16),
 
@@ -129,10 +132,10 @@ class _ApplicationsScreenState extends ConsumerState<ApplicationsScreen> with Si
                           builder: (_, c) {
                             final wide = c.maxWidth >= 900;
                             final cards = <Widget>[
-                              _StatTile(title: 'Toplam', value: '$total', icon: Icons.list_alt),
-                              _StatTile(title: 'Beklemede', value: '$pending', icon: Icons.hourglass_bottom),
-                              _StatTile(title: 'Kabul', value: '$accepted', icon: Icons.check_circle_outline),
-                              _StatTile(title: 'Aktif', value: '$active', icon: Icons.bolt_outlined),
+                              _StatTile(title: l10n.t(AppText.commonTotal), value: '$total', icon: Icons.list_alt),
+                              _StatTile(title: l10n.t(AppText.statusPending), value: '$pending', icon: Icons.hourglass_bottom),
+                              _StatTile(title: l10n.t(AppText.statusAccepted), value: '$accepted', icon: Icons.check_circle_outline),
+                              _StatTile(title: l10n.t(AppText.commonActive), value: '$active', icon: Icons.bolt_outlined),
                             ];
 
                             if (wide) {
@@ -179,10 +182,10 @@ class _ApplicationsScreenState extends ConsumerState<ApplicationsScreen> with Si
                             indicatorColor: const Color(0xFF6D28D9),
                             onTap: (i) => setState(() => _statusFilter = _sanitizeStatusFilter(i, _statusFilter)),
                             tabs: [
-                              Tab(child: _TabLabel(text: 'Tümü', count: all.length)),
-                              Tab(child: _TabLabel(text: 'İş İlanları', count: jobsCount)),
-                              Tab(child: _TabLabel(text: 'Stajlar', count: internshipsCount)),
-                              Tab(child: _TabLabel(text: 'Kurslar', count: coursesCount)),
+                              Tab(child: _TabLabel(text: l10n.t(AppText.commonAll), count: all.length)),
+                              Tab(child: _TabLabel(text: l10n.t(AppText.navJobs), count: jobsCount)),
+                              Tab(child: _TabLabel(text: l10n.t(AppText.navInternships), count: internshipsCount)),
+                              Tab(child: _TabLabel(text: l10n.t(AppText.navCourses), count: coursesCount)),
                             ],
                           ),
                         ),
@@ -196,22 +199,22 @@ class _ApplicationsScreenState extends ConsumerState<ApplicationsScreen> with Si
                             children: [
                               _ListViewTab(
                                 items: _applyFilter(all),
-                                emptyText: 'Henüz başvurunuz bulunmuyor.',
+                                emptyText: l10n.t(AppText.applicationsEmpty),
                                 onOpen: _openItem,
                               ),
                               _ListViewTab(
                                 items: _applyFilter(bundle.jobs),
-                                emptyText: 'Henüz başvurunuz bulunmuyor.',
+                                emptyText: l10n.t(AppText.applicationsEmpty),
                                 onOpen: _openItem,
                               ),
                               _ListViewTab(
                                 items: _applyFilter(bundle.internships),
-                                emptyText: 'Henüz başvurunuz bulunmuyor.',
+                                emptyText: l10n.t(AppText.applicationsEmpty),
                                 onOpen: _openItem,
                               ),
                               _ListViewTab(
                                 items: _applyFilter(bundle.courses),
-                                emptyText: 'Henüz başvurunuz bulunmuyor.',
+                                emptyText: l10n.t(AppText.applicationsEmpty),
                                 onOpen: _openItem,
                               ),
                             ],
@@ -298,6 +301,7 @@ class _ApplicationsScreenState extends ConsumerState<ApplicationsScreen> with Si
 class _Guest extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       color: const Color(0xFFF9FAFB),
       child: Center(
@@ -305,11 +309,14 @@ class _Guest extends StatelessWidget {
           padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            children: const [
-              Icon(Icons.lock_outline, size: 44, color: Color(0xFF6B7280)),
-              SizedBox(height: 10),
-              Text('Başvuruları görmek için giriş yapmalısın.',
-                  style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF374151))),
+            children: [
+              const Icon(Icons.lock_outline, size: 44, color: Color(0xFF6B7280)),
+              const SizedBox(height: 10),
+              Text(
+                l10n.t(AppText.applicationsLoginRequired),
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF374151)),
+              ),
             ],
           ),
         ),
@@ -325,6 +332,7 @@ class _ErrorState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -335,7 +343,10 @@ class _ErrorState extends StatelessWidget {
             const SizedBox(height: 12),
             Text(text, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700)),
             const SizedBox(height: 14),
-            SizedBox(height: 44, child: ElevatedButton(onPressed: onRetry, child: const Text('Tekrar dene'))),
+            SizedBox(
+              height: 44,
+              child: ElevatedButton(onPressed: onRetry, child: Text(l10n.t(AppText.retry))),
+            ),
           ],
         ),
       ),
@@ -402,14 +413,32 @@ class _FiltersBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: TextField(
-            controller: controller,
+    final l10n = AppLocalizations.of(context);
+
+    final search = TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        hintText: l10n.t(AppText.applicationsSearchHint),
+        prefixIcon: const Icon(Icons.search),
+        filled: true,
+        fillColor: Colors.white,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+        ),
+      ),
+    );
+
+    final statusDropdown = statusOptions.isEmpty
+        ? const SizedBox.shrink()
+        : DropdownButtonFormField<ApplicationStatus?>(
+            initialValue: status,
             decoration: InputDecoration(
-              hintText: 'Başvuru ara...',
-              prefixIcon: const Icon(Icons.search),
               filled: true,
               fillColor: Colors.white,
               contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
@@ -422,53 +451,53 @@ class _FiltersBar extends StatelessWidget {
                 borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
               ),
             ),
-          ),
-        ),
-        const SizedBox(width: 12),
-        if (statusOptions.isEmpty)
-          const SizedBox(width: 160)
-        else
-          SizedBox(
-            width: 190,
-            child: DropdownButtonFormField<ApplicationStatus?>(
-              initialValue: status,
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: Colors.white,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                ),
+            items: [
+              DropdownMenuItem<ApplicationStatus?>(
+                value: null,
+                child: Text(l10n.t(AppText.companyApplicationsFilterAllStatuses)),
               ),
-              items: [
-                const DropdownMenuItem<ApplicationStatus?>(value: null, child: Text('Tüm Durumlar')),
-                for (final s in statusOptions)
-                  DropdownMenuItem<ApplicationStatus?>(value: s, child: Text(_statusText(s))),
-              ],
-              onChanged: onStatusChanged,
-            ),
-          ),
-      ],
+              for (final s in statusOptions)
+                DropdownMenuItem<ApplicationStatus?>(value: s, child: Text(_statusLabel(l10n, s))),
+            ],
+            onChanged: onStatusChanged,
+          );
+
+    return LayoutBuilder(
+      builder: (_, c) {
+        final narrow = c.maxWidth < 620;
+        if (narrow) {
+          return Column(
+            children: [
+              search,
+              const SizedBox(height: 10),
+              SizedBox(width: double.infinity, child: statusDropdown),
+            ],
+          );
+        }
+
+        return Row(
+          children: [
+            Expanded(child: search),
+            const SizedBox(width: 12),
+            SizedBox(width: 210, child: statusDropdown),
+          ],
+        );
+      },
     );
   }
 
-  static String _statusText(ApplicationStatus s) {
+  String _statusLabel(AppLocalizations l10n, ApplicationStatus s) {
     switch (s) {
       case ApplicationStatus.pending:
-        return 'Beklemede';
+        return l10n.t(AppText.statusPending);
       case ApplicationStatus.accepted:
-        return 'Kabul';
+        return l10n.t(AppText.statusAccepted);
       case ApplicationStatus.rejected:
-        return 'Reddedildi';
+        return l10n.t(AppText.statusRejected);
       case ApplicationStatus.active:
-        return 'Aktif';
+        return l10n.t(AppText.commonActive);
       case ApplicationStatus.completed:
-        return 'Tamamlandı';
+        return l10n.t(AppText.statusCompleted);
     }
   }
 }
@@ -486,6 +515,7 @@ class _ListViewTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     if (items.isEmpty) {
       return Center(
         child: Padding(
@@ -515,17 +545,17 @@ class _ListViewTab extends StatelessWidget {
                   runSpacing: 6,
                   children: [
                     _EmptyCta(
-                      label: 'İş İlanlarına Göz At',
+                      label: l10n.t(AppText.favoritesBrowseJobs),
                       onTap: () => context.go('/jobs'),
                     ),
                     const Text('•', style: TextStyle(color: Color(0xFF9CA3AF), fontWeight: FontWeight.w900)),
                     _EmptyCta(
-                      label: 'Stajları Keşfet',
+                      label: l10n.t(AppText.favoritesBrowseInternships),
                       onTap: () => context.go('/internships'),
                     ),
                     const Text('•', style: TextStyle(color: Color(0xFF9CA3AF), fontWeight: FontWeight.w900)),
                     _EmptyCta(
-                      label: 'Kurslara Katıl',
+                      label: l10n.t(AppText.favoritesExploreCourses),
                       onTap: () => context.go('/courses'),
                     ),
                   ],
@@ -553,13 +583,16 @@ class _ApplicationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final pill = _pill(item.status);
+    final l10n = AppLocalizations.of(context);
+    final pill = _pill(l10n, item.status);
 
     final kindLabel = item.kind == ApplicationKind.internship
-        ? 'Staj'
+        ? l10n.t(AppText.applicationsKindInternship)
         : item.kind == ApplicationKind.course
-            ? 'Kurs'
-            : 'İş';
+            ? l10n.t(AppText.applicationsKindCourse)
+            : l10n.t(AppText.applicationsKindJob);
+
+    final dateText = MaterialLocalizations.of(context).formatShortDate(item.date);
 
     final detailText = [
       if (item.subtitle != null && item.subtitle!.isNotEmpty) item.subtitle!,
@@ -631,7 +664,7 @@ class _ApplicationCard extends StatelessWidget {
                     ),
                     const Spacer(),
                     Text(
-                      _fmt(item.date),
+                      dateText,
                       style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w800, fontSize: 12),
                     ),
                     const SizedBox(width: 10),
@@ -645,7 +678,7 @@ class _ApplicationCard extends StatelessWidget {
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           elevation: 0,
                         ),
-                        child: const Text('Detay →', style: TextStyle(fontWeight: FontWeight.w900)),
+                        child: Text(l10n.t(AppText.internshipsDetails), style: const TextStyle(fontWeight: FontWeight.w900)),
                       ),
                     ),
                   ],
@@ -654,7 +687,8 @@ class _ApplicationCard extends StatelessWidget {
                   const SizedBox(height: 10),
                   Row(
                     children: [
-                      const Text('İlerleme', style: TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700)),
+                      Text(l10n.t(AppText.courseDetailProgress),
+                          style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700)),
                       const Spacer(),
                       Text('%${item.progress}',
                           style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF111827))),
@@ -679,21 +713,18 @@ class _ApplicationCard extends StatelessWidget {
     );
   }
 
-  static String _fmt(DateTime d) =>
-      '${d.day.toString().padLeft(2, '0')}.${d.month.toString().padLeft(2, '0')}.${d.year}';
-
-  static _Pill _pill(ApplicationStatus s) {
+  static _Pill _pill(AppLocalizations l10n, ApplicationStatus s) {
     switch (s) {
       case ApplicationStatus.pending:
-        return const _Pill('Beklemede', Color(0xFF92400E), Color(0xFFFEF3C7));
+        return _Pill(l10n.t(AppText.statusPending), Color(0xFF92400E), Color(0xFFFEF3C7));
       case ApplicationStatus.accepted:
-        return const _Pill('Kabul', Color(0xFF065F46), Color(0xFFDCFCE7));
+        return _Pill(l10n.t(AppText.statusAccepted), Color(0xFF065F46), Color(0xFFDCFCE7));
       case ApplicationStatus.rejected:
-        return const _Pill('Reddedildi', Color(0xFF991B1B), Color(0xFFFEE2E2));
+        return _Pill(l10n.t(AppText.statusRejected), Color(0xFF991B1B), Color(0xFFFEE2E2));
       case ApplicationStatus.active:
-        return const _Pill('Aktif', Color(0xFF1D4ED8), Color(0xFFDBEAFE));
+        return _Pill(l10n.t(AppText.commonActive), Color(0xFF1D4ED8), Color(0xFFDBEAFE));
       case ApplicationStatus.completed:
-        return const _Pill('Tamamlandı', Color(0xFF065F46), Color(0xFFDCFCE7));
+        return _Pill(l10n.t(AppText.statusCompleted), Color(0xFF065F46), Color(0xFFDCFCE7));
     }
   }
 }

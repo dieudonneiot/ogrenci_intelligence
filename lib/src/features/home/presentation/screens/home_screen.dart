@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../../core/supabase/supabase_service.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
@@ -17,6 +18,7 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final authAsync = ref.watch(authViewStateProvider);
 
     final isLoading = authAsync.isLoading;
@@ -57,27 +59,24 @@ class HomeScreen extends ConsumerWidget {
 
                   _SectionGrid(
                     title: null,
-                    cards: const [
+                    cards: [
                       _InfoCard(
                         icon: Icons.school_outlined,
                         iconColor: _purple700,
-                        title: 'Alanına Özel İçerikler',
-                        description:
-                            'Bölümüne uygun kurslar, stajlar ve iş ilanlarıyla odaklanmış öğrenme.',
+                        title: l10n.t(AppText.homeCard1Title),
+                        description: l10n.t(AppText.homeCard1Desc),
                       ),
                       _InfoCard(
                         icon: Icons.work_outline,
                         iconColor: _purple700,
-                        title: 'Kariyerine Yön Ver',
-                        description:
-                            'Kişiselleştirilmiş kariyer rehberliği ve fırsatlarla desteklen.',
+                        title: l10n.t(AppText.homeCard2Title),
+                        description: l10n.t(AppText.homeCard2Desc),
                       ),
                       _InfoCard(
                         icon: Icons.assignment_outlined,
                         iconColor: _purple700,
-                        title: 'Kolay ve Hızlı Kullanım',
-                        description:
-                            'Modern tasarım ve kullanıcı dostu arayüz ile zamandan tasarruf et.',
+                        title: l10n.t(AppText.homeCard3Title),
+                        description: l10n.t(AppText.homeCard3Desc),
                       ),
                     ],
                   ),
@@ -85,28 +84,25 @@ class HomeScreen extends ConsumerWidget {
                   const SizedBox(height: 56),
 
                   _SectionGrid(
-                    title: 'Öğrenciler İçin Faydalar',
-                    cards: const [
+                    title: l10n.t(AppText.homeStudentBenefitsTitle),
+                    cards: [
                       _InfoCard(
                         icon: Icons.track_changes_outlined,
                         iconColor: _purple700,
-                        title: 'Hedef Odaklı İçerik',
-                        description:
-                            'Alanına uygun fırsatlarla zaman kaybetmeden hedefe ulaş.',
+                        title: l10n.t(AppText.homeStudentCard1Title),
+                        description: l10n.t(AppText.homeStudentCard1Desc),
                       ),
                       _InfoCard(
                         icon: Icons.star_outline,
                         iconColor: _purple700,
-                        title: 'Rekabet Avantajı',
-                        description:
-                            'Özgeçmişini güçlendirecek fırsatlara herkesten önce ulaş.',
+                        title: l10n.t(AppText.homeStudentCard2Title),
+                        description: l10n.t(AppText.homeStudentCard2Desc),
                       ),
                       _InfoCard(
                         icon: Icons.bar_chart_outlined,
                         iconColor: _purple700,
-                        title: 'Gelişim Takibi',
-                        description:
-                            'İlerleyişini takip et, eksiklerini zamanında fark et.',
+                        title: l10n.t(AppText.homeStudentCard3Title),
+                        description: l10n.t(AppText.homeStudentCard3Desc),
                       ),
                     ],
                   ),
@@ -114,35 +110,32 @@ class HomeScreen extends ConsumerWidget {
                   const SizedBox(height: 56),
 
                   _SectionGrid(
-                    title: 'İşletmeler İçin Faydalar',
-                    cards: const [
+                    title: l10n.t(AppText.homeCompanyBenefitsTitle),
+                    cards: [
                       _InfoCard(
                         icon: Icons.people_outline,
                         iconColor: _purple700,
-                        title: 'Genç Yeteneklere Erişim',
-                        description:
-                            'Motivasyonu yüksek, alanına ilgili öğrencilere ulaşın.',
+                        title: l10n.t(AppText.homeCompanyCard1Title),
+                        description: l10n.t(AppText.homeCompanyCard1Desc),
                       ),
                       _InfoCard(
                         icon: Icons.handshake_outlined,
                         iconColor: _purple700,
-                        title: 'İşbirliği Olanakları',
-                        description:
-                            'Projelerinizde üniversite öğrencileriyle birlikte çalışın.',
+                        title: l10n.t(AppText.homeCompanyCard2Title),
+                        description: l10n.t(AppText.homeCompanyCard2Desc),
                       ),
                       _InfoCard(
                         icon: Icons.query_stats_outlined,
                         iconColor: _purple700,
-                        title: 'Veriye Dayalı Seçim',
-                        description:
-                            'Profil verileriyle doğru kişiyi kolayca belirleyin.',
+                        title: l10n.t(AppText.homeCompanyCard3Title),
+                        description: l10n.t(AppText.homeCompanyCard3Desc),
                       ),
                     ],
                   ),
 
                   const SizedBox(height: 56),
 
-                  // ✅ Keep it here, from widgets/how_it_works_section.dart
+                  // Keep it here, from widgets/how_it_works_section.dart
                   const HowItWorksSection(),
 
                   const SizedBox(height: 24),
@@ -182,6 +175,7 @@ class _Hero extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final titleStyle = Theme.of(context).textTheme.headlineMedium?.copyWith(
           color: Colors.white,
           fontWeight: FontWeight.w800,
@@ -223,7 +217,7 @@ class _Hero extends StatelessWidget {
           child: Column(
             children: [
               Text(
-                'Üniversite Hayatını Güçlendir,\nKariyerine Hızla Yön Ver!',
+                l10n.t(AppText.homeHeroTitle),
                 textAlign: TextAlign.center,
                 style: titleStyle,
               ),
@@ -231,7 +225,7 @@ class _Hero extends StatelessWidget {
               ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 720),
                 child: Text(
-                  'Alanına özel kurslar, stajlar ve iş ilanları ile geleceğine sağlam adımlarla ilerle.',
+                  l10n.t(AppText.homeHeroSubtitle),
                   textAlign: TextAlign.center,
                   style: subtitleStyle,
                 ),
@@ -250,27 +244,27 @@ class _Hero extends StatelessWidget {
                   children: [
                     if (!isLoggedIn) ...[
                       _FilledCta(
-                        label: 'Kayıt Ol',
+                        label: l10n.t(AppText.signUp),
                         color: _yellow400,
                         textColor: Color(0xFF111827),
                         onTap: onRegister,
                       ),
                       _FilledCta(
-                        label: 'Giriş Yap',
+                        label: l10n.t(AppText.login),
                         color: _yellow400,
                         textColor: Color(0xFF111827),
                         onTap: onLogin,
                       ),
                     ] else ...[
                       _FilledCta(
-                        label: 'Profil',
+                        label: l10n.t(AppText.profile),
                         color: _green400,
                         textColor: Color(0xFF111827),
                         icon: Icons.person_outline,
                         onTap: onProfile,
                       ),
                       _FilledCta(
-                        label: 'Çıkış Yap',
+                        label: l10n.t(AppText.signOut),
                         color: _red400,
                         textColor: Colors.white,
                         icon: Icons.logout_outlined,

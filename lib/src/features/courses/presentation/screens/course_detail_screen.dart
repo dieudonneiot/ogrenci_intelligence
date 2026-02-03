@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/localization/app_localizations.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
 import '../../application/courses_providers.dart';
 import '../../domain/course_models.dart';
@@ -12,6 +13,7 @@ class CourseDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final courseAsync = ref.watch(courseDetailProvider(courseId));
     final enrollmentAsync = ref.watch(myCourseEnrollmentProvider(courseId));
     final repo = ref.read(coursesRepositoryProvider);
@@ -52,7 +54,7 @@ class CourseDetailScreen extends ConsumerWidget {
                       onEnroll: null,
                       onUnenroll: null,
                       onUpdateProgress: null,
-                      warning: 'Enrollment yüklenemedi: $e',
+                      warning: l10n.coursesEnrollmentLoadFailed(e.toString()),
                     ),
                     data: (enrollment) {
                       Future<void> doEnroll() async {
@@ -127,6 +129,7 @@ class _CourseDetailBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final enrolled = enrollment != null;
     final progress = (enrollment?.progress ?? 0).clamp(0, 100);
 
@@ -139,10 +142,11 @@ class _CourseDetailBody extends StatelessWidget {
             IconButton(
               onPressed: () => Navigator.of(context).maybePop(),
               icon: const Icon(Icons.arrow_back),
-              tooltip: 'Geri',
+              tooltip: l10n.t(AppText.commonBack),
             ),
             const SizedBox(width: 6),
-            const Text('Kurs Detayı', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18)),
+            Text(l10n.t(AppText.courseDetailTitle),
+                style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18)),
           ],
         ),
         const SizedBox(height: 10),
@@ -185,13 +189,13 @@ class _CourseDetailBody extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                course.description ?? 'Açıklama yok.',
+                course.description ?? l10n.t(AppText.commonNoDescription),
                 style: const TextStyle(color: Color(0xFF374151), fontWeight: FontWeight.w600, height: 1.45),
               ),
               const SizedBox(height: 14),
 
               if (course.videoUrl != null && course.videoUrl!.trim().isNotEmpty) ...[
-                const Text('Video URL', style: TextStyle(fontWeight: FontWeight.w900)),
+                Text(l10n.t(AppText.courseDetailVideoUrl), style: const TextStyle(fontWeight: FontWeight.w900)),
                 const SizedBox(height: 6),
                 SelectableText(course.videoUrl!, style: const TextStyle(color: Color(0xFF6D28D9))),
                 const SizedBox(height: 12),
@@ -206,7 +210,10 @@ class _CourseDetailBody extends StatelessWidget {
                   child: ElevatedButton.icon(
                     onPressed: (enrolling || onEnroll == null) ? null : () async => onEnroll!(),
                     icon: const Icon(Icons.add),
-                    label: Text(enrolling ? 'Yükleniyor...' : 'Kursa Kayıt Ol', style: const TextStyle(fontWeight: FontWeight.w900)),
+                    label: Text(
+                      enrolling ? l10n.t(AppText.commonLoading) : l10n.t(AppText.courseDetailEnroll),
+                      style: const TextStyle(fontWeight: FontWeight.w900),
+                    ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF6D28D9),
                       foregroundColor: Colors.white,
@@ -222,7 +229,7 @@ class _CourseDetailBody extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('İlerleme', style: TextStyle(fontWeight: FontWeight.w900)),
+                          Text(l10n.t(AppText.courseDetailProgress), style: const TextStyle(fontWeight: FontWeight.w900)),
                           const SizedBox(height: 6),
                           ClipRRect(
                             borderRadius: BorderRadius.circular(999),
@@ -234,7 +241,8 @@ class _CourseDetailBody extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 6),
-                          Text('%$progress tamamlandı', style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w800)),
+                          Text(l10n.dashboardCourseProgress(progress),
+                              style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w800)),
                         ],
                       ),
                     ),
@@ -242,7 +250,7 @@ class _CourseDetailBody extends StatelessWidget {
                     if (onUnenroll != null)
                       OutlinedButton(
                         onPressed: () async => onUnenroll!(),
-                        child: const Text('Kayıt İptal'),
+                        child: Text(l10n.t(AppText.courseDetailUnenroll)),
                       ),
                   ],
                 ),
@@ -261,7 +269,7 @@ class _CourseDetailBody extends StatelessWidget {
                       ),
                       OutlinedButton(
                         onPressed: () async => onUpdateProgress!(100),
-                        child: const Text('Tamamlandı'),
+                        child: Text(l10n.t(AppText.profileCourseCompleted)),
                       ),
                     ],
                   ),
@@ -306,6 +314,7 @@ class _DetailError extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 620),
@@ -314,11 +323,11 @@ class _DetailError extends StatelessWidget {
           children: [
             const Icon(Icons.error_outline, size: 54),
             const SizedBox(height: 10),
-            const Text('Course yüklenemedi', style: TextStyle(fontWeight: FontWeight.w900)),
+            Text(l10n.t(AppText.courseDetailLoadFailedTitle), style: const TextStyle(fontWeight: FontWeight.w900)),
             const SizedBox(height: 8),
             Text(message, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFF6B7280))),
             const SizedBox(height: 10),
-            ElevatedButton(onPressed: onRetry, child: const Text('Retry')),
+            ElevatedButton(onPressed: onRetry, child: Text(l10n.t(AppText.retry))),
           ],
         ),
       ),

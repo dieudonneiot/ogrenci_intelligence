@@ -1,47 +1,50 @@
 ﻿import 'package:flutter/material.dart';
 
+import '../../../../core/localization/app_localizations.dart';
+
 class CompanyPricingScreen extends StatelessWidget {
   const CompanyPricingScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final packages = <_Package>[
-      const _Package(
-        name: 'Başlangıç',
-        price: '₺1999 / ay',
-        description: 'Küçük işletmeler için ideal',
+      _Package(
+        name: l10n.t(AppText.companyPricingStarterName),
+        price: l10n.t(AppText.companyPricingStarterPrice),
+        description: l10n.t(AppText.companyPricingStarterDesc),
         features: [
-          '5 aktif ilan',
-          'Temel raporlama',
-          'E-posta desteği',
-          'Aylık 50 CV görüntüleme',
+          l10n.t(AppText.companyPricingStarterFeature1),
+          l10n.t(AppText.companyPricingStarterFeature2),
+          l10n.t(AppText.companyPricingStarterFeature3),
+          l10n.t(AppText.companyPricingStarterFeature4),
         ],
         accent: Color(0xFF6D28D9),
       ),
-      const _Package(
-        name: 'Profesyonel',
-        price: '₺2999 / ay',
-        description: 'Büyüyen şirketler için',
+      _Package(
+        name: l10n.t(AppText.companyPricingProName),
+        price: l10n.t(AppText.companyPricingProPrice),
+        description: l10n.t(AppText.companyPricingProDesc),
         features: [
-          '20 aktif ilan',
-          'Gelişmiş raporlama',
-          'Öncelikli destek',
-          'Aylık 500 CV görüntüleme',
-          'Aday filtreleme araçları',
+          l10n.t(AppText.companyPricingProFeature1),
+          l10n.t(AppText.companyPricingProFeature2),
+          l10n.t(AppText.companyPricingProFeature3),
+          l10n.t(AppText.companyPricingProFeature4),
+          l10n.t(AppText.companyPricingProFeature5),
         ],
         accent: Color(0xFF2563EB),
         highlighted: true,
       ),
-      const _Package(
-        name: 'Kurumsal',
-        price: 'Özel Fiyat',
-        description: 'Büyük organizasyonlar için',
+      _Package(
+        name: l10n.t(AppText.companyPricingEnterpriseName),
+        price: l10n.t(AppText.companyPricingEnterprisePrice),
+        description: l10n.t(AppText.companyPricingEnterpriseDesc),
         features: [
-          'Sınırsız ilan',
-          'Özel raporlar',
-          '7/24 destek',
-          'Sınırsız CV görüntüleme',
-          'API erişimi',
+          l10n.t(AppText.companyPricingEnterpriseFeature1),
+          l10n.t(AppText.companyPricingEnterpriseFeature2),
+          l10n.t(AppText.companyPricingEnterpriseFeature3),
+          l10n.t(AppText.companyPricingEnterpriseFeature4),
+          l10n.t(AppText.companyPricingEnterpriseFeature5),
         ],
         accent: Color(0xFF111827),
       ),
@@ -58,12 +61,14 @@ class CompanyPricingScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Paketler ve Fiyatlar',
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900)),
+                  Text(
+                    l10n.t(AppText.companyPricingTitle),
+                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900),
+                  ),
                   const SizedBox(height: 8),
-                  const Text(
-                    'Şirketiniz için en uygun paketi seçin. Yeni paketler için bizimle iletişime geçebilirsiniz.',
-                    style: TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
+                  Text(
+                    l10n.t(AppText.companyPricingSubtitle),
+                    style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: 16),
                   LayoutBuilder(
@@ -121,6 +126,7 @@ class _PackageCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -157,11 +163,14 @@ class _PackageCard extends StatelessWidget {
             child: ElevatedButton(
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Satış ekibi sizinle iletişime geçecek.')),
+                  SnackBar(content: Text(l10n.t(AppText.companyPricingSalesContacted))),
                 );
               },
               style: ElevatedButton.styleFrom(backgroundColor: pkg.accent),
-              child: const Text('Paketi Seç', style: TextStyle(fontWeight: FontWeight.w800)),
+              child: Text(
+                l10n.t(AppText.companyPricingSelectPackage),
+                style: const TextStyle(fontWeight: FontWeight.w800),
+              ),
             ),
           ),
         ],

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/config/env.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../../core/supabase/supabase_service.dart';
 import '../controllers/auth_controller.dart';
@@ -60,32 +61,33 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   }
 
   bool _validate() {
+    final l10n = AppLocalizations.of(context);
     setState(() => _error = null);
 
     final email = _email.text.trim();
     final emailRegex = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
     if (email.isEmpty || !emailRegex.hasMatch(email)) {
-      setState(() => _error = 'Please enter a valid email address.');
+      setState(() => _error = l10n.t(AppText.commonInvalidEmail));
       return false;
     }
     if (_password.text != _confirm.text) {
-      setState(() => _error = 'Passwords do not match.');
+      setState(() => _error = l10n.t(AppText.commonPasswordsNoMatch));
       return false;
     }
     if (_password.text.length < 6) {
-      setState(() => _error = 'Password must be at least 6 characters.');
+      setState(() => _error = l10n.t(AppText.commonPasswordMin));
       return false;
     }
     if (_department == null) {
-      setState(() => _error = 'Please select your department.');
+      setState(() => _error = l10n.t(AppText.authSelectDepartment));
       return false;
     }
     if (_year == null) {
-      setState(() => _error = 'Please select your year.');
+      setState(() => _error = l10n.t(AppText.authSelectYear));
       return false;
     }
     if (!_acceptTerms) {
-      setState(() => _error = 'You must accept Terms & Privacy.');
+      setState(() => _error = l10n.t(AppText.authAcceptTermsError));
       return false;
     }
     return true;
@@ -144,10 +146,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final busy = ref.watch(authActionLoadingProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Register')),
+      appBar: AppBar(title: Text(l10n.t(AppText.authRegisterTitle))),
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 520),
@@ -176,7 +179,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     ),
                     const SizedBox(height: 14),
                     Text(
-                      'Create your account',
+                      l10n.t(AppText.authCreateAccount),
                       textAlign: TextAlign.center,
                       style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                             fontWeight: FontWeight.w700,
@@ -184,7 +187,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      'Student registration',
+                      l10n.t(AppText.authStudentRegisterSubtitle),
                       textAlign: TextAlign.center,
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
@@ -192,9 +195,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
                     TextField(
                       controller: _fullName,
-                      decoration: const InputDecoration(
-                        labelText: 'Full name',
-                        prefixIcon: Icon(Icons.badge_outlined),
+                      decoration: InputDecoration(
+                        labelText: l10n.t(AppText.commonFullName),
+                        prefixIcon: const Icon(Icons.badge_outlined),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -202,9 +205,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     TextField(
                       controller: _email,
                       keyboardType: TextInputType.emailAddress,
-                      decoration: const InputDecoration(
-                        labelText: 'Email',
-                        prefixIcon: Icon(Icons.mail_outline),
+                      decoration: InputDecoration(
+                        labelText: l10n.t(AppText.commonEmail),
+                        prefixIcon: const Icon(Icons.mail_outline),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -215,9 +218,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           .map((d) => DropdownMenuItem(value: d, child: Text(d)))
                           .toList(),
                       onChanged: (v) => setState(() => _department = v),
-                      decoration: const InputDecoration(
-                        labelText: 'Department',
-                        prefixIcon: Icon(Icons.school_outlined),
+                      decoration: InputDecoration(
+                        labelText: l10n.t(AppText.commonDepartment),
+                        prefixIcon: const Icon(Icons.school_outlined),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -227,13 +230,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       items: const [1, 2, 3, 4, 5]
                           .map((y) => DropdownMenuItem(
                                 value: y,
-                                child: Text(y == 5 ? '5+ (and above)' : '$y'),
+                                child: Text(y == 5 ? l10n.t(AppText.authYearPlus) : '$y'),
                               ))
                           .toList(),
                       onChanged: (v) => setState(() => _year = v),
-                      decoration: const InputDecoration(
-                        labelText: 'Year',
-                        prefixIcon: Icon(Icons.calendar_today_outlined),
+                      decoration: InputDecoration(
+                        labelText: l10n.t(AppText.commonYear),
+                        prefixIcon: const Icon(Icons.calendar_today_outlined),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -242,7 +245,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       controller: _password,
                       obscureText: !_showPassword,
                       decoration: InputDecoration(
-                        labelText: 'Password',
+                        labelText: l10n.t(AppText.commonPassword),
                         prefixIcon: const Icon(Icons.lock_outline),
                         suffixIcon: IconButton(
                           onPressed: () => setState(() => _showPassword = !_showPassword),
@@ -255,9 +258,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     TextField(
                       controller: _confirm,
                       obscureText: !_showPassword,
-                      decoration: const InputDecoration(
-                        labelText: 'Confirm password',
-                        prefixIcon: Icon(Icons.lock_outline),
+                      decoration: InputDecoration(
+                        labelText: l10n.t(AppText.commonConfirmPassword),
+                        prefixIcon: const Icon(Icons.lock_outline),
                       ),
                     ),
 
@@ -275,22 +278,22 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             padding: const EdgeInsets.only(top: 10),
                             child: Wrap(
                               children: [
-                                const Text('I accept '),
+                                Text(l10n.t(AppText.authAcceptTermsPrefix)),
                                 GestureDetector(
                                   onTap: () => context.push(Routes.terms),
                                   child: Text(
-                                    'Terms of Service',
+                                    l10n.t(AppText.linkTerms),
                                     style: TextStyle(
                                       color: Theme.of(context).colorScheme.primary,
                                       fontWeight: FontWeight.w700,
                                     ),
                                   ),
                                 ),
-                                const Text(' and '),
+                                Text(l10n.t(AppText.authAcceptTermsAnd)),
                                 GestureDetector(
                                   onTap: () => context.push(Routes.privacy),
                                   child: Text(
-                                    'Privacy Policy',
+                                    l10n.t(AppText.linkPrivacy),
                                     style: TextStyle(
                                       color: Theme.of(context).colorScheme.primary,
                                       fontWeight: FontWeight.w700,
@@ -328,7 +331,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               height: 18,
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
-                          : const Text('Register'),
+                          : Text(l10n.t(AppText.authRegisterTitle)),
                     ),
 
                     const SizedBox(height: 14),
@@ -337,7 +340,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
                     OutlinedButton(
                       onPressed: () => context.push(Routes.companyAuth),
-                      child: const Text('Register as company'),
+                      child: Text(l10n.t(AppText.authRegisterAsCompany)),
                     ),
 
                     const SizedBox(height: 12),
@@ -345,10 +348,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text('Already have an account? '),
+                        Text('${l10n.t(AppText.authAlreadyHaveAccount)} '),
                         TextButton(
                           onPressed: () => context.go(Routes.login),
-                          child: const Text('Login'),
+                          child: Text(l10n.t(AppText.authLoginTitle)),
                         ),
                       ],
                     ),

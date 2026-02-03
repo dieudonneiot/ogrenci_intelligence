@@ -78,7 +78,7 @@ class StudentDashboardRepository {
       return p < 100;
     }).length;
 
-    // ✅ FIX: pending applications are in job_applications / internship_applications
+    // FIX: pending applications are in job_applications / internship_applications
     // application_notes has NO status column.
     final jobPending = await _client
         .from('job_applications')

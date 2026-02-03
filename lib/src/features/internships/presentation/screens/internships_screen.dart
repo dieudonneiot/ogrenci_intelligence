@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/routing/routes.dart';
 import '../../application/internships_providers.dart';
 import '../../domain/internship_models.dart';
@@ -18,24 +19,6 @@ class InternshipsScreen extends ConsumerStatefulWidget {
 class _InternshipsScreenState extends ConsumerState<InternshipsScreen> {
   final _search = TextEditingController();
   Timer? _debounce;
-
-  static const _locations = <Map<String, String>>[
-    {'value': 'all', 'label': 'Tüm Lokasyonlar'},
-    {'value': 'İstanbul', 'label': 'İstanbul'},
-    {'value': 'Ankara', 'label': 'Ankara'},
-    {'value': 'İzmir', 'label': 'İzmir'},
-    {'value': 'Bursa', 'label': 'Bursa'},
-    {'value': 'remote', 'label': 'Remote'},
-  ];
-
-  static const _durations = <Map<String, String>>[
-    {'value': 'all', 'label': 'Tüm Süreler'},
-    {'value': '1-3', 'label': '1-3 Ay'},
-    {'value': '3-6', 'label': '3-6 Ay'},
-    {'value': '6-12', 'label': '6-12 Ay'},
-    {'value': '6+', 'label': '6+ Ay'},
-    {'value': '12+', 'label': '12+ Ay'},
-  ];
 
   @override
   void dispose() {
@@ -53,9 +36,28 @@ class _InternshipsScreenState extends ConsumerState<InternshipsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final asyncVm = ref.watch(internshipsProvider);
     final selectedLoc = ref.watch(internshipsLocationProvider);
     final selectedDur = ref.watch(internshipsDurationProvider);
+
+    final locations = <Map<String, String>>[
+      {'value': 'all', 'label': l10n.t(AppText.internshipsLocationAll)},
+      {'value': 'İstanbul', 'label': 'İstanbul'},
+      {'value': 'Ankara', 'label': 'Ankara'},
+      {'value': 'İzmir', 'label': 'İzmir'},
+      {'value': 'Bursa', 'label': 'Bursa'},
+      {'value': 'remote', 'label': l10n.t(AppText.remote)},
+    ];
+
+    final durations = <Map<String, String>>[
+      {'value': 'all', 'label': l10n.t(AppText.internshipsDurationAll)},
+      {'value': '1-3', 'label': l10n.t(AppText.internshipsDuration1_3)},
+      {'value': '3-6', 'label': l10n.t(AppText.internshipsDuration3_6)},
+      {'value': '6-12', 'label': l10n.t(AppText.internshipsDuration6_12)},
+      {'value': '6+', 'label': l10n.t(AppText.internshipsDuration6Plus)},
+      {'value': '12+', 'label': l10n.t(AppText.internshipsDuration12Plus)},
+    ];
 
     return asyncVm.when(
       loading: () => const Center(child: Padding(padding: EdgeInsets.all(24), child: CircularProgressIndicator())),
@@ -67,7 +69,8 @@ class _InternshipsScreenState extends ConsumerState<InternshipsScreen> {
             children: [
               const Icon(Icons.error_outline, size: 48, color: Color(0xFFEF4444)),
               const SizedBox(height: 10),
-              const Text('Stajlar yüklenemedi', style: TextStyle(fontWeight: FontWeight.w900)),
+              Text(l10n.t(AppText.internshipsLoadFailed),
+                  style: const TextStyle(fontWeight: FontWeight.w900)),
               const SizedBox(height: 8),
               Text(e.toString(), textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFF6B7280))),
               const SizedBox(height: 12),
@@ -75,7 +78,7 @@ class _InternshipsScreenState extends ConsumerState<InternshipsScreen> {
                 height: 44,
                 child: ElevatedButton(
                   onPressed: () => ref.read(internshipsProvider.notifier).refresh(),
-                  child: const Text('Tekrar dene'),
+                  child: Text(l10n.t(AppText.retry)),
                 ),
               ),
             ],
@@ -97,10 +100,11 @@ class _InternshipsScreenState extends ConsumerState<InternshipsScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Stajlar', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900)),
+                        Text(l10n.t(AppText.internshipsTitle),
+                            style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900)),
                         const SizedBox(height: 6),
                         Text(
-                          'Sektörün önde gelen şirketlerinde staj yaparak deneyim kazanın.',
+                          l10n.t(AppText.internshipsSubtitle),
                           style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
                         ),
                         const SizedBox(height: 14),
@@ -109,13 +113,16 @@ class _InternshipsScreenState extends ConsumerState<InternshipsScreen> {
                           _Card(
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              children: const [
-                                Icon(Icons.info_outline, color: Color(0xFF6D28D9)),
-                                SizedBox(width: 10),
+                              children: [
+                                const Icon(Icons.info_outline, color: Color(0xFF6D28D9)),
+                                const SizedBox(width: 10),
                                 Expanded(
                                   child: Text(
-                                    'Profilinde bölüm bilgisi yok. Staj ilanları bölüm bazlı gösteriliyor. Lütfen profilinden bölümünü ekle.',
-                                    style: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF374151)),
+                                    l10n.t(AppText.internshipsNoDepartmentInfo),
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      color: Color(0xFF374151),
+                                    ),
                                   ),
                                 ),
                               ],
@@ -133,7 +140,7 @@ class _InternshipsScreenState extends ConsumerState<InternshipsScreen> {
                                 onChanged: _onSearchChanged,
                                 decoration: InputDecoration(
                                   prefixIcon: const Icon(Icons.search),
-                                  hintText: 'Ara: baslik, sirket, aciklama...',
+                                  hintText: l10n.t(AppText.internshipsSearchHint),
                                   filled: true,
                                   fillColor: const Color(0xFFF9FAFB),
                                   border: OutlineInputBorder(
@@ -152,13 +159,13 @@ class _InternshipsScreenState extends ConsumerState<InternshipsScreen> {
                                   final wide = c.maxWidth >= 760;
                                   final left = _Drop(
                                     value: selectedLoc,
-                                    items: _locations,
+                                    items: locations,
                                     onChanged: (v) =>
                                         ref.read(internshipsLocationProvider.notifier).state = v,
                                   );
                                   final right = _Drop(
                                     value: selectedDur,
-                                    items: _durations,
+                                    items: durations,
                                     onChanged: (v) =>
                                         ref.read(internshipsDurationProvider.notifier).state = v,
                                   );
@@ -173,9 +180,9 @@ class _InternshipsScreenState extends ConsumerState<InternshipsScreen> {
                                         ref.read(internshipsDurationProvider.notifier).state = 'all';
                                       },
                                       icon: const Icon(Icons.refresh),
-                                      label: const Text(
-                                        'Sifirla',
-                                        style: TextStyle(fontWeight: FontWeight.w900),
+                                      label: Text(
+                                        l10n.t(AppText.resetFilters),
+                                        style: const TextStyle(fontWeight: FontWeight.w900),
                                       ),
                                     ),
                                   );
@@ -216,32 +223,32 @@ class _InternshipsScreenState extends ConsumerState<InternshipsScreen> {
 
                             final cards = <Widget>[
                               _StatSmall(
-                                title: 'Aktif İlanlar',
+                                title: l10n.t(AppText.internshipsActiveListings),
                                 value: '${vm.activeCount}',
                                 icon: Icons.work_outline,
                                 iconColor: const Color(0xFF7C3AED),
                                 iconBg: const Color(0xFFEDE9FE),
                               ),
                               _StatSmall(
-                                title: 'Başvurulan',
+                                title: l10n.t(AppText.internshipsApplied),
                                 value: '${vm.appliedCount}',
                                 icon: Icons.track_changes_outlined,
                                 iconColor: const Color(0xFF2563EB),
                                 iconBg: const Color(0xFFDBEAFE),
                               ),
-                              const _StatSmall(
-                                title: 'Ortalama Süre',
-                                value: '3-6 Ay',
+                              _StatSmall(
+                                title: l10n.t(AppText.internshipsAvgDuration),
+                                value: l10n.t(AppText.internshipsDuration3_6),
                                 icon: Icons.schedule,
-                                iconColor: Color(0xFF6B7280),
-                                iconBg: Color(0xFFF3F4F6),
+                                iconColor: const Color(0xFF6B7280),
+                                iconBg: const Color(0xFFF3F4F6),
                               ),
-                              const _StatSmall(
-                                title: 'Kazanılacak Puan',
+                              _StatSmall(
+                                title: l10n.t(AppText.internshipsPointsEarn),
                                 value: '+100',
                                 icon: Icons.emoji_events_outlined,
-                                iconColor: Color(0xFFF59E0B),
-                                iconBg: Color(0xFFFEF3C7),
+                                iconColor: const Color(0xFFF59E0B),
+                                iconBg: const Color(0xFFFEF3C7),
                               ),
                             ];
 
@@ -268,12 +275,12 @@ class _InternshipsScreenState extends ConsumerState<InternshipsScreen> {
                         const SizedBox(height: 14),
 
                         if (!vm.departmentMissing && vm.items.isEmpty)
-                          const Center(
+                          Center(
                             child: Padding(
-                              padding: EdgeInsets.all(24),
+                              padding: const EdgeInsets.all(24),
                               child: Text(
-                                'Aradığınız kriterlere uygun staj ilanı bulunamadı.',
-                                style: TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
+                                l10n.t(AppText.internshipsNoResults),
+                                style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
                               ),
                             ),
                           )
@@ -452,6 +459,7 @@ class _InternshipCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final i = item.internship;
     final status = item.myApplication?.status;
 
@@ -489,7 +497,7 @@ class _InternshipCard extends StatelessWidget {
                 onPressed: onFav,
                 icon: Icon(item.isFavorite ? Icons.favorite : Icons.favorite_border),
                 color: item.isFavorite ? const Color(0xFFEF4444) : const Color(0xFF9CA3AF),
-                tooltip: 'Favori',
+                tooltip: l10n.t(AppText.internshipsFavorite),
               ),
             ],
           ),
@@ -519,17 +527,20 @@ class _InternshipCard extends StatelessWidget {
             spacing: 8,
             runSpacing: 8,
             children: [
-              _Meta(icon: Icons.location_on_outlined, text: i.location ?? 'Belirtilmemiş'),
-              _Meta(icon: Icons.schedule, text: '${i.durationMonths} ay'),
-              if (i.isRemote) const _Meta(icon: Icons.wifi, text: 'Remote'),
+              _Meta(
+                icon: Icons.location_on_outlined,
+                text: i.location ?? l10n.t(AppText.internshipsNotSpecified),
+              ),
+              _Meta(icon: Icons.schedule, text: l10n.internshipsMonths(i.durationMonths)),
+              if (i.isRemote) _Meta(icon: Icons.wifi, text: l10n.t(AppText.remote)),
               if (i.deadline != null)
                 _Meta(icon: Icons.event_outlined, text: _fmtDate(i.deadline!)),
               if (i.isPaid)
                 _Meta(
                   icon: Icons.payments_outlined,
                   text: i.monthlyStipend != null
-                      ? '${i.monthlyStipend!.toStringAsFixed(0)} TL/ay'
-                      : 'Ucretli',
+                      ? l10n.internshipsMonthlyStipend(i.monthlyStipend!.toStringAsFixed(0))
+                      : l10n.t(AppText.internshipsPaid),
                   fg: const Color(0xFF16A34A),
                   bg: const Color(0xFFDCFCE7),
                 ),
@@ -546,7 +557,10 @@ class _InternshipCard extends StatelessWidget {
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                 elevation: 0,
               ),
-              child: const Text('Detay →', style: TextStyle(fontWeight: FontWeight.w900)),
+              child: Text(
+                l10n.t(AppText.internshipsDetails),
+                style: const TextStyle(fontWeight: FontWeight.w900),
+              ),
             ),
           ),
         ],
@@ -593,23 +607,24 @@ class _StatusPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     String label;
     Color bg;
     Color fg;
 
     switch (status) {
       case InternshipApplicationStatus.pending:
-        label = 'Beklemede';
+        label = l10n.t(AppText.statusPending);
         bg = const Color(0xFFDBEAFE);
         fg = const Color(0xFF1D4ED8);
         break;
       case InternshipApplicationStatus.accepted:
-        label = 'Kabul';
+        label = l10n.t(AppText.statusAccepted);
         bg = const Color(0xFFDCFCE7);
         fg = const Color(0xFF16A34A);
         break;
       case InternshipApplicationStatus.rejected:
-        label = 'Red';
+        label = l10n.t(AppText.statusRejected);
         bg = const Color(0xFFFEE2E2);
         fg = const Color(0xFFDC2626);
         break;
@@ -629,6 +644,7 @@ class _InfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -645,11 +661,14 @@ class _InfoCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Nasıl puan kazanırım?', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
+                Text(
+                  l10n.t(AppText.internshipsPointsTitle),
+                  style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+                ),
                 const SizedBox(height: 8),
-                const Text(
-                  '• Staj başvurusu: +100 puan (örnek)\n• Kabul / Tamamlama: ekstra puan (sonra bağlarız)',
-                  style: TextStyle(color: Color(0xFF4B5563), fontWeight: FontWeight.w600),
+                Text(
+                  l10n.t(AppText.internshipsPointsDesc),
+                  style: const TextStyle(color: Color(0xFF4B5563), fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 12),
                 Align(
@@ -657,7 +676,7 @@ class _InfoCard extends StatelessWidget {
                   child: OutlinedButton.icon(
                     onPressed: onPointsSystem,
                     icon: const Icon(Icons.track_changes_outlined),
-                    label: const Text('Puan Sistemini Gör'),
+                    label: Text(l10n.t(AppText.internshipsPointsButton)),
                   ),
                 ),
               ],

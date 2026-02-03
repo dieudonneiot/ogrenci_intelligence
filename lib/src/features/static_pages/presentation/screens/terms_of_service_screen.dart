@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/localization/app_localizations.dart';
+
 class TermsOfServiceScreen extends StatelessWidget {
   const TermsOfServiceScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       color: const Color(0xFFF9FAFB),
       child: SingleChildScrollView(
@@ -16,6 +19,10 @@ class TermsOfServiceScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const _Hero(),
+                if (l10n.locale.languageCode != 'tr') ...[
+                  const SizedBox(height: 12),
+                  _NoticeCard(text: l10n.t(AppText.legalTurkishOnlyNote)),
+                ],
                 const SizedBox(height: 18),
                 const _Toc(),
                 const SizedBox(height: 18),
@@ -112,6 +119,9 @@ class _Hero extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final lastUpdated = DateTime(2026, 2, 2);
+    final dateText = MaterialLocalizations.of(context).formatFullDate(lastUpdated);
     return Container(
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
@@ -120,23 +130,51 @@ class _Hero extends StatelessWidget {
         border: Border.all(color: const Color(0xFFE5E7EB)),
       ),
       child: Row(
-        children: const [
-          CircleAvatar(
+        children: [
+          const CircleAvatar(
             radius: 28,
             backgroundColor: Color(0xFFEDE9FE),
             child: Icon(Icons.description_outlined, color: Color(0xFF6D28D9), size: 28),
           ),
-          SizedBox(width: 14),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Kullanım Şartları',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Color(0xFF111827))),
-                SizedBox(height: 4),
-                Text('Son güncellenme: 2 Şubat 2026', style: TextStyle(color: Color(0xFF6B7280))),
+                Text(l10n.t(AppText.linkTerms),
+                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Color(0xFF111827))),
+                const SizedBox(height: 4),
+                Text(l10n.legalLastUpdated(dateText), style: const TextStyle(color: Color(0xFF6B7280))),
               ],
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _NoticeCard extends StatelessWidget {
+  const _NoticeCard({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFFBEB),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFFDE68A)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(Icons.info_outline, color: Color(0xFFB45309)),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(text, style: const TextStyle(color: Color(0xFF92400E), fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -340,6 +378,7 @@ class _ContactBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -349,10 +388,12 @@ class _ContactBox extends StatelessWidget {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
-          Text('E-posta: info@ogrenciintelligence.com', style: TextStyle(color: Color(0xFF374151))),
-          SizedBox(height: 4),
-          Text('Telefon: +90 (212) 345 67 89', style: TextStyle(color: Color(0xFF374151))),
+        children: [
+          Text('${l10n.t(AppText.contactEmailTitle)}: info@ogrenciintelligence.com',
+              style: const TextStyle(color: Color(0xFF374151))),
+          const SizedBox(height: 4),
+          Text('${l10n.t(AppText.contactPhoneTitle)}: +90 (212) 345 67 89',
+              style: const TextStyle(color: Color(0xFF374151))),
         ],
       ),
     );

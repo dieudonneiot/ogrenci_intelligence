@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../../core/supabase/supabase_service.dart';
 import '../controllers/auth_controller.dart';
@@ -53,9 +55,10 @@ class _EmailVerificationScreenState extends ConsumerState<EmailVerificationScree
   }
 
   Future<void> _resend() async {
+    final l10n = AppLocalizations.of(context);
     final email = _emailToShow();
     if (email == null || email.trim().isEmpty) {
-      _snack('Email not found. Please login again.', isError: true);
+      _snack(l10n.t(AppText.authEmailNotFound), isError: true);
       return;
     }
 
@@ -69,22 +72,23 @@ class _EmailVerificationScreenState extends ConsumerState<EmailVerificationScree
         email: email.trim(),
       );
 
-      _snack('Verification email sent again.');
+      _snack(l10n.t(AppText.authVerificationEmailSentAgain));
       _startCountdown(60);
     } catch (e) {
-      _snack('Failed to resend email: $e', isError: true);
+      _snack(l10n.authResendFailed('$e'), isError: true);
     } finally {
       if (mounted) setState(() => _resending = false);
     }
   }
 
   Future<void> _check() async {
+    final l10n = AppLocalizations.of(context);
     final auth = ref.watch(authViewStateProvider).value;
     final user = auth?.user;
 
     // If no session/user, we cannot call getUser() reliably.
     if (user == null) {
-      _snack('Please login again after verifying your email.', isError: true);
+      _snack(l10n.t(AppText.authPleaseLoginAfterVerify), isError: true);
       return;
     }
 
@@ -96,7 +100,7 @@ class _EmailVerificationScreenState extends ConsumerState<EmailVerificationScree
       final updated = res.user;
 
       if (updated?.emailConfirmedAt != null) {
-        _snack('Email verified successfully!');
+        _snack(l10n.t(AppText.authEmailVerifiedSuccess));
         if (!mounted) return;
 
         // React goes to /profile
@@ -106,10 +110,10 @@ class _EmailVerificationScreenState extends ConsumerState<EmailVerificationScree
         // Better with GoRouter, but keep this screen self-contained.
         // Your router will handle redirect from home -> role dashboard.
       } else {
-        _snack('Email not verified yet.', isError: true);
+        _snack(l10n.t(AppText.authEmailNotVerifiedYet), isError: true);
       }
     } catch (e) {
-      _snack('Verification check failed: $e', isError: true);
+      _snack(l10n.authVerificationCheckFailed('$e'), isError: true);
     } finally {
       if (mounted) setState(() => _checking = false);
     }
@@ -127,12 +131,13 @@ class _EmailVerificationScreenState extends ConsumerState<EmailVerificationScree
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final auth = ref.watch(authViewStateProvider).value;
     final email = _emailToShow() ?? '—';
     final hasUser = auth?.user != null;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Email Verification')),
+      appBar: AppBar(title: Text(l10n.t(AppText.authEmailVerificationTitle))),
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 520),
@@ -163,7 +168,7 @@ class _EmailVerificationScreenState extends ConsumerState<EmailVerificationScree
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'Email verification pending',
+                      l10n.t(AppText.authEmailVerificationPending),
                       textAlign: TextAlign.center,
                       style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                             fontWeight: FontWeight.w700,
@@ -171,7 +176,7 @@ class _EmailVerificationScreenState extends ConsumerState<EmailVerificationScree
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'To activate your account, please verify your email address.',
+                      l10n.t(AppText.authEmailVerificationSubtitle),
                       textAlign: TextAlign.center,
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
@@ -184,7 +189,7 @@ class _EmailVerificationScreenState extends ConsumerState<EmailVerificationScree
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
-                        'Verification link sent to: $email',
+                        l10n.authVerificationSentTo(email),
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               fontWeight: FontWeight.w600,
@@ -195,18 +200,18 @@ class _EmailVerificationScreenState extends ConsumerState<EmailVerificationScree
                     const SizedBox(height: 18),
                     _StepTile(
                       index: 1,
-                      title: 'Check your inbox',
-                      subtitle: 'The verification email should arrive in a few minutes.',
+                      title: l10n.t(AppText.authStepCheckInboxTitle),
+                      subtitle: l10n.t(AppText.authStepCheckInboxSubtitle),
                     ),
                     _StepTile(
                       index: 2,
-                      title: 'Click the verification link',
-                      subtitle: 'Open the email and confirm your account.',
+                      title: l10n.t(AppText.authStepClickLinkTitle),
+                      subtitle: l10n.t(AppText.authStepClickLinkSubtitle),
                     ),
                     _StepTile(
                       index: 3,
-                      title: 'Return to the app',
-                      subtitle: 'After verification, you can access all features.',
+                      title: l10n.t(AppText.authStepReturnTitle),
+                      subtitle: l10n.t(AppText.authStepReturnSubtitle),
                     ),
 
                     const SizedBox(height: 16),
@@ -220,7 +225,11 @@ class _EmailVerificationScreenState extends ConsumerState<EmailVerificationScree
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
                           : const Icon(Icons.verified_outlined),
-                      label: Text(_checking ? 'Checking...' : 'I verified my email'),
+                      label: Text(
+                        _checking
+                            ? l10n.t(AppText.commonChecking)
+                            : l10n.t(AppText.authIHaveVerified),
+                      ),
                     ),
 
                     const SizedBox(height: 10),
@@ -236,10 +245,10 @@ class _EmailVerificationScreenState extends ConsumerState<EmailVerificationScree
                           : const Icon(Icons.refresh),
                       label: Text(
                         _resending
-                            ? 'Sending...'
+                            ? l10n.t(AppText.commonSending)
                             : _countdown > 0
-                                ? 'Resend ($_countdown s)'
-                                : 'Resend email',
+                                ? l10n.commonResendCountdown(_countdown)
+                                : l10n.t(AppText.authResendEmail),
                       ),
                     ),
 
@@ -252,9 +261,9 @@ class _EmailVerificationScreenState extends ConsumerState<EmailVerificationScree
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: Colors.amber.withValues(alpha: 0.35)),
                       ),
-                      child: const Text(
-                        'Didn’t receive the email? Check spam/junk, or try resending.',
-                        style: TextStyle(fontSize: 13),
+                      child: Text(
+                        l10n.t(AppText.authDidNotReceive),
+                        style: const TextStyle(fontSize: 13),
                       ),
                     ),
 
@@ -262,11 +271,9 @@ class _EmailVerificationScreenState extends ConsumerState<EmailVerificationScree
 
                     TextButton(
                       onPressed: () {
-                        // Use GoRouter if available
-                        // ignore: use_build_context_synchronously
-                        Navigator.of(context).pushNamed(Routes.login);
+                        context.go(Routes.login);
                       },
-                      child: const Text('Login with a different account'),
+                      child: Text(l10n.t(AppText.authLoginDifferent)),
                     ),
                   ],
                 ),

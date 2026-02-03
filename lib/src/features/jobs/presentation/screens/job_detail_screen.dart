@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/localization/app_localizations.dart';
 import '../../application/jobs_providers.dart';
 import '../../domain/job_models.dart';
 
@@ -10,6 +11,7 @@ class JobDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final asyncVm = ref.watch(jobDetailViewProvider(jobId));
 
     return asyncVm.when(
@@ -25,7 +27,8 @@ class JobDetailScreen extends ConsumerWidget {
               children: [
                 const Icon(Icons.error_outline, size: 48, color: Color(0xFFEF4444)),
                 const SizedBox(height: 12),
-                const Text('Ilan yuklenemedi', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
+                Text(l10n.t(AppText.jobDetailLoadFailed),
+                    style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
                 const SizedBox(height: 8),
                 Text(e.toString(), textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFF6B7280))),
                 const SizedBox(height: 14),
@@ -33,7 +36,7 @@ class JobDetailScreen extends ConsumerWidget {
                   height: 44,
                   child: ElevatedButton(
                     onPressed: () => ref.read(jobDetailViewProvider(jobId).notifier).refresh(),
-                    child: const Text('Tekrar dene'),
+                    child: Text(l10n.t(AppText.retry)),
                   ),
                 ),
               ],
@@ -52,6 +55,7 @@ class _Body extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final j = vm.job;
     final applied = vm.applicationStatus != null;
 
@@ -61,7 +65,7 @@ class _Body extends ConsumerWidget {
         backgroundColor: Colors.white,
         foregroundColor: const Color(0xFF111827),
         elevation: 0,
-        title: const Text('Is Detayi', style: TextStyle(fontWeight: FontWeight.w900)),
+        title: Text(l10n.t(AppText.jobDetailTitle), style: const TextStyle(fontWeight: FontWeight.w900)),
         actions: [
           IconButton(
             onPressed: () async {
@@ -70,7 +74,7 @@ class _Body extends ConsumerWidget {
               } catch (e) {
                 if (!context.mounted) return;
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Favori guncellenemedi: $e')),
+                  SnackBar(content: Text(l10n.favoriteUpdateFailed(e.toString()))),
                 );
               }
             },
@@ -120,10 +124,10 @@ class _Body extends ConsumerWidget {
                             _Chip(text: j.department, bg: const Color(0xFFEDE9FE), fg: const Color(0xFF6D28D9)),
                             _Chip(text: j.workType, bg: const Color(0xFFF3F4F6), fg: const Color(0xFF374151)),
                             if (j.isRemote)
-                              _Chip(text: 'Remote', bg: const Color(0xFFDCFCE7), fg: const Color(0xFF16A34A)),
+                              _Chip(text: l10n.t(AppText.remote), bg: const Color(0xFFDCFCE7), fg: const Color(0xFF16A34A)),
                             if (j.deadline != null)
                               _Chip(
-                                text: 'Son: ${_fmtDate(j.deadline!)}',
+                                text: l10n.deadlineLabel(_fmtDate(context, j.deadline!)),
                                 bg: const Color(0xFFFFF7ED),
                                 fg: const Color(0xFFB45309),
                               ),
@@ -131,7 +135,7 @@ class _Body extends ConsumerWidget {
                                 (j.salaryMin ?? 0) > 0 ||
                                 (j.salaryMax ?? 0) > 0)
                               _Chip(
-                                text: _salaryText(j.salaryText, j.salaryMin, j.salaryMax),
+                                text: _salaryText(l10n, j.salaryText, j.salaryMin, j.salaryMax),
                                 bg: const Color(0xFFDBEAFE),
                                 fg: const Color(0xFF1D4ED8),
                               ),
@@ -141,9 +145,9 @@ class _Body extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 14),
-                  _Section(title: 'Aciklama', text: j.description),
+                  _Section(title: l10n.t(AppText.jobDetailDescription), text: j.description),
                   const SizedBox(height: 12),
-                  _Section(title: 'Gereksinimler', text: j.requirements),
+                  _Section(title: l10n.t(AppText.jobDetailRequirements), text: j.requirements),
                   const SizedBox(height: 18),
                   if (!applied)
                     SizedBox(
@@ -152,7 +156,7 @@ class _Body extends ConsumerWidget {
                       child: ElevatedButton.icon(
                         onPressed: () => _openApplySheet(context, ref, j.id),
                         icon: const Icon(Icons.send_outlined),
-                        label: const Text('Basvur', style: TextStyle(fontWeight: FontWeight.w900)),
+                        label: Text(l10n.t(AppText.jobDetailApply), style: const TextStyle(fontWeight: FontWeight.w900)),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF6D28D9),
                           foregroundColor: Colors.white,
@@ -175,7 +179,7 @@ class _Body extends ConsumerWidget {
                           const SizedBox(width: 10),
                           Expanded(
                             child: Text(
-                              'Bu ilana basvurdun. Durum: ${vm.applicationStatus}',
+                              l10n.jobDetailAppliedStatus(_statusText(l10n, vm.applicationStatus!)),
                               style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF4B5563)),
                             ),
                           ),
@@ -191,21 +195,37 @@ class _Body extends ConsumerWidget {
     );
   }
 
-  static String _fmtDate(DateTime d) =>
-      '${d.day.toString().padLeft(2, '0')}.${d.month.toString().padLeft(2, '0')}.${d.year}';
+  static String _fmtDate(BuildContext context, DateTime d) {
+    return MaterialLocalizations.of(context).formatShortDate(d.toLocal());
+  }
 
-  static String _salaryText(String? salaryText, int? min, int? max) {
+  static String _statusText(AppLocalizations l10n, String raw) {
+    switch (raw.toLowerCase().trim()) {
+      case 'accepted':
+        return l10n.t(AppText.statusAccepted);
+      case 'rejected':
+        return l10n.t(AppText.statusRejected);
+      case 'pending':
+        return l10n.t(AppText.statusPending);
+      case 'applied':
+      default:
+        return l10n.t(AppText.statusApplied);
+    }
+  }
+
+  static String _salaryText(AppLocalizations l10n, String? salaryText, int? min, int? max) {
     final s = (salaryText ?? '').trim();
     if (s.isNotEmpty) return s;
     final a = min ?? 0;
     final b = max ?? 0;
     if (a > 0 && b > 0) return '$a - $b';
-    if (a > 0) return 'Min $a';
-    if (b > 0) return 'Max $b';
+    if (a > 0) return l10n.jobDetailSalaryMin(a);
+    if (b > 0) return l10n.jobDetailSalaryMax(b);
     return '';
   }
 
   static Future<void> _openApplySheet(BuildContext context, WidgetRef ref, String jobId) async {
+    final l10n = AppLocalizations.of(context);
     final ctrl = TextEditingController();
 
     await showModalBottomSheet(
@@ -225,18 +245,17 @@ class _Body extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Basvuru', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+              Text(l10n.t(AppText.jobDetailApplySheetTitle),
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
               const SizedBox(height: 6),
-              const Text(
-                'Istersen kisa bir cover letter ekle (opsiyonel).',
-                style: TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
-              ),
+              Text(l10n.t(AppText.jobDetailApplySheetSubtitle),
+                  style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700)),
               const SizedBox(height: 12),
               TextField(
                 controller: ctrl,
                 maxLines: 6,
                 decoration: InputDecoration(
-                  hintText: 'Motivasyonun / kisa tanitimin...',
+                  hintText: l10n.t(AppText.jobDetailApplySheetHint),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
                 ),
               ),
@@ -251,12 +270,12 @@ class _Body extends ConsumerWidget {
                       if (ctx.mounted) Navigator.pop(ctx);
                       if (!context.mounted) return;
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Basvuru gonderildi')),
+                        SnackBar(content: Text(l10n.t(AppText.jobDetailApplySuccess))),
                       );
                     } catch (e) {
                       if (!context.mounted) return;
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Basvuru gonderilemedi: $e')),
+                        SnackBar(content: Text(l10n.jobDetailApplyFailed(e.toString()))),
                       );
                     }
                   },
@@ -266,7 +285,7 @@ class _Body extends ConsumerWidget {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                     elevation: 0,
                   ),
-                  child: const Text('Gonder', style: TextStyle(fontWeight: FontWeight.w900)),
+                  child: Text(l10n.t(AppText.commonSend), style: const TextStyle(fontWeight: FontWeight.w900)),
                 ),
               ),
             ],
@@ -284,6 +303,7 @@ class _Section extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -298,7 +318,7 @@ class _Section extends StatelessWidget {
           Text(title, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
           const SizedBox(height: 10),
           Text(
-            text.isEmpty ? '-' : text,
+            text.isEmpty ? l10n.t(AppText.commonNotSpecified) : text,
             style: const TextStyle(color: Color(0xFF374151), fontWeight: FontWeight.w600, height: 1.4),
           ),
         ],
@@ -329,6 +349,7 @@ class _StatusPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final s = status.toLowerCase().trim();
     Color bg;
     Color fg;
@@ -338,17 +359,17 @@ class _StatusPill extends StatelessWidget {
       case 'accepted':
         bg = const Color(0xFFDCFCE7);
         fg = const Color(0xFF16A34A);
-        label = 'Kabul';
+        label = l10n.t(AppText.statusAccepted);
         break;
       case 'rejected':
         bg = const Color(0xFFFEE2E2);
         fg = const Color(0xFFDC2626);
-        label = 'Red';
+        label = l10n.t(AppText.statusRejected);
         break;
       default:
         bg = const Color(0xFFFEF3C7);
         fg = const Color(0xFFB45309);
-        label = 'Basvuruldu';
+        label = l10n.t(AppText.statusApplied);
         break;
     }
 

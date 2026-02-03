@@ -76,7 +76,10 @@ class ChatController extends StateNotifier<ChatState> {
 
   ChatRepository get _repo => _ref.read(chatRepositoryProvider);
 
-  Future<void> loadHistory({String? userName}) async {
+  Future<void> loadHistory({
+    required String greetingMessage,
+    required List<String> suggestions,
+  }) async {
     if (_loaded || state.isLoading) return;
     _loaded = true;
 
@@ -86,8 +89,8 @@ class ChatController extends StateNotifier<ChatState> {
       final history = await _repo.fetchHistory(_userId);
       if (history.isEmpty) {
         state = state.copyWith(
-          messages: [_greetingMessage(userName)],
-          suggestions: _defaultSuggestions(),
+          messages: [_makeLocalBotMessage(greetingMessage)],
+          suggestions: suggestions,
         );
       } else {
         _activeSessionId = history.last.sessionId;
@@ -95,16 +98,20 @@ class ChatController extends StateNotifier<ChatState> {
       }
     } catch (e) {
       state = state.copyWith(
-        error: 'Gecmis yuklenemedi: $e',
-        messages: [_greetingMessage(userName)],
-        suggestions: _defaultSuggestions(),
+        error: 'history|${e.toString()}',
+        messages: [_makeLocalBotMessage(greetingMessage)],
+        suggestions: suggestions,
       );
     } finally {
       state = state.copyWith(isLoading: false);
     }
   }
 
-  Future<void> sendMessage(String text, {String locale = 'tr'}) async {
+  Future<void> sendMessage(
+    String text, {
+    required String locale,
+    required String errorReplyMessage,
+  }) async {
     final trimmed = text.trim();
     if (trimmed.isEmpty || state.isTyping) return;
 
@@ -130,7 +137,7 @@ class ChatController extends StateNotifier<ChatState> {
     } catch (e) {
       final botMessage = ChatMessage(
         id: 'bot-${DateTime.now().microsecondsSinceEpoch}',
-        message: 'Uzgunum, su an yanit veremiyorum. Lutfen tekrar deneyin.',
+        message: errorReplyMessage,
         type: ChatMessageType.bot,
         createdAt: DateTime.now(),
         sessionId: _activeSessionId,
@@ -139,7 +146,7 @@ class ChatController extends StateNotifier<ChatState> {
 
       state = state.copyWith(
         messages: [...state.messages, botMessage],
-        error: e.toString(),
+        error: 'reply|${e.toString()}',
         isTyping: false,
       );
     }
@@ -179,7 +186,7 @@ class ChatController extends StateNotifier<ChatState> {
             started = true;
             botId = 'bot-${DateTime.now().microsecondsSinceEpoch}';
             final botMessage = ChatMessage(
-              id: botId!,
+              id: botId,
               message: buffer,
               type: ChatMessageType.bot,
               createdAt: DateTime.now(),
@@ -190,7 +197,7 @@ class ChatController extends StateNotifier<ChatState> {
               messages: [...state.messages, botMessage],
             );
           } else if (botId != null) {
-            _updateBotMessage(botId!, buffer);
+            _updateBotMessage(botId, buffer);
           }
           break;
         case ChatStreamEventType.done:
@@ -233,11 +240,14 @@ class ChatController extends StateNotifier<ChatState> {
     state = state.copyWith(messages: messages);
   }
 
-  Future<void> resetChat({String? userName}) async {
+  Future<void> resetChat({
+    required String greetingMessage,
+    required List<String> suggestions,
+  }) async {
     _activeSessionId = null;
     state = state.copyWith(
-      messages: [_greetingMessage(userName)],
-      suggestions: _defaultSuggestions(),
+      messages: [_makeLocalBotMessage(greetingMessage)],
+      suggestions: suggestions,
       error: null,
     );
   }
@@ -249,26 +259,14 @@ class ChatController extends StateNotifier<ChatState> {
     }
   }
 
-  ChatMessage _greetingMessage(String? userName) {
-    final name = (userName ?? '').trim();
-    final label = name.isEmpty ? 'arkadasim' : name;
+  ChatMessage _makeLocalBotMessage(String message) {
     return ChatMessage(
       id: 'greeting',
-      message:
-          'Merhaba $label! Ben senin kariyer asistaninim. Staj, bolum secimi, CV hazirlama ve mulakat konularinda yardimci olabilirim. Sana nasil destek olayim?',
+      message: message,
       type: ChatMessageType.bot,
       createdAt: DateTime.now(),
       sessionId: _activeSessionId,
       isLocal: true,
     );
-  }
-
-  List<String> _defaultSuggestions() {
-    return const [
-      'Staj basvurusu nasil yapilir?',
-      'CV hazirlama ipuclari',
-      'Mulakat sorulari ve cevaplari',
-      'Bolum secimi icin oneriler',
-    ];
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../../core/supabase/supabase_service.dart';
 import '../../presentation/controllers/admin_controller.dart';
@@ -89,6 +90,7 @@ class _AdminCompaniesScreenState extends ConsumerState<AdminCompaniesScreen> {
   }
 
   Future<void> _showCompanyDetail(_AdminCompany company) async {
+    final l10n = AppLocalizations.of(context);
     var rejectionReason = company.rejectionReason ?? '';
     var actionLoading = false;
 
@@ -113,7 +115,7 @@ class _AdminCompaniesScreenState extends ConsumerState<AdminCompaniesScreen> {
             }
 
             return AlertDialog(
-              title: const Text('Şirket Detayları'),
+              title: Text(l10n.t(AppText.adminCompanyDetailsTitle)),
               content: SizedBox(
                 width: 560,
                 child: SingleChildScrollView(
@@ -141,16 +143,19 @@ class _AdminCompaniesScreenState extends ConsumerState<AdminCompaniesScreen> {
                       ),
                       const SizedBox(height: 16),
                       _DetailGrid(items: [
-                        _DetailItem(label: 'Email', value: company.email ?? '-'),
-                        _DetailItem(label: 'Telefon', value: company.phone ?? '-'),
-                        _DetailItem(label: 'Şehir', value: company.city ?? '-'),
-                        _DetailItem(label: 'Çalışan Sayısı', value: company.employeeCount ?? '-'),
-                        _DetailItem(label: 'Kuruluş Yılı', value: company.foundedYear?.toString() ?? '-'),
-                        _DetailItem(label: 'Website', value: company.website ?? '-'),
+                        _DetailItem(label: l10n.t(AppText.commonEmail), value: company.email ?? '-'),
+                        _DetailItem(label: l10n.t(AppText.commonPhone), value: company.phone ?? '-'),
+                        _DetailItem(label: l10n.t(AppText.companyRegisterCityLabel), value: company.city ?? '-'),
+                        _DetailItem(label: l10n.t(AppText.companyProfileFieldCompanySize), value: company.employeeCount ?? '-'),
+                        _DetailItem(label: l10n.t(AppText.companyProfileFieldFoundedYear), value: company.foundedYear?.toString() ?? '-'),
+                        _DetailItem(label: l10n.t(AppText.companyProfileFieldWebsite), value: company.website ?? '-'),
                       ]),
                       if (company.description != null && company.description!.isNotEmpty) ...[
                         const SizedBox(height: 12),
-                        const Text('Açıklama', style: TextStyle(fontWeight: FontWeight.w700)),
+                        Text(
+                          l10n.t(AppText.adminCompanyDescriptionLabel),
+                          style: const TextStyle(fontWeight: FontWeight.w700),
+                        ),
                         const SizedBox(height: 4),
                         Text(company.description!, style: const TextStyle(color: Color(0xFF6B7280))),
                       ],
@@ -166,7 +171,10 @@ class _AdminCompaniesScreenState extends ConsumerState<AdminCompaniesScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text('Red Nedeni', style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF991B1B))),
+                              Text(
+                                l10n.t(AppText.adminCompanyRejectReasonTitle),
+                                style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF991B1B)),
+                              ),
                               const SizedBox(height: 6),
                               Text(company.rejectionReason!, style: const TextStyle(color: Color(0xFF7F1D1D))),
                             ],
@@ -175,14 +183,17 @@ class _AdminCompaniesScreenState extends ConsumerState<AdminCompaniesScreen> {
                       ],
                       if (company.approvalStatus == 'pending') ...[
                         const SizedBox(height: 16),
-                        const Text('Red Nedeni (Reddetmek için zorunlu)', style: TextStyle(fontWeight: FontWeight.w700)),
+                        Text(
+                          l10n.t(AppText.adminCompanyRejectReasonRequired),
+                          style: const TextStyle(fontWeight: FontWeight.w700),
+                        ),
                         const SizedBox(height: 6),
                         TextField(
                           minLines: 3,
                           maxLines: 5,
                           onChanged: (v) => rejectionReason = v,
                           decoration: InputDecoration(
-                            hintText: 'Şirketin neden reddedildiğini açıklayın...',
+                            hintText: l10n.t(AppText.adminCompanyRejectReasonHint),
                             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                           ),
                         ),
@@ -194,7 +205,7 @@ class _AdminCompaniesScreenState extends ConsumerState<AdminCompaniesScreen> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Kapat'),
+                  child: Text(l10n.t(AppText.close)),
                 ),
                 if (company.approvalStatus == 'pending') ...[
                   ElevatedButton.icon(
@@ -208,7 +219,7 @@ class _AdminCompaniesScreenState extends ConsumerState<AdminCompaniesScreen> {
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         : const Icon(Icons.check_circle_outline),
-                    label: const Text('Onayla'),
+                    label: Text(l10n.t(AppText.adminCompanyApprove)),
                     style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF16A34A)),
                   ),
                   ElevatedButton.icon(
@@ -222,7 +233,7 @@ class _AdminCompaniesScreenState extends ConsumerState<AdminCompaniesScreen> {
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         : const Icon(Icons.cancel_outlined),
-                    label: const Text('Reddet'),
+                    label: Text(l10n.t(AppText.adminCompanyReject)),
                     style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFDC2626)),
                   ),
                 ],
@@ -242,7 +253,7 @@ class _AdminCompaniesScreenState extends ConsumerState<AdminCompaniesScreen> {
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         : const Icon(Icons.block),
-                    label: const Text('Şirketi Engelle'),
+                    label: Text(l10n.t(AppText.adminCompanyBan)),
                     style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFDC2626)),
                   ),
               ],
@@ -254,17 +265,21 @@ class _AdminCompaniesScreenState extends ConsumerState<AdminCompaniesScreen> {
   }
 
   Future<bool> _confirmBan(BuildContext context) async {
+    final l10n = AppLocalizations.of(context);
     final result = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Şirketi Engelle'),
-        content: const Text('Bu şirketi engellemek istediğinizden emin misiniz?'),
+        title: Text(l10n.t(AppText.adminCompanyBanTitle)),
+        content: Text(l10n.t(AppText.adminCompanyBanConfirm)),
         actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Vazgeç')),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(AppLocalizations.of(ctx).t(AppText.commonCancel)),
+          ),
           ElevatedButton(
             onPressed: () => Navigator.of(ctx).pop(true),
             style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFDC2626)),
-            child: const Text('Engelle'),
+            child: Text(l10n.t(AppText.adminCompanyBanAction)),
           ),
         ],
       ),
@@ -273,6 +288,7 @@ class _AdminCompaniesScreenState extends ConsumerState<AdminCompaniesScreen> {
   }
 
   Future<String?> _approveCompany(_AdminCompany company) async {
+    final l10n = AppLocalizations.of(context);
     try {
       final admin = await ref.read(activeAdminProvider.future);
       final now = DateTime.now().toUtc().toIso8601String();
@@ -289,14 +305,15 @@ class _AdminCompaniesScreenState extends ConsumerState<AdminCompaniesScreen> {
             targetType: 'company',
             targetId: company.id,
             details: {'company_name': company.name},
-          );
+      );
       return null;
     } catch (e) {
-      return 'Onaylama işlemi başarısız: $e';
+      return l10n.commonActionFailed(e.toString());
     }
   }
 
   Future<String?> _rejectCompany(_AdminCompany company, String reason) async {
+    final l10n = AppLocalizations.of(context);
     try {
       final admin = await ref.read(activeAdminProvider.future);
       final now = DateTime.now().toUtc().toIso8601String();
@@ -314,14 +331,15 @@ class _AdminCompaniesScreenState extends ConsumerState<AdminCompaniesScreen> {
             targetType: 'company',
             targetId: company.id,
             details: {'company_name': company.name, 'reason': reason},
-          );
+      );
       return null;
     } catch (e) {
-      return 'Reddetme işlemi başarısız: $e';
+      return l10n.commonActionFailed(e.toString());
     }
   }
 
   Future<String?> _banCompany(_AdminCompany company) async {
+    final l10n = AppLocalizations.of(context);
     try {
       await Future.wait<void>([
         SupabaseService.client.from('jobs').update({'is_active': false}).eq('company_id', company.id),
@@ -338,15 +356,16 @@ class _AdminCompaniesScreenState extends ConsumerState<AdminCompaniesScreen> {
             targetType: 'company',
             targetId: company.id,
             details: {'company_name': company.name},
-          );
+      );
       return null;
     } catch (e) {
-      return 'Engelleme işlemi başarısız: $e';
+      return l10n.commonActionFailed(e.toString());
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final filtered = _companies.where((c) {
       final query = _searchCtrl.text.trim().toLowerCase();
       if (query.isEmpty) return true;
@@ -358,8 +377,11 @@ class _AdminCompaniesScreenState extends ConsumerState<AdminCompaniesScreen> {
     return AdminPageScaffold(
       header: AdminPageHeader(
         icon: Icons.apartment_outlined,
-        title: 'Şirket Yönetimi',
-        trailing: Text('Toplam: ${_companies.length}', style: const TextStyle(color: Color(0xFF6B7280))),
+        title: l10n.t(AppText.adminCompaniesTitle),
+        trailing: Text(
+          l10n.adminCompaniesTotalCountWithCount(_companies.length),
+          style: const TextStyle(color: Color(0xFF6B7280)),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -404,6 +426,7 @@ class _FiltersBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final statuses = const ['all', 'pending', 'approved', 'rejected', 'banned'];
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -417,7 +440,7 @@ class _FiltersBar extends StatelessWidget {
             controller: controller,
             onChanged: onSearchChanged,
             decoration: InputDecoration(
-              hintText: 'Şirket adı, email veya şehir ara...',
+              hintText: l10n.t(AppText.adminCompaniesSearchHint),
               prefixIcon: const Icon(Icons.search),
               filled: true,
               fillColor: const Color(0xFFF9FAFB),
@@ -440,7 +463,7 @@ class _FiltersBar extends StatelessWidget {
                   foregroundColor: active ? Colors.white : const Color(0xFF374151),
                   side: BorderSide(color: active ? const Color(0xFF7C3AED) : const Color(0xFFE5E7EB)),
                 ),
-                child: Text(_statusLabel(s)),
+                child: Text(_statusLabel(l10n, s)),
               );
             }).toList(),
           ),
@@ -449,19 +472,19 @@ class _FiltersBar extends StatelessWidget {
     );
   }
 
-  static String _statusLabel(String value) {
+  static String _statusLabel(AppLocalizations l10n, String value) {
     switch (value) {
       case 'pending':
-        return 'Bekleyen';
+        return l10n.t(AppText.adminCompaniesFilterPending);
       case 'approved':
-        return 'Onaylı';
+        return l10n.t(AppText.adminCompaniesFilterApproved);
       case 'rejected':
-        return 'Reddedilen';
+        return l10n.t(AppText.adminCompaniesFilterRejected);
       case 'banned':
-        return 'Engelli';
+        return l10n.t(AppText.adminCompaniesFilterBanned);
       case 'all':
       default:
-        return 'Tümü';
+        return l10n.t(AppText.adminCompaniesFilterAll);
     }
   }
 }
@@ -477,6 +500,7 @@ class _CompaniesTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -486,13 +510,13 @@ class _CompaniesTable extends StatelessWidget {
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: DataTable(
-          columns: const [
-            DataColumn(label: Text('Şirket')),
-            DataColumn(label: Text('İletişim')),
-            DataColumn(label: Text('Durum')),
-            DataColumn(label: Text('Abonelik')),
-            DataColumn(label: Text('İlanlar')),
-            DataColumn(label: Text('İşlemler')),
+          columns: [
+            DataColumn(label: Text(l10n.t(AppText.adminTableCompany))),
+            DataColumn(label: Text(l10n.t(AppText.adminTableContact))),
+            DataColumn(label: Text(l10n.t(AppText.adminTableStatus))),
+            DataColumn(label: Text(l10n.t(AppText.adminTableSubscription))),
+            DataColumn(label: Text(l10n.t(AppText.adminTableListings))),
+            DataColumn(label: Text(l10n.t(AppText.adminTableActions))),
           ],
           rows: companies.map((company) {
             return DataRow(
@@ -531,26 +555,29 @@ class _CompaniesTable extends StatelessWidget {
                 DataCell(_StatusBadge(status: company.approvalStatus)),
                 DataCell(
                   company.activeSubscription == null
-                      ? const Text('Abonelik yok', style: TextStyle(color: Color(0xFF6B7280)))
+                      ? Text(l10n.t(AppText.commonNotSpecified),
+                          style: const TextStyle(color: Color(0xFF6B7280)))
                       : Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(company.activeSubscription!.planLabel, style: const TextStyle(fontWeight: FontWeight.w700)),
                             const SizedBox(height: 4),
-                            Text(
-                              'Bitiş: ${company.activeSubscription!.endsAtText}',
-                              style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
-                            ),
+                            Text(company.activeSubscription!.endsAtText,
+                                style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280))),
                           ],
                         ),
                 ),
                 DataCell(
-                  Text('${company.totalJobs} iş, ${company.totalInternships} staj', style: const TextStyle(fontSize: 12)),
+                  Text(
+                    l10n.adminStatActiveListingsSubtitle(jobs: company.totalJobs, internships: company.totalInternships),
+                    style: const TextStyle(fontSize: 12),
+                  ),
                 ),
                 DataCell(
-                  TextButton(
+                  IconButton(
+                    tooltip: l10n.t(AppText.commonViewDetails),
                     onPressed: () => onOpen(company),
-                    child: const Text('Detay'),
+                    icon: const Icon(Icons.remove_red_eye_outlined, color: Color(0xFF7C3AED)),
                   ),
                 ),
               ],
@@ -567,6 +594,7 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -575,13 +603,10 @@ class _EmptyState extends StatelessWidget {
         border: Border.all(color: const Color(0xFFE5E7EB)),
       ),
       child: Column(
-        children: const [
-          Icon(Icons.apartment_outlined, size: 56, color: Color(0xFF9CA3AF)),
-          SizedBox(height: 8),
-          Text('Şirket bulunamadı', style: TextStyle(fontWeight: FontWeight.w800)),
-          SizedBox(height: 4),
-          Text('Arama kriterlerinize uygun şirket bulunmuyor',
-              style: TextStyle(color: Color(0xFF6B7280))),
+        children: [
+          const Icon(Icons.apartment_outlined, size: 56, color: Color(0xFF9CA3AF)),
+          const SizedBox(height: 8),
+          Text(l10n.t(AppText.noResults), style: const TextStyle(fontWeight: FontWeight.w800)),
         ],
       ),
     );
@@ -595,6 +620,7 @@ class _ErrorState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -605,7 +631,7 @@ class _ErrorState extends StatelessWidget {
             const SizedBox(height: 10),
             Text(text, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFF6B7280))),
             const SizedBox(height: 12),
-            ElevatedButton(onPressed: onRetry, child: const Text('Tekrar Dene')),
+            ElevatedButton(onPressed: onRetry, child: Text(l10n.t(AppText.retry))),
           ],
         ),
       ),
@@ -619,15 +645,36 @@ class _StatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     switch (status) {
       case 'approved':
-        return _Pill(icon: Icons.check_circle_outline, text: 'Onaylı', fg: const Color(0xFF15803D), bg: const Color(0xFFDCFCE7));
+        return _Pill(
+          icon: Icons.check_circle_outline,
+          text: l10n.t(AppText.adminCompaniesFilterApproved),
+          fg: const Color(0xFF15803D),
+          bg: const Color(0xFFDCFCE7),
+        );
       case 'pending':
-        return _Pill(icon: Icons.schedule, text: 'Bekliyor', fg: const Color(0xFFB45309), bg: const Color(0xFFFEF3C7));
+        return _Pill(
+          icon: Icons.schedule,
+          text: l10n.t(AppText.adminCompaniesFilterPending),
+          fg: const Color(0xFFB45309),
+          bg: const Color(0xFFFEF3C7),
+        );
       case 'rejected':
-        return _Pill(icon: Icons.cancel_outlined, text: 'Reddedildi', fg: const Color(0xFFB91C1C), bg: const Color(0xFFFEE2E2));
+        return _Pill(
+          icon: Icons.cancel_outlined,
+          text: l10n.t(AppText.adminCompaniesFilterRejected),
+          fg: const Color(0xFFB91C1C),
+          bg: const Color(0xFFFEE2E2),
+        );
       case 'banned':
-        return _Pill(icon: Icons.block, text: 'Engelli', fg: Colors.white, bg: const Color(0xFF111827));
+        return _Pill(
+          icon: Icons.block,
+          text: l10n.t(AppText.adminCompaniesFilterBanned),
+          fg: Colors.white,
+          bg: const Color(0xFF111827),
+        );
       default:
         return const SizedBox.shrink();
     }
@@ -806,7 +853,7 @@ class _CompanySubscription {
   final DateTime? endsAt;
 
   String get planLabel {
-    if (planType.isEmpty) return 'Plan';
+    if (planType.isEmpty) return '-';
     return planType[0].toUpperCase() + planType.substring(1);
   }
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
 
@@ -12,6 +13,7 @@ class HowItWorksSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final authAsync = ref.watch(authViewStateProvider);
     final isLoading = authAsync.isLoading;
     final isLoggedIn = (!isLoading) && (authAsync.value?.isAuthenticated ?? false);
@@ -22,12 +24,11 @@ class HowItWorksSection extends ConsumerWidget {
     final columns = w >= 1024 ? 4 : (w >= 768 ? 2 : 1);
     final showArrows = columns >= 4;
 
-    const steps = <_HowStep>[
+    final steps = <_HowStep>[
       _HowStep(
         index: 1,
-        title: 'Eğitim Modülü',
-        description:
-            'Alanına özel temel bilgiler, video anlatımlar ve mini sınavlarla kariyer yolculuğuna güçlü bir başlangıç yap.',
+        title: l10n.t(AppText.howItWorksStep1Title),
+        description: l10n.t(AppText.howItWorksStep1Desc),
         icon: Icons.menu_book_outlined,
         iconColor: Color(0xFF4F46E5), // indigo-600
         bgColor: Color(0xFFEFF6FF), // indigo-50 vibe
@@ -35,9 +36,8 @@ class HowItWorksSection extends ConsumerWidget {
       ),
       _HowStep(
         index: 2,
-        title: 'Saha Uygulaması',
-        description:
-            'Teorik bilgilerini pratikte uygulayarak gerçek iş ortamında deneyim kazan. Mentör desteği ile gelişimini pekiştir.',
+        title: l10n.t(AppText.howItWorksStep2Title),
+        description: l10n.t(AppText.howItWorksStep2Desc),
         icon: Icons.business_center_outlined,
         iconColor: Color(0xFF7C3AED), // purple-600
         bgColor: Color(0xFFF3E8FF), // purple-50
@@ -45,9 +45,8 @@ class HowItWorksSection extends ConsumerWidget {
       ),
       _HowStep(
         index: 3,
-        title: 'Network Oluştur',
-        description:
-            'Sektör profesyonelleri ve diğer öğrencilerle tanış, kariyer ağını genişlet ve yeni fırsatlar keşfet.',
+        title: l10n.t(AppText.howItWorksStep3Title),
+        description: l10n.t(AppText.howItWorksStep3Desc),
         icon: Icons.groups_outlined,
         iconColor: Color(0xFF16A34A), // green-600
         bgColor: Color(0xFFECFDF5), // green-50
@@ -55,9 +54,8 @@ class HowItWorksSection extends ConsumerWidget {
       ),
       _HowStep(
         index: 4,
-        title: 'Başarıyı Yakala',
-        description:
-            'Sertifikalarını al, referanslarını topla ve hayalindeki kariyere doğru emin adımlarla ilerle.',
+        title: l10n.t(AppText.howItWorksStep4Title),
+        description: l10n.t(AppText.howItWorksStep4Desc),
         icon: Icons.emoji_events_outlined,
         iconColor: Color(0xFFCA8A04), // yellow-600
         bgColor: Color(0xFFFFFBEB), // yellow-50
@@ -76,7 +74,7 @@ class HowItWorksSection extends ConsumerWidget {
             children: [
               // Title
               Text(
-                'Nasıl Çalışır?',
+                l10n.t(AppText.howItWorksTitle),
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.w800,
@@ -87,7 +85,7 @@ class HowItWorksSection extends ConsumerWidget {
               ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 720),
                 child: Text(
-                  'Platformumuz dört temel aşamadan oluşur. Her adımda yanındayız!',
+                  l10n.t(AppText.howItWorksSubtitle),
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         color: const Color(0xFF6B7280),
@@ -127,7 +125,9 @@ class HowItWorksSection extends ConsumerWidget {
 
               // CTA
               _CtaButton(
-                label: isLoggedIn ? "Dashboard'a Git" : "Hemen Başla",
+                label: isLoggedIn
+                    ? l10n.t(AppText.howItWorksCtaDashboard)
+                    : l10n.t(AppText.howItWorksCtaStart),
                 onTap: () => context.go(
                   isLoggedIn ? Routes.dashboard : Routes.register,
                 ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
 import '../../../user/data/points_service.dart';
@@ -28,6 +29,7 @@ class StudentDashboardScreen extends ConsumerStatefulWidget {
 class _StudentDashboardScreenState extends ConsumerState<StudentDashboardScreen> {
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final dashAsync = ref.watch(studentDashboardProvider);
 
     ref.listen(studentDashboardProvider, (prev, next) async {
@@ -45,14 +47,15 @@ class _StudentDashboardScreenState extends ConsumerState<StudentDashboardScreen>
 
         if (!context.mounted) return;
 
+        final l10n = AppLocalizations.of(context);
         if (result.dailyAwarded) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Günlük giriş bonusu kazandınız! +2 puan')),
+            SnackBar(content: Text(l10n.t(AppText.dashboardDailyLoginBonus))),
           );
         }
         if (result.weeklyAwarded) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('7 günlük seri tamamlandı! +15 puan')),
+            SnackBar(content: Text(l10n.t(AppText.dashboardWeeklyStreakBonus))),
           );
         }
 
@@ -72,10 +75,8 @@ class _StudentDashboardScreenState extends ConsumerState<StudentDashboardScreen>
             children: [
               const Icon(Icons.error_outline, size: 48, color: Color(0xFFEF4444)),
               const SizedBox(height: 12),
-              const Text(
-                'Dashboard yüklenemedi',
-                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
-              ),
+              Text(l10n.t(AppText.dashboardLoadFailed),
+                  style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
               const SizedBox(height: 8),
               Text(
                 e.toString(),
@@ -87,7 +88,7 @@ class _StudentDashboardScreenState extends ConsumerState<StudentDashboardScreen>
                 height: 44,
                 child: ElevatedButton(
                   onPressed: () => ref.read(studentDashboardProvider.notifier).refresh(),
-                  child: const Text('Tekrar dene'),
+                  child: Text(l10n.t(AppText.retry)),
                 ),
               ),
             ],
@@ -112,14 +113,12 @@ class _StudentDashboardScreenState extends ConsumerState<StudentDashboardScreen>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Hoş Geldin, ${vm.displayName}! 👋',
+                          l10n.dashboardWelcome(vm.displayName),
                           style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900),
                         ),
                         const SizedBox(height: 6),
-                        const Text(
-                          'Bugün kariyerine yön verecek yeni fırsatlar seni bekliyor.',
-                          style: TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
-                        ),
+                        Text(l10n.t(AppText.dashboardWelcomeSubtitle),
+                            style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700)),
                         const SizedBox(height: 18),
 
                         LayoutBuilder(
@@ -132,10 +131,10 @@ class _StudentDashboardScreenState extends ConsumerState<StudentDashboardScreen>
                                 icon: Icons.emoji_events_outlined,
                                 iconBg: const Color(0xFFEDE9FE),
                                 iconColor: const Color(0xFF7C3AED),
-                                title: 'Toplam Puan',
+                                title: l10n.t(AppText.dashboardTotalPoints),
                                 value: '${stats.totalPoints}',
                                 subtitle: stats.departmentRank != null
-                                    ? 'Bölüm sıralaması: ${stats.departmentRank}.'
+                                    ? l10n.dashboardDepartmentRank(stats.departmentRank!)
                                     : null,
                                 showTrend: true,
                               ),
@@ -143,21 +142,21 @@ class _StudentDashboardScreenState extends ConsumerState<StudentDashboardScreen>
                                 icon: Icons.menu_book_outlined,
                                 iconBg: const Color(0xFFDBEAFE),
                                 iconColor: const Color(0xFF2563EB),
-                                title: 'Tamamlanan Kurs',
+                                title: l10n.t(AppText.dashboardCompletedCourses),
                                 value: '${stats.coursesCompleted}',
                               ),
                               _StatCard(
                                 icon: Icons.work_outline,
                                 iconBg: const Color(0xFFDCFCE7),
                                 iconColor: const Color(0xFF16A34A),
-                                title: 'Aktif Başvuru',
+                                title: l10n.t(AppText.dashboardActiveApplications),
                                 value: '${stats.activeApplications}',
                               ),
                               _StatCard(
                                 icon: Icons.track_changes_outlined,
                                 iconBg: const Color(0xFFFEF3C7),
                                 iconColor: const Color(0xFFD97706),
-                                title: 'Devam Eden Kurs',
+                                title: l10n.t(AppText.dashboardOngoingCourses),
                                 value: '${stats.ongoingCourses}',
                               ),
                             ];
@@ -347,6 +346,7 @@ class _PointsHero extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -371,8 +371,8 @@ class _PointsHero extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Puan Durumun',
-                          style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900)),
+                      Text(l10n.t(AppText.dashboardPointsStatusTitle),
+                          style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900)),
                       const SizedBox(height: 6),
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.end,
@@ -380,16 +380,17 @@ class _PointsHero extends StatelessWidget {
                           Text('$totalPoints',
                               style: const TextStyle(color: Colors.white, fontSize: 34, fontWeight: FontWeight.w900)),
                           const SizedBox(width: 6),
-                          const Padding(
-                            padding: EdgeInsets.only(bottom: 5),
-                            child: Text('Puan', style: TextStyle(color: Color(0xCCFFFFFF), fontWeight: FontWeight.w800)),
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 5),
+                            child: Text(l10n.t(AppText.commonPoints),
+                                style: const TextStyle(color: Color(0xCCFFFFFF), fontWeight: FontWeight.w800)),
                           ),
                         ],
                       ),
                       if (departmentRank != null) ...[
                         const SizedBox(height: 4),
                         Text(
-                          'Bölüm sıralaması: $departmentRank.',
+                          l10n.dashboardDepartmentRank(departmentRank!),
                           style: const TextStyle(color: Color(0xCCFFFFFF), fontWeight: FontWeight.w800),
                         ),
                       ],
@@ -407,7 +408,8 @@ class _PointsHero extends StatelessWidget {
                     child: ElevatedButton.icon(
                       onPressed: onLeaderboard,
                       icon: const Icon(Icons.workspace_premium_outlined),
-                      label: const Text('Sıralamayı Gör', style: TextStyle(fontWeight: FontWeight.w900)),
+                      label: Text(l10n.t(AppText.dashboardViewLeaderboard),
+                          style: const TextStyle(fontWeight: FontWeight.w900)),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFFBBF24),
                         foregroundColor: const Color(0xFF111827),
@@ -421,7 +423,8 @@ class _PointsHero extends StatelessWidget {
                     child: ElevatedButton.icon(
                       onPressed: onHowToPoints,
                       icon: const Icon(Icons.track_changes_outlined),
-                      label: const Text('Nasıl Puan Kazanırım?', style: TextStyle(fontWeight: FontWeight.w900)),
+                      label: Text(l10n.t(AppText.dashboardHowToEarnPoints),
+                          style: const TextStyle(fontWeight: FontWeight.w900)),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
                         foregroundColor: const Color(0xFF6D28D9),
@@ -462,10 +465,10 @@ class _PointsHero extends StatelessWidget {
             builder: (_, c) {
               final isWide = c.maxWidth >= 860;
               final items = <Widget>[
-                _MiniMetric(title: 'Bugün', value: '+$todayPoints puan'),
-                _MiniMetric(title: 'Bu Hafta', value: '+$weekPoints puan'),
-                _MiniMetric(title: 'Kurs Tamamlama', value: '$coursesCompleted'),
-                _MiniMetric(title: 'Sonraki Hedef', value: '$nextTarget puan'),
+                _MiniMetric(title: l10n.t(AppText.dashboardMetricToday), value: l10n.pointsDelta(todayPoints)),
+                _MiniMetric(title: l10n.t(AppText.dashboardMetricThisWeek), value: l10n.pointsDelta(weekPoints)),
+                _MiniMetric(title: l10n.t(AppText.dashboardMetricCoursesCompleted), value: '$coursesCompleted'),
+                _MiniMetric(title: l10n.t(AppText.dashboardMetricNextTarget), value: l10n.pointsValue(nextTarget)),
               ];
 
               if (isWide) {
@@ -499,6 +502,7 @@ class _ChatAssistantCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -521,24 +525,24 @@ class _ChatAssistantCard extends StatelessWidget {
                 width: 52,
                 height: 52,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withAlpha((0.2 * 255).round()),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: const Icon(Icons.smart_toy_outlined, color: Colors.white, size: 30),
               ),
               const SizedBox(width: 14),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Kariyer Asistani',
-                      style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900),
+                      l10n.t(AppText.dashboardAssistantTitle),
+                      style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900),
                     ),
-                    SizedBox(height: 6),
+                    const SizedBox(height: 6),
                     Text(
-                      'CV, staj ve mulakat sorularinda hizli destek al.',
-                      style: TextStyle(color: Color(0xDDFFFFFF), fontWeight: FontWeight.w600),
+                      l10n.t(AppText.dashboardAssistantSubtitle),
+                      style: const TextStyle(color: Color(0xDDFFFFFF), fontWeight: FontWeight.w600),
                     ),
                   ],
                 ),
@@ -549,10 +553,10 @@ class _ChatAssistantCard extends StatelessWidget {
           final bullets = Wrap(
             spacing: 12,
             runSpacing: 10,
-            children: const [
-              _ChatChip(icon: Icons.description_outlined, label: 'CV ozellestirme'),
-              _ChatChip(icon: Icons.work_outline, label: 'Staj basvurulari'),
-              _ChatChip(icon: Icons.mic_none, label: 'Mulakat hazirligi'),
+            children: [
+              _ChatChip(icon: Icons.description_outlined, label: l10n.t(AppText.dashboardAssistantChipCv)),
+              _ChatChip(icon: Icons.work_outline, label: l10n.t(AppText.dashboardAssistantChipInternships)),
+              _ChatChip(icon: Icons.mic_none, label: l10n.t(AppText.dashboardAssistantChipInterview)),
             ],
           );
 
@@ -561,7 +565,7 @@ class _ChatAssistantCard extends StatelessWidget {
             child: ElevatedButton.icon(
               onPressed: onStartChat,
               icon: const Icon(Icons.chat_bubble_outline),
-              label: const Text('Sohbete Basla', style: TextStyle(fontWeight: FontWeight.w900)),
+              label: Text(l10n.t(AppText.dashboardStartChat), style: const TextStyle(fontWeight: FontWeight.w900)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
                 foregroundColor: const Color(0xFF5B21B6),
@@ -617,9 +621,9 @@ class _ChatChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
+        color: Colors.white.withAlpha((0.2 * 255).round()),
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: Colors.white.withOpacity(0.25)),
+        border: Border.all(color: Colors.white.withAlpha((0.25 * 255).round())),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -672,6 +676,7 @@ class _OngoingCoursesCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -687,10 +692,11 @@ class _OngoingCoursesCard extends StatelessWidget {
             children: [
               const Icon(Icons.menu_book_outlined, color: Color(0xFF2563EB)),
               const SizedBox(width: 8),
-              const Expanded(
-                child: Text('Devam Eden Kurslarım', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+              Expanded(
+                child: Text(l10n.t(AppText.dashboardOngoingCoursesTitle),
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
               ),
-              TextButton(onPressed: onSeeAll, child: const Text('Tümünü Gör →')),
+              TextButton(onPressed: onSeeAll, child: Text(l10n.t(AppText.commonSeeAllArrow))),
             ],
           ),
           const SizedBox(height: 12),
@@ -703,12 +709,10 @@ class _OngoingCoursesCard extends StatelessWidget {
                   children: [
                     const Icon(Icons.menu_book, size: 46, color: Color(0xFFD1D5DB)),
                     const SizedBox(height: 10),
-                    const Text(
-                      'Henüz kayıtlı kursunuz yok.',
-                      style: TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
-                    ),
+                    Text(l10n.t(AppText.dashboardNoCourses),
+                        style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700)),
                     const SizedBox(height: 10),
-                    OutlinedButton(onPressed: onSeeAll, child: const Text('Kursları Keşfet →')),
+                    OutlinedButton(onPressed: onSeeAll, child: Text(l10n.t(AppText.dashboardExploreCoursesArrow))),
                   ],
                 ),
               ),
@@ -733,6 +737,7 @@ class _EnrolledCourseTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final p = course.progress.clamp(0, 100);
 
     return Container(
@@ -795,7 +800,7 @@ class _EnrolledCourseTile extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '%$p tamamlandı',
+                      l10n.dashboardCourseProgress(p),
                       style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700, fontSize: 12),
                     ),
                   ],
@@ -814,7 +819,7 @@ class _EnrolledCourseTile extends StatelessWidget {
                     elevation: 0,
                   ),
                   child: Text(
-                    'Devam Et →',
+                    l10n.t(AppText.commonContinueArrow),
                     style: TextStyle(
                       fontWeight: FontWeight.w900,
                       fontSize: isTablet ? 12 : 14,
@@ -860,6 +865,7 @@ class _RecentActivitiesCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -871,12 +877,13 @@ class _RecentActivitiesCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.local_activity_outlined, color: Color(0xFF7C3AED)),
-              SizedBox(width: 8),
+              const Icon(Icons.local_activity_outlined, color: Color(0xFF7C3AED)),
+              const SizedBox(width: 8),
               Expanded(
-                child: Text('Son Aktiviteler', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+                child: Text(l10n.t(AppText.dashboardRecentActivitiesTitle),
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
               ),
             ],
           ),
@@ -886,18 +893,18 @@ class _RecentActivitiesCard extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 22),
               child: Center(
                 child: Column(
-                  children: const [
-                    Icon(Icons.local_activity_outlined, size: 42, color: Color(0xFFD1D5DB)),
-                    SizedBox(height: 8),
-                    Text('Henüz aktivite yok.',
-                        style: TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700)),
+                  children: [
+                    const Icon(Icons.local_activity_outlined, size: 42, color: Color(0xFFD1D5DB)),
+                    const SizedBox(height: 8),
+                    Text(l10n.t(AppText.dashboardNoActivity),
+                        style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700)),
                   ],
                 ),
               ),
             )
           else
             SizedBox(
-              height: 380, // ✅ React-like scroll area
+              height: 380, // React-like scroll area
               child: Scrollbar(
                 child: ListView.builder(
                   itemCount: activities.length,
@@ -917,6 +924,7 @@ class _ActivityRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final style = _activityStyle(activity.category);
 
     return Padding(
@@ -939,11 +947,11 @@ class _ActivityRow extends StatelessWidget {
                 const SizedBox(height: 3),
                 Row(
                   children: [
-                    Text(_dateText(activity.createdAt),
+                    Text(_dateText(context, activity.createdAt),
                         style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700, fontSize: 12)),
                     const Spacer(),
                     if (activity.points > 0)
-                      Text('+${activity.points} puan',
+                      Text(l10n.pointsDelta(activity.points),
                           style: const TextStyle(color: Color(0xFF10B981), fontWeight: FontWeight.w900, fontSize: 12)),
                   ],
                 ),
@@ -955,10 +963,8 @@ class _ActivityRow extends StatelessWidget {
     );
   }
 
-  static String _dateText(DateTime dt) {
-    return '${dt.day.toString().padLeft(2, '0')}.'
-        '${dt.month.toString().padLeft(2, '0')}.'
-        '${dt.year}';
+  static String _dateText(BuildContext context, DateTime dt) {
+    return MaterialLocalizations.of(context).formatShortDate(dt);
   }
 
   static _ActStyle _activityStyle(ActivityCategory c) {

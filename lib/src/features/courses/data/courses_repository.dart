@@ -53,7 +53,7 @@ class CoursesRepository {
     required String userId,
     required String courseId,
   }) async {
-    // ✅ FIX: filter by user_id (NOT id)
+    // FIX: filter by user_id (NOT id)
     final rows = await _client
         .from('course_enrollments')
         .select('id,user_id,course_id,enrolled_at,progress')
@@ -67,7 +67,7 @@ class CoursesRepository {
   }
 
   Future<List<EnrolledCourse>> listMyEnrolledCourses(String userId) async {
-    // ✅ FIX: filter by user_id (NOT id)
+    // FIX: filter by user_id (NOT id)
     final rows = await _client
         .from('course_enrollments')
         .select(
@@ -106,7 +106,7 @@ class CoursesRepository {
     required String userId,
     required String courseId,
   }) async {
-    // ✅ Optional safety: prevents duplicates if a unique constraint exists on (user_id, course_id).
+    // Optional safety: prevents duplicates if a unique constraint exists on (user_id, course_id).
     // If you DON'T have unique constraint, this still works (it will just insert).
     await _client.from('course_enrollments').upsert(
       {
@@ -122,7 +122,7 @@ class CoursesRepository {
     required String userId,
     required String courseId,
   }) async {
-    // ✅ FIX: delete by user_id (NOT id)
+    // FIX: delete by user_id (NOT id)
     await _client
         .from('course_enrollments')
         .delete()

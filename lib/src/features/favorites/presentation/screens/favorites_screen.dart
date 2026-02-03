@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../../core/supabase/supabase_service.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
@@ -24,6 +25,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final authAsync = ref.watch(authViewStateProvider);
     if (authAsync.isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -34,7 +36,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
     final isLoggedIn = auth?.isAuthenticated ?? false;
 
     if (!isLoggedIn || user == null) {
-      return _GuestView(title: 'Favorileri görmek için giriş yapmalısın.');
+      return _GuestView(title: l10n.t(AppText.favoritesLoginRequired));
     }
 
     _ensureLoaded(user.id);
@@ -60,17 +62,16 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
-                    children: const [
-                      Icon(Icons.favorite, color: Color(0xFFEF4444), size: 28),
-                      SizedBox(width: 10),
-                      Text('Favorilerim', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900)),
+                    children: [
+                      const Icon(Icons.favorite, color: Color(0xFFEF4444), size: 28),
+                      const SizedBox(width: 10),
+                      Text(l10n.t(AppText.navFavorites),
+                          style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900)),
                     ],
                   ),
                   const SizedBox(height: 6),
-                  const Text(
-                    'Beğendiğiniz içerikleri buradan takip edebilirsiniz.',
-                    style: TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
-                  ),
+                  Text(l10n.t(AppText.favoritesSubtitle),
+                      style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600)),
                   const SizedBox(height: 16),
                   _FiltersBar(
                     activeTab: _activeTab,
@@ -160,7 +161,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Favoriler yüklenirken hata oluştu: $e')),
+        SnackBar(content: Text(AppLocalizations.of(context).favoritesLoadFailed(e.toString()))),
       );
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -204,12 +205,12 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
         _items = _items.where((e) => e.id != id).toList();
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Favorilerden kaldırıldı')),
+        SnackBar(content: Text(AppLocalizations.of(context).t(AppText.favoritesRemoved))),
       );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('İşlem başarısız: $e')),
+        SnackBar(content: Text(AppLocalizations.of(context).commonActionFailed(e.toString()))),
       );
     } finally {
       if (mounted) setState(() => _removingId = null);
@@ -240,11 +241,24 @@ class _FiltersBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final tabs = <_TabItem>[
-      _TabItem(id: 'all', label: 'Tümü', count: items.length),
-      _TabItem(id: 'course', label: 'Kurslar', count: items.where((e) => e.type == 'course').length),
-      _TabItem(id: 'job', label: 'İş İlanları', count: items.where((e) => e.type == 'job').length),
-      _TabItem(id: 'internship', label: 'Stajlar', count: items.where((e) => e.type == 'internship').length),
+      _TabItem(id: 'all', label: l10n.t(AppText.commonAll), count: items.length),
+      _TabItem(
+        id: 'course',
+        label: l10n.t(AppText.navCourses),
+        count: items.where((e) => e.type == 'course').length,
+      ),
+      _TabItem(
+        id: 'job',
+        label: l10n.t(AppText.navJobs),
+        count: items.where((e) => e.type == 'job').length,
+      ),
+      _TabItem(
+        id: 'internship',
+        label: l10n.t(AppText.navInternships),
+        count: items.where((e) => e.type == 'internship').length,
+      ),
     ];
 
     return Container(
@@ -427,7 +441,7 @@ class _FavoriteCard extends StatelessWidget {
           const Spacer(),
           TextButton(
             onPressed: onOpen,
-            child: const Text('Detayları Gör →'),
+            child: Text(AppLocalizations.of(context).t(AppText.commonViewDetailsArrow)),
           ),
         ],
       ),
@@ -490,7 +504,7 @@ class _FavoriteListRow extends StatelessWidget {
           ElevatedButton(
             onPressed: onOpen,
             style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6D28D9)),
-            child: const Text('Detayları Gör'),
+            child: Text(AppLocalizations.of(context).t(AppText.commonViewDetails)),
           ),
           const SizedBox(width: 8),
           IconButton(
@@ -615,27 +629,28 @@ class _TypePill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     String label;
     Color bg;
     Color fg;
     switch (type) {
       case 'course':
-        label = 'Kurs';
+        label = l10n.t(AppText.navCourses);
         bg = const Color(0xFFEDE9FE);
         fg = const Color(0xFF6D28D9);
         break;
       case 'job':
-        label = 'İş İlanı';
+        label = l10n.t(AppText.navJobs);
         bg = const Color(0xFFDBEAFE);
         fg = const Color(0xFF2563EB);
         break;
       case 'internship':
-        label = 'Staj';
+        label = l10n.t(AppText.navInternships);
         bg = const Color(0xFFDCFCE7);
         fg = const Color(0xFF16A34A);
         break;
       default:
-        label = 'Favori';
+        label = l10n.t(AppText.navFavorites);
         bg = const Color(0xFFF3F4F6);
         fg = const Color(0xFF6B7280);
     }
@@ -661,6 +676,7 @@ class _EmptyFavorites extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -672,15 +688,15 @@ class _EmptyFavorites extends StatelessWidget {
         children: [
           const Icon(Icons.favorite_border, size: 44, color: Color(0xFFD1D5DB)),
           const SizedBox(height: 8),
-          const Text('Henüz favoriniz bulunmuyor.',
-              style: TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600)),
+          Text(l10n.t(AppText.favoritesEmptyTitle),
+              style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600)),
           const SizedBox(height: 10),
           Wrap(
             spacing: 10,
             children: [
-              TextButton(onPressed: onCourses, child: const Text('Kursları Keşfet')),
-              TextButton(onPressed: onJobs, child: const Text('İş İlanlarına Göz At')),
-              TextButton(onPressed: onInternships, child: const Text('Stajları İncele')),
+              TextButton(onPressed: onCourses, child: Text(l10n.t(AppText.favoritesExploreCourses))),
+              TextButton(onPressed: onJobs, child: Text(l10n.t(AppText.favoritesBrowseJobs))),
+              TextButton(onPressed: onInternships, child: Text(l10n.t(AppText.favoritesBrowseInternships))),
             ],
           ),
         ],

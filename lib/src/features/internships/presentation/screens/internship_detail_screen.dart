@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/localization/app_localizations.dart';
 import '../../application/internships_providers.dart';
 import '../../domain/internship_models.dart';
 
@@ -10,6 +11,7 @@ class InternshipDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final asyncVm = ref.watch(internshipDetailProvider(internshipId));
 
     return asyncVm.when(
@@ -31,7 +33,7 @@ class InternshipDetailScreen extends ConsumerWidget {
                 const Icon(Icons.error_outline, size: 48, color: Color(0xFFEF4444)),
                 const SizedBox(height: 10),
                 Text(
-                  'Detay yuklenemedi: $e',
+                  l10n.internshipDetailLoadFailed(e.toString()),
                   textAlign: TextAlign.center,
                   style: const TextStyle(color: Color(0xFF6B7280)),
                 ),
@@ -40,7 +42,7 @@ class InternshipDetailScreen extends ConsumerWidget {
                   height: 44,
                   child: ElevatedButton(
                     onPressed: () => ref.read(internshipDetailProvider(internshipId).notifier).refresh(),
-                    child: const Text('Tekrar dene'),
+                    child: Text(l10n.t(AppText.retry)),
                   ),
                 ),
               ],
@@ -59,6 +61,7 @@ class _InternshipDetailBody extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final item = vm.item;
     final i = item.internship;
     final app = item.myApplication;
@@ -72,7 +75,7 @@ class _InternshipDetailBody extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: const Color(0xFFF9FAFB),
         elevation: 0,
-        title: const Text('Staj Detayi', style: TextStyle(fontWeight: FontWeight.w900)),
+        title: Text(l10n.t(AppText.internshipDetailTitle), style: const TextStyle(fontWeight: FontWeight.w900)),
         actions: [
           IconButton(
             onPressed: () => ref.read(internshipDetailProvider(i.id).notifier).toggleFavorite(),
@@ -106,13 +109,13 @@ class _InternshipDetailBody extends ConsumerWidget {
                       await ref.read(internshipDetailProvider(i.id).notifier).apply(motivation);
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Basvurun alindi')),
+                          SnackBar(content: Text(l10n.t(AppText.internshipDetailApplySuccess))),
                         );
                       }
                     } catch (e) {
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(e.toString())),
+                          SnackBar(content: Text(l10n.internshipDetailApplyFailed(e.toString()))),
                         );
                       }
                     }
@@ -161,8 +164,9 @@ class _MainDetail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final i = internship;
-    final location = i.isRemote ? 'Remote' : (i.location ?? 'Belirtilmemis');
+    final location = i.isRemote ? l10n.t(AppText.remote) : (i.location ?? l10n.t(AppText.internshipsNotSpecified));
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -191,58 +195,67 @@ class _MainDetail extends StatelessWidget {
             runSpacing: 8,
             children: [
               _Chip(icon: Icons.place_outlined, text: location),
-              _Chip(icon: Icons.timelapse, text: '${i.durationMonths} ay'),
-              if (i.deadline != null) _Chip(icon: Icons.event_outlined, text: _fmtDate(i.deadline!)),
+              _Chip(icon: Icons.timelapse, text: l10n.internshipsMonths(i.durationMonths)),
+              if (i.deadline != null)
+                _Chip(
+                  icon: Icons.event_outlined,
+                  text: l10n.deadlineLabel(_fmtDate(context, i.deadline!)),
+                ),
               if (i.isPaid)
                 _Chip(
                   icon: Icons.payments_outlined,
                   text: i.monthlyStipend != null
-                      ? '${i.monthlyStipend!.toStringAsFixed(0)} TL/ay'
-                      : 'Ucretli',
+                      ? l10n.internshipsMonthlyStipend(i.monthlyStipend!.toStringAsFixed(0))
+                      : l10n.t(AppText.internshipsPaid),
                   fg: const Color(0xFF16A34A),
                   bg: const Color(0xFFDCFCE7),
                 ),
-              if (i.providesCertificate) const _Chip(icon: Icons.verified_outlined, text: 'Sertifika'),
-              if (i.possibilityOfEmployment) const _Chip(icon: Icons.trending_up, text: 'Ise alim sansi'),
+              if (i.providesCertificate)
+                _Chip(icon: Icons.verified_outlined, text: l10n.t(AppText.internshipDetailCertificate)),
+              if (i.possibilityOfEmployment)
+                _Chip(icon: Icons.trending_up, text: l10n.t(AppText.internshipDetailEmploymentChance)),
             ],
           ),
           const SizedBox(height: 14),
-          const _SectionTitle('Staj Hakkinda'),
+          _SectionTitle(l10n.t(AppText.internshipDetailAbout)),
           const SizedBox(height: 8),
           Text(
-            i.description.isNotEmpty ? i.description : 'Aciklama yok.',
+            i.description.isNotEmpty ? i.description : l10n.t(AppText.commonNoDescription),
             style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 14),
-          const _SectionTitle('Saglanan Faydalar'),
+          _SectionTitle(l10n.t(AppText.internshipDetailBenefits)),
           const SizedBox(height: 8),
           if (benefits.isEmpty)
-            const Text('Belirtilmemis', style: TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600))
+            Text(l10n.t(AppText.internshipsNotSpecified),
+                style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600))
           else
             _Bullets(items: benefits),
           const SizedBox(height: 14),
-          const _SectionTitle('Aranan Nitelikler'),
+          _SectionTitle(l10n.t(AppText.internshipDetailRequirements)),
           const SizedBox(height: 8),
           if (requirements.isEmpty)
-            const Text('Belirtilmemis', style: TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600))
+            Text(l10n.t(AppText.internshipsNotSpecified),
+                style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600))
           else
             _Bullets(items: requirements),
           const SizedBox(height: 14),
-          const _SectionTitle('Staj Sureci'),
+          _SectionTitle(l10n.t(AppText.internshipDetailProcess)),
           const SizedBox(height: 8),
-          const _Bullets(items: [
-            'Basvurunu gonder',
-            'Degerlendirme sureci',
-            'Mulakat (gerekirse)',
-            'Sonuc bildirimi',
+          _Bullets(items: [
+            l10n.t(AppText.internshipDetailProcessStep1),
+            l10n.t(AppText.internshipDetailProcessStep2),
+            l10n.t(AppText.internshipDetailProcessStep3),
+            l10n.t(AppText.internshipDetailProcessStep4),
           ]),
         ],
       ),
     );
   }
 
-  static String _fmtDate(DateTime d) =>
-      '${d.day.toString().padLeft(2, '0')}.${d.month.toString().padLeft(2, '0')}.${d.year}';
+  static String _fmtDate(BuildContext context, DateTime d) {
+    return MaterialLocalizations.of(context).formatShortDate(d.toLocal());
+  }
 }
 
 class _ApplyCard extends StatelessWidget {
@@ -260,6 +273,7 @@ class _ApplyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final s = status ?? InternshipApplicationStatus.pending;
 
     return Container(
@@ -273,20 +287,17 @@ class _ApplyCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Basvuru', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+          Text(l10n.t(AppText.internshipDetailApplyTitle),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
           const SizedBox(height: 10),
           if (hasApplied) ...[
             _StatusLine(status: s),
             const SizedBox(height: 10),
-            const Text(
-              'Bu staja zaten basvurdun. Durum guncellendiginde burada gorunecek.',
-              style: TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
-            ),
+            Text(l10n.t(AppText.internshipDetailAlreadyApplied),
+                style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600)),
           ] else ...[
-            const Text(
-              'Motivasyonunu yaz ve basvurunu gonder. (en az 100 karakter)',
-              style: TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
-            ),
+            Text(l10n.internshipDetailApplyHint(100),
+                style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600)),
             const SizedBox(height: 12),
             SizedBox(
               height: 46,
@@ -297,9 +308,10 @@ class _ApplyCard extends StatelessWidget {
                   backgroundColor: const Color(0xFF6D28D9),
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                  elevation: 0,
-                ),
-                child: const Text('Basvuru Yap', style: TextStyle(fontWeight: FontWeight.w900)),
+                        elevation: 0,
+                      ),
+                child: Text(l10n.t(AppText.internshipDetailApplyButton),
+                    style: const TextStyle(fontWeight: FontWeight.w900)),
               ),
             ),
           ],
@@ -309,6 +321,7 @@ class _ApplyCard extends StatelessWidget {
   }
 
   void _openApplySheet(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final ctrl = TextEditingController();
     showModalBottomSheet(
       context: context,
@@ -334,15 +347,15 @@ class _ApplyCard extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Motivasyon Mektubu',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+                  Text(l10n.t(AppText.internshipDetailMotivationTitle),
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
                   const SizedBox(height: 10),
                   TextField(
                     controller: ctrl,
                     maxLines: 7,
                     onChanged: (_) => setState(() {}),
                     decoration: InputDecoration(
-                      hintText: 'Neden bu staj? Neler katacaksin? Hedeflerin ne?',
+                      hintText: l10n.t(AppText.internshipDetailMotivationHint),
                       filled: true,
                       fillColor: const Color(0xFFF9FAFB),
                       border: OutlineInputBorder(
@@ -383,7 +396,7 @@ class _ApplyCard extends StatelessWidget {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                         elevation: 0,
                       ),
-                      child: const Text('Gonder', style: TextStyle(fontWeight: FontWeight.w900)),
+                      child: Text(l10n.t(AppText.commonSend), style: const TextStyle(fontWeight: FontWeight.w900)),
                     ),
                   ),
                 ],
@@ -402,7 +415,7 @@ class _StatusLine extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final label = _statusLabel(status);
+    final label = _statusLabel(AppLocalizations.of(context), status);
     final color = _statusColor(status);
 
     return Row(
@@ -460,7 +473,7 @@ class _StatusPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final label = _statusLabel(status);
+    final label = _statusLabel(AppLocalizations.of(context), status);
     final bg = _statusBg(status);
     final fg = _statusColor(status);
 
@@ -502,14 +515,14 @@ class _Chip extends StatelessWidget {
   }
 }
 
-String _statusLabel(InternshipApplicationStatus status) {
+String _statusLabel(AppLocalizations l10n, InternshipApplicationStatus status) {
   switch (status) {
     case InternshipApplicationStatus.accepted:
-      return 'Kabul Edildi';
+      return l10n.t(AppText.statusAccepted);
     case InternshipApplicationStatus.rejected:
-      return 'Reddedildi';
+      return l10n.t(AppText.statusRejected);
     case InternshipApplicationStatus.pending:
-      return 'Basvuru Gonderildi';
+      return l10n.t(AppText.internshipDetailStatusSubmitted);
   }
 }
 

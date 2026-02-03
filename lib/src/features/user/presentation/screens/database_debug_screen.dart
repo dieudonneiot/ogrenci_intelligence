@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/supabase/supabase_service.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
 
@@ -33,6 +34,7 @@ class _DatabaseDebugScreenState extends ConsumerState<DatabaseDebugScreen> {
 
   Future<void> _checkDatabase() async {
     setState(() => _loading = true);
+    final l10n = AppLocalizations.of(context);
     final user = ref.read(authViewStateProvider).value?.user;
     if (user == null) {
       setState(() => _loading = false);
@@ -46,15 +48,15 @@ class _DatabaseDebugScreenState extends ConsumerState<DatabaseDebugScreen> {
       final profile = await client.from('profiles').select('*').eq('id', user.id).maybeSingle();
       if (profile != null) {
         _profile = Map<String, dynamic>.from(profile);
+        final dept = (_profile?['department'] ?? '').toString();
         results['profiles'] = _TableResult.success(
           count: 1,
-          message:
-              'Profil bulundu - Bölüm: ${(_profile?['department'] ?? 'Belirtilmemiş').toString()}',
+          message: l10n.dbDebugProfileFound(dept.isEmpty ? l10n.t(AppText.commonNotSpecified) : dept),
           sample: [Map<String, dynamic>.from(profile)],
           columns: _columnsFromRows([profile]),
         );
       } else {
-        results['profiles'] = _TableResult.error('Profil bulunamadı');
+        results['profiles'] = _TableResult.error(l10n.t(AppText.dbDebugProfileNotFound));
       }
     } catch (e) {
       results['profiles'] = _TableResult.error(e.toString());
@@ -132,6 +134,7 @@ class _DatabaseDebugScreenState extends ConsumerState<DatabaseDebugScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final auth = ref.watch(authViewStateProvider);
     final user = auth.value?.user;
 
@@ -147,7 +150,7 @@ class _DatabaseDebugScreenState extends ConsumerState<DatabaseDebugScreen> {
             color: const Color(0xFFFEE2E2),
             borderRadius: BorderRadius.circular(12),
           ),
-          child: const Text('Lütfen giriş yapın.', style: TextStyle(color: Color(0xFF991B1B))),
+          child: Text(l10n.t(AppText.commonPleaseSignIn), style: const TextStyle(color: Color(0xFF991B1B))),
         ),
       );
     }
@@ -163,16 +166,18 @@ class _DatabaseDebugScreenState extends ConsumerState<DatabaseDebugScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
-                  children: const [
-                    Icon(Icons.storage_outlined, color: Color(0xFF6D28D9), size: 28),
-                    SizedBox(width: 10),
-                    Text('Veritabanı Kontrol Paneli',
-                        style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900)),
+                  children: [
+                    const Icon(Icons.storage_outlined, color: Color(0xFF6D28D9), size: 28),
+                    const SizedBox(width: 10),
+                    Text(l10n.t(AppText.dbDebugTitle),
+                        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900)),
                   ],
                 ),
                 const SizedBox(height: 6),
-                const Text('Supabase tablolarının durumunu kontrol edin',
-                    style: TextStyle(color: Color(0xFF6B7280))),
+                Text(
+                  l10n.t(AppText.dbDebugSubtitle),
+                  style: const TextStyle(color: Color(0xFF6B7280)),
+                ),
                 const SizedBox(height: 16),
                 _UserCard(user: user, profile: _profile),
                 const SizedBox(height: 16),
@@ -198,6 +203,7 @@ class _UserCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -209,10 +215,10 @@ class _UserCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            children: const [
-              Icon(Icons.table_chart_outlined, color: Color(0xFF6B7280)),
-              SizedBox(width: 8),
-              Text('Kullanıcı Bilgileri', style: TextStyle(fontWeight: FontWeight.w800)),
+            children: [
+              const Icon(Icons.table_chart_outlined, color: Color(0xFF6B7280)),
+              const SizedBox(width: 8),
+              Text(l10n.t(AppText.dbDebugUserInfoTitle), style: const TextStyle(fontWeight: FontWeight.w800)),
             ],
           ),
           const SizedBox(height: 12),
@@ -220,10 +226,16 @@ class _UserCard extends StatelessWidget {
             spacing: 18,
             runSpacing: 8,
             children: [
-              _InfoLine(label: 'User ID', value: user.id),
-              _InfoLine(label: 'Email', value: user.email ?? '-'),
-              _InfoLine(label: 'Bölüm', value: profile?['department']?.toString() ?? 'Belirtilmemiş'),
-              _InfoLine(label: 'Sınıf', value: profile?['year']?.toString() ?? 'Belirtilmemiş'),
+              _InfoLine(label: l10n.t(AppText.commonUserId), value: user.id),
+              _InfoLine(label: l10n.t(AppText.commonEmail), value: user.email ?? '-'),
+              _InfoLine(
+                label: l10n.t(AppText.commonDepartment),
+                value: profile?['department']?.toString() ?? l10n.t(AppText.commonNotSpecified),
+              ),
+              _InfoLine(
+                label: l10n.t(AppText.commonYear),
+                value: profile?['year']?.toString() ?? l10n.t(AppText.commonNotSpecified),
+              ),
             ],
           ),
         ],
@@ -304,6 +316,7 @@ class _TableCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -316,9 +329,9 @@ class _TableCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(Icons.table_chart_outlined, color: const Color(0xFF6B7280)),
+              const Icon(Icons.table_chart_outlined, color: Color(0xFF6B7280)),
               const SizedBox(width: 8),
-              Text('$name Tablosu', style: const TextStyle(fontWeight: FontWeight.w800)),
+              Text(l10n.dbDebugTableTitle(name), style: const TextStyle(fontWeight: FontWeight.w800)),
               const Spacer(),
               Icon(
                 result.success ? Icons.check_circle : Icons.error_outline,
@@ -332,19 +345,19 @@ class _TableCard extends StatelessWidget {
               spacing: 12,
               runSpacing: 8,
               children: [
-                _Tag(label: 'Toplam Kayıt: ${result.count}', bg: const Color(0xFFF3F4F6)),
+                _Tag(label: l10n.dbDebugTotalRecords(result.count), bg: const Color(0xFFF3F4F6)),
                 if (result.departmentCount != null)
                   _Tag(
-                    label: 'Bölüm Kayıtları: ${result.departmentCount}',
+                    label: l10n.dbDebugDepartmentRecords(result.departmentCount!),
                     bg: const Color(0xFFEDE9FE),
                   ),
                 if (result.partTimeCount != null)
-                  _Tag(label: 'Part-Time: ${result.partTimeCount}', bg: const Color(0xFFDBEAFE)),
+                  _Tag(label: l10n.dbDebugPartTimeRecords(result.partTimeCount!), bg: const Color(0xFFDBEAFE)),
               ],
             ),
             if (result.columns.isNotEmpty) ...[
               const SizedBox(height: 12),
-              const Text('Tablo Kolonları', style: TextStyle(fontWeight: FontWeight.w700)),
+              Text(l10n.t(AppText.dbDebugTableColumnsTitle), style: const TextStyle(fontWeight: FontWeight.w700)),
               const SizedBox(height: 6),
               Wrap(
                 spacing: 6,
@@ -354,7 +367,7 @@ class _TableCard extends StatelessWidget {
             ],
             if (result.sample.isNotEmpty) ...[
               const SizedBox(height: 12),
-              const Text('Örnek Kayıtlar', style: TextStyle(fontWeight: FontWeight.w700)),
+              Text(l10n.t(AppText.dbDebugSampleRecordsTitle), style: const TextStyle(fontWeight: FontWeight.w700)),
               const SizedBox(height: 6),
               Container(
                 width: double.infinity,
@@ -382,7 +395,7 @@ class _TableCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
-                'Hata: ${result.error ?? 'Bilinmeyen hata'}',
+                l10n.dbDebugError(result.error ?? l10n.t(AppText.commonUnknownError)),
                 style: const TextStyle(color: Color(0xFF991B1B)),
               ),
             ),
@@ -414,6 +427,7 @@ class _Tag extends StatelessWidget {
 class _TipsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -423,20 +437,23 @@ class _TipsCard extends StatelessWidget {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
+        children: [
           Row(
             children: [
-              Icon(Icons.info_outline, color: Color(0xFFB45309)),
-              SizedBox(width: 8),
-              Text('Kontrol Edilecekler', style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF92400E))),
+              const Icon(Icons.info_outline, color: Color(0xFFB45309)),
+              const SizedBox(width: 8),
+              Text(
+                l10n.t(AppText.dbDebugTipsTitle),
+                style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF92400E)),
+              ),
             ],
           ),
-          SizedBox(height: 10),
-          _Tip('Profil tablosunda department alanı dolu mu?'),
-          _Tip('courses, internships ve jobs tablolarında department kolonları var mı?'),
-          _Tip('Tablolarda kayıt var mı? Yoksa örnek veri eklenmeli.'),
-          _Tip('RLS (Row Level Security) politikaları aktif mi?'),
-          _Tip('Kullanıcının bölümüne uygun kayıtlar var mı?'),
+          const SizedBox(height: 10),
+          _Tip(l10n.t(AppText.dbDebugTipProfileDepartment)),
+          _Tip(l10n.t(AppText.dbDebugTipTablesHaveDepartment)),
+          _Tip(l10n.t(AppText.dbDebugTipTablesHaveData)),
+          _Tip(l10n.t(AppText.dbDebugTipRlsEnabled)),
+          _Tip(l10n.t(AppText.dbDebugTipDepartmentHasMatches)),
         ],
       ),
     );

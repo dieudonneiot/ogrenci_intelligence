@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/routing/routes.dart';
 import '../../application/jobs_providers.dart';
 import '../../domain/job_models.dart';
@@ -36,6 +37,7 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final filters = ref.watch(jobsFiltersProvider);
     final asyncVm = ref.watch(jobsProvider);
 
@@ -62,8 +64,10 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
             children: [
               const Icon(Icons.error_outline, size: 48, color: Color(0xFFEF4444)),
               const SizedBox(height: 12),
-              const Text('Ä°ÅŸ ilanlarÄ± yÃ¼klenemedi',
-                  style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
+              Text(
+                l10n.t(AppText.jobsLoadFailed),
+                style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+              ),
               const SizedBox(height: 8),
               Text(e.toString(),
                   textAlign: TextAlign.center,
@@ -73,7 +77,7 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
                 height: 44,
                 child: ElevatedButton(
                   onPressed: () => ref.read(jobsProvider.notifier).refresh(),
-                  child: const Text('Tekrar dene'),
+                  child: Text(l10n.t(AppText.retry)),
                 ),
               ),
             ],
@@ -95,13 +99,17 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Ä°ÅŸ Ä°lanlarÄ±',
-                            style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900)),
+                        Text(
+                          l10n.t(AppText.jobsTitle),
+                          style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900),
+                        ),
                         const SizedBox(height: 6),
-                        const Text(
-                          'Arama yap, filtrele, favorile ve baÅŸvur. React ile aynÄ± akÄ±ÅŸ.',
-                          style:
-                              TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
+                        Text(
+                          l10n.t(AppText.jobsSubtitle),
+                          style: const TextStyle(
+                            color: Color(0xFF6B7280),
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                         const SizedBox(height: 14),
 
@@ -124,9 +132,9 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
                                 child: TextField(
                                   controller: _searchCtrl,
                                   onChanged: _applySearch,
-                                  decoration: const InputDecoration(
+                                  decoration: InputDecoration(
                                     border: InputBorder.none,
-                                    hintText: 'BaÅŸlÄ±k, ÅŸirket, bÃ¶lÃ¼m, konum...',
+                                    hintText: l10n.t(AppText.jobsSearchHint),
                                   ),
                                 ),
                               ),
@@ -154,7 +162,7 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
                         const SizedBox(height: 14),
 
                         if (vm.items.isEmpty)
-                          const _Empty(text: 'SonuÃ§ bulunamadÄ±.')
+                          _Empty(text: l10n.t(AppText.noResults))
                         else
                           ListView.separated(
                             shrinkWrap: true,
@@ -199,19 +207,19 @@ class _FiltersRow extends StatelessWidget {
         FilterChip(
           selected: filters.remoteOnly,
           onSelected: (v) => onChange(filters.copyWith(remoteOnly: v)),
-          label: const Text('Remote'),
+          label: Text(AppLocalizations.of(context).t(AppText.remote)),
           selectedColor: const Color(0xFFEDE9FE),
           checkmarkColor: const Color(0xFF6D28D9),
         ),
         _DropdownFilter(
-          label: 'BÃ¶lÃ¼m',
+          label: AppLocalizations.of(context).t(AppText.filterDepartment),
           value: filters.department,
           items: vm.availableDepartments,
           onChanged: (v) => onChange(filters.copyWith(department: v)),
           onClear: () => onChange(filters.copyWith(clearDepartment: true)),
         ),
         _DropdownFilter(
-          label: 'Ã‡alÄ±ÅŸma',
+          label: AppLocalizations.of(context).t(AppText.filterWorkType),
           value: filters.workType,
           items: vm.availableWorkTypes,
           onChanged: (v) => onChange(filters.copyWith(workType: v)),
@@ -253,7 +261,7 @@ class _DropdownFilter extends StatelessWidget {
           const SizedBox(width: 8),
           DropdownButton<String>(
             value: (value != null && value!.isNotEmpty && items.contains(value)) ? value : null,
-            hint: const Text('SeÃ§'),
+            hint: Text(AppLocalizations.of(context).t(AppText.select)),
             underline: const SizedBox.shrink(),
             items: items
                 .map((e) => DropdownMenuItem<String>(value: e, child: Text(e)))
@@ -279,6 +287,7 @@ class _JobCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final j = item.job;
     final applied = item.applicationStatus != null;
 
@@ -325,7 +334,7 @@ class _JobCard extends ConsumerWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${j.companyName} â€¢ ${j.location}',
+                    '${j.companyName} • ${j.location}',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
@@ -338,10 +347,10 @@ class _JobCard extends ConsumerWidget {
                       _Chip(text: j.department, bg: const Color(0xFFEDE9FE), fg: const Color(0xFF6D28D9)),
                       _Chip(text: j.workType, bg: const Color(0xFFF3F4F6), fg: const Color(0xFF374151)),
                       if (j.isRemote)
-                        _Chip(text: 'Remote', bg: const Color(0xFFDCFCE7), fg: const Color(0xFF16A34A)),
+                        _Chip(text: l10n.t(AppText.remote), bg: const Color(0xFFDCFCE7), fg: const Color(0xFF16A34A)),
                       if (j.deadline != null)
                         _Chip(
-                          text: 'Son: ${_fmtDate(j.deadline!)}',
+                          text: l10n.deadlineLabel(_fmtDate(j.deadline!)),
                           bg: const Color(0xFFFFF7ED),
                           fg: const Color(0xFFB45309),
                         ),
@@ -352,14 +361,16 @@ class _JobCard extends ConsumerWidget {
             ),
             const SizedBox(width: 10),
             IconButton(
-              tooltip: item.isFavorite ? 'Favoriden Ã§Ä±kar' : 'Favorile',
+              tooltip: item.isFavorite
+                  ? l10n.t(AppText.favoriteRemove)
+                  : l10n.t(AppText.favoriteAdd),
               onPressed: () async {
                 try {
                   await ref.read(jobsProvider.notifier).toggleFavorite(j.id);
                 } catch (e) {
                   if (!context.mounted) return;
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Favori gÃ¼ncellenemedi: $e')),
+                    SnackBar(content: Text(l10n.favoriteUpdateFailed('$e'))),
                   );
                 }
               },
@@ -397,6 +408,7 @@ class _StatusPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final s = status.toLowerCase().trim();
     Color bg;
     Color fg;
@@ -406,17 +418,17 @@ class _StatusPill extends StatelessWidget {
       case 'accepted':
         bg = const Color(0xFFDCFCE7);
         fg = const Color(0xFF16A34A);
-        label = 'Kabul';
+        label = l10n.t(AppText.statusAccepted);
         break;
       case 'rejected':
         bg = const Color(0xFFFEE2E2);
         fg = const Color(0xFFDC2626);
-        label = 'Red';
+        label = l10n.t(AppText.statusRejected);
         break;
       default:
         bg = const Color(0xFFFEF3C7);
         fg = const Color(0xFFB45309);
-        label = 'BaÅŸvuruldu';
+        label = l10n.t(AppText.statusApplied);
         break;
     }
 

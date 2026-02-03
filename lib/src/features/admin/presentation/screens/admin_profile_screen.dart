@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/localization/app_localizations.dart';
 import '../widgets/admin_layout.dart';
 
 class AdminProfileScreen extends StatelessWidget {
@@ -7,15 +8,16 @@ class AdminProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return AdminPageScaffold(
-      header: const AdminPageHeader(
+      header: AdminPageHeader(
         icon: Icons.person_outline,
-        title: 'Admin Profili',
+        title: l10n.t(AppText.adminNavProfile),
       ),
-      child: const AdminPlaceholderCard(
+      child: AdminPlaceholderCard(
         icon: Icons.person_outline,
-        title: 'Profil Ayarları',
-        subtitle: 'Bu sayfa yakında aktif olacak',
+        title: l10n.t(AppText.adminNavProfile),
+        subtitle: l10n.t(AppText.commonComingSoonSubtitle),
       ),
     );
   }

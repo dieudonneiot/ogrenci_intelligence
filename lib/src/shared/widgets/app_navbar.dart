@@ -7,6 +7,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../core/localization/app_localizations.dart';
+import '../../core/localization/locale_controller.dart';
 import '../../core/routing/routes.dart';
 import '../../core/supabase/supabase_service.dart';
 import '../../features/auth/domain/auth_models.dart';
@@ -26,7 +28,7 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
   Future<int>? _pointsFuture;
   String? _pointsUserId;
 
-  // ✅ Type-safe metadata read
+  // Type-safe metadata read
   String? _metaString(Map<String, dynamic>? meta, String key) {
     final v = meta?[key];
     if (v is String) {
@@ -36,8 +38,8 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
     return null;
   }
 
-  String _displayNameFromUser(User? user) {
-    if (user == null) return 'Kullanıcı';
+  String _displayNameFromUser(User? user, String fallbackName) {
+    if (user == null) return fallbackName;
 
     final fullName = _metaString(user.userMetadata, 'full_name');
     if (fullName != null) return fullName;
@@ -45,7 +47,7 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
     final email = user.email;
     if (email != null && email.contains('@')) return email.split('@').first;
 
-    return 'Kullanıcı';
+    return fallbackName;
   }
 
   Future<void> _logout(BuildContext context) async {
@@ -55,8 +57,9 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
     if (!context.mounted) return;
 
     if (err != null && err.isNotEmpty) {
+      final l10n = AppLocalizations.of(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Çıkış yapılamadı: $err')),
+        SnackBar(content: Text(l10n.signOutFailed(err))),
       );
       return;
     }
@@ -65,63 +68,79 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final locale = ref.watch(appLocaleProvider);
     final authAsync = ref.watch(authViewStateProvider);
     final isLoading = authAsync.isLoading;
     final auth = authAsync.value;
 
     final isLoggedIn = (!isLoading) && (auth?.isAuthenticated ?? false);
 
-    // ✅ IMPORTANT: default should be guest (not student)
+    // IMPORTANT: default should be guest (not student)
     final userType = auth?.userType ?? UserType.guest;
 
-    // ✅ Real Supabase User (from AuthViewState)
+    // Real Supabase User (from AuthViewState)
     final user = auth?.user;
 
-    // ✅ Safe display name
-    final userName = _displayNameFromUser(user);
+    // Safe display name
+    final userName = _displayNameFromUser(user, l10n.t(AppText.user));
 
     final isCompany = isLoggedIn && userType == UserType.company;
     final isStudent = isLoggedIn && userType == UserType.student;
 
     // React-like menu sets
-    final studentMenu = const <_NavItem>[
-      _NavItem('Anasayfa', Routes.home),
-      _NavItem('Kurslar', Routes.courses),
-      _NavItem('İş İlanları', Routes.jobs),
-      _NavItem('Stajlar', Routes.internships),
-      _NavItem('Chat', Routes.chat),
+    final studentMenu = <_NavItem>[
+      _NavItem(l10n.t(AppText.navHome), Routes.home),
+      _NavItem(l10n.t(AppText.navCourses), Routes.courses),
+      _NavItem(l10n.t(AppText.navJobs), Routes.jobs),
+      _NavItem(l10n.t(AppText.navInternships), Routes.internships),
+      _NavItem(l10n.t(AppText.navChat), Routes.chat),
     ];
 
-    final companyMenu = const <_NavItem>[
-      _NavItem('İlanlarım', Routes.companyJobs),
-      _NavItem('Staj Yönetimi', Routes.companyInternships),
-      _NavItem('Başvurular', Routes.companyApplications),
-      _NavItem('Raporlar', Routes.companyReports),
+    final companyMenu = <_NavItem>[
+      _NavItem(l10n.t(AppText.navCompanyJobs), Routes.companyJobs),
+      _NavItem(l10n.t(AppText.navCompanyInternships), Routes.companyInternships),
+      _NavItem(l10n.t(AppText.navCompanyApplications), Routes.companyApplications),
+      _NavItem(l10n.t(AppText.navCompanyReports), Routes.companyReports),
     ];
 
     final menuItems = isCompany ? companyMenu : studentMenu;
 
-    final studentDropdown = const <_NavItem>[
-      _NavItem('Profilim', Routes.profile),
-      _NavItem('Dashboard', Routes.dashboard),
-      _NavItem('Kariyer Asistani', Routes.chat),
-      _NavItem('Başvurularım', Routes.applications),
-      _NavItem('Favorilerim', Routes.favorites),
-      _NavItem('Bildirimler', Routes.notifications),
-      _NavItem('Ayarlar', Routes.settings),
+    final studentDropdown = <_NavItem>[
+      _NavItem(l10n.t(AppText.navProfile), Routes.profile),
+      _NavItem(l10n.t(AppText.navDashboard), Routes.dashboard),
+      _NavItem(l10n.t(AppText.navCareerAssistant), Routes.chat),
+      _NavItem(l10n.t(AppText.navMyApplications), Routes.applications),
+      _NavItem(l10n.t(AppText.navFavorites), Routes.favorites),
+      _NavItem(l10n.t(AppText.navNotifications), Routes.notifications),
+      _NavItem(l10n.t(AppText.navSettings), Routes.settings),
     ];
 
-    final companyDropdown = const <_NavItem>[
-      _NavItem('Şirket Profili', Routes.companyProfile),
-      _NavItem('Dashboard', Routes.companyDashboard),
-      _NavItem('Paketler ve Fiyatlar', Routes.companyPricing),
+    final companyDropdown = <_NavItem>[
+      _NavItem(l10n.t(AppText.navCompanyProfile), Routes.companyProfile),
+      _NavItem(l10n.t(AppText.navDashboard), Routes.companyDashboard),
+      _NavItem(l10n.t(AppText.navPlansPricing), Routes.companyPricing),
     ];
 
     final dropdownItems = isCompany ? companyDropdown : studentDropdown;
 
-    // Desktop breakpoint similar to React md+
+    // Desktop breakpoint: keep plenty of room for nav links + actions (avoid overflow on tablets)
     final w = MediaQuery.of(context).size.width;
-    final isDesktop = w >= 768;
+    final isDesktop = w >= 1024;
+
+    // Note: actual in-bar width is constrained below; we further compact some controls based on that width.
+    final languageMenuDesktop = _LanguageMenu(
+      l10n: l10n,
+      currentLocale: locale,
+      onSelected: (next) => unawaited(ref.read(appLocaleProvider.notifier).setLocale(next)),
+      compact: false,
+    );
+    final languageMenuMobile = _LanguageMenu(
+      l10n: l10n,
+      currentLocale: locale,
+      onSelected: (next) => unawaited(ref.read(appLocaleProvider.notifier).setLocale(next)),
+      compact: true,
+    );
 
     // Student points chip: prepare/cached future
     if (isStudent) {
@@ -156,11 +175,148 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
               bottom: false,
               child: Center(
                 child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 1080),
+                  constraints: const BoxConstraints(maxWidth: 1280),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                    child: Row(
-                      children: [
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        final barW = constraints.maxWidth;
+
+                        // Width-driven compaction to avoid overflow when translations are longer.
+                        // We estimate "fixed" widths (logo + actions) based on current translations,
+                        // and only show the wide action set if it fits comfortably.
+                        final textDirection = Directionality.of(context);
+                        double measure(String s, TextStyle style) {
+                          final tp = TextPainter(
+                            text: TextSpan(text: s, style: style),
+                            maxLines: 1,
+                            textDirection: textDirection,
+                          )..layout();
+                          return tp.size.width;
+                        }
+
+                        double pillWidth(
+                          String label, {
+                          required TextStyle style,
+                          double? maxTextWidth,
+                        }) {
+                          final w = measure(label, style);
+                          final tw = maxTextWidth == null ? w : w.clamp(0, maxTextWidth).toDouble();
+                          // Matches _PrimaryPill padding (14 + 14) and keeps a tiny buffer.
+                          return tw + 28 + 2;
+                        }
+
+                        // Rough widths for the logo block:
+                        // icon/image (~40) + gap (10) + optional title.
+                        const brandStyle = TextStyle(fontSize: 20, fontWeight: FontWeight.w800);
+                        final brandLabel = isCompany ? l10n.t(AppText.companyPanel) : l10n.t(AppText.brandName);
+                        final brandTextW = measure(brandLabel, brandStyle);
+                        final logoBaseW = 40 + 10;
+
+                        // Language pill: icon(16) + gaps + label + chevron(16)
+                        const langStyle = TextStyle(fontWeight: FontWeight.w600);
+                        final currentLang = AppLocalizations.languageFor(locale);
+                        final langLabelWide = currentLang.nativeName;
+                        final langLabelCompact = currentLang.code.toUpperCase();
+                        final langWideW = 16 + 6 + measure(langLabelWide, langStyle) + 4 + 16 + 20;
+                        final langCompactW = 16 + 6 + measure(langLabelCompact, langStyle) + 4 + 16 + 20;
+
+                        // Wide guest actions (3 buttons) only if they fit.
+                        const pillStyle = TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 13,
+                        );
+                        final guestButtonsW = pillWidth(
+                              l10n.t(AppText.companyLogin),
+                              style: pillStyle,
+                              maxTextWidth: 160,
+                            ) +
+                            10 +
+                            pillWidth(
+                              l10n.t(AppText.studentLogin),
+                              style: pillStyle,
+                              maxTextWidth: 160,
+                            ) +
+                            10 +
+                            pillWidth(
+                              l10n.t(AppText.signUp),
+                              style: pillStyle,
+                              maxTextWidth: 160,
+                            );
+
+                        // Compact guest actions: one menu pill.
+                        final guestMenuW = pillWidth(
+                          l10n.t(AppText.login),
+                          style: pillStyle,
+                          maxTextWidth: 140,
+                        );
+
+                        // Logged-in actions: optional "New Listing" pill + profile pill.
+                        final newListingW = pillWidth(
+                          l10n.t(AppText.newListing),
+                          style: pillStyle,
+                          maxTextWidth: 160,
+                        );
+                        // Profile pill: icon(18) + gaps + name + optional badge + chevron.
+                        const profileStyle = TextStyle(fontWeight: FontWeight.w600, fontSize: 13);
+                        final profileNameW = measure(userName, profileStyle).clamp(0, 160).toDouble();
+                        final profileWideW = 18 + 8 + profileNameW + (isCompany ? (8 + 72) : 0) + 8 + 16 + 20;
+                        final profileCompactW = 18 + 8 + 16 + 20;
+
+                        // Leave some breathing room for the center nav links.
+                        // NOTE: These gaps must match the actual Row layout below, otherwise we can
+                        // incorrectly think we have room and still overflow in some locales.
+                        const gapLogoToNav = 12.0;
+                        const gapNavToActions = 12.0;
+                        const minNavW = 260.0;
+
+                        // When space is tight, prefer keeping the navbar stable (no overflow) over showing the brand text.
+                        final minRightCushion = isLoggedIn
+                            ? (langCompactW +
+                                10 +
+                                (isStudent ? (92 + 12) : 0) + // _PointsChip + gap
+                                (isCompany ? (48 + 12) : 0) + // compact new listing icon + gap
+                                profileCompactW)
+                            : (langCompactW + 10 + guestMenuW);
+                        final canShowBrandText =
+                            barW >= (logoBaseW + brandTextW + gapLogoToNav + minNavW + gapNavToActions + minRightCushion);
+                        final showBrandText = canShowBrandText;
+
+                        final leftW = logoBaseW + (showBrandText ? brandTextW : 0);
+
+                        double rightWForGuest({required bool wide}) {
+                          if (wide) return langWideW + 10 + guestButtonsW;
+                          return langCompactW + 10 + guestMenuW;
+                        }
+
+                        double rightWForLoggedIn({required bool wide}) {
+                          final langW = wide ? langWideW : langCompactW;
+                          final profileW = wide ? profileWideW : profileCompactW;
+                          final companyW = isCompany
+                              ? (wide ? (newListingW + 12) : (48 + 12)) // IconButton ~48
+                              : 0.0;
+                          final studentW = isStudent ? (92 + 12) : 0.0; // _PointsChip ~92
+                          return langW + 10 + studentW + companyW + profileW;
+                        }
+
+                        final showWideActions = isDesktop &&
+                            (isLoggedIn
+                                ? (leftW + gapLogoToNav + minNavW + gapNavToActions + rightWForLoggedIn(wide: true) <= barW)
+                                : (leftW + gapLogoToNav + minNavW + gapNavToActions + rightWForGuest(wide: true) <= barW));
+
+                        final langMenu = showWideActions
+                            ? languageMenuDesktop
+                            : _LanguageMenu(
+                                l10n: l10n,
+                                currentLocale: locale,
+                                onSelected: (next) =>
+                                    unawaited(ref.read(appLocaleProvider.notifier).setLocale(next)),
+                                compact: true,
+                              );
+
+                        return Row(
+                          children: [
                         // Logo + Title (React: logo changes for company)
                         InkWell(
                           onTap: () {
@@ -176,10 +332,10 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
                               if (isCompany) ...[
                                 const Icon(Icons.apartment, size: 34, color: Color(0xFF6D28D9)),
                                 const SizedBox(width: 10),
-                                if (isDesktop)
-                                  const Text(
-                                    'İşletme Paneli',
-                                    style: TextStyle(
+                                if (showBrandText)
+                                  Text(
+                                    l10n.t(AppText.companyPanel),
+                                    style: const TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.w800,
                                       color: Color(0xFF6D28D9),
@@ -197,10 +353,10 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
                                   ),
                                 ),
                                 const SizedBox(width: 10),
-                                if (isDesktop)
-                                  const Text(
-                                    'Öğrenci İntelligence',
-                                    style: TextStyle(
+                                if (showBrandText)
+                                  Text(
+                                    l10n.t(AppText.brandName),
+                                    style: const TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.w800,
                                       color: Color(0xFF6D28D9),
@@ -211,40 +367,41 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
                           ),
                         ),
 
-                        const Spacer(),
+                        const SizedBox(width: 12),
 
                         // Desktop menu
                         if (isDesktop) ...[
-                          Row(
-                            children: [
-                              for (final item in menuItems)
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                                  child: _NavTextLink(
-                                    label: item.label,
-                                    onTap: () {
-                                      _closeMobile();
-                                      context.go(item.path);
-                                    },
-                                  ),
+                          Expanded(
+                            child: Align(
+                              alignment: Alignment.center,
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                physics: const ClampingScrollPhysics(),
+                                child: Row(
+                                  children: [
+                                    for (final item in menuItems)
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                                        child: _NavTextLink(
+                                          label: item.label,
+                                          onTap: () {
+                                            _closeMobile();
+                                            context.go(item.path);
+                                          },
+                                        ),
+                                      ),
+                                  ],
                                 ),
-                            ],
+                              ),
+                            ),
                           ),
 
-                          const Spacer(),
+                          const SizedBox(width: 12),
+
+                          langMenu,
+                          const SizedBox(width: 10),
 
                           // Right actions (React-like)
-                          if (!isLoggedIn) ...[
-                            _PrimaryPill(
-                              label: 'İşletme Girişi',
-                              onTap: () {
-                                _closeMobile();
-                                context.go(Routes.companyAuth);
-                              },
-                            ),
-                            const SizedBox(width: 10),
-                          ],
-
                           if (isLoading)
                             const SizedBox(width: 90, height: 36, child: _SkeletonPill())
                           else if (isLoggedIn) ...[
@@ -257,17 +414,28 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
                                 },
                               ),
                               const SizedBox(width: 12),
-                            ],
+                            ], 
 
                             if (isCompany) ...[
-                              _PrimaryPill(
-                                label: 'Yeni İlan',
-                                rounded: 14,
-                                onTap: () {
-                                  _closeMobile();
-                                  context.go(Routes.companyJobsCreate);
-                                },
-                              ),
+                              if (showWideActions)
+                                _PrimaryPill(
+                                  label: l10n.t(AppText.newListing),
+                                  maxWidth: 160,
+                                  rounded: 14,
+                                  onTap: () {
+                                    _closeMobile();
+                                    context.go(Routes.companyJobsCreate);
+                                  },
+                                )
+                              else
+                                IconButton(
+                                  tooltip: l10n.t(AppText.newListing),
+                                  onPressed: () {
+                                    _closeMobile();
+                                    context.go(Routes.companyJobsCreate);
+                                  },
+                                  icon: const Icon(Icons.add_circle_outline, color: Color(0xFF6D28D9)),
+                                ),
                               const SizedBox(width: 12),
                             ],
 
@@ -279,36 +447,67 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
                                 _closeMobile();
                                 context.go(path);
                               },
-                              // ✅ Use controller signOut (type-safe flow)
+                              // Use controller signOut (type-safe flow)
                               onLogout: () => _logout(context),
+                              compact: !showWideActions,
                             ),
                           ] else ...[
-                            _PrimaryPill(
-                              label: 'Öğrenci Girişi',
-                              onTap: () {
-                                _closeMobile();
-                                context.go(Routes.login);
-                              },
-                            ),
-                            const SizedBox(width: 10),
-                            _PrimaryPill(
-                              label: 'Kayıt Ol',
-                              onTap: () {
-                                _closeMobile();
-                                context.go(Routes.register);
-                              },
-                            ),
+                            if (showWideActions) ...[
+                              _PrimaryPill(
+                                label: l10n.t(AppText.companyLogin),
+                                maxWidth: 160,
+                                onTap: () {
+                                  _closeMobile();
+                                  context.go(Routes.companyAuth);
+                                },
+                              ),
+                              const SizedBox(width: 10),
+                              _PrimaryPill(
+                                label: l10n.t(AppText.studentLogin),
+                                maxWidth: 160,
+                                onTap: () {
+                                  _closeMobile();
+                                  context.go(Routes.login);
+                                },
+                              ),
+                              const SizedBox(width: 10),
+                              _PrimaryPill(
+                                label: l10n.t(AppText.signUp),
+                                maxWidth: 160,
+                                onTap: () {
+                                  _closeMobile();
+                                  context.go(Routes.register);
+                                },
+                              ),
+                            ] else
+                              _LoginMenuPill(
+                                l10n: l10n,
+                                onStudent: () {
+                                  _closeMobile();
+                                  context.go(Routes.login);
+                                },
+                                onCompany: () {
+                                  _closeMobile();
+                                  context.go(Routes.companyAuth);
+                                },
+                                onSignUp: () {
+                                  _closeMobile();
+                                  context.go(Routes.register);
+                                },
+                              ),
                           ],
                         ],
 
                         // Mobile hamburger
                         if (!isDesktop)
                           IconButton(
-                            tooltip: _mobileOpen ? 'Kapat' : 'Menü',
+                            tooltip: _mobileOpen ? l10n.t(AppText.close) : l10n.t(AppText.menu),
                             onPressed: () => setState(() => _mobileOpen = !_mobileOpen),
                             icon: Icon(_mobileOpen ? Icons.close : Icons.menu),
                           ),
                       ],
+                        );
+                      },
                     ),
                   ),
                 ),
@@ -342,10 +541,12 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
                                   ),
 
                                 const SizedBox(height: 8),
+                                Center(child: languageMenuMobile),
+                                const SizedBox(height: 8),
 
                                 if (!isLoggedIn)
                                   _MobilePrimary(
-                                    label: 'İşletme Girişi',
+                                    label: l10n.t(AppText.companyLogin),
                                     onTap: () {
                                       _closeMobile();
                                       context.go(Routes.companyAuth);
@@ -360,7 +561,7 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
 
                                   if (isStudent)
                                     _MobileTile(
-                                      label: 'Puan Sistemi',
+                                      label: l10n.t(AppText.pointsSystem),
                                       leading: const Icon(Icons.emoji_events, size: 18),
                                       onTap: () {
                                         _closeMobile();
@@ -371,7 +572,7 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
                                   if (isCompany) ...[
                                     const SizedBox(height: 6),
                                     _MobilePrimary(
-                                      label: 'Yeni İlan',
+                                      label: l10n.t(AppText.newListing),
                                       onTap: () {
                                         _closeMobile();
                                         context.go(Routes.companyJobsCreate);
@@ -383,7 +584,7 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
 
                                   _MobileHeader(
                                     title: userName,
-                                    badge: isCompany ? 'İşletme' : null,
+                                    badge: isCompany ? l10n.t(AppText.companyBadge) : null,
                                   ),
 
                                   for (final it in dropdownItems)
@@ -397,13 +598,13 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
 
                                   const SizedBox(height: 8),
                                   _MobileDanger(
-                                    label: 'Çıkış Yap',
+                                    label: l10n.t(AppText.signOut),
                                     onTap: () => _logout(context),
                                   ),
                                 ] else ...[
                                   const SizedBox(height: 10),
                                   _MobilePrimary(
-                                    label: 'Öğrenci Girişi',
+                                    label: l10n.t(AppText.studentLogin),
                                     onTap: () {
                                       _closeMobile();
                                       context.go(Routes.login);
@@ -411,7 +612,7 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
                                   ),
                                   const SizedBox(height: 8),
                                   _MobilePrimary(
-                                    label: 'Kayıt Ol',
+                                    label: l10n.t(AppText.signUp),
                                     onTap: () {
                                       _closeMobile();
                                       context.go(Routes.register);
@@ -489,11 +690,13 @@ class _PrimaryPill extends StatefulWidget {
     required this.label,
     required this.onTap,
     this.rounded = 10,
+    this.maxWidth,
   });
 
   final String label;
   final VoidCallback onTap;
   final double rounded;
+  final double? maxWidth;
 
   @override
   State<_PrimaryPill> createState() => _PrimaryPillState();
@@ -507,6 +710,16 @@ class _PrimaryPillState extends State<_PrimaryPill> {
   @override
   Widget build(BuildContext context) {
     final enableHover = kIsWeb;
+    final text = Text(
+      widget.label,
+      overflow: TextOverflow.ellipsis,
+      softWrap: false,
+      style: const TextStyle(
+        color: Colors.white,
+        fontWeight: FontWeight.w700,
+        fontSize: 13,
+      ),
+    );
     return MouseRegion(
       onEnter: enableHover ? (_) => setState(() => _hover = true) : null,
       onExit: enableHover ? (_) => setState(() => _hover = false) : null,
@@ -529,14 +742,12 @@ class _PrimaryPillState extends State<_PrimaryPill> {
                 )
               ],
             ),
-            child: Text(
-              widget.label,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w700,
-                fontSize: 13,
-              ),
-            ),
+            child: widget.maxWidth == null
+                ? text
+                : ConstrainedBox(
+                    constraints: BoxConstraints(maxWidth: widget.maxWidth!),
+                    child: text,
+                  ),
           ),
         ),
       ),
@@ -592,6 +803,7 @@ class _ProfileDropdown extends StatelessWidget {
     required this.items,
     required this.onItemTap,
     required this.onLogout,
+    this.compact = false,
   });
 
   final String userName;
@@ -599,11 +811,13 @@ class _ProfileDropdown extends StatelessWidget {
   final List<_NavItem> items;
   final void Function(String path) onItemTap;
   final Future<void> Function() onLogout;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return PopupMenuButton<_MenuAction>(
-      tooltip: 'Profil Menüsü',
+      tooltip: l10n.t(AppText.profileMenu),
       offset: const Offset(0, 12),
       onSelected: (selected) async {
         if (selected.isLogout) {
@@ -619,39 +833,43 @@ class _ProfileDropdown extends StatelessWidget {
             child: Text(it.label),
           ),
         const PopupMenuDivider(),
-        const PopupMenuItem<_MenuAction>(
+        PopupMenuItem<_MenuAction>(
           value: _MenuAction.logout(),
           child: Text(
-            'Çıkış Yap',
+            l10n.t(AppText.signOut),
             style: TextStyle(color: Colors.red),
           ),
         ),
       ],
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Icon(isCompany ? Icons.apartment : Icons.person, size: 18, color: const Color(0xFF374151)),
-          const SizedBox(width: 8),
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 160),
-            child: Text(
-              userName,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Color(0xFF374151)),
-            ),
-          ),
-          if (isCompany) ...[
+          if (!compact) ...[
             const SizedBox(width: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF3E8FF),
-                borderRadius: BorderRadius.circular(999),
-              ),
-              child: const Text(
-                'İşletme',
-                style: TextStyle(color: Color(0xFF6D28D9), fontSize: 11, fontWeight: FontWeight.w700),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 160),
+              child: Text(
+                userName,
+                overflow: TextOverflow.ellipsis,
+                softWrap: false,
+                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Color(0xFF374151)),
               ),
             ),
+            if (isCompany) ...[
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF3E8FF),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Text(
+                  l10n.t(AppText.companyBadge),
+                  style: const TextStyle(color: Color(0xFF6D28D9), fontSize: 11, fontWeight: FontWeight.w700),
+                ),
+              ),
+            ],
           ],
           const SizedBox(width: 6),
           const Icon(Icons.expand_more, size: 18, color: Color(0xFF6B7280)),
@@ -660,6 +878,146 @@ class _ProfileDropdown extends StatelessWidget {
     );
   }
 }
+
+class _LanguageMenu extends StatelessWidget {
+  const _LanguageMenu({
+    required this.l10n,
+    required this.currentLocale,
+    required this.onSelected,
+    required this.compact,
+  });
+
+  final AppLocalizations l10n;
+  final Locale currentLocale;
+  final ValueChanged<Locale> onSelected;
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    final current = AppLocalizations.languageFor(currentLocale);
+    return PopupMenuButton<Locale>(
+      tooltip: l10n.t(AppText.language),
+      onSelected: onSelected,
+      itemBuilder: (context) => [
+        for (final language in AppLocalizations.languages)
+          PopupMenuItem<Locale>(
+            value: language.locale,
+            child: Row(
+              children: [
+                if (language.code == current.code)
+                  const Icon(Icons.check, size: 16)
+                else
+                  const SizedBox(width: 16, height: 16),
+                const SizedBox(width: 8),
+                Text(language.nativeName),
+              ],
+            ),
+          ),
+      ],
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        decoration: BoxDecoration(
+          border: Border.all(color: const Color(0xFFE5E7EB)),
+          borderRadius: BorderRadius.circular(999),
+          color: Colors.white,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.language, size: 16, color: Color(0xFF374151)),
+            const SizedBox(width: 6),
+            Text(
+              compact ? current.code.toUpperCase() : current.nativeName,
+              style: const TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF374151)),
+            ),
+            const SizedBox(width: 4),
+            const Icon(Icons.expand_more, size: 16, color: Color(0xFF6B7280)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _LoginMenuPill extends StatelessWidget {
+  const _LoginMenuPill({
+    required this.l10n,
+    required this.onStudent,
+    required this.onCompany,
+    required this.onSignUp,
+  });
+
+  final AppLocalizations l10n;
+  final VoidCallback onStudent;
+  final VoidCallback onCompany;
+  final VoidCallback onSignUp;
+
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton<_LoginMenuAction>(
+      tooltip: l10n.t(AppText.login),
+      offset: const Offset(0, 12),
+      onSelected: (action) {
+        switch (action) {
+          case _LoginMenuAction.student:
+            onStudent();
+            break;
+          case _LoginMenuAction.company:
+            onCompany();
+            break;
+          case _LoginMenuAction.signUp:
+            onSignUp();
+            break;
+        }
+      },
+      itemBuilder: (context) => [
+        PopupMenuItem<_LoginMenuAction>(
+          value: _LoginMenuAction.student,
+          child: Text(l10n.t(AppText.studentLogin)),
+        ),
+        PopupMenuItem<_LoginMenuAction>(
+          value: _LoginMenuAction.company,
+          child: Text(l10n.t(AppText.companyLogin)),
+        ),
+        const PopupMenuDivider(),
+        PopupMenuItem<_LoginMenuAction>(
+          value: _LoginMenuAction.signUp,
+          child: Text(l10n.t(AppText.signUp)),
+        ),
+      ],
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: const Color(0xFF7C3AED),
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: const [
+            BoxShadow(
+              blurRadius: 10,
+              offset: Offset(0, 6),
+              color: Color(0x14000000),
+            )
+          ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.login, size: 16, color: Colors.white),
+            const SizedBox(width: 8),
+            Text(
+              l10n.t(AppText.login),
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 13),
+            ),
+            const SizedBox(width: 6),
+            const Icon(Icons.expand_more, size: 16, color: Color(0xDDFFFFFF)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+enum _LoginMenuAction { student, company, signUp }
 
 class _MenuAction {
   const _MenuAction._({this.path, required this.isLogout});

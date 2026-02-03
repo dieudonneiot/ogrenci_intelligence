@@ -1,40 +1,46 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/localization/app_localizations.dart';
+
 class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
 
-  static const _values = <_ValueCard>[
-    _ValueCard(
-      icon: Icons.flag_outlined,
-      title: 'Misyonumuz',
-      description:
-          'Öğrencilerin kariyerlerini şekillendirmelerine yardımcı olmak, onları sektörle buluşturmak ve potansiyellerini keşfetmelerini sağlamak.',
-    ),
-    _ValueCard(
-      icon: Icons.favorite_border,
-      title: 'Değerlerimiz',
-      description:
-          'Eşitlik, fırsat yaratma, sürekli öğrenme ve gelişim. Her öğrencinin başarılı olabileceğine inanıyoruz.',
-    ),
-    _ValueCard(
-      icon: Icons.bolt_outlined,
-      title: 'Vizyonumuz',
-      description:
-          "Türkiye'nin en kapsamlı öğrenci kariyer platformu olmak ve her yıl binlerce öğrencinin hayallerine ulaşmasına katkı sağlamak.",
-    ),
-  ];
-
-  static const _stats = <_StatCard>[
-    _StatCard(number: '10.000+', label: 'Aktif Öğrenci'),
-    _StatCard(number: '500+', label: 'Partner Şirket'),
-    _StatCard(number: '1.000+', label: 'Staj İmkanı'),
-    _StatCard(number: '50+', label: 'Online Kurs'),
-  ];
-
-  static const _teamRoles = <String>['Ürün', 'Pazarlama', 'Topluluk', 'Teknoloji'];
-
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
+    final values = <_ValueCard>[
+      _ValueCard(
+        icon: Icons.flag_outlined,
+        title: l10n.t(AppText.aboutValueMissionTitle),
+        description: l10n.t(AppText.aboutValueMissionDesc),
+      ),
+      _ValueCard(
+        icon: Icons.favorite_border,
+        title: l10n.t(AppText.aboutValueValuesTitle),
+        description: l10n.t(AppText.aboutValueValuesDesc),
+      ),
+      _ValueCard(
+        icon: Icons.bolt_outlined,
+        title: l10n.t(AppText.aboutValueVisionTitle),
+        description: l10n.t(AppText.aboutValueVisionDesc),
+      ),
+    ];
+
+    final stats = <_StatCard>[
+      _StatCard(number: '10.000+', label: l10n.t(AppText.aboutStatActiveStudents)),
+      _StatCard(number: '500+', label: l10n.t(AppText.aboutStatPartnerCompanies)),
+      _StatCard(number: '1.000+', label: l10n.t(AppText.aboutStatInternshipOpportunities)),
+      _StatCard(number: '50+', label: l10n.t(AppText.aboutStatOnlineCourses)),
+    ];
+
+    final teamRoles = <String>[
+      l10n.t(AppText.aboutRoleProduct),
+      l10n.t(AppText.aboutRoleMarketing),
+      l10n.t(AppText.aboutRoleCommunity),
+      l10n.t(AppText.aboutRoleTechnology),
+    ];
+
     return Container(
       color: const Color(0xFFF9FAFB),
       child: SingleChildScrollView(
@@ -47,11 +53,11 @@ class AboutScreen extends StatelessWidget {
               children: [
                 const _Hero(),
                 const SizedBox(height: 24),
-                _StoryCard(stats: _stats),
+                _StoryCard(stats: stats),
                 const SizedBox(height: 24),
-                const _SectionHeader(
-                  title: 'Değerlerimiz',
-                  subtitle: 'Bizi ileri taşıyan temel prensipler.',
+                _SectionHeader(
+                  title: l10n.t(AppText.aboutValuesSectionTitle),
+                  subtitle: l10n.t(AppText.aboutValuesSectionSubtitle),
                 ),
                 const SizedBox(height: 16),
                 LayoutBuilder(
@@ -62,14 +68,14 @@ class AboutScreen extends StatelessWidget {
                       spacing: 16,
                       runSpacing: 16,
                       children: [
-                        for (final value in _values)
+                        for (final value in values)
                           SizedBox(width: width, child: _ValueCardView(card: value)),
                       ],
                     );
                   },
                 ),
                 const SizedBox(height: 24),
-                _TeamSection(roles: _teamRoles),
+                _TeamSection(roles: teamRoles),
                 const SizedBox(height: 24),
                 const _WhyUsSection(),
               ],
@@ -86,6 +92,7 @@ class _Hero extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -113,13 +120,15 @@ class _Hero extends StatelessWidget {
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              Text('Hakkımızda',
-                  style: TextStyle(fontSize: 32, fontWeight: FontWeight.w900, color: Colors.white)),
-              SizedBox(height: 10),
+            children: [
               Text(
-                'Öğrenci Intelligence, öğrenciler ve işverenler arasında köprü kurarak kariyer yolculuğunu hızlandıran bir ekosistem sunar.',
-                style: TextStyle(color: Color(0xFFE0E7FF), height: 1.4),
+                l10n.t(AppText.aboutHeroTitle),
+                style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w900, color: Colors.white),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                l10n.t(AppText.aboutHeroSubtitle),
+                style: const TextStyle(color: Color(0xFFE0E7FF), height: 1.4),
               ),
             ],
           ),
@@ -188,24 +197,25 @@ class _StoryText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    final l10n = AppLocalizations.of(context);
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Hikayemiz', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900)),
-        SizedBox(height: 12),
+        Text(l10n.t(AppText.aboutStoryTitle), style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900)),
+        const SizedBox(height: 12),
         Text(
-          '2023 yılında, üniversite öğrencilerinin yaşadığı staj bulma zorluğunu ve mezuniyet sonrası iş arama sürecindeki belirsizlikleri gözlemleyerek yola çıktık.',
-          style: TextStyle(color: Color(0xFF6B7280), height: 1.5),
+          l10n.t(AppText.aboutStoryP1),
+          style: const TextStyle(color: Color(0xFF6B7280), height: 1.5),
         ),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
         Text(
-          'Amacımız yalnızca iş ve staj bulmayı kolaylaştırmak değil; kurslar, mentorluk ve puan sistemiyle öğrencilerin sürekli gelişimini desteklemek.',
-          style: TextStyle(color: Color(0xFF6B7280), height: 1.5),
+          l10n.t(AppText.aboutStoryP2),
+          style: const TextStyle(color: Color(0xFF6B7280), height: 1.5),
         ),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
         Text(
-          'Bugün binlerce öğrenci platformumuz üzerinden kariyerlerine yön veriyor. Her başarı hikayesi bizim için yeni bir motivasyon.',
-          style: TextStyle(color: Color(0xFF6B7280), height: 1.5),
+          l10n.t(AppText.aboutStoryP3),
+          style: const TextStyle(color: Color(0xFF6B7280), height: 1.5),
         ),
       ],
     );
@@ -330,6 +340,7 @@ class _TeamSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
@@ -338,12 +349,12 @@ class _TeamSection extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const Text('Ekibimiz', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900)),
+          Text(l10n.t(AppText.aboutTeamTitle), style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900)),
           const SizedBox(height: 10),
-          const Text(
-            'Öğrencilerin kariyerlerine değer katmak için tutkuyla çalışan, deneyimli ve dinamik bir ekibiz.',
+          Text(
+            l10n.t(AppText.aboutTeamSubtitle),
             textAlign: TextAlign.center,
-            style: TextStyle(color: Color(0xFF6B7280)),
+            style: const TextStyle(color: Color(0xFF6B7280)),
           ),
           const SizedBox(height: 16),
           LayoutBuilder(
@@ -360,7 +371,7 @@ class _TeamSection extends StatelessWidget {
                       children: [
                         const CircleAvatar(radius: 38, backgroundColor: Color(0xFFC4B5FD)),
                         const SizedBox(height: 8),
-                        const Text('Takım Üyesi', style: TextStyle(fontWeight: FontWeight.w700)),
+                        Text(l10n.t(AppText.aboutTeamMember), style: const TextStyle(fontWeight: FontWeight.w700)),
                         Text(roles[index], style: const TextStyle(color: Color(0xFF6B7280), fontSize: 12)),
                       ],
                     ),
@@ -380,6 +391,7 @@ class _WhyUsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
@@ -389,7 +401,7 @@ class _WhyUsSection extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const Text('Neden Biz?', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900)),
+          Text(l10n.t(AppText.aboutWhyTitle), style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900)),
           const SizedBox(height: 16),
           LayoutBuilder(
             builder: (context, c) {
@@ -401,34 +413,34 @@ class _WhyUsSection extends StatelessWidget {
                 children: [
                   SizedBox(
                     width: width,
-                    child: const _WhyItem(
+                    child: _WhyItem(
                       icon: Icons.people_outline,
-                      title: 'Geniş Ağ',
-                      description: "500'den fazla partner şirket ve binlerce aktif öğrenci ile güçlü bir kariyer ağı.",
+                      title: l10n.t(AppText.aboutWhyNetworkTitle),
+                      description: l10n.t(AppText.aboutWhyNetworkDesc),
                     ),
                   ),
                   SizedBox(
                     width: width,
-                    child: const _WhyItem(
+                    child: _WhyItem(
                       icon: Icons.card_giftcard,
-                      title: 'Ödül Sistemi',
-                      description: 'Aktiviteleriniz karşılığında puan kazanın, bu puanları gerçek ödüllerle değiştirin.',
+                      title: l10n.t(AppText.aboutWhyRewardsTitle),
+                      description: l10n.t(AppText.aboutWhyRewardsDesc),
                     ),
                   ),
                   SizedBox(
                     width: width,
-                    child: const _WhyItem(
+                    child: _WhyItem(
                       icon: Icons.trending_up,
-                      title: 'Kariyer Gelişimi',
-                      description: 'Online kurslar, mentorluk programları ve kariyer etkinlikleri ile gelişiminizi destekliyoruz.',
+                      title: l10n.t(AppText.aboutWhyCareerTitle),
+                      description: l10n.t(AppText.aboutWhyCareerDesc),
                     ),
                   ),
                   SizedBox(
                     width: width,
-                    child: const _WhyItem(
+                    child: _WhyItem(
                       icon: Icons.favorite_outline,
-                      title: 'Öğrenci Dostu',
-                      description: 'Tamamen ücretsiz platform, öğrenci ihtiyaçlarına göre tasarlanmış arayüz ve özellikler.',
+                      title: l10n.t(AppText.aboutWhyStudentFriendlyTitle),
+                      description: l10n.t(AppText.aboutWhyStudentFriendlyDesc),
                     ),
                   ),
                 ],

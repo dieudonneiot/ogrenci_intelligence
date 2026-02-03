@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../auth/domain/auth_models.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
@@ -23,6 +24,8 @@ class _CompanyStatusCheckState extends ConsumerState<CompanyStatusCheck> {
   CompanyStatus? _status;
   String? _error;
 
+  static const _errCompanyAccountMissing = '__company_account_missing__';
+
   @override
   void initState() {
     super.initState();
@@ -35,7 +38,7 @@ class _CompanyStatusCheckState extends ConsumerState<CompanyStatusCheck> {
     if (auth == null || auth.userType != UserType.company || companyId == null) {
       setState(() {
         _loading = false;
-        _error = 'Şirket hesabı bulunamadı.';
+        _error = _errCompanyAccountMissing;
       });
       return;
     }
@@ -60,6 +63,7 @@ class _CompanyStatusCheckState extends ConsumerState<CompanyStatusCheck> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     if (_loading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -69,12 +73,14 @@ class _CompanyStatusCheckState extends ConsumerState<CompanyStatusCheck> {
         icon: Icons.error_outline,
         iconBg: const Color(0xFFFEE2E2),
         iconFg: const Color(0xFFDC2626),
-        title: 'Bir sorun oluştu',
-        subtitle: _error!,
+        title: l10n.t(AppText.commonSomethingWentWrong),
+        subtitle: _error == _errCompanyAccountMissing
+            ? l10n.t(AppText.companyStatusCompanyAccountMissing)
+            : _error!,
         actions: [
           ElevatedButton(
             onPressed: _load,
-            child: const Text('Tekrar Dene'),
+            child: Text(l10n.t(AppText.retry)),
           ),
         ],
       );
@@ -86,12 +92,12 @@ class _CompanyStatusCheckState extends ConsumerState<CompanyStatusCheck> {
         icon: Icons.apartment_outlined,
         iconBg: const Color(0xFFE5E7EB),
         iconFg: const Color(0xFF6B7280),
-        title: 'Şirket kaydı bulunamadı',
-        subtitle: 'Şirket hesabınızı tamamlamak için kaydınızı oluşturun.',
+        title: l10n.t(AppText.companyStatusNoRegistrationTitle),
+        subtitle: l10n.t(AppText.companyStatusNoRegistrationSubtitle),
         actions: [
           ElevatedButton(
             onPressed: () => context.go(Routes.companyRegister),
-            child: const Text('Şirket Kaydı'),
+            child: Text(l10n.t(AppText.companyStatusRegisterCta)),
           ),
         ],
       );
@@ -102,14 +108,13 @@ class _CompanyStatusCheckState extends ConsumerState<CompanyStatusCheck> {
         icon: Icons.block,
         iconBg: const Color(0xFF111827),
         iconFg: Colors.white,
-        title: 'Hesap askıya alındı',
-        subtitle:
-            'Şirket hesabınız platform kurallarının ihlali nedeniyle askıya alınmıştır. Destek ekibiyle iletişime geçin.',
+        title: l10n.t(AppText.companyStatusBannedTitle),
+        subtitle: l10n.t(AppText.companyStatusBannedSubtitle),
         actions: [
           ElevatedButton.icon(
             onPressed: _launchMail,
             icon: const Icon(Icons.mail_outline),
-            label: const Text('Destek Ekibi'),
+            label: Text(l10n.t(AppText.companyStatusSupportTeam)),
             style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF111827)),
           ),
         ],
@@ -121,22 +126,21 @@ class _CompanyStatusCheckState extends ConsumerState<CompanyStatusCheck> {
         icon: Icons.schedule,
         iconBg: const Color(0xFFFEF3C7),
         iconFg: const Color(0xFFB45309),
-        title: 'Onay bekleniyor',
-        subtitle:
-            'Şirket hesabınız onay sürecinde. En kısa sürede size dönüş yapacağız.',
+        title: l10n.t(AppText.companyStatusPendingTitle),
+        subtitle: l10n.t(AppText.companyStatusPendingSubtitle),
         actions: [
           _InfoBox(
-            title: 'Ne yapabilirsiniz?',
-            items: const [
-              'Şirket profilinizi tamamlayın',
-              'Logo ve kapak görseli ekleyin',
-              'İletişim bilgilerinizi güncelleyin',
+            title: l10n.t(AppText.companyStatusPendingWhatYouCanDoTitle),
+            items: [
+              l10n.t(AppText.companyStatusPendingTip1),
+              l10n.t(AppText.companyStatusPendingTip2),
+              l10n.t(AppText.companyStatusPendingTip3),
             ],
           ),
           const SizedBox(height: 12),
           ElevatedButton(
             onPressed: () => context.go(Routes.companyProfile),
-            child: const Text('Profili Düzenle'),
+            child: Text(l10n.t(AppText.companyStatusEditProfile)),
           ),
         ],
       );
@@ -147,12 +151,12 @@ class _CompanyStatusCheckState extends ConsumerState<CompanyStatusCheck> {
         icon: Icons.cancel_outlined,
         iconBg: const Color(0xFFFEE2E2),
         iconFg: const Color(0xFFDC2626),
-        title: 'Başvuru reddedildi',
-        subtitle: 'Üzgünüz, şirket başvurunuz kabul edilmedi.',
+        title: l10n.t(AppText.companyStatusRejectedTitle),
+        subtitle: l10n.t(AppText.companyStatusRejectedSubtitle),
         actions: [
           if ((status.rejectionReason ?? '').isNotEmpty)
             _InfoBox(
-              title: 'Red Nedeni',
+              title: l10n.t(AppText.companyStatusRejectedReasonTitle),
               items: [status.rejectionReason!],
               accent: const Color(0xFFFEE2E2),
               accentText: const Color(0xFF991B1B),
@@ -161,7 +165,7 @@ class _CompanyStatusCheckState extends ConsumerState<CompanyStatusCheck> {
           ElevatedButton.icon(
             onPressed: _launchMail,
             icon: const Icon(Icons.mail_outline),
-            label: const Text('Destek ile İletişim'),
+            label: Text(l10n.t(AppText.companyStatusContactSupport)),
             style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF111827)),
           ),
         ],
@@ -173,12 +177,12 @@ class _CompanyStatusCheckState extends ConsumerState<CompanyStatusCheck> {
         icon: Icons.credit_card,
         iconBg: const Color(0xFFEDE9FE),
         iconFg: const Color(0xFF6D28D9),
-        title: 'Abonelik gerekli',
-        subtitle: 'İlan yayınlayabilmek için bir abonelik paketi seçmelisiniz.',
+        title: l10n.t(AppText.companyStatusSubscriptionRequiredTitle),
+        subtitle: l10n.t(AppText.companyStatusSubscriptionRequiredSubtitle),
         actions: [
           _InfoBox(
-            title: 'Hesabınız onaylandı',
-            items: const ['Şimdi size uygun bir paket seçerek başlayabilirsiniz.'],
+            title: l10n.t(AppText.companyStatusSubscriptionApprovedTitle),
+            items: [l10n.t(AppText.companyStatusSubscriptionApprovedTip)],
             accent: const Color(0xFFDCFCE7),
             accentText: const Color(0xFF166534),
           ),
@@ -186,7 +190,7 @@ class _CompanyStatusCheckState extends ConsumerState<CompanyStatusCheck> {
           ElevatedButton.icon(
             onPressed: () => context.go(Routes.companyPricing),
             icon: const Icon(Icons.credit_card),
-            label: const Text('Paketleri İncele'),
+            label: Text(l10n.t(AppText.companyStatusViewPlans)),
             style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6D28D9)),
           ),
         ],

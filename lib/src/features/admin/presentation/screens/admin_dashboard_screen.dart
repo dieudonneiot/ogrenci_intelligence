@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../../core/supabase/supabase_service.dart';
 import '../../presentation/controllers/admin_controller.dart';
@@ -137,8 +138,9 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final admin = ref.watch(activeAdminProvider).valueOrNull;
-    final adminName = admin?.name.isNotEmpty == true ? admin!.name : 'Admin';
+    final adminName = admin?.name.isNotEmpty == true ? admin!.name : l10n.t(AppText.adminRoleAdmin);
     final isSuper = admin?.isSuperAdmin ?? false;
 
     if (_loading) {
@@ -154,13 +156,14 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
             children: [
               const Icon(Icons.error_outline, size: 48, color: Color(0xFFEF4444)),
               const SizedBox(height: 10),
-              const Text('Dashboard yüklenemedi', style: TextStyle(fontWeight: FontWeight.w900)),
+              Text(l10n.t(AppText.adminDashboardLoadFailedTitle),
+                  style: const TextStyle(fontWeight: FontWeight.w900)),
               const SizedBox(height: 8),
               Text(_error!, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFF6B7280))),
               const SizedBox(height: 14),
               ElevatedButton(
                 onPressed: _fetchDashboard,
-                child: const Text('Tekrar Dene'),
+                child: Text(l10n.t(AppText.retry)),
               ),
             ],
           ),
@@ -171,8 +174,8 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
     return AdminPageScaffold(
       header: AdminPageHeader(
         icon: Icons.security_outlined,
-        title: 'Admin Dashboard',
-        subtitle: 'Hoş geldiniz, $adminName',
+        title: l10n.t(AppText.adminDashboardTitle),
+        subtitle: l10n.adminDashboardSubtitleWithName(adminName),
         trailing: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
@@ -180,7 +183,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
             borderRadius: BorderRadius.circular(999),
           ),
           child: Text(
-            isSuper ? 'Süper Admin' : 'Admin',
+            isSuper ? l10n.t(AppText.adminRoleSuper) : l10n.t(AppText.adminRoleAdmin),
             style: const TextStyle(color: Color(0xFF6D28D9), fontWeight: FontWeight.w800),
           ),
         ),
@@ -282,35 +285,36 @@ class _StatsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final cards = <Widget>[
       _StatCard(
-        title: 'Toplam Kullanıcı',
+        title: l10n.t(AppText.adminStatTotalUsersTitle),
         value: stats.totalUsers.toString(),
-        subtitle: '+${stats.todayRegistrations} bugün',
+        subtitle: l10n.adminStatTotalUsersSubtitleToday(stats.todayRegistrations),
         subtitleColor: const Color(0xFF16A34A),
         icon: Icons.group_outlined,
         iconColor: const Color(0xFF2563EB),
       ),
       _StatCard(
-        title: 'Şirketler',
+        title: l10n.t(AppText.adminStatCompaniesTitle),
         value: stats.totalCompanies.toString(),
-        subtitle: '${stats.pendingCompanies} onay bekliyor',
+        subtitle: l10n.adminStatCompaniesSubtitlePending(stats.pendingCompanies),
         subtitleColor: const Color(0xFFF97316),
         icon: Icons.apartment_outlined,
         iconColor: const Color(0xFF7C3AED),
       ),
       _StatCard(
-        title: 'Aktif İlanlar',
+        title: l10n.t(AppText.adminStatActiveListingsTitle),
         value: (stats.totalJobs + stats.totalInternships).toString(),
-        subtitle: '${stats.totalJobs} iş, ${stats.totalInternships} staj',
+        subtitle: l10n.adminStatActiveListingsSubtitle(jobs: stats.totalJobs, internships: stats.totalInternships),
         subtitleColor: const Color(0xFF6B7280),
         icon: Icons.work_outline,
         iconColor: const Color(0xFF16A34A),
       ),
       _StatCard(
-        title: 'Aylık Gelir',
+        title: l10n.t(AppText.adminStatMonthlyRevenueTitle),
         value: '₺${_formatNumber(stats.monthlyRevenue)}',
-        subtitle: '${stats.activeSubscriptions} aktif abonelik',
+        subtitle: l10n.adminStatMonthlyRevenueSubtitle(stats.activeSubscriptions),
         subtitleColor: const Color(0xFF16A34A),
         icon: Icons.credit_card_outlined,
         iconColor: const Color(0xFFF59E0B),
@@ -397,6 +401,7 @@ class _PendingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -408,26 +413,29 @@ class _PendingCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            children: const [
-              Icon(Icons.error_outline, color: Color(0xFFF97316)),
-              SizedBox(width: 8),
-              Text('Onay Bekleyenler', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
+            children: [
+              const Icon(Icons.error_outline, color: Color(0xFFF97316)),
+              const SizedBox(width: 8),
+              Text(l10n.t(AppText.adminCompanyApprovalsTitle),
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
             ],
           ),
           const SizedBox(height: 12),
           if (pending > 0) ...[
             Text('$pending', style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w900, color: Color(0xFFF97316))),
             const SizedBox(height: 6),
-            const Text('Şirket onay bekliyor', style: TextStyle(color: Color(0xFF6B7280))),
+            Text(l10n.t(AppText.adminCompanyApprovalsSubtitle),
+                style: const TextStyle(color: Color(0xFF6B7280))),
             const SizedBox(height: 12),
             ElevatedButton.icon(
               onPressed: onTap,
               icon: const Icon(Icons.trending_up, size: 18),
-              label: const Text('Şirketleri İncele'),
+              label: Text(l10n.t(AppText.adminReviewCompanies)),
               style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFF97316)),
             ),
           ] else
-            const Text('Onay bekleyen şirket bulunmuyor', style: TextStyle(color: Color(0xFF6B7280))),
+            Text(l10n.t(AppText.adminCompanyApprovalsEmpty),
+                style: const TextStyle(color: Color(0xFF6B7280))),
         ],
       ),
     );
@@ -439,6 +447,7 @@ class _QuickLinks extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -449,7 +458,8 @@ class _QuickLinks extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Hızlı Erişim', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
+          Text(l10n.t(AppText.adminQuickAccessTitle),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
           const SizedBox(height: 12),
           Wrap(
             spacing: 12,
@@ -457,25 +467,25 @@ class _QuickLinks extends StatelessWidget {
             children: [
               _QuickLinkTile(
                 icon: Icons.apartment_outlined,
-                label: 'Şirketler',
+                label: l10n.t(AppText.adminNavCompanies),
                 color: const Color(0xFF7C3AED),
                 onTap: () => context.go(Routes.adminCompanies),
               ),
               _QuickLinkTile(
                 icon: Icons.group_outlined,
-                label: 'Kullanıcılar',
+                label: l10n.t(AppText.adminNavUsers),
                 color: const Color(0xFF2563EB),
                 onTap: () => context.go(Routes.adminUsers),
               ),
               _QuickLinkTile(
                 icon: Icons.work_outline,
-                label: 'İlanlar',
+                label: l10n.t(AppText.adminNavJobs),
                 color: const Color(0xFF16A34A),
                 onTap: () => context.go(Routes.adminJobs),
               ),
               _QuickLinkTile(
                 icon: Icons.credit_card_outlined,
-                label: 'Abonelikler',
+                label: l10n.t(AppText.adminNavSubscriptions),
                 color: const Color(0xFFF59E0B),
                 onTap: () => context.go(Routes.adminSubscriptions),
               ),
@@ -516,7 +526,16 @@ class _QuickLinkTile extends StatelessWidget {
           children: [
             Icon(icon, size: 30, color: color),
             const SizedBox(height: 8),
-            Text(label, style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF374151))),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Text(
+                label,
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+                softWrap: false,
+                style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF374151)),
+              ),
+            ),
           ],
         ),
       ),
@@ -530,6 +549,8 @@ class _RecentActivities extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final ml10n = MaterialLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -541,15 +562,17 @@ class _RecentActivities extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            children: const [
-              Icon(Icons.access_time, color: Color(0xFF6B7280)),
-              SizedBox(width: 8),
-              Text('Son Aktiviteler', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
+            children: [
+              const Icon(Icons.access_time, color: Color(0xFF6B7280)),
+              const SizedBox(width: 8),
+              Text(l10n.t(AppText.adminRecentActivitiesTitle),
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
             ],
           ),
           const SizedBox(height: 12),
           if (activities.isEmpty)
-            const Text('Henüz aktivite bulunmuyor', style: TextStyle(color: Color(0xFF6B7280)))
+            Text(l10n.t(AppText.adminRecentActivitiesEmpty),
+                style: const TextStyle(color: Color(0xFF6B7280)))
           else
             Column(
               children: activities
@@ -569,11 +592,11 @@ class _RecentActivities extends StatelessWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(_activityText(a.actionType),
+                                Text(_activityText(l10n, a.actionType),
                                     style: const TextStyle(fontWeight: FontWeight.w700)),
                                 const SizedBox(height: 2),
                                 Text(
-                                  '${a.adminName} • ${_formatTimeAgo(a.createdAt)}',
+                                  '${a.adminName} • ${_formatTimeAgo(l10n, ml10n, a.createdAt)}',
                                   style: const TextStyle(color: Color(0xFF6B7280), fontSize: 12),
                                 ),
                               ],
@@ -621,28 +644,28 @@ class _ActivityIcon extends StatelessWidget {
   }
 }
 
-String _activityText(String actionType) {
+String _activityText(AppLocalizations l10n, String actionType) {
   switch (actionType) {
     case 'company_approve':
-      return 'Şirket onaylandı';
+      return l10n.t(AppText.adminActivityCompanyApproved);
     case 'company_reject':
-      return 'Şirket reddedildi';
+      return l10n.t(AppText.adminActivityCompanyRejected);
     case 'job_delete':
-      return 'İş ilanı silindi';
+      return l10n.t(AppText.adminActivityJobDeleted);
     case 'user_ban':
-      return 'Kullanıcı engellendi';
+      return l10n.t(AppText.adminActivityUserBanned);
     default:
-      return actionType;
+      return l10n.t(AppText.adminActivityUnknown);
   }
 }
 
-String _formatTimeAgo(DateTime date) {
+String _formatTimeAgo(AppLocalizations l10n, MaterialLocalizations ml10n, DateTime date) {
   final now = DateTime.now();
   final diff = now.difference(date);
-  if (diff.inMinutes < 60) return '${diff.inMinutes} dakika önce';
-  if (diff.inHours < 24) return '${diff.inHours} saat önce';
-  if (diff.inDays < 7) return '${diff.inDays} gün önce';
-  return '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}.${date.year}';
+  if (diff.inMinutes < 60) return l10n.adminTimeAgoMinutes(diff.inMinutes);
+  if (diff.inHours < 24) return l10n.adminTimeAgoHours(diff.inHours);
+  if (diff.inDays < 7) return l10n.adminTimeAgoDays(diff.inDays);
+  return ml10n.formatShortDate(date);
 }
 
 int _toInt(dynamic v) {

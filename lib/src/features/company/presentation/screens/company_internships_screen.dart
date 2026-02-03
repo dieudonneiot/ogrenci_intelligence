@@ -2,6 +2,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../auth/domain/auth_models.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
@@ -63,6 +64,7 @@ class _CompanyInternshipsScreenState extends ConsumerState<CompanyInternshipsScr
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final authAsync = ref.watch(authViewStateProvider);
     if (authAsync.isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -70,7 +72,7 @@ class _CompanyInternshipsScreenState extends ConsumerState<CompanyInternshipsScr
 
     final auth = authAsync.value;
     if (auth == null || !auth.isAuthenticated || auth.userType != UserType.company) {
-      return const Center(child: Text('Şirket panelini görmek için giriş yapmalısınız.'));
+      return Center(child: Text(l10n.t(AppText.companyPanelLoginRequired)));
     }
 
     final filtered = _internships.where((i) {
@@ -102,13 +104,15 @@ class _CompanyInternshipsScreenState extends ConsumerState<CompanyInternshipsScr
                     children: [
                       const Icon(Icons.school_outlined, color: Color(0xFF6D28D9)),
                       const SizedBox(width: 8),
-                      const Text('Staj İlanlarım',
-                          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900)),
+                      Text(
+                        l10n.t(AppText.companyInternshipsTitle),
+                        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900),
+                      ),
                       const Spacer(),
                       ElevatedButton.icon(
                         onPressed: () => context.go(Routes.companyInternshipsCreate),
                         icon: const Icon(Icons.add),
-                        label: const Text('Yeni Staj'),
+                        label: Text(l10n.t(AppText.newListing)),
                         style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6D28D9)),
                       ),
                     ],
@@ -118,10 +122,10 @@ class _CompanyInternshipsScreenState extends ConsumerState<CompanyInternshipsScr
                     spacing: 12,
                     runSpacing: 12,
                     children: [
-                      _MiniStat(label: 'Toplam', value: _internships.length),
-                      _MiniStat(label: 'Aktif', value: activeCount),
-                      _MiniStat(label: 'Pasif', value: inactiveCount),
-                      _MiniStat(label: 'Başvuru', value: totalApps),
+                      _MiniStat(label: l10n.t(AppText.commonTotal), value: _internships.length),
+                      _MiniStat(label: l10n.t(AppText.commonActive), value: activeCount),
+                      _MiniStat(label: l10n.t(AppText.commonInactive), value: inactiveCount),
+                      _MiniStat(label: l10n.t(AppText.commonApplications), value: totalApps),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -180,6 +184,7 @@ class _FiltersBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -197,7 +202,7 @@ class _FiltersBar extends StatelessWidget {
             child: TextField(
               decoration: InputDecoration(
                 prefixIcon: const Icon(Icons.search),
-                hintText: 'Staj ara...',
+                hintText: l10n.t(AppText.companyInternshipsSearchHint),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 isDense: true,
               ),
@@ -206,17 +211,17 @@ class _FiltersBar extends StatelessWidget {
             ),
           ),
           _FilterChip(
-            label: 'Tümü',
+            label: l10n.t(AppText.commonAll),
             active: filter == 'all',
             onTap: () => onFilter('all'),
           ),
           _FilterChip(
-            label: 'Aktif',
+            label: l10n.t(AppText.commonActive),
             active: filter == 'active',
             onTap: () => onFilter('active'),
           ),
           _FilterChip(
-            label: 'Pasif',
+            label: l10n.t(AppText.commonInactive),
             active: filter == 'inactive',
             onTap: () => onFilter('inactive'),
           ),
@@ -302,9 +307,10 @@ class _InternshipCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final deadline = item.deadline == null
-        ? '—'
-        : '${item.deadline!.day.toString().padLeft(2, '0')}.${item.deadline!.month.toString().padLeft(2, '0')}.${item.deadline!.year}';
+    final l10n = AppLocalizations.of(context);
+    final deadlineText = item.deadline == null
+        ? l10n.t(AppText.commonNotSpecified)
+        : MaterialLocalizations.of(context).formatShortDate(item.deadline!);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -339,9 +345,15 @@ class _InternshipCard extends StatelessWidget {
           Wrap(
             spacing: 12,
             children: [
-              _InfoChip(icon: Icons.people_outline, text: '${item.applicationsCount} başvuru'),
-              _InfoChip(icon: Icons.check_circle_outline, text: '${item.acceptedCount} kabul'),
-              _InfoChip(icon: Icons.event_outlined, text: 'Son tarih: $deadline'),
+              _InfoChip(
+                icon: Icons.people_outline,
+                text: '${l10n.t(AppText.commonApplications)}: ${item.applicationsCount}',
+              ),
+              _InfoChip(
+                icon: Icons.check_circle_outline,
+                text: '${l10n.t(AppText.statusAccepted)}: ${item.acceptedCount}',
+              ),
+              _InfoChip(icon: Icons.event_outlined, text: '${l10n.t(AppText.deadline)}: $deadlineText'),
             ],
           ),
           const SizedBox(height: 12),
@@ -350,13 +362,13 @@ class _InternshipCard extends StatelessWidget {
               TextButton.icon(
                 onPressed: onApplications,
                 icon: const Icon(Icons.people_outline),
-                label: const Text('Başvurular'),
+                label: Text(l10n.t(AppText.commonApplications)),
               ),
               const SizedBox(width: 8),
               TextButton.icon(
                 onPressed: onEdit,
                 icon: const Icon(Icons.edit_outlined),
-                label: const Text('Düzenle'),
+                label: Text(l10n.t(AppText.commonEdit)),
               ),
             ],
           ),
@@ -393,6 +405,7 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -405,7 +418,7 @@ class _EmptyState extends StatelessWidget {
           const Icon(Icons.school_outlined, size: 44, color: Color(0xFFD1D5DB)),
           const SizedBox(height: 10),
           Text(
-            hasSearch ? 'Aradığınız staj bulunamadı.' : 'Henüz staj ilanınız yok.',
+            hasSearch ? l10n.t(AppText.noResults) : l10n.t(AppText.companyInternshipsEmptyNoListings),
             style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF6B7280)),
           ),
           const SizedBox(height: 10),
@@ -413,7 +426,7 @@ class _EmptyState extends StatelessWidget {
             ElevatedButton.icon(
               onPressed: onCreate,
               icon: const Icon(Icons.add),
-              label: const Text('Staj İlanı Oluştur'),
+              label: Text(l10n.t(AppText.newListing)),
               style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6D28D9)),
             ),
         ],

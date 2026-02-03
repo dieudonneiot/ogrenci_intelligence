@@ -2,6 +2,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../auth/domain/auth_models.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
@@ -120,47 +121,48 @@ class _CompanyInternshipFormScreenState extends ConsumerState<CompanyInternshipF
     final companyId = auth?.companyId;
     if (auth == null || user == null || companyId == null) return;
 
+    final l10n = AppLocalizations.of(context);
     if (_titleCtrl.text.trim().isEmpty || _descriptionCtrl.text.trim().isEmpty) {
-      _snack('Başlık ve açıklama zorunludur.', error: true);
+      _snack(l10n.t(AppText.companyInternshipFormValidationTitleDesc), error: true);
       return;
     }
     if (_requirementsCtrl.text.trim().isEmpty) {
-      _snack('Gereksinimler zorunludur.', error: true);
+      _snack(l10n.t(AppText.companyInternshipFormValidationRequirements), error: true);
       return;
     }
     if (_department == null || _department!.trim().isEmpty) {
-      _snack('Departman seçimi zorunludur.', error: true);
+      _snack(l10n.t(AppText.companyInternshipFormValidationDepartment), error: true);
       return;
     }
     if (_locationCtrl.text.trim().isEmpty) {
-      _snack('Lokasyon zorunludur.', error: true);
+      _snack(l10n.t(AppText.companyInternshipFormValidationLocation), error: true);
       return;
     }
     if (_durationMonths == null) {
-      _snack('Süre seçimi zorunludur.', error: true);
+      _snack(l10n.t(AppText.companyInternshipFormValidationDuration), error: true);
       return;
     }
     if (_startDate == null) {
-      _snack('Başlangıç tarihi seçin.', error: true);
+      _snack(l10n.t(AppText.companyInternshipFormValidationStartDate), error: true);
       return;
     }
     if (_deadline == null) {
-      _snack('Son başvuru tarihi seçin.', error: true);
+      _snack(l10n.t(AppText.companyInternshipFormValidationDeadline), error: true);
       return;
     }
     if (_quotaCtrl.text.trim().isEmpty) {
-      _snack('Kontenjan zorunludur.', error: true);
+      _snack(l10n.t(AppText.companyInternshipFormValidationQuotaRequired), error: true);
       return;
     }
 
     final quota = int.tryParse(_quotaCtrl.text.trim());
     if (quota == null || quota < 1) {
-      _snack('Geçerli bir kontenjan girin.', error: true);
+      _snack(l10n.t(AppText.companyInternshipFormValidationQuotaValid), error: true);
       return;
     }
 
     if (_isPaid && _monthlyStipendCtrl.text.trim().isEmpty) {
-      _snack('Ücretli staj için aylık ücret girin.', error: true);
+      _snack(l10n.t(AppText.companyInternshipFormValidationPaidStipend), error: true);
       return;
     }
 
@@ -202,10 +204,14 @@ class _CompanyInternshipFormScreenState extends ConsumerState<CompanyInternshipF
       }
 
       if (!mounted) return;
-      _snack(widget.internshipId == null ? 'Staj ilanı oluşturuldu.' : 'Staj ilanı güncellendi.');
+      _snack(
+        widget.internshipId == null
+            ? l10n.t(AppText.companyInternshipFormCreated)
+            : l10n.t(AppText.companyInternshipFormUpdated),
+      );
       context.go(Routes.companyInternships);
     } catch (e) {
-      _snack('Kayıt başarısız: $e', error: true);
+      _snack(l10n.commonActionFailed('$e'), error: true);
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -245,6 +251,7 @@ class _CompanyInternshipFormScreenState extends ConsumerState<CompanyInternshipF
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     if (_loading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -268,7 +275,9 @@ class _CompanyInternshipFormScreenState extends ConsumerState<CompanyInternshipF
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        widget.internshipId == null ? 'Yeni Staj İlanı' : 'Staj İlanını Düzenle',
+                        widget.internshipId == null
+                            ? l10n.t(AppText.companyInternshipFormCreateTitle)
+                            : l10n.t(AppText.companyInternshipFormEditTitle),
                         style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900),
                       ),
                     ],
@@ -277,82 +286,117 @@ class _CompanyInternshipFormScreenState extends ConsumerState<CompanyInternshipF
                   _Card(
                     child: Column(
                       children: [
-                        _Field(label: 'Başlık *', controller: _titleCtrl),
-                        _Field(label: 'Açıklama *', controller: _descriptionCtrl, maxLines: 4),
-                        _Field(label: 'Gereksinimler *', controller: _requirementsCtrl, maxLines: 3),
+                        _Field(label: l10n.t(AppText.companyInternshipFormTitleLabel), controller: _titleCtrl),
+                        _Field(
+                          label: l10n.t(AppText.companyInternshipFormDescriptionLabel),
+                          controller: _descriptionCtrl,
+                          maxLines: 4,
+                        ),
+                        _Field(
+                          label: l10n.t(AppText.companyInternshipFormRequirementsLabel),
+                          controller: _requirementsCtrl,
+                          maxLines: 3,
+                        ),
                         _DropdownField(
-                          label: 'Departman *',
+                          label: l10n.t(AppText.companyInternshipFormDepartmentLabel),
                           value: _department,
                           items: _departments,
                           onChanged: (v) => setState(() => _department = v),
                         ),
-                        _Field(label: 'Lokasyon *', controller: _locationCtrl),
+                        _Field(label: l10n.t(AppText.companyInternshipFormLocationLabel), controller: _locationCtrl),
                         _DropdownField(
-                          label: 'Çalışma Şekli',
+                          label: l10n.t(AppText.companyInternshipFormWorkModeLabel),
                           value: _workType,
                           items: _workTypes,
                           onChanged: (v) => setState(() => _workType = v ?? _workType),
+                          itemLabel: (v) => _workModeLabel(l10n, v),
                         ),
                         _DropdownFieldInt(
-                          label: 'Staj Süresi (Ay) *',
+                          label: l10n.t(AppText.companyInternshipFormDurationLabel),
                           value: _durationMonths,
                           items: _durations,
                           onChanged: (v) => setState(() => _durationMonths = v),
+                          itemLabel: (m) => l10n.internshipsMonths(m),
                         ),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _DateField(
-                                label: 'Başlangıç Tarihi *',
-                                value: _startDate,
-                                onPick: _pickStartDate,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: _DateField(
-                                label: 'Son Başvuru *',
-                                value: _deadline,
-                                onPick: _pickDeadline,
-                              ),
-                            ),
-                          ],
+                        LayoutBuilder(
+                          builder: (context, c) {
+                            final narrow = c.maxWidth < 520;
+                            if (narrow) {
+                              return Column(
+                                children: [
+                                  _DateField(
+                                    label: l10n.t(AppText.companyInternshipFormStartDateLabel),
+                                    value: _startDate,
+                                    onPick: _pickStartDate,
+                                  ),
+                                  _DateField(
+                                    label: l10n.t(AppText.companyInternshipFormDeadlineLabel),
+                                    value: _deadline,
+                                    onPick: _pickDeadline,
+                                  ),
+                                ],
+                              );
+                            }
+                            return Row(
+                              children: [
+                                Expanded(
+                                  child: _DateField(
+                                    label: l10n.t(AppText.companyInternshipFormStartDateLabel),
+                                    value: _startDate,
+                                    onPick: _pickStartDate,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: _DateField(
+                                    label: l10n.t(AppText.companyInternshipFormDeadlineLabel),
+                                    value: _deadline,
+                                    onPick: _pickDeadline,
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
                         ),
                         _Field(
-                          label: 'Kontenjan *',
+                          label: l10n.t(AppText.companyInternshipFormQuotaLabel),
                           controller: _quotaCtrl,
                           keyboardType: TextInputType.number,
                         ),
                         SwitchListTile(
                           value: _isPaid,
                           onChanged: (v) => setState(() => _isPaid = v),
-                          title: const Text('Ücretli Staj'),
+                          title: Text(l10n.t(AppText.companyInternshipFormPaidLabel)),
                           contentPadding: EdgeInsets.zero,
                         ),
                         if (_isPaid)
                           _Field(
-                            label: 'Aylık Ücret *',
+                            label: l10n.t(AppText.companyInternshipFormMonthlyStipendLabel),
                             controller: _monthlyStipendCtrl,
                             keyboardType: TextInputType.number,
                           ),
-                        _Field(label: 'Yan Haklar', controller: _benefitsCtrl, maxLines: 2),
+                        _Field(
+                          label: l10n.t(AppText.companyInternshipFormBenefitsLabel),
+                          controller: _benefitsCtrl,
+                          maxLines: 2,
+                        ),
                         SwitchListTile(
                           value: _providesCertificate,
                           onChanged: (v) => setState(() => _providesCertificate = v),
-                          title: const Text('Staj Sertifikası Verilir'),
+                          title: Text(l10n.t(AppText.companyInternshipFormCertificateLabel)),
                           contentPadding: EdgeInsets.zero,
                         ),
                         SwitchListTile(
                           value: _possibilityOfEmployment,
                           onChanged: (v) => setState(() => _possibilityOfEmployment = v),
-                          title: const Text('İş İmkanı Sunulur'),
+                          title: Text(l10n.t(AppText.companyInternshipFormEmploymentPossibilityLabel)),
                           contentPadding: EdgeInsets.zero,
                         ),
                         if (widget.internshipId != null)
                           SwitchListTile(
                             value: _isActive,
                             onChanged: (v) => setState(() => _isActive = v),
-                            title: const Text('İlan Aktif'),
+                            title: Text(l10n.t(AppText.companyInternshipFormActiveLabel)),
                             contentPadding: EdgeInsets.zero,
                           ),
                         const SizedBox(height: 16),
@@ -367,7 +411,7 @@ class _CompanyInternshipFormScreenState extends ConsumerState<CompanyInternshipF
                                     child: CircularProgressIndicator(strokeWidth: 2),
                                   )
                                 : const Icon(Icons.save),
-                            label: Text(_saving ? 'Kaydediliyor...' : 'Kaydet'),
+                            label: Text(_saving ? l10n.t(AppText.commonSaving) : l10n.t(AppText.commonSave)),
                             style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6D28D9)),
                           ),
                         ),
@@ -381,6 +425,19 @@ class _CompanyInternshipFormScreenState extends ConsumerState<CompanyInternshipF
         ),
       ),
     );
+  }
+
+  String _workModeLabel(AppLocalizations l10n, String mode) {
+    switch (mode) {
+      case 'on-site':
+        return l10n.t(AppText.workModeOnSite);
+      case 'remote':
+        return l10n.t(AppText.workModeRemote);
+      case 'hybrid':
+        return l10n.t(AppText.workModeHybrid);
+      default:
+        return mode;
+    }
   }
 }
 
@@ -439,12 +496,14 @@ class _DropdownField extends StatelessWidget {
     required this.value,
     required this.items,
     required this.onChanged,
+    this.itemLabel,
   });
 
   final String label;
   final String? value;
   final List<String> items;
   final ValueChanged<String?> onChanged;
+  final String Function(String value)? itemLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -452,7 +511,12 @@ class _DropdownField extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 12),
       child: DropdownButtonFormField<String>(
         initialValue: (value != null && value!.isNotEmpty) ? value : null,
-        items: items.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+        items: items
+            .map((e) => DropdownMenuItem(
+                  value: e,
+                  child: Text(itemLabel == null ? e : itemLabel!(e)),
+                ))
+            .toList(),
         onChanged: onChanged,
         decoration: InputDecoration(
           labelText: label,
@@ -469,12 +533,14 @@ class _DropdownFieldInt extends StatelessWidget {
     required this.value,
     required this.items,
     required this.onChanged,
+    this.itemLabel,
   });
 
   final String label;
   final int? value;
   final List<int> items;
   final ValueChanged<int?> onChanged;
+  final String Function(int value)? itemLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -482,7 +548,12 @@ class _DropdownFieldInt extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 12),
       child: DropdownButtonFormField<int>(
         initialValue: value,
-        items: items.map((e) => DropdownMenuItem(value: e, child: Text('$e Ay'))).toList(),
+        items: items
+            .map((e) => DropdownMenuItem(
+                  value: e,
+                  child: Text(itemLabel == null ? '$e' : itemLabel!(e)),
+                ))
+            .toList(),
         onChanged: onChanged,
         decoration: InputDecoration(
           labelText: label,
@@ -506,9 +577,9 @@ class _DateField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final text = value == null
-        ? 'Tarih seçilmedi'
-        : '${value!.day.toString().padLeft(2, '0')}.${value!.month.toString().padLeft(2, '0')}.${value!.year}';
+    final l10n = AppLocalizations.of(context);
+    final text =
+        value == null ? l10n.t(AppText.commonNotSpecified) : MaterialLocalizations.of(context).formatShortDate(value!);
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: InkWell(

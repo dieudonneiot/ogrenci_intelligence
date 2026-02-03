@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/localization/app_localizations.dart';
+import '../../../../core/localization/locale_controller.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
 import '../../presentation/controllers/admin_controller.dart';
@@ -18,6 +20,8 @@ class _AdminNavbarState extends ConsumerState<AdminNavbar> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final locale = ref.watch(appLocaleProvider);
     final admin = ref.watch(activeAdminProvider).valueOrNull;
     final isSuper = admin?.isSuperAdmin ?? false;
 
@@ -25,13 +29,13 @@ class _AdminNavbarState extends ConsumerState<AdminNavbar> {
     final isDesktop = w >= 900;
     final currentPath = GoRouterState.of(context).uri.path;
 
-    final navItems = const <_AdminNavItem>[
-      _AdminNavItem('Dashboard', Routes.adminDashboard, Icons.home_outlined),
-      _AdminNavItem('Şirketler', Routes.adminCompanies, Icons.apartment_outlined),
-      _AdminNavItem('Kullanıcılar', Routes.adminUsers, Icons.group_outlined),
-      _AdminNavItem('İlanlar', Routes.adminJobs, Icons.work_outline),
-      _AdminNavItem('Abonelikler', Routes.adminSubscriptions, Icons.credit_card_outlined),
-      _AdminNavItem('Raporlar', Routes.adminReports, Icons.bar_chart_outlined),
+    final navItems = <_AdminNavItem>[
+      _AdminNavItem(l10n.t(AppText.adminNavDashboard), Routes.adminDashboard, Icons.home_outlined),
+      _AdminNavItem(l10n.t(AppText.adminNavCompanies), Routes.adminCompanies, Icons.apartment_outlined),
+      _AdminNavItem(l10n.t(AppText.adminNavUsers), Routes.adminUsers, Icons.group_outlined),
+      _AdminNavItem(l10n.t(AppText.adminNavJobs), Routes.adminJobs, Icons.work_outline),
+      _AdminNavItem(l10n.t(AppText.adminNavSubscriptions), Routes.adminSubscriptions, Icons.credit_card_outlined),
+      _AdminNavItem(l10n.t(AppText.adminNavReports), Routes.adminReports, Icons.bar_chart_outlined),
     ];
 
     return Material(
@@ -53,8 +57,8 @@ class _AdminNavbarState extends ConsumerState<AdminNavbar> {
                           children: [
                             const Icon(Icons.security, color: Color(0xFFA78BFA), size: 28),
                             const SizedBox(width: 10),
-                            const Text(
-                              'Admin Panel',
+                            Text(
+                              l10n.t(AppText.adminPanelTitle),
                               style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800),
                             ),
                             if (isSuper) ...[
@@ -65,8 +69,8 @@ class _AdminNavbarState extends ConsumerState<AdminNavbar> {
                                   color: const Color(0xFF7C3AED),
                                   borderRadius: BorderRadius.circular(999),
                                 ),
-                                child: const Text(
-                                  'SUPER',
+                                child: Text(
+                                  l10n.t(AppText.adminSuperBadge),
                                   style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w800),
                                 ),
                               ),
@@ -76,25 +80,42 @@ class _AdminNavbarState extends ConsumerState<AdminNavbar> {
                       ),
                       if (isDesktop) ...[
                         const SizedBox(width: 24),
-                        for (final item in navItems)
-                          _NavLink(
-                            item: item,
-                            isActive: _isActive(currentPath, item.path),
-                            onTap: () => context.go(item.path),
+                        Expanded(
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            physics: const ClampingScrollPhysics(),
+                            child: Row(
+                              children: [
+                                for (final item in navItems)
+                                  _NavLink(
+                                    item: item,
+                                    isActive: _isActive(currentPath, item.path),
+                                    onTap: () => context.go(item.path),
+                                  ),
+                              ],
+                            ),
                           ),
-                      ],
-                      const Spacer(),
+                        ),
+                      ] else
+                        const Spacer(),
+                      _AdminLanguageMenu(
+                        l10n: l10n,
+                        currentLocale: locale,
+                        onSelected: (next) => ref.read(appLocaleProvider.notifier).setLocale(next),
+                      ),
+                      const SizedBox(width: 10),
                       _NotificationsButton(),
                       const SizedBox(width: 12),
                       _ProfileMenu(
-                        name: admin?.name.isNotEmpty == true ? admin!.name : 'Admin',
+                        l10n: l10n,
+                        name: admin?.name.isNotEmpty == true ? admin!.name : l10n.t(AppText.adminRoleAdmin),
                         email: admin?.email,
                         onNavigate: (path) => context.go(path),
                         onLogout: () => _handleLogout(context),
                       ),
                       if (!isDesktop)
                         IconButton(
-                          tooltip: _mobileOpen ? 'Kapat' : 'Menü',
+                          tooltip: _mobileOpen ? l10n.t(AppText.close) : l10n.t(AppText.menu),
                           onPressed: () => setState(() => _mobileOpen = !_mobileOpen),
                           icon: Icon(_mobileOpen ? Icons.close : Icons.menu, color: Colors.white),
                         ),
@@ -132,7 +153,7 @@ class _AdminNavbarState extends ConsumerState<AdminNavbar> {
                                 ),
                               const SizedBox(height: 8),
                               _MobileNavLink(
-                                item: const _AdminNavItem('Çıkış Yap', Routes.home, Icons.logout),
+                                item: _AdminNavItem(l10n.t(AppText.adminNavLogout), Routes.home, Icons.logout),
                                 isActive: false,
                                 onTap: () => _handleLogout(context),
                                 danger: true,
@@ -155,15 +176,74 @@ class _AdminNavbarState extends ConsumerState<AdminNavbar> {
   }
 
   Future<void> _handleLogout(BuildContext context) async {
+    final l10n = AppLocalizations.of(context);
     final err = await ref.read(authActionLoadingProvider.notifier).signOut();
     if (!context.mounted) return;
     if (err != null && err.isNotEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Çıkış yapılamadı: $err')),
+        SnackBar(content: Text(l10n.adminLogoutFailed(err))),
       );
       return;
     }
     context.go(Routes.home);
+  }
+}
+
+class _AdminLanguageMenu extends StatelessWidget {
+  const _AdminLanguageMenu({
+    required this.l10n,
+    required this.currentLocale,
+    required this.onSelected,
+  });
+
+  final AppLocalizations l10n;
+  final Locale currentLocale;
+  final ValueChanged<Locale> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final current = AppLocalizations.languageFor(currentLocale);
+    return PopupMenuButton<Locale>(
+      tooltip: l10n.t(AppText.language),
+      onSelected: onSelected,
+      itemBuilder: (context) => [
+        for (final language in AppLocalizations.languages)
+          PopupMenuItem<Locale>(
+            value: language.locale,
+            child: Row(
+              children: [
+                if (language.code == current.code)
+                  const Icon(Icons.check, size: 16)
+                else
+                  const SizedBox(width: 16, height: 16),
+                const SizedBox(width: 8),
+                Text(language.nativeName),
+              ],
+            ),
+          ),
+      ],
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        decoration: BoxDecoration(
+          border: Border.all(color: const Color(0xFF374151)),
+          borderRadius: BorderRadius.circular(999),
+          color: const Color(0xFF111827),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.language, size: 16, color: Colors.white),
+            const SizedBox(width: 6),
+            Text(
+              current.code.toUpperCase(),
+              style: const TextStyle(fontWeight: FontWeight.w700, color: Colors.white),
+            ),
+            const SizedBox(width: 4),
+            const Icon(Icons.expand_more, size: 16, color: Color(0xFFD1D5DB)),
+          ],
+        ),
+      ),
+    );
   }
 }
 
@@ -284,12 +364,14 @@ class _NotificationsButton extends StatelessWidget {
 
 class _ProfileMenu extends StatelessWidget {
   const _ProfileMenu({
+    required this.l10n,
     required this.name,
     required this.email,
     required this.onNavigate,
     required this.onLogout,
   });
 
+  final AppLocalizations l10n;
   final String name;
   final String? email;
   final void Function(String path) onNavigate;
@@ -298,7 +380,7 @@ class _ProfileMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton<_ProfileAction>(
-      tooltip: 'Profil Menüsü',
+      tooltip: l10n.t(AppText.profileMenu),
       offset: const Offset(0, 12),
       onSelected: (value) async {
         switch (value) {
@@ -329,22 +411,22 @@ class _ProfileMenu extends StatelessWidget {
           ),
         ),
         const PopupMenuDivider(),
-        const PopupMenuItem<_ProfileAction>(
+        PopupMenuItem<_ProfileAction>(
           value: _ProfileAction.profile,
-          child: _ProfileMenuRow(icon: Icons.person_outline, label: 'Profil'),
+          child: _ProfileMenuRow(icon: Icons.person_outline, label: l10n.t(AppText.adminNavProfile)),
         ),
-        const PopupMenuItem<_ProfileAction>(
+        PopupMenuItem<_ProfileAction>(
           value: _ProfileAction.settings,
-          child: _ProfileMenuRow(icon: Icons.settings_outlined, label: 'Ayarlar'),
+          child: _ProfileMenuRow(icon: Icons.settings_outlined, label: l10n.t(AppText.adminNavSettings)),
         ),
-        const PopupMenuItem<_ProfileAction>(
+        PopupMenuItem<_ProfileAction>(
           value: _ProfileAction.logs,
-          child: _ProfileMenuRow(icon: Icons.receipt_long_outlined, label: 'İşlem Kayıtları'),
+          child: _ProfileMenuRow(icon: Icons.receipt_long_outlined, label: l10n.t(AppText.adminNavLogs)),
         ),
         const PopupMenuDivider(),
-        const PopupMenuItem<_ProfileAction>(
+        PopupMenuItem<_ProfileAction>(
           value: _ProfileAction.logout,
-          child: _ProfileMenuRow(icon: Icons.logout, label: 'Çıkış Yap', danger: true),
+          child: _ProfileMenuRow(icon: Icons.logout, label: l10n.t(AppText.adminNavLogout), danger: true),
         ),
       ],
       child: Row(

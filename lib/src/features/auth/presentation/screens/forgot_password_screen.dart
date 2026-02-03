@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/routing/routes.dart';
 import '../controllers/auth_controller.dart';
 
@@ -43,20 +44,21 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   }
 
   Future<void> _submit() async {
+    final l10n = AppLocalizations.of(context);
     setState(() => _error = null);
 
     final email = _email.text.trim();
     if (email.isEmpty) {
-      setState(() => _error = 'Email is required.');
+      setState(() => _error = l10n.t(AppText.authEmailRequired));
       return;
     }
     final emailRegex = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
     if (!emailRegex.hasMatch(email)) {
-      setState(() => _error = 'Please enter a valid email address.');
+      setState(() => _error = l10n.t(AppText.commonInvalidEmail));
       return;
     }
     if (_cooldown > 0) {
-      setState(() => _error = 'Please wait $_cooldown seconds before requesting again.');
+      setState(() => _error = l10n.authWaitSeconds(_cooldown));
       return;
     }
 
@@ -67,7 +69,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     if (err != null) {
       if (err.toLowerCase().contains('rate_limit')) {
         _startCooldown(60);
-        setState(() => _error = 'Too many requests. Please wait a minute and try again.');
+        setState(() => _error = l10n.t(AppText.authTooManyRequests));
       } else {
         setState(() => _error = err);
       }
@@ -79,11 +81,12 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final busy = ref.watch(authActionLoadingProvider);
 
     if (_submitted) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Forgot Password')),
+        appBar: AppBar(title: Text(l10n.t(AppText.authForgotTitle))),
         body: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 520),
@@ -98,14 +101,14 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                       const Icon(Icons.check_circle_outline, size: 54),
                       const SizedBox(height: 12),
                       Text(
-                        'Email sent!',
+                        l10n.t(AppText.authEmailSentTitle),
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
                               fontWeight: FontWeight.w700,
                             ),
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'A password reset link was sent to:\n${_email.text.trim()}',
+                        l10n.authResetLinkSentTo(_email.text.trim()),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 12),
@@ -116,22 +119,22 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(color: Colors.amber.withValues(alpha: 0.35)),
                         ),
-                        child: const Text(
-                          'If you don’t see it, check your spam/junk folder.',
+                        child: Text(
+                          l10n.t(AppText.authCheckSpam),
                           textAlign: TextAlign.center,
                         ),
                       ),
                       if (_cooldown > 0) ...[
                         const SizedBox(height: 12),
                         Text(
-                          'You can request another email in $_cooldown seconds.',
+                          l10n.authRequestAgainIn(_cooldown),
                           textAlign: TextAlign.center,
                         ),
                       ],
                       const SizedBox(height: 14),
                       TextButton(
                         onPressed: () => context.go(Routes.login),
-                        child: const Text('Back to Login'),
+                        child: Text(l10n.t(AppText.commonBackToLogin)),
                       ),
                     ],
                   ),
@@ -144,7 +147,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Forgot Password')),
+      appBar: AppBar(title: Text(l10n.t(AppText.authForgotTitle))),
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 520),
@@ -173,7 +176,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                     ),
                     const SizedBox(height: 14),
                     Text(
-                      'Reset your password',
+                      l10n.t(AppText.authForgotTitle),
                       textAlign: TextAlign.center,
                       style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                             fontWeight: FontWeight.w700,
@@ -181,7 +184,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      'We will send a reset link to your email.',
+                      l10n.t(AppText.authForgotSubtitle),
                       textAlign: TextAlign.center,
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
@@ -190,9 +193,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                     TextField(
                       controller: _email,
                       keyboardType: TextInputType.emailAddress,
-                      decoration: const InputDecoration(
-                        labelText: 'Email',
-                        prefixIcon: Icon(Icons.alternate_email),
+                      decoration: InputDecoration(
+                        labelText: l10n.t(AppText.commonEmail),
+                        prefixIcon: const Icon(Icons.alternate_email),
                       ),
                     ),
 
@@ -222,7 +225,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                               height: 18,
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
-                          : const Text('Send reset link'),
+                          : Text(l10n.t(AppText.authSendResetLink)),
                     ),
 
                     const SizedBox(height: 10),
@@ -230,7 +233,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                     TextButton.icon(
                       onPressed: () => context.go(Routes.login),
                       icon: const Icon(Icons.arrow_back),
-                      label: const Text('Back to Login'),
+                      label: Text(l10n.t(AppText.commonBackToLogin)),
                     ),
                   ],
                 ),

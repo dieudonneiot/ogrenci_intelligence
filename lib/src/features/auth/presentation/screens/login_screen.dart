@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/routing/routes.dart';
 import '../controllers/auth_controller.dart';
 
@@ -73,18 +74,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
 Future<void> _submit() async {
+  final l10n = AppLocalizations.of(context);
   setState(() => _error = null);
 
   final email = _email.text.trim();
   final pass = _password.text;
 
   if (email.isEmpty || pass.isEmpty) {
-    setState(() => _error = 'Please fill in all fields.');
+    setState(() => _error = l10n.t(AppText.commonFillAllFields));
     return;
   }
   final emailRegex = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
   if (!emailRegex.hasMatch(email)) {
-    setState(() => _error = 'Please enter a valid email address.');
+    setState(() => _error = l10n.t(AppText.commonInvalidEmail));
     return;
   }
 
@@ -99,14 +101,14 @@ Future<void> _submit() async {
     return;
   }
 
-  // ✅ If auth state is already updated, navigate immediately.
+  // If auth state is already updated, navigate immediately.
   final current = ref.read(authViewStateProvider).valueOrNull;
   if (current?.isAuthenticated == true) {
     context.go(_resolveFromTarget());
     return;
   }
 
-  // ✅ Otherwise wait a bit for auth to update (but never hang forever).
+  // Otherwise wait a bit for auth to update (but never hang forever).
   final completer = Completer<void>();
   final sub = ref.listenManual<AsyncValue<AuthViewState>>(
     authViewStateProvider,
@@ -132,11 +134,11 @@ Future<void> _submit() async {
 
   @override
   Widget build(BuildContext context) {
-    
+    final l10n = AppLocalizations.of(context);
     final busy = ref.watch(authActionLoadingProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Login')),
+      appBar: AppBar(title: Text(l10n.t(AppText.authLoginTitle))),
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 520),
@@ -165,7 +167,7 @@ Future<void> _submit() async {
                     ),
                     const SizedBox(height: 14),
                     Text(
-                      'Welcome back',
+                      l10n.t(AppText.authWelcomeBack),
                       textAlign: TextAlign.center,
                       style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                             fontWeight: FontWeight.w700,
@@ -173,7 +175,7 @@ Future<void> _submit() async {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      'Student login',
+                      l10n.t(AppText.authStudentLoginSubtitle),
                       textAlign: TextAlign.center,
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
@@ -182,9 +184,9 @@ Future<void> _submit() async {
                     TextField(
                       controller: _email,
                       keyboardType: TextInputType.emailAddress,
-                      decoration: const InputDecoration(
-                        labelText: 'Email',
-                        prefixIcon: Icon(Icons.mail_outline),
+                      decoration: InputDecoration(
+                        labelText: l10n.t(AppText.commonEmail),
+                        prefixIcon: const Icon(Icons.mail_outline),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -193,7 +195,7 @@ Future<void> _submit() async {
                       controller: _password,
                       obscureText: !_showPassword,
                       decoration: InputDecoration(
-                        labelText: 'Password',
+                        labelText: l10n.t(AppText.commonPassword),
                         prefixIcon: const Icon(Icons.lock_outline),
                         suffixIcon: IconButton(
                           onPressed: () =>
@@ -213,11 +215,11 @@ Future<void> _submit() async {
                           onChanged: (v) =>
                               setState(() => _rememberMe = v ?? false),
                         ),
-                        const Text('Remember me'),
+                        Text(l10n.t(AppText.commonRememberMe)),
                         const Spacer(),
                         TextButton(
                           onPressed: () => context.push(Routes.forgotPassword),
-                          child: const Text('Forgot password?'),
+                          child: Text(l10n.t(AppText.commonForgotPassword)),
                         ),
                       ],
                     ),
@@ -248,7 +250,7 @@ Future<void> _submit() async {
                               height: 18,
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
-                          : const Text('Login'),
+                          : Text(l10n.t(AppText.authLoginTitle)),
                     ),
 
                     const SizedBox(height: 14),
@@ -257,7 +259,7 @@ Future<void> _submit() async {
 
                     OutlinedButton(
                       onPressed: () => context.push(Routes.companyAuth),
-                      child: const Text('Login as company'),
+                      child: Text(l10n.t(AppText.authLoginAsCompany)),
                     ),
 
                     const SizedBox(height: 12),
@@ -265,10 +267,10 @@ Future<void> _submit() async {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text('No account? '),
+                        Text('${l10n.t(AppText.authNoAccount)} '),
                         TextButton(
                           onPressed: () => context.push(Routes.register),
-                          child: const Text('Register'),
+                          child: Text(l10n.t(AppText.authRegisterCta)),
                         ),
                       ],
                     ),

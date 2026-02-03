@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/routing/routes.dart';
 import '../../application/courses_providers.dart';
 import '../../domain/course_models.dart';
@@ -44,6 +45,7 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
 
     final allCoursesAsync = ref.watch(coursesListProvider);
     final myCoursesAsync = ref.watch(myEnrolledCoursesProvider);
@@ -67,14 +69,14 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Kurslar',
-                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900),
+                  Text(
+                    l10n.t(AppText.navCourses),
+                    style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900),
                   ),
                   const SizedBox(height: 6),
-                  const Text(
-                    'Kurslara göz at, kaydol ve puan kazan.',
-                    style: TextStyle(
+                  Text(
+                    l10n.t(AppText.coursesSubtitle),
+                    style: const TextStyle(
                       color: Color(0xFF6B7280),
                       fontWeight: FontWeight.w700,
                     ),
@@ -110,9 +112,9 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen>
                       unselectedLabelColor: const Color(0xFF6B7280),
                       labelStyle: const TextStyle(fontWeight: FontWeight.w900),
                       indicatorColor: const Color(0xFF6D28D9),
-                      tabs: const [
-                        Tab(text: 'Tümü'),
-                        Tab(text: 'Kayıtlılarım'),
+                      tabs: [
+                        Tab(text: l10n.t(AppText.commonAll)),
+                        Tab(text: l10n.t(AppText.coursesMyEnrolledTab)),
                       ],
                     ),
                   ),
@@ -128,16 +130,16 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen>
                         allCoursesAsync.when(
                           loading: () => const _LoadingBlock(),
                           error: (e, _) => _ErrorBlock(
-                            title: 'Kurslar yüklenemedi',
+                            title: l10n.t(AppText.coursesLoadFailedTitle),
                             message: e.toString(),
                             onRetry: () => ref.invalidate(coursesListProvider),
                           ),
                           data: (courses) {
                             if (courses.isEmpty) {
-                              return const _EmptyBlock(
+                              return _EmptyBlock(
                                 icon: Icons.menu_book_outlined,
-                                title: 'Kurs bulunamadı',
-                                message: 'Filtreleri temizleyip tekrar deneyin.',
+                                title: l10n.t(AppText.coursesEmptyTitle),
+                                message: l10n.t(AppText.coursesEmptySubtitle),
                               );
                             }
 
@@ -189,7 +191,7 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen>
                         myCoursesAsync.when(
                           loading: () => const _LoadingBlock(),
                           error: (e, _) => _ErrorBlock(
-                            title: 'Kayıtlı kurslar yüklenemedi',
+                            title: l10n.t(AppText.coursesMyLoadFailedTitle),
                             message: e.toString(),
                             onRetry: () => ref.invalidate(myEnrolledCoursesProvider),
                           ),
@@ -197,9 +199,9 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen>
                             if (myCourses.isEmpty) {
                               return _EmptyBlock(
                                 icon: Icons.school_outlined,
-                                title: 'Henüz kayıtlı kurs yok',
-                                message: '“Tümü” sekmesinden bir kursa kayıt olabilirsin.',
-                                actionLabel: 'Kursları Keşfet',
+                                title: l10n.t(AppText.coursesMyEmptyTitle),
+                                message: l10n.t(AppText.coursesMyEmptySubtitle),
+                                actionLabel: l10n.t(AppText.coursesExploreAction),
                                 onAction: () => _tabs.animateTo(0),
                               );
                             }
@@ -244,6 +246,7 @@ class _FiltersCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final dept = ref.watch(coursesDepartmentProvider);
     final level = ref.watch(coursesLevelProvider);
     final search = ref.watch(coursesSearchProvider);
@@ -265,7 +268,7 @@ class _FiltersCard extends ConsumerWidget {
             onChanged: onSearchChanged,
             decoration: InputDecoration(
               prefixIcon: const Icon(Icons.search),
-              hintText: 'Kurs ara (örn: SQL, Flutter, Veri...)',
+              hintText: l10n.t(AppText.coursesSearchHint),
               filled: true,
               fillColor: const Color(0xFFF9FAFB),
               border: OutlineInputBorder(
@@ -280,28 +283,29 @@ class _FiltersCard extends ConsumerWidget {
                   ? IconButton(
                       onPressed: onClear,
                       icon: const Icon(Icons.close),
-                      tooltip: 'Temizle',
+                      tooltip: l10n.t(AppText.commonClear),
                     )
                   : null,
             ),
           ),
           const SizedBox(height: 10),
-          Row(
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               _SmallPill(
                 icon: Icons.filter_alt_outlined,
-                text: dept == null ? 'Bölüm: Hepsi' : 'Bölüm: $dept',
+                text: dept == null ? l10n.t(AppText.coursesDepartmentAll) : l10n.coursesDepartmentSelected(dept),
               ),
-              const SizedBox(width: 8),
               _SmallPill(
                 icon: Icons.bar_chart_outlined,
-                text: level == null ? 'Seviye: Hepsi' : 'Seviye: $level',
+                text: level == null ? l10n.t(AppText.coursesLevelAll) : l10n.coursesLevelSelected(level),
               ),
-              const Spacer(),
               TextButton.icon(
                 onPressed: () => context.go(Routes.pointsSystem),
                 icon: const Icon(Icons.track_changes_outlined),
-                label: const Text('Puan Sistemi'),
+                label: Text(l10n.t(AppText.pointsSystem)),
               ),
             ],
           ),
@@ -322,6 +326,7 @@ class _QuickChipsRow extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final selectedDept = ref.watch(coursesDepartmentProvider);
     final selectedLevel = ref.watch(coursesLevelProvider);
 
@@ -329,7 +334,7 @@ class _QuickChipsRow extends ConsumerWidget {
       spacing: 8,
       runSpacing: 8,
       children: [
-        const Text('Hızlı Filtre:', style: TextStyle(fontWeight: FontWeight.w900)),
+        Text(l10n.t(AppText.coursesQuickFilterLabel), style: const TextStyle(fontWeight: FontWeight.w900)),
         const SizedBox(width: 6),
 
         // Departments
@@ -377,6 +382,7 @@ class _CourseCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final p = (progress ?? 0).clamp(0, 100);
 
     return Container(
@@ -420,16 +426,16 @@ class _CourseCard extends StatelessWidget {
                           color: const Color(0xFFDCFCE7),
                           borderRadius: BorderRadius.circular(999),
                         ),
-                        child: const Text(
-                          'Kayıtlı',
-                          style: TextStyle(color: Color(0xFF16A34A), fontWeight: FontWeight.w900, fontSize: 12),
+                        child: Text(
+                          l10n.t(AppText.coursesEnrolledPill),
+                          style: const TextStyle(color: Color(0xFF16A34A), fontWeight: FontWeight.w900, fontSize: 12),
                         ),
                       ),
                   ],
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  (course.description ?? 'Açıklama yok.'),
+                  (course.description ?? l10n.t(AppText.commonNoDescription)),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
@@ -457,7 +463,7 @@ class _CourseCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '%$p tamamlandı',
+                    l10n.dashboardCourseProgress(p),
                     style: const TextStyle(
                       color: Color(0xFF6B7280),
                       fontWeight: FontWeight.w800,
@@ -478,7 +484,9 @@ class _CourseCard extends StatelessWidget {
               elevation: 0,
             ),
             child: Text(
-              (enrolled && p < 100) ? 'Continue →' : 'Detay →',
+              (enrolled && p < 100)
+                  ? l10n.t(AppText.commonContinueArrow)
+                  : l10n.t(AppText.commonViewDetailsArrow),
               style: const TextStyle(fontWeight: FontWeight.w900),
             ),
           ),
@@ -496,7 +504,7 @@ class _EnrolledCourseCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
+    final l10n = AppLocalizations.of(context);
     final c = item.course;
     final p = item.enrollment.progress.clamp(0, 100);
 
@@ -516,12 +524,12 @@ class _EnrolledCourseCard extends StatelessWidget {
               Expanded(
                 child: Text(c.title, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
               ),
-              TextButton(onPressed: onOpen, child: const Text('Aç →')),
+              TextButton(onPressed: onOpen, child: Text(l10n.t(AppText.commonOpenArrow))),
             ],
           ),
           const SizedBox(height: 6),
           Text(
-            c.description ?? 'Açıklama yok.',
+            c.description ?? l10n.t(AppText.commonNoDescription),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
@@ -537,7 +545,10 @@ class _EnrolledCourseCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 6),
-          Text('%$p tamamlandı', style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w800, fontSize: 12)),
+          Text(
+            l10n.dashboardCourseProgress(p),
+            style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w800, fontSize: 12),
+          ),
         ],
       ),
     );
@@ -672,7 +683,7 @@ class _ErrorBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 620),
@@ -691,7 +702,7 @@ class _ErrorBlock extends StatelessWidget {
                 style: const TextStyle(color: Color(0xFF6B7280)),
               ),
               const SizedBox(height: 10),
-              ElevatedButton(onPressed: onRetry, child: const Text('Retry')),
+              ElevatedButton(onPressed: onRetry, child: Text(l10n.t(AppText.retry))),
             ],
           ),
         ),

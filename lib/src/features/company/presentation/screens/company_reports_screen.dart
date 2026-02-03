@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/utils/csv_export.dart';
 import '../../../auth/domain/auth_models.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
@@ -72,33 +73,56 @@ class _CompanyReportsScreenState extends ConsumerState<CompanyReportsScreen> {
   }
 
   Future<void> _exportCsv() async {
+    final l10n = AppLocalizations.of(context);
+    String rangeLabel;
+    switch (_rangeKey) {
+      case 'today':
+        rangeLabel = l10n.t(AppText.companyReportsRangeToday);
+        break;
+      case 'last7':
+        rangeLabel = l10n.t(AppText.companyReportsRangeLast7);
+        break;
+      case 'last90':
+        rangeLabel = l10n.t(AppText.companyReportsRangeLast90);
+        break;
+      case 'all':
+        rangeLabel = l10n.t(AppText.companyReportsRangeAll);
+        break;
+      case 'last30':
+      default:
+        rangeLabel = l10n.t(AppText.companyReportsRangeLast30);
+        break;
+    }
+
     final buffer = StringBuffer();
-    buffer.writeln('Sirket Raporu');
-    buffer.writeln('Tarih Araligi,$_rangeKey');
+    buffer.writeln('Company Report');
+    buffer.writeln('Range,$rangeLabel');
     buffer.writeln('');
-    buffer.writeln('GENEL METRIKLER');
-    buffer.writeln('Toplam Görüntüleme,${_summary.totalViews}');
-    buffer.writeln('Benzersiz Ziyaretçi,${_summary.uniqueVisitors}');
-    buffer.writeln('Toplam Basvuru,${_summary.totalApplications}');
-    buffer.writeln('Kabul Edilen,${_summary.acceptedApplications}');
-    buffer.writeln('Reddedilen,${_summary.rejectedApplications}');
-    buffer.writeln('Dönüsüm Orani,%${_summary.conversionRate.toStringAsFixed(1)}');
-    buffer.writeln('Ortalama Yanit Süresi,${_summary.avgResponseTimeHours.toStringAsFixed(1)} saat');
+    buffer.writeln('Metrics');
+    buffer.writeln('${l10n.t(AppText.companyReportsMetricTotalViews)},${_summary.totalViews}');
+    buffer.writeln('${l10n.t(AppText.companyReportsMetricUniqueVisitors)},${_summary.uniqueVisitors}');
+    buffer.writeln('${l10n.t(AppText.companyReportsMetricTotalApplications)},${_summary.totalApplications}');
+    buffer.writeln('${l10n.t(AppText.companyReportsMetricAccepted)},${_summary.acceptedApplications}');
+    buffer.writeln('${l10n.t(AppText.companyReportsMetricRejected)},${_summary.rejectedApplications}');
+    buffer.writeln('${l10n.t(AppText.companyReportsMetricConversionRate)},%${_summary.conversionRate.toStringAsFixed(1)}');
+    buffer.writeln(
+      '${l10n.t(AppText.companyReportsMetricAvgResponseTime)},${_summary.avgResponseTimeHours.toStringAsFixed(1)} ${l10n.t(AppText.companyReportsHoursUnit)}',
+    );
     buffer.writeln('');
-    buffer.writeln('GÖRÜNTÜLEME TRENDI (7 gün)');
-    buffer.writeln('Tarih,Adet');
+    buffer.writeln('${l10n.t(AppText.companyReportsChartViewsTrend)} (7 days)');
+    buffer.writeln('Date,Count');
     for (final p in _trends.views) {
       buffer.writeln('${_fmtDate(p.date)},${p.count}');
     }
     buffer.writeln('');
-    buffer.writeln('BASVURU TRENDI (7 gün)');
-    buffer.writeln('Tarih,Adet');
+    buffer.writeln('${l10n.t(AppText.companyReportsChartApplicationsTrend)} (7 days)');
+    buffer.writeln('Date,Count');
     for (final p in _trends.applications) {
       buffer.writeln('${_fmtDate(p.date)},${p.count}');
     }
     buffer.writeln('');
-    buffer.writeln('DEPARTMAN DAGILIMI');
-    buffer.writeln('Departman,Adet');
+    buffer.writeln(l10n.t(AppText.companyReportsDepartmentDistribution));
+    buffer.writeln('Department,Count');
     final sorted = _trends.departmentCounts.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
     for (final e in sorted) {
@@ -107,16 +131,17 @@ class _CompanyReportsScreenState extends ConsumerState<CompanyReportsScreen> {
 
     final now = DateTime.now();
     final fileName =
-        'rapor-${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}.csv';
+        'report-${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}.csv';
     await downloadCsv(buffer.toString(), fileName);
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('CSV indirildi.')),
+      SnackBar(content: Text(l10n.t(AppText.companyReportsCsvDownloaded))),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final authAsync = ref.watch(authViewStateProvider);
     if (authAsync.isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -124,7 +149,7 @@ class _CompanyReportsScreenState extends ConsumerState<CompanyReportsScreen> {
 
     final auth = authAsync.value;
     if (auth == null || !auth.isAuthenticated || auth.userType != UserType.company) {
-      return const Center(child: Text('Sirket raporlarini görmek için giris yapmalisiniz.'));
+      return Center(child: Text(l10n.t(AppText.companyReportsLoginRequired)));
     }
 
     return Container(
@@ -142,11 +167,11 @@ class _CompanyReportsScreenState extends ConsumerState<CompanyReportsScreen> {
                     builder: (_, c) {
                       final isNarrow = c.maxWidth < 640;
                       final titleRow = Row(
-                        children: const [
-                          Icon(Icons.bar_chart_outlined, color: Color(0xFF6D28D9)),
-                          SizedBox(width: 8),
-                          Text('Raporlar',
-                              style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900)),
+                        children: [
+                          const Icon(Icons.bar_chart_outlined, color: Color(0xFF6D28D9)),
+                          const SizedBox(width: 8),
+                          Text(l10n.t(AppText.companyReportsTitle),
+                              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900)),
                         ],
                       );
                       final actions = Wrap(
@@ -160,12 +185,12 @@ class _CompanyReportsScreenState extends ConsumerState<CompanyReportsScreen> {
                               setState(() => _rangeKey = v);
                               _load();
                             },
-                            items: const [
-                              DropdownMenuItem(value: 'today', child: Text('Bugün')),
-                              DropdownMenuItem(value: 'last7', child: Text('Son 7 Gün')),
-                              DropdownMenuItem(value: 'last30', child: Text('Son 30 Gün')),
-                              DropdownMenuItem(value: 'last90', child: Text('Son 90 Gün')),
-                              DropdownMenuItem(value: 'all', child: Text('Tümü')),
+                            items: [
+                              DropdownMenuItem(value: 'today', child: Text(l10n.t(AppText.companyReportsRangeToday))),
+                              DropdownMenuItem(value: 'last7', child: Text(l10n.t(AppText.companyReportsRangeLast7))),
+                              DropdownMenuItem(value: 'last30', child: Text(l10n.t(AppText.companyReportsRangeLast30))),
+                              DropdownMenuItem(value: 'last90', child: Text(l10n.t(AppText.companyReportsRangeLast90))),
+                              DropdownMenuItem(value: 'all', child: Text(l10n.t(AppText.companyReportsRangeAll))),
                             ],
                           ),
                           IconButton(
@@ -175,7 +200,7 @@ class _CompanyReportsScreenState extends ConsumerState<CompanyReportsScreen> {
                           ElevatedButton.icon(
                             onPressed: _exportCsv,
                             icon: const Icon(Icons.download_outlined),
-                            label: const Text('CSV Indir'),
+                            label: Text(l10n.t(AppText.companyReportsExportCsv)),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF6D28D9),
                             ),
@@ -223,51 +248,54 @@ class _CompanyReportsScreenState extends ConsumerState<CompanyReportsScreen> {
                           childAspectRatio: 1.25,
                           children: [
                             _MetricCard(
-                              title: 'Toplam Görüntüleme',
+                              title: l10n.t(AppText.companyReportsMetricTotalViews),
                               value: _summary.totalViews.toString(),
                               icon: Icons.visibility_outlined,
                               color: const Color(0xFF3B82F6),
                             ),
                             _MetricCard(
-                              title: 'Benzersiz Ziyaretçi',
+                              title: l10n.t(AppText.companyReportsMetricUniqueVisitors),
                               value: _summary.uniqueVisitors.toString(),
                               icon: Icons.people_outline,
                               color: const Color(0xFF10B981),
                             ),
                             _MetricCard(
-                              title: 'Toplam Basvuru',
+                              title: l10n.t(AppText.companyReportsMetricTotalApplications),
                               value: _summary.totalApplications.toString(),
                               icon: Icons.assignment_turned_in_outlined,
                               color: const Color(0xFF7C3AED),
                             ),
                             _MetricCard(
-                              title: 'Dönüsüm Orani',
+                              title: l10n.t(AppText.companyReportsMetricConversionRate),
                               value: '%${_summary.conversionRate.toStringAsFixed(1)}',
                               icon: Icons.trending_up,
                               color: const Color(0xFFF59E0B),
                             ),
                             _MetricCard(
-                              title: 'Ortalama Yanit Süresi',
-                              value: '${_summary.avgResponseTimeHours.toStringAsFixed(1)} saat',
+                              title: l10n.t(AppText.companyReportsMetricAvgResponseTime),
+                              value:
+                                  '${_summary.avgResponseTimeHours.toStringAsFixed(1)} ${l10n.t(AppText.companyReportsHoursUnit)}',
                               icon: Icons.schedule,
                               color: const Color(0xFF6366F1),
                             ),
                             _MetricCard(
-                              title: 'Kabul Edilen',
+                              title: l10n.t(AppText.companyReportsMetricAccepted),
                               value: _summary.acceptedApplications.toString(),
                               icon: Icons.check_circle_outline,
                               color: const Color(0xFF16A34A),
                             ),
                             _MetricCard(
-                              title: 'Reddedilen',
+                              title: l10n.t(AppText.companyReportsMetricRejected),
                               value: _summary.rejectedApplications.toString(),
                               icon: Icons.cancel_outlined,
                               color: const Color(0xFFDC2626),
                             ),
                             _MetricCard(
-                              title: 'Aktif Ilan',
-                              value:
-                                  '${_summary.activeJobs} is • ${_summary.activeInternships} staj',
+                              title: l10n.t(AppText.companyReportsMetricActiveListings),
+                              value: l10n.companyReportsActiveListingsValue(
+                                _summary.activeJobs,
+                                _summary.activeInternships,
+                              ),
                               icon: Icons.work_outline,
                               color: const Color(0xFF111827),
                             ),
@@ -276,8 +304,8 @@ class _CompanyReportsScreenState extends ConsumerState<CompanyReportsScreen> {
                       },
                     ),
                     const SizedBox(height: 20),
-                    const Text('Son 7 Gün Trendleri',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+                    Text(l10n.t(AppText.companyReportsTrendsTitle),
+                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
                     const SizedBox(height: 12),
                     LayoutBuilder(
                       builder: (_, c) {
@@ -291,12 +319,12 @@ class _CompanyReportsScreenState extends ConsumerState<CompanyReportsScreen> {
                           childAspectRatio: 1.6,
                           children: [
                             _TrendCard(
-                              title: 'Görüntüleme Trendi',
+                              title: l10n.t(AppText.companyReportsChartViewsTrend),
                               points: _trends.views,
                               color: const Color(0xFF3B82F6),
                             ),
                             _TrendCard(
-                              title: 'Basvuru Trendi',
+                              title: l10n.t(AppText.companyReportsChartApplicationsTrend),
                               points: _trends.applications,
                               color: const Color(0xFF7C3AED),
                             ),
@@ -333,9 +361,10 @@ class _CompanyReportsScreenState extends ConsumerState<CompanyReportsScreen> {
   }
 
   String _fmtDate(DateTime d) {
+    final y = d.year.toString().padLeft(4, '0');
+    final m = d.month.toString().padLeft(2, '0');
     final day = d.day.toString().padLeft(2, '0');
-    final month = d.month.toString().padLeft(2, '0');
-    return '$day.$month.${d.year}';
+    return '$y-$m-$day';
   }
 
   String _escape(String input) {
@@ -433,7 +462,7 @@ class _LineChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (points.isEmpty) {
-      return const Center(child: Text('Veri yok'));
+      return Center(child: Text(AppLocalizations.of(context).t(AppText.commonNoData)));
     }
 
     return Column(
@@ -538,10 +567,11 @@ class _DistributionCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Departman Dagilimi', style: TextStyle(fontWeight: FontWeight.w900)),
+          Text(AppLocalizations.of(context).t(AppText.companyReportsDepartmentDistribution),
+              style: const TextStyle(fontWeight: FontWeight.w900)),
           const SizedBox(height: 12),
           if (top.isEmpty)
-            const Expanded(child: Center(child: Text('Veri yok')))
+            Expanded(child: Center(child: Text(AppLocalizations.of(context).t(AppText.commonNoData))))
           else
             Expanded(
               child: ListView.separated(
@@ -607,13 +637,26 @@ class _FunnelCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Dönüsüm Hunisi', style: TextStyle(fontWeight: FontWeight.w900)),
+          Text(AppLocalizations.of(context).t(AppText.companyReportsConversionFunnel),
+              style: const TextStyle(fontWeight: FontWeight.w900)),
           const SizedBox(height: 12),
-          _FunnelRow(label: 'Görüntüleme', value: funnel.views, max: maxValue),
+          _FunnelRow(
+            label: AppLocalizations.of(context).t(AppText.companyReportsMetricTotalViews),
+            value: funnel.views,
+            max: maxValue,
+          ),
           const SizedBox(height: 10),
-          _FunnelRow(label: 'Basvuru', value: funnel.applications, max: maxValue),
+          _FunnelRow(
+            label: AppLocalizations.of(context).t(AppText.companyReportsMetricTotalApplications),
+            value: funnel.applications,
+            max: maxValue,
+          ),
           const SizedBox(height: 10),
-          _FunnelRow(label: 'Kabul', value: funnel.accepted, max: maxValue),
+          _FunnelRow(
+            label: AppLocalizations.of(context).t(AppText.companyReportsMetricAccepted),
+            value: funnel.accepted,
+            max: maxValue,
+          ),
         ],
       ),
     );

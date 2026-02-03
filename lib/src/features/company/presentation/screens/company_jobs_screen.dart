@@ -2,6 +2,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../auth/domain/auth_models.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
@@ -63,6 +64,7 @@ class _CompanyJobsScreenState extends ConsumerState<CompanyJobsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final authAsync = ref.watch(authViewStateProvider);
     if (authAsync.isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -70,7 +72,7 @@ class _CompanyJobsScreenState extends ConsumerState<CompanyJobsScreen> {
 
     final auth = authAsync.value;
     if (auth == null || !auth.isAuthenticated || auth.userType != UserType.company) {
-      return const Center(child: Text('Şirket panelini görmek için giriş yapmalısınız.'));
+      return Center(child: Text(l10n.t(AppText.companyPanelLoginRequired)));
     }
 
     final filtered = _jobs.where((j) {
@@ -102,12 +104,13 @@ class _CompanyJobsScreenState extends ConsumerState<CompanyJobsScreen> {
                     children: [
                       const Icon(Icons.work_outline, color: Color(0xFF6D28D9)),
                       const SizedBox(width: 8),
-                      const Text('İş İlanlarım', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900)),
+                      Text(l10n.t(AppText.companyJobsTitle),
+                          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900)),
                       const Spacer(),
                       ElevatedButton.icon(
                         onPressed: () => context.go(Routes.companyJobsCreate),
                         icon: const Icon(Icons.add),
-                        label: const Text('Yeni İlan'),
+                        label: Text(l10n.t(AppText.newListing)),
                         style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6D28D9)),
                       ),
                     ],
@@ -117,10 +120,10 @@ class _CompanyJobsScreenState extends ConsumerState<CompanyJobsScreen> {
                     spacing: 12,
                     runSpacing: 12,
                     children: [
-                      _MiniStat(label: 'Toplam', value: _jobs.length),
-                      _MiniStat(label: 'Aktif', value: activeCount),
-                      _MiniStat(label: 'Pasif', value: inactiveCount),
-                      _MiniStat(label: 'Basvuru', value: totalApps),
+                      _MiniStat(label: l10n.t(AppText.commonTotal), value: _jobs.length),
+                      _MiniStat(label: l10n.t(AppText.commonActive), value: activeCount),
+                      _MiniStat(label: l10n.t(AppText.commonInactive), value: inactiveCount),
+                      _MiniStat(label: l10n.t(AppText.commonApplications), value: totalApps),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -178,6 +181,7 @@ class _FiltersBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -195,7 +199,7 @@ class _FiltersBar extends StatelessWidget {
             child: TextField(
               decoration: InputDecoration(
                 prefixIcon: const Icon(Icons.search),
-                hintText: 'İlan ara...',
+                hintText: l10n.t(AppText.companyJobsSearchHint),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 isDense: true,
               ),
@@ -204,17 +208,17 @@ class _FiltersBar extends StatelessWidget {
             ),
           ),
           _FilterChip(
-            label: 'Tümü',
+            label: l10n.t(AppText.commonAll),
             active: filter == 'all',
             onTap: () => onFilter('all'),
           ),
           _FilterChip(
-            label: 'Aktif',
+            label: l10n.t(AppText.commonActive),
             active: filter == 'active',
             onTap: () => onFilter('active'),
           ),
           _FilterChip(
-            label: 'Pasif',
+            label: l10n.t(AppText.commonInactive),
             active: filter == 'inactive',
             onTap: () => onFilter('inactive'),
           ),
@@ -300,9 +304,10 @@ class _JobCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final deadline = job.deadline == null
-        ? '—'
-        : '${job.deadline!.day.toString().padLeft(2, '0')}.${job.deadline!.month.toString().padLeft(2, '0')}.${job.deadline!.year}';
+    final l10n = AppLocalizations.of(context);
+    final deadlineText = job.deadline == null
+        ? l10n.t(AppText.commonNotSpecified)
+        : MaterialLocalizations.of(context).formatShortDate(job.deadline!);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -337,10 +342,19 @@ class _JobCard extends StatelessWidget {
           Wrap(
             spacing: 12,
             children: [
-              _InfoChip(icon: Icons.people_outline, text: '${job.applicationsCount} basvuru'),
-              _InfoChip(icon: Icons.check_circle_outline, text: '${job.acceptedCount} kabul'),
-              _InfoChip(icon: Icons.visibility_outlined, text: '${job.viewsCount} görüntüleme'),
-              _InfoChip(icon: Icons.event_outlined, text: 'Son tarih: $deadline'),
+              _InfoChip(
+                icon: Icons.people_outline,
+                text: '${l10n.t(AppText.commonApplications)}: ${job.applicationsCount}',
+              ),
+              _InfoChip(
+                icon: Icons.check_circle_outline,
+                text: '${l10n.t(AppText.statusAccepted)}: ${job.acceptedCount}',
+              ),
+              _InfoChip(
+                icon: Icons.visibility_outlined,
+                text: '${l10n.t(AppText.commonViews)}: ${job.viewsCount}',
+              ),
+              _InfoChip(icon: Icons.event_outlined, text: '${l10n.t(AppText.deadline)}: $deadlineText'),
             ],
           ),
           const SizedBox(height: 12),
@@ -349,13 +363,13 @@ class _JobCard extends StatelessWidget {
               TextButton.icon(
                 onPressed: onApplications,
                 icon: const Icon(Icons.people_outline),
-                label: const Text('Basvurular'),
+                label: Text(l10n.t(AppText.commonApplications)),
               ),
               const SizedBox(width: 8),
               TextButton.icon(
                 onPressed: onEdit,
                 icon: const Icon(Icons.edit_outlined),
-                label: const Text('Düzenle'),
+                label: Text(l10n.t(AppText.commonEdit)),
               ),
             ],
           ),
@@ -392,6 +406,7 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -404,7 +419,7 @@ class _EmptyState extends StatelessWidget {
           const Icon(Icons.work_outline, size: 44, color: Color(0xFFD1D5DB)),
           const SizedBox(height: 10),
           Text(
-            hasSearch ? 'Aradiginiz ilan bulunamadi.' : 'Henüz ilaniniz yok.',
+            hasSearch ? l10n.t(AppText.noResults) : l10n.t(AppText.companyJobsEmptyNoListings),
             style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF6B7280)),
           ),
           const SizedBox(height: 10),
@@ -412,7 +427,7 @@ class _EmptyState extends StatelessWidget {
             ElevatedButton.icon(
               onPressed: onCreate,
               icon: const Icon(Icons.add),
-              label: const Text('İlan Oluştur'),
+              label: Text(l10n.t(AppText.newListing)),
               style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6D28D9)),
             ),
         ],

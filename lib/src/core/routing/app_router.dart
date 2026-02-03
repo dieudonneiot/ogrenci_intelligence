@@ -24,6 +24,7 @@ import '../../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/auth/presentation/screens/reset_password_screen.dart';
+import '../../features/chat/presentation/screens/chat_screen.dart';
 import '../../features/company/presentation/screens/company_applications_screen.dart';
 import '../../features/company/presentation/screens/company_dashboard_screen.dart';
 import '../../features/company/presentation/screens/company_internship_applications_screen.dart';
@@ -37,7 +38,6 @@ import '../../features/company/presentation/screens/company_profile_screen.dart'
 import '../../features/company/presentation/screens/company_reports_screen.dart';
 import '../../features/company/presentation/screens/register_company_screen.dart';
 import '../../features/company/presentation/widgets/company_status_check.dart';
-import '../../features/chat/presentation/screens/chat_screen.dart';
 import '../../features/courses/presentation/screens/course_detail_screen.dart';
 import '../../features/courses/presentation/screens/courses_screen.dart';
 import '../../features/favorites/presentation/screens/favorites_screen.dart';
@@ -68,7 +68,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
   final refreshNotifier = GoRouterRefreshNotifier(ref);
   ref.onDispose(refreshNotifier.dispose);
 
-  // ✅ IMPORTANT (Web): use the real browser URL, not defaultRouteName "/"
+  // IMPORTANT (Web): use the real browser URL, not defaultRouteName "/"
   final String initialLocation = () {
     if (kIsWeb) {
       final base = Uri.base;
@@ -100,7 +100,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       final auth = authAsync.value;
       if (auth == null) return null;
 
-      // ✅ Always allow reset-password (deep-link recovery flow)
+      // Always allow reset-password (deep-link recovery flow)
       if (location == Routes.resetPassword) return null;
 
       final isAuthorized = auth.isAuthenticated;
@@ -471,7 +471,7 @@ class _MainShellState extends ConsumerState<MainShell> {
         final chatBottom = _showFooter ? footerHeight + 18.0 : 18.0;
 
         return Scaffold(
-          // ✅ No AppBar (we reproduce React navbar)
+          // No AppBar (we reproduce React navbar)
           body: Stack(
             children: [
               Positioned.fill(
