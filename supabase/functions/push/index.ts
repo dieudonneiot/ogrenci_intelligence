@@ -34,6 +34,18 @@ function envAny(keys: string[]): string {
   throw new Error(`Missing env (any of): ${keys.join(", ")}`);
 }
 
+function looksLikeJwt(v: string) {
+  return v.startsWith("eyJ");
+}
+
+function envJwtAny(keys: string[]): string {
+  for (const key of keys) {
+    const v = Deno.env.get(key);
+    if (v && v.trim().length > 0 && looksLikeJwt(v.trim())) return v.trim();
+  }
+  return envAny(keys);
+}
+
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
     status,
@@ -124,8 +136,8 @@ Deno.serve(async (req) => {
   if (!focusCheckId) return jsonResponse({ error: "focus_check_id required" }, 400);
 
   const supabaseUrl = envAny(["SUPABASE_URL", "BASE_URL"]);
-  const anonKey = envAny(["SUPABASE_ANON_KEY", "BASE_ANON_KEY"]);
-  const serviceKey = envAny(["SERVICE_ROLE_KEY", "BASE_SERVICE_ROLE_KEY", "SUPABASE_SERVICE_ROLE_KEY"]);
+  const anonKey = envJwtAny(["BASE_ANON_KEY", "SUPABASE_ANON_KEY"]);
+  const serviceKey = envJwtAny(["SERVICE_ROLE_KEY", "BASE_SERVICE_ROLE_KEY", "SUPABASE_SERVICE_ROLE_KEY"]);
 
   // 1) Use caller auth (RLS enforced) to validate access to that focus_check
   const userClient = createClient(supabaseUrl, anonKey, {

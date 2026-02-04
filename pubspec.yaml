@@ -85,7 +85,7 @@ flutter:
 # App launcher icons (Android/iOS/Web/Windows)
 # Put your source image at: assets/icons/app_icon.png (recommended: 1024x1024 PNG)
 flutter_launcher_icons:
-  image_path: assets/icons/app_icon.png
+  image_path: assets/icons/app_icon.jpeg
   android: true
   ios: true
   web:
