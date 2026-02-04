@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -24,6 +26,9 @@ class _AdminSetupScreenState extends State<AdminSetupScreen> {
   bool _loading = true;
   bool _creating = false;
   bool _hasAdmins = false;
+  DateTime? _cooldownUntilUtc;
+  Timer? _cooldownTimer;
+  int _cooldownSeconds = 0;
 
   @override
   void initState() {
@@ -38,7 +43,60 @@ class _AdminSetupScreenState extends State<AdminSetupScreen> {
     _emailCtrl.dispose();
     _passwordCtrl.dispose();
     _confirmCtrl.dispose();
+    _cooldownTimer?.cancel();
     super.dispose();
+  }
+
+  bool get _isCooldownActive =>
+      _cooldownUntilUtc != null && DateTime.now().toUtc().isBefore(_cooldownUntilUtc!);
+
+  void _startCooldownSeconds(int seconds) {
+    final s = seconds.clamp(1, 300);
+    _cooldownTimer?.cancel();
+    _cooldownUntilUtc = DateTime.now().toUtc().add(Duration(seconds: s));
+    _cooldownSeconds = s;
+
+    _cooldownTimer = Timer.periodic(const Duration(seconds: 1), (t) {
+      final until = _cooldownUntilUtc;
+      if (until == null) {
+        t.cancel();
+        return;
+      }
+      final remaining = until.difference(DateTime.now().toUtc()).inSeconds;
+      if (remaining <= 0) {
+        t.cancel();
+        if (mounted) {
+          setState(() {
+            _cooldownSeconds = 0;
+            _cooldownUntilUtc = null;
+          });
+        }
+        return;
+      }
+      if (mounted) setState(() => _cooldownSeconds = remaining);
+    });
+  }
+
+  int? _extractCooldownSecondsFromMessage(String message) {
+    final lower = message.toLowerCase();
+
+    final after = RegExp(r'after\s+(\d+)\s+second', caseSensitive: false).firstMatch(lower) ??
+        RegExp(r'after\s+(\d+)\s+seconds', caseSensitive: false).firstMatch(lower) ??
+        RegExp(r'wait\s+(\d+)\s+seconds', caseSensitive: false).firstMatch(lower);
+
+    if (after == null) return null;
+    return int.tryParse(after.group(1) ?? '');
+  }
+
+  bool _isEmailRateLimitError(Object e) {
+    final msg = e.toString().toLowerCase();
+    return msg.contains('over_email_send_rate_limit') ||
+        msg.contains('email_send_rate_limit') ||
+        msg.contains('send_rate_limit') ||
+        msg.contains('statuscode: 429') ||
+        msg.contains('request this after') ||
+        msg.contains('only request this after') ||
+        msg.contains('for security purposes');
   }
 
   Future<void> _checkExistingAdmins() async {
@@ -69,6 +127,12 @@ class _AdminSetupScreenState extends State<AdminSetupScreen> {
 
   Future<void> _submit() async {
     final l10n = AppLocalizations.of(context);
+
+    if (_isCooldownActive) {
+      _showError('Please wait ${_cooldownSeconds}s and try again.');
+      return;
+    }
+
     final setupKey = _setupKeyCtrl.text.trim();
     if (setupKey != Env.adminSetupKey) {
       _showError(l10n.t(AppText.adminSetupErrorInvalidKey));
@@ -164,7 +228,13 @@ class _AdminSetupScreenState extends State<AdminSetupScreen> {
         context.go(Routes.adminLogin);
       }
     } catch (e) {
-      _showError(e.toString());
+      if (_isEmailRateLimitError(e)) {
+        final secs = _extractCooldownSecondsFromMessage(e.toString()) ?? 45;
+        _startCooldownSeconds(secs + 2);
+        _showError('Too many email requests. Please wait ${secs}s and try again.');
+      } else {
+        _showError(e.toString());
+      }
     }
     if (!mounted) return;
     setState(() => _creating = false);
@@ -298,7 +368,7 @@ class _AdminSetupScreenState extends State<AdminSetupScreen> {
                     SizedBox(
                       height: 48,
                       child: ElevatedButton.icon(
-                        onPressed: _creating ? null : _submit,
+                        onPressed: (_creating || _isCooldownActive) ? null : _submit,
                         icon: _creating
                             ? const SizedBox(
                                 width: 16,
@@ -317,6 +387,40 @@ class _AdminSetupScreenState extends State<AdminSetupScreen> {
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),
                       ),
+                    ),
+                    if (_isCooldownActive) ...[
+                      const SizedBox(height: 10),
+                      Text(
+                        'Please wait ${_cooldownSeconds}s before retrying.',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
+                      ),
+                    ],
+                    const SizedBox(height: 14),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: _creating ? null : () => context.go(Routes.login),
+                            icon: const Icon(Icons.school_outlined),
+                            label: Text(l10n.t(AppText.studentLogin)),
+                            style: OutlinedButton.styleFrom(
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: _creating ? null : () => context.go(Routes.companyAuth),
+                            icon: const Icon(Icons.apartment_outlined),
+                            label: Text(l10n.t(AppText.companyLogin)),
+                            style: OutlinedButton.styleFrom(
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),

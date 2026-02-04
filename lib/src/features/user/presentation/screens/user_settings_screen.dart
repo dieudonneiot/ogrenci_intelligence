@@ -652,7 +652,7 @@ class _SettingsContent extends StatelessWidget {
               subtitle: l10n.t(AppText.settingsFreezeAccountSubtitle),
               actionLabel: l10n.t(AppText.settingsFreezeAccountButton),
               actionColor: const Color(0xFF374151),
-              onTap: () {},
+              onTap: () => context.go(Routes.excuseRequest),
             ),
             const SizedBox(height: 8),
             _DangerRow(

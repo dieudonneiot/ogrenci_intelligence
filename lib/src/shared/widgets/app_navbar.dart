@@ -94,12 +94,14 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
       _NavItem(l10n.t(AppText.navCourses), Routes.courses),
       _NavItem(l10n.t(AppText.navJobs), Routes.jobs),
       _NavItem(l10n.t(AppText.navInternships), Routes.internships),
+      _NavItem('Development', Routes.development),
       _NavItem(l10n.t(AppText.navChat), Routes.chat),
     ];
 
     final companyMenu = <_NavItem>[
       _NavItem(l10n.t(AppText.navCompanyJobs), Routes.companyJobs),
       _NavItem(l10n.t(AppText.navCompanyInternships), Routes.companyInternships),
+      _NavItem('Talent Mining', Routes.companyTalent),
       _NavItem(l10n.t(AppText.navCompanyApplications), Routes.companyApplications),
       _NavItem(l10n.t(AppText.navCompanyReports), Routes.companyReports),
     ];
@@ -109,6 +111,9 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
     final studentDropdown = <_NavItem>[
       _NavItem(l10n.t(AppText.navProfile), Routes.profile),
       _NavItem(l10n.t(AppText.navDashboard), Routes.dashboard),
+      _NavItem('Evidence', Routes.evidence),
+      _NavItem('Instant Focus Check', Routes.focusCheck),
+      _NavItem('Case Analysis', Routes.caseAnalysis),
       _NavItem(l10n.t(AppText.navCareerAssistant), Routes.chat),
       _NavItem(l10n.t(AppText.navMyApplications), Routes.applications),
       _NavItem(l10n.t(AppText.navFavorites), Routes.favorites),
@@ -119,6 +124,9 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
     final companyDropdown = <_NavItem>[
       _NavItem(l10n.t(AppText.navCompanyProfile), Routes.companyProfile),
       _NavItem(l10n.t(AppText.navDashboard), Routes.companyDashboard),
+      _NavItem('Talent Mining', Routes.companyTalent),
+      _NavItem('Excuse Requests', Routes.companyExcuses),
+      _NavItem('Evidence Approvals', Routes.companyEvidence),
       _NavItem(l10n.t(AppText.navPlansPricing), Routes.companyPricing),
     ];
 

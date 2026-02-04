@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/routing/routes.dart';
+import '../../../../core/supabase/supabase_service.dart';
 import '../../../../core/utils/csv_export.dart';
 import '../../../auth/domain/auth_models.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
@@ -32,6 +33,7 @@ class _CompanyApplicationsScreenState extends ConsumerState<CompanyApplicationsS
   String _search = '';
   String _statusFilter = 'all';
   String _typeFilter = 'all';
+  final Set<String> _sendingFocus = <String>{};
   late final TextEditingController _searchCtrl;
 
   @override
@@ -109,6 +111,38 @@ class _CompanyApplicationsScreenState extends ConsumerState<CompanyApplicationsS
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(l10n.t(AppText.companyApplicationsCsvDownloaded))),
     );
+  }
+
+  Future<void> _sendFocusCheck(CompanyApplication app) async {
+    if (app.type != 'internship') return;
+    if (app.status != 'accepted') return;
+    if (app.profileId == null || app.profileId!.isEmpty) return;
+
+    setState(() => _sendingFocus.add(app.id));
+    try {
+      final focusId = await SupabaseService.client.rpc(
+        'company_create_focus_check',
+        params: {
+          'p_user_id': app.profileId,
+          'p_internship_application_id': app.id,
+          'p_question': null,
+          'p_expires_in_seconds': 30,
+        },
+      );
+
+      final id = (focusId ?? '').toString();
+      if (id.isEmpty) throw Exception('Failed to create focus check');
+
+      await SupabaseService.client.functions.invoke('push', body: {'focus_check_id': id});
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Focus check sent.')));
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed: $e')));
+    } finally {
+      if (mounted) setState(() => _sendingFocus.remove(app.id));
+    }
   }
 
   @override
@@ -234,6 +268,7 @@ class _CompanyApplicationsScreenState extends ConsumerState<CompanyApplicationsS
                           _ApplicationCard(
                             app: app,
                             onUpdateStatus: (status) => _updateStatus(app, status),
+                            onSendFocusCheck: _sendingFocus.contains(app.id) ? null : () => _sendFocusCheck(app),
                           ),
                       ],
                     ),
@@ -270,6 +305,7 @@ extension on CompanyApplication {
       type: type,
       status: status ?? this.status,
       appliedAt: appliedAt,
+      profileId: profileId,
       profileName: profileName,
       profileEmail: profileEmail,
       profilePhone: profilePhone,
@@ -437,10 +473,12 @@ class _ApplicationCard extends StatelessWidget {
   const _ApplicationCard({
     required this.app,
     required this.onUpdateStatus,
+    required this.onSendFocusCheck,
   });
 
   final CompanyApplication app;
   final ValueChanged<String> onUpdateStatus;
+  final VoidCallback? onSendFocusCheck;
 
   @override
   Widget build(BuildContext context) {
@@ -509,24 +547,32 @@ class _ApplicationCard extends StatelessWidget {
             ),
           ],
           const SizedBox(height: 6),
-          Row(
-            children: [
-              TextButton.icon(
-                onPressed: () {
-                  if (isJob && app.jobId != null) {
-                    context.go('${Routes.companyJobs}/${app.jobId}/applications');
-                  } else if (!isJob && app.internshipId != null) {
-                    context.go('${Routes.companyInternships}/${app.internshipId}/applications');
-                  }
-                },
-                icon: const Icon(Icons.visibility_outlined),
-                label: Text(l10n.t(AppText.commonViewDetails)),
-              ),
-              const Spacer(),
-              if (app.status == 'pending') ...[
-                ElevatedButton.icon(
-                  onPressed: () => onUpdateStatus('accepted'),
-                  icon: const Icon(Icons.check_circle_outline),
+            Row(
+              children: [
+                TextButton.icon(
+                  onPressed: () {
+                    if (isJob && app.jobId != null) {
+                      context.go('${Routes.companyJobs}/${app.jobId}/applications');
+                    } else if (!isJob && app.internshipId != null) {
+                      context.go('${Routes.companyInternships}/${app.internshipId}/applications');
+                    }
+                  },
+                  icon: const Icon(Icons.visibility_outlined),
+                  label: Text(l10n.t(AppText.commonViewDetails)),
+                ),
+                if (!isJob && app.status == 'accepted' && app.profileId != null && app.profileId!.isNotEmpty) ...[
+                  const SizedBox(width: 8),
+                  OutlinedButton.icon(
+                    onPressed: onSendFocusCheck,
+                    icon: const Icon(Icons.notifications_active_outlined),
+                    label: const Text('Send Focus Check', style: TextStyle(fontWeight: FontWeight.w900)),
+                  ),
+                ],
+                const Spacer(),
+                if (app.status == 'pending') ...[
+                  ElevatedButton.icon(
+                    onPressed: () => onUpdateStatus('accepted'),
+                    icon: const Icon(Icons.check_circle_outline),
                   label: Text(l10n.t(AppText.commonAccept)),
                   style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF16A34A)),
                 ),

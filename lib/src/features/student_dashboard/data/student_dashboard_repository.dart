@@ -99,6 +99,79 @@ class StudentDashboardRepository {
     );
   }
 
+  Future<int> _casesSolved(String uid) async {
+    final rows = await _client.from('case_responses').select('id').eq('user_id', uid);
+    return (rows as List).length;
+  }
+
+  Future<int> _daysAttendedThisMonth(String uid) async {
+    final nowUtc = DateTime.now().toUtc();
+    final monthStart = DateTime.utc(nowUtc.year, nowUtc.month, 1);
+    final rows = await _client
+        .from('focus_responses')
+        .select('submitted_at')
+        .eq('user_id', uid)
+        .gte('submitted_at', monthStart.toIso8601String());
+
+    final set = <String>{};
+    for (final r in (rows as List)) {
+      final m = r as Map<String, dynamic>;
+      final dt = DateTime.tryParse(m['submitted_at']?.toString() ?? '')?.toUtc();
+      if (dt == null) continue;
+      set.add('${dt.year.toString().padLeft(4, '0')}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}');
+    }
+    return set.length;
+  }
+
+  Future<List<DashboardRecommendedCourse>> listRecommendedCourses({
+    int limit = 4,
+  }) async {
+    final rows = await _client
+        .from('courses')
+        .select('id,title,department,video_url,created_at')
+        .order('created_at', ascending: false)
+        .limit(limit) as List<dynamic>;
+
+    return rows.map((r) {
+      final m = r as Map<String, dynamic>;
+      return DashboardRecommendedCourse(
+        id: (m['id'] ?? '').toString(),
+        title: (m['title'] ?? '').toString(),
+        department: (m['department'] as String?)?.trim(),
+        videoUrl: (m['video_url'] as String?)?.trim(),
+      );
+    }).where((c) => c.id.isNotEmpty && c.title.trim().isNotEmpty).toList(growable: false);
+  }
+
+  Future<DashboardTaskSummary> _taskSummary(String uid) async {
+    final accepted = await _client
+        .from('internship_applications')
+        .select('id')
+        .eq('user_id', uid)
+        .eq('status', 'accepted')
+        .limit(1);
+
+    final pendingEvidence = await _client
+        .from('evidence_items')
+        .select('id')
+        .eq('user_id', uid)
+        .eq('status', 'pending');
+
+    final scenarios = await _client.from('case_scenarios').select('id').eq('is_active', true);
+    final answered = await _client.from('case_responses').select('scenario_id').eq('user_id', uid);
+
+    final scenarioIds = (scenarios as List).map((e) => (e as Map<String, dynamic>)['id']?.toString()).whereType<String>().toSet();
+    final answeredIds = (answered as List).map((e) => (e as Map<String, dynamic>)['scenario_id']?.toString()).whereType<String>().toSet();
+
+    final unanswered = scenarioIds.difference(answeredIds).length;
+
+    return DashboardTaskSummary(
+      hasAcceptedInternship: (accepted as List).isNotEmpty,
+      pendingEvidenceCount: (pendingEvidence as List).length,
+      unansweredCaseCount: unanswered,
+    );
+  }
+
   Future<List<DashboardEnrolledCourse>> listOngoingCourses({
     required String uid,
     int limit = 3,
@@ -159,14 +232,22 @@ class StudentDashboardRepository {
     final profile = await _getProfile(uid);
 
     final countsF = _getCounts(uid);
+    final casesSolvedF = _casesSolved(uid);
+    final attendedF = _daysAttendedThisMonth(uid);
     final rankF = _getDepartmentRank(uid: uid, department: profile.department);
     final ongoingCoursesF = listOngoingCourses(uid: uid, limit: 3);
     final activitiesF = listActivities(uid: uid, limit: 10);
+    final recommendedF = listRecommendedCourses(limit: 4);
+    final tasksF = _taskSummary(uid);
 
     final counts = await countsF;
+    final casesSolved = await casesSolvedF;
+    final attended = await attendedF;
     final rank = await rankF;
     final ongoingCourses = await ongoingCoursesF;
     final activities = await activitiesF;
+    final recommended = await recommendedF;
+    final tasks = await tasksF;
     final todayPts = _sumTodayPoints(activities);
     final weekPts = _sumWeekPoints(activities);
 
@@ -183,12 +264,16 @@ class StudentDashboardRepository {
         coursesCompleted: counts.coursesCompleted,
         activeApplications: counts.activeApplications,
         ongoingCourses: counts.ongoingCourses,
+        daysAttendedThisMonth: attended,
+        casesSolved: casesSolved,
         departmentRank: rank,
       ),
       todayPoints: todayPts,
       weekPoints: weekPts,
       enrolledCourses: ongoingCourses,
       activities: activities,
+      recommendedCourses: recommended,
+      tasks: tasks,
     );
   }
 

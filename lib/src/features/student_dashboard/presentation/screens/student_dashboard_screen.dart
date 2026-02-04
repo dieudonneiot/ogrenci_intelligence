@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
+import '../../../oi/application/oi_providers.dart';
+import '../../../oi/domain/oi_models.dart';
 import '../../../user/data/points_service.dart';
 import '../../application/student_dashboard_providers.dart';
 import '../../domain/student_dashboard_models.dart';
@@ -112,13 +114,42 @@ class _StudentDashboardScreenState extends ConsumerState<StudentDashboardScreen>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          l10n.dashboardWelcome(vm.displayName),
-                          style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    l10n.dashboardWelcome(vm.displayName),
+                                    style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    l10n.t(AppText.dashboardWelcomeSubtitle),
+                                    style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            _MiniOiScoreChip(
+                              oiAsync: ref.watch(myOiProfileProvider),
+                              onTap: () => context.go(Routes.profile),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 6),
-                        Text(l10n.t(AppText.dashboardWelcomeSubtitle),
-                            style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700)),
+                        const SizedBox(height: 14),
+
+                        _UrgentTaskCard(
+                          tasks: vm.tasks,
+                          onEvidence: () => context.go(Routes.evidence),
+                          onCaseAnalysis: () => context.go(Routes.caseAnalysis),
+                          onFocusCheck: () => context.go(Routes.focusCheck),
+                          onProfile: () => context.go(Routes.profile),
+                        ),
+
                         const SizedBox(height: 18),
 
                         LayoutBuilder(
@@ -153,6 +184,20 @@ class _StudentDashboardScreenState extends ConsumerState<StudentDashboardScreen>
                                 value: '${stats.activeApplications}',
                               ),
                               _StatCard(
+                                icon: Icons.event_available_outlined,
+                                iconBg: const Color(0xFFFFEDD5),
+                                iconColor: const Color(0xFFEA580C),
+                                title: 'Days Attended (Month)',
+                                value: '${stats.daysAttendedThisMonth}',
+                              ),
+                              _StatCard(
+                                icon: Icons.swipe,
+                                iconBg: const Color(0xFFE0E7FF),
+                                iconColor: const Color(0xFF4338CA),
+                                title: 'Cases Solved',
+                                value: '${stats.casesSolved}',
+                              ),
+                              _StatCard(
                                 icon: Icons.track_changes_outlined,
                                 iconBg: const Color(0xFFFEF3C7),
                                 iconColor: const Color(0xFFD97706),
@@ -183,6 +228,15 @@ class _StudentDashboardScreenState extends ConsumerState<StudentDashboardScreen>
 
                         const SizedBox(height: 16),
 
+                        _MvpActionsRow(
+                          onFocusCheck: () => context.go(Routes.focusCheck),
+                          onCaseAnalysis: () => context.go(Routes.caseAnalysis),
+                          onEvidence: () => context.go(Routes.evidence),
+                          onProfile: () => context.go(Routes.profile),
+                        ),
+
+                        const SizedBox(height: 16),
+
                         _PointsHero(
                           totalPoints: stats.totalPoints,
                           departmentRank: stats.departmentRank,
@@ -198,6 +252,13 @@ class _StudentDashboardScreenState extends ConsumerState<StudentDashboardScreen>
 
                         _ChatAssistantCard(
                           onStartChat: () => context.go(Routes.chat),
+                        ),
+
+                        const SizedBox(height: 18),
+
+                        _RecommendedCoursesStrip(
+                          courses: vm.recommendedCourses,
+                          onOpen: (id) => context.go('/courses/$id'),
                         ),
 
                         const SizedBox(height: 18),
@@ -242,6 +303,600 @@ class _StudentDashboardScreenState extends ConsumerState<StudentDashboardScreen>
           ),
         );
       },
+    );
+  }
+}
+
+class _MiniOiScoreChip extends StatelessWidget {
+  const _MiniOiScoreChip({
+    required this.oiAsync,
+    required this.onTap,
+  });
+
+  final AsyncValue<OiProfile> oiAsync;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final child = oiAsync.when(
+      loading: () => const SizedBox(
+        width: 18,
+        height: 18,
+        child: CircularProgressIndicator(strokeWidth: 2),
+      ),
+      error: (e, st) => const Text('—', style: TextStyle(fontWeight: FontWeight.w900)),
+      data: (profile) {
+        final score = profile.oiScore;
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              '$score',
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Color(0xFF111827)),
+            ),
+            const Text(
+              '/100',
+              style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: Color(0xFF6B7280)),
+            ),
+          ],
+        );
+      },
+    );
+
+    return Semantics(
+      button: true,
+      label: 'OI Score',
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(999),
+        child: Container(
+          width: 54,
+          height: 54,
+          padding: const EdgeInsets.all(2),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: const LinearGradient(colors: [Color(0xFF7C3AED), Color(0xFF4F46E5)]),
+            boxShadow: const [BoxShadow(color: Color(0x22000000), blurRadius: 14, offset: Offset(0, 8))],
+          ),
+          child: DecoratedBox(
+            decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+            child: Center(child: child),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _UrgentTaskCard extends StatelessWidget {
+  const _UrgentTaskCard({
+    required this.tasks,
+    required this.onEvidence,
+    required this.onCaseAnalysis,
+    required this.onFocusCheck,
+    required this.onProfile,
+  });
+
+  final DashboardTaskSummary tasks;
+  final VoidCallback onEvidence;
+  final VoidCallback onCaseAnalysis;
+  final VoidCallback onFocusCheck;
+  final VoidCallback onProfile;
+
+  _TaskUi _pickTask() {
+    if (tasks.pendingEvidenceCount > 0) {
+      return _TaskUi(
+        icon: Icons.verified_outlined,
+        iconColor: const Color(0xFF16A34A),
+        title: 'Evidence submitted',
+        subtitle: '${tasks.pendingEvidenceCount} item(s) pending approval',
+        actionLabel: 'View evidence',
+        onAction: onEvidence,
+      );
+    }
+
+    if (tasks.hasAcceptedInternship) {
+      return _TaskUi(
+        icon: Icons.upload_file,
+        iconColor: const Color(0xFF7C3AED),
+        title: 'Upload your internship proof',
+        subtitle: 'Submit evidence so your mentor can approve it.',
+        actionLabel: 'Upload proof',
+        onAction: onEvidence,
+      );
+    }
+
+    if (tasks.unansweredCaseCount > 0) {
+      return _TaskUi(
+        icon: Icons.swipe,
+        iconColor: const Color(0xFF2563EB),
+        title: 'New case analysis available',
+        subtitle: '${tasks.unansweredCaseCount} scenario(s) ready',
+        actionLabel: 'Start now',
+        onAction: onCaseAnalysis,
+      );
+    }
+
+    return _TaskUi(
+      icon: Icons.timer_outlined,
+      iconColor: const Color(0xFFF59E0B),
+      title: 'Instant Focus Check',
+      subtitle: '30s challenge to boost your consistency.',
+      actionLabel: 'Start',
+      onAction: onFocusCheck,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final picked = _pickTask();
+
+    final chips = Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      children: [
+        _TaskChip(
+          icon: Icons.work_outline,
+          label: tasks.hasAcceptedInternship ? 'Internship active' : 'No internship yet',
+          color: tasks.hasAcceptedInternship ? const Color(0xFF16A34A) : const Color(0xFF6B7280),
+        ),
+        _TaskChip(
+          icon: Icons.verified_outlined,
+          label: tasks.pendingEvidenceCount > 0 ? '${tasks.pendingEvidenceCount} pending proof' : 'No pending proof',
+          color: tasks.pendingEvidenceCount > 0 ? const Color(0xFF16A34A) : const Color(0xFF6B7280),
+        ),
+        _TaskChip(
+          icon: Icons.swipe,
+          label: tasks.unansweredCaseCount > 0 ? '${tasks.unansweredCaseCount} new cases' : 'No new cases',
+          color: tasks.unansweredCaseCount > 0 ? const Color(0xFF2563EB) : const Color(0xFF6B7280),
+        ),
+        _TaskChip(
+          icon: Icons.person_outline,
+          label: 'Improve profile',
+          color: const Color(0xFF7C3AED),
+          onTap: onProfile,
+        ),
+      ],
+    );
+
+    final primaryButton = SizedBox(
+      height: 44,
+      child: ElevatedButton.icon(
+        onPressed: picked.onAction,
+        icon: Icon(picked.icon),
+        label: Text(picked.actionLabel, style: const TextStyle(fontWeight: FontWeight.w900)),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.white,
+          foregroundColor: const Color(0xFF4F46E5),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        ),
+      ),
+    );
+
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(18),
+        gradient: const LinearGradient(
+          colors: [Color(0xFFEEF2FF), Color(0xFFF5F3FF)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
+        boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 18, offset: Offset(0, 8))],
+      ),
+      child: LayoutBuilder(
+        builder: (_, c) {
+          final isWide = c.maxWidth >= 720;
+
+          final left = Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 52,
+                height: 52,
+                decoration: BoxDecoration(
+                  color: picked.iconColor.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Icon(picked.icon, color: picked.iconColor),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      picked.title,
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Color(0xFF111827)),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      picked.subtitle,
+                      style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
+                    ),
+                    const SizedBox(height: 12),
+                    chips,
+                  ],
+                ),
+              ),
+            ],
+          );
+
+          if (!isWide) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                left,
+                const SizedBox(height: 14),
+                primaryButton,
+              ],
+            );
+          }
+
+          return Row(
+            children: [
+              Expanded(child: left),
+              const SizedBox(width: 14),
+              primaryButton,
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _TaskUi {
+  const _TaskUi({
+    required this.icon,
+    required this.iconColor,
+    required this.title,
+    required this.subtitle,
+    required this.actionLabel,
+    required this.onAction,
+  });
+
+  final IconData icon;
+  final Color iconColor;
+  final String title;
+  final String subtitle;
+  final String actionLabel;
+  final VoidCallback onAction;
+}
+
+class _TaskChip extends StatelessWidget {
+  const _TaskChip({
+    required this.icon,
+    required this.label,
+    required this.color,
+    this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final content = Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 16, color: color),
+        const SizedBox(width: 6),
+        Text(label, style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12, color: color)),
+      ],
+    );
+
+    final child = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.8),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
+      ),
+      child: content,
+    );
+
+    if (onTap == null) return child;
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(999),
+      child: child,
+    );
+  }
+}
+
+class _RecommendedCoursesStrip extends StatelessWidget {
+  const _RecommendedCoursesStrip({
+    required this.courses,
+    required this.onOpen,
+  });
+
+  final List<DashboardRecommendedCourse> courses;
+  final void Function(String id) onOpen;
+
+  @override
+  Widget build(BuildContext context) {
+    final items = courses.isEmpty
+        ? List<DashboardRecommendedCourse>.generate(
+            3,
+            (i) => DashboardRecommendedCourse(id: '_placeholder_$i', title: '', department: null, videoUrl: null),
+          )
+        : courses;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Row(
+          children: [
+            Icon(Icons.auto_awesome, color: Color(0xFF7C3AED)),
+            SizedBox(width: 8),
+            Text('Picked for you', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+          ],
+        ),
+        const SizedBox(height: 10),
+        SizedBox(
+          height: 168,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: items.length,
+            separatorBuilder: (_, i) => const SizedBox(width: 12),
+            itemBuilder: (_, i) {
+              final c = items[i];
+              final isPlaceholder = c.id.startsWith('_placeholder_');
+              return _RecommendedCourseCard(
+                course: c,
+                isPlaceholder: isPlaceholder,
+                onTap: isPlaceholder ? null : () => onOpen(c.id),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _RecommendedCourseCard extends StatelessWidget {
+  const _RecommendedCourseCard({
+    required this.course,
+    required this.onTap,
+    required this.isPlaceholder,
+  });
+
+  final DashboardRecommendedCourse course;
+  final VoidCallback? onTap;
+  final bool isPlaceholder;
+
+  @override
+  Widget build(BuildContext context) {
+    final title = course.title.trim();
+    final department = course.department?.trim();
+    final hasVideo = (course.videoUrl != null && course.videoUrl!.trim().isNotEmpty);
+
+    final bg = isPlaceholder
+        ? const LinearGradient(colors: [Color(0xFFE5E7EB), Color(0xFFF3F4F6)])
+        : const LinearGradient(colors: [Color(0xFF7C3AED), Color(0xFF4F46E5)]);
+
+    final child = ClipRRect(
+      borderRadius: BorderRadius.circular(18),
+      child: DecoratedBox(
+        decoration: BoxDecoration(gradient: bg),
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.black.withValues(alpha: isPlaceholder ? 0.0 : 0.0),
+                      Colors.black.withValues(alpha: isPlaceholder ? 0.0 : 0.32),
+                    ],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              top: 12,
+              left: 12,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.9),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Text(
+                  (department == null || department.isEmpty) ? 'Course' : department,
+                  style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 11, color: Color(0xFF111827)),
+                ),
+              ),
+            ),
+            Positioned(
+              right: 12,
+              top: 12,
+              child: Container(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.25),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(
+                  hasVideo ? Icons.play_arrow_rounded : Icons.menu_book_outlined,
+                  color: Colors.white,
+                  size: 26,
+                ),
+              ),
+            ),
+            Positioned(
+              left: 12,
+              right: 12,
+              bottom: 12,
+              child: Text(
+                title.isEmpty ? ' ' : title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: isPlaceholder ? const Color(0xFFE5E7EB) : Colors.white,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 14,
+                  height: 1.15,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    return SizedBox(
+      width: 260,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(18),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: const Color(0xFFE5E7EB)),
+            boxShadow: const [BoxShadow(color: Color(0x07000000), blurRadius: 14, offset: Offset(0, 8))],
+          ),
+          child: child,
+        ),
+      ),
+    );
+  }
+}
+
+class _MvpActionsRow extends StatelessWidget {
+  const _MvpActionsRow({
+    required this.onFocusCheck,
+    required this.onCaseAnalysis,
+    required this.onEvidence,
+    required this.onProfile,
+  });
+
+  final VoidCallback onFocusCheck;
+  final VoidCallback onCaseAnalysis;
+  final VoidCallback onEvidence;
+  final VoidCallback onProfile;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (_, c) {
+        final isWide = c.maxWidth >= 900;
+        final items = <Widget>[
+          _ActionCard(
+            icon: Icons.timer_outlined,
+            title: 'Instant Focus Check',
+            subtitle: '30s timer challenge',
+            color: const Color(0xFF6D28D9),
+            onTap: onFocusCheck,
+          ),
+          _ActionCard(
+            icon: Icons.swipe,
+            title: 'Case Analysis',
+            subtitle: 'Swipe to answer',
+            color: const Color(0xFF2563EB),
+            onTap: onCaseAnalysis,
+          ),
+          _ActionCard(
+            icon: Icons.upload_file,
+            title: 'Upload Evidence',
+            subtitle: 'Pending approval',
+            color: const Color(0xFF16A34A),
+            onTap: onEvidence,
+          ),
+          _ActionCard(
+            icon: Icons.insights_outlined,
+            title: 'OI Score',
+            subtitle: 'View your profile',
+            color: const Color(0xFFF59E0B),
+            onTap: onProfile,
+          ),
+        ];
+
+        if (isWide) {
+          return Row(
+            children: [
+              for (int i = 0; i < items.length; i++) ...[
+                Expanded(child: items[i]),
+                if (i != items.length - 1) const SizedBox(width: 14),
+              ],
+            ],
+          );
+        }
+
+        final w = (c.maxWidth - 14) / 2;
+        return Wrap(
+          spacing: 14,
+          runSpacing: 14,
+          children: items.map((e) => SizedBox(width: w, child: e)).toList(),
+        );
+      },
+    );
+  }
+}
+
+class _ActionCard extends StatelessWidget {
+  const _ActionCard({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.color,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final Color color;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(18),
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: const Color(0xFFE5E7EB)),
+          boxShadow: const [BoxShadow(color: Color(0x07000000), blurRadius: 14, offset: Offset(0, 8))],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Icon(icon, color: color),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: const TextStyle(fontWeight: FontWeight.w900)),
+                  const SizedBox(height: 4),
+                  Text(subtitle, style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600)),
+                ],
+              ),
+            ),
+            const Icon(Icons.chevron_right, color: Color(0xFF9CA3AF)),
+          ],
+        ),
+      ),
     );
   }
 }

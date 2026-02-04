@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/supabase/supabase_service.dart';
 import '../../auth/presentation/controllers/auth_controller.dart';
 import '../data/jobs_repository.dart';
 import '../domain/job_models.dart';
@@ -191,28 +192,94 @@ class JobsController extends AutoDisposeAsyncNotifier<JobsViewModel> {
       repo.fetchJobsRaw(filters: filters),
       repo.fetchMyFavoriteJobIds(userId: uid),
       repo.fetchMyJobApplicationStatuses(userId: uid),
+      // Fit context (best effort; keep jobs usable even if missing tables)
+      (() async => await SupabaseService.client
+              .from('profiles')
+              .select('department,year')
+              .eq('id', uid)
+              .maybeSingle())(),
+      (() async => await SupabaseService.client
+              .from('oi_scores')
+              .select('oi_score')
+              .eq('user_id', uid)
+              .maybeSingle())(),
     ]);
 
     final jobs = futures[0] as List<Job>;
     final favs = futures[1] as Set<String>;
     final applied = futures[2] as Map<String, String>;
+    final profileRow = futures[3] as Map<String, dynamic>?;
+    final oiRow = futures[4] as Map<String, dynamic>?;
 
-    final items = jobs
-        .map((j) => JobCardVM(
-              job: j,
-              isFavorite: favs.contains(j.id),
-              applicationStatus: applied[j.id],
-            ))
-        .toList(growable: false);
+    final myDept = (profileRow?['department'] as String?)?.trim();
+    final myYear = (profileRow?['year'] as num?)?.toInt();
+    final oiScore = (oiRow?['oi_score'] as num?)?.toInt() ?? 50;
 
-    final departments = jobs
+    int scoreJob(Job j) {
+      var score = 0;
+
+      // Department (0..40)
+      final jd = j.department.trim();
+      if (jd.isEmpty) {
+        score += 10;
+      } else if (myDept != null && myDept.isNotEmpty) {
+        final a = jd.toLowerCase();
+        final b = myDept.toLowerCase();
+        if (a == b) {
+          score += 40;
+        } else if (a.contains(b) || b.contains(a)) {
+          score += 26;
+        } else {
+          score += 8;
+        }
+      }
+
+      // Year fit (0..20)
+      final y = myYear;
+      if (y == null) {
+        score += 8;
+      } else {
+        final min = j.minYear ?? 0;
+        final max = j.maxYear ?? 0;
+        if (min == 0 && max == 0) {
+          score += 10;
+        } else if (min != 0 && max != 0 && y >= min && y <= max) {
+          score += 20;
+        } else if (min != 0 && max == 0 && y >= min) {
+          score += 18;
+        } else if (min == 0 && max != 0 && y <= max) {
+          score += 18;
+        } else {
+          score += 6;
+        }
+      }
+
+      // OI score contribution (0..40)
+      score += ((oiScore.clamp(0, 100) / 100.0) * 40).round();
+
+      return score.clamp(0, 100);
+    }
+
+    final scoredJobs = jobs
+        .map((j) => j.copyWith(compatibility: scoreJob(j)))
+        .toList(growable: false)
+      ..sort((a, b) => b.compatibility.compareTo(a.compatibility));
+
+    final departments = scoredJobs
         .map((j) => j.department.trim())
         .where((s) => s.isNotEmpty)
         .toSet()
         .toList()
       ..sort();
 
-    final workTypes = jobs
+    final cities = scoredJobs
+        .map((j) => j.location.trim())
+        .where((s) => s.isNotEmpty)
+        .toSet()
+        .toList()
+      ..sort();
+
+    final workTypes = scoredJobs
         .map((j) => j.workType.trim())
         .where((s) => s.isNotEmpty)
         .toSet()
@@ -220,8 +287,15 @@ class JobsController extends AutoDisposeAsyncNotifier<JobsViewModel> {
       ..sort();
 
     return JobsViewModel(
-      items: items,
+      items: scoredJobs
+          .map((j) => JobCardVM(
+                job: j,
+                isFavorite: favs.contains(j.id),
+                applicationStatus: applied[j.id],
+              ))
+          .toList(growable: false),
       availableDepartments: departments,
+      availableCities: cities,
       availableWorkTypes: workTypes,
     );
   }
@@ -258,6 +332,7 @@ class JobsController extends AutoDisposeAsyncNotifier<JobsViewModel> {
       JobsViewModel(
         items: nextItems,
         availableDepartments: current.availableDepartments,
+        availableCities: current.availableCities,
         availableWorkTypes: current.availableWorkTypes,
       ),
     );

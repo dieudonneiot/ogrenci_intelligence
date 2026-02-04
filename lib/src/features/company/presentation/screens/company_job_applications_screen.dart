@@ -188,6 +188,7 @@ extension on CompanyApplication {
       type: type,
       status: status ?? this.status,
       appliedAt: appliedAt,
+      profileId: profileId,
       profileName: profileName,
       profileEmail: profileEmail,
       profilePhone: profilePhone,

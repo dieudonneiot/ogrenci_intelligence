@@ -16,6 +16,7 @@ class Routes {
   static const dashboard = '/dashboard';
   static const profile = '/profile';
   static const settings = '/settings';
+  static const excuseRequest = '/excuse-request';
   static const courses = '/courses';
   static const courseDetail = '/courses/:id';
   static const jobs = '/jobs';
@@ -28,6 +29,10 @@ class Routes {
   static const leaderboard = '/leaderboard';
   static const pointsSystem = '/points-system';
   static const chat = '/chat';
+  static const development = '/development';
+  static const caseAnalysis = '/case-analysis';
+  static const focusCheck = '/focus-check';
+  static const evidence = '/evidence';
   static const debug = '/debug';
 
   // Footer pages (public)
@@ -54,6 +59,9 @@ class Routes {
   static const companyReports = '/company/reports';
   static const companyApplications = '/company/applications';
   static const companyPricing = '/company/pricing';
+  static const companyEvidence = '/company/evidence';
+  static const companyTalent = '/company/talent';
+  static const companyExcuses = '/company/excuses';
 
   // Admin (protected)
   static const adminDashboard = '/admin/dashboard';

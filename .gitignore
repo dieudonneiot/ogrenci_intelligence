@@ -173,9 +173,9 @@ app.*.symbols
 .gclient_previous_custom_vars
 .gclient_previous_sync_commits
 
-# Local SQL files and unzipped React reference
-docs/sql/
+# Unzipped React reference
 React_src/
+artifacts/
 
 # Supabase edge function (local only)
 supabase/functions/chatbot/

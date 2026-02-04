@@ -4,10 +4,15 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/routing/routes.dart';
+import '../../../../core/supabase/supabase_service.dart';
 import '../../../auth/domain/auth_models.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
 import '../../../company/application/company_providers.dart';
 import '../../../company/domain/company_models.dart';
+import '../../../evidence/data/evidence_repository.dart';
+import '../../../evidence/domain/evidence_models.dart';
+import '../../../excuse/data/excuse_repository.dart';
+import '../../../excuse/domain/excuse_models.dart';
 
 class CompanyDashboardScreen extends ConsumerStatefulWidget {
   const CompanyDashboardScreen({super.key});
@@ -21,6 +26,12 @@ class _CompanyDashboardScreenState extends ConsumerState<CompanyDashboardScreen>
   Map<String, dynamic>? _company;
   CompanyStats _stats = CompanyStats.empty();
   CompanyReportSummary _report = CompanyReportSummary.empty();
+  int _activeInterns = 0;
+  int _pendingEvidence = 0;
+  int _pendingExcuses = 0;
+  int _avgOiScore = 0;
+  Map<String, int> _departmentDistribution = const {};
+  List<_CompanyFeedItem> _feed = const [];
 
   @override
   void didChangeDependencies() {
@@ -35,21 +46,124 @@ class _CompanyDashboardScreenState extends ConsumerState<CompanyDashboardScreen>
     setState(() => _loading = true);
     try {
       final repo = ref.read(companyRepositoryProvider);
-      final company = await repo.getCompanyById(companyId);
-      final stats = await repo.fetchStats(companyId: companyId);
-      final report = await repo.fetchReportSummary(
-        companyId: companyId,
-        startDate: DateTime.now().subtract(const Duration(days: 30)),
-      );
+      final evidenceRepo = const EvidenceRepository();
+      final excuseRepo = const ExcuseRepository();
+
+      final results = await Future.wait([
+        repo.getCompanyById(companyId),
+        repo.fetchStats(companyId: companyId),
+        repo.fetchReportSummary(
+          companyId: companyId,
+          startDate: DateTime.now().subtract(const Duration(days: 30)),
+        ),
+        evidenceRepo.listCompanyPendingEvidence(companyId: companyId, limit: 6),
+        excuseRepo.listCompanyRequests(companyId: companyId, status: 'pending', limit: 6),
+        _loadActiveInterns(companyId),
+      ]);
+
+      final company = results[0] as Map<String, dynamic>?;
+      final stats = results[1] as CompanyStats;
+      final report = results[2] as CompanyReportSummary;
+      final pendingEvidenceItems = results[3] as List<EvidenceItem>;
+      final pendingExcuses = results[4] as List<CompanyExcuseRequest>;
+      final internBundle = results[5] as _InternBundle;
+
+      final evidenceUserIds = pendingEvidenceItems.map((e) => e.userId).where((e) => e.isNotEmpty).toSet();
+      Map<String, String> nameByUserId = {};
+      if (evidenceUserIds.isNotEmpty) {
+        final rows = await SupabaseService.client
+            .from('profiles')
+            .select('id, full_name, email')
+            .inFilter('id', evidenceUserIds.toList(growable: false));
+        nameByUserId = {
+          for (final r in (rows as List))
+            (r as Map<String, dynamic>)['id']?.toString() ?? '': ((r['full_name'] ?? r['email'] ?? '').toString())
+        }..removeWhere((k, v) => k.isEmpty);
+      }
+
+      final feed = <_CompanyFeedItem>[
+        for (final e in pendingEvidenceItems.take(4))
+          _CompanyFeedItem(
+            kind: _FeedKind.evidence,
+            message: '${nameByUserId[e.userId] ?? 'A student'} uploaded proof.',
+            createdAt: e.createdAt,
+          ),
+        for (final r in pendingExcuses.take(4))
+          _CompanyFeedItem(
+            kind: _FeedKind.excuse,
+            message: '${r.studentName.isEmpty ? 'A student' : r.studentName} reported an excuse.',
+            createdAt: r.createdAt,
+          ),
+      ]..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
       if (!mounted) return;
       setState(() {
         _company = company;
         _stats = stats;
         _report = report;
+        _pendingEvidence = pendingEvidenceItems.length;
+        _pendingExcuses = pendingExcuses.length;
+        _activeInterns = internBundle.activeInterns;
+        _avgOiScore = internBundle.avgOiScore;
+        _departmentDistribution = internBundle.departmentDistribution;
+        _feed = feed.take(6).toList(growable: false);
       });
     } finally {
       if (mounted) setState(() => _loading = false);
     }
+  }
+
+  Future<_InternBundle> _loadActiveInterns(String companyId) async {
+    final internshipRows = await SupabaseService.client.from('internships').select('id').eq('company_id', companyId);
+    final internshipIds = (internshipRows as List)
+        .map((e) => (e as Map<String, dynamic>)['id']?.toString())
+        .whereType<String>()
+        .where((e) => e.isNotEmpty)
+        .toList(growable: false);
+
+    if (internshipIds.isEmpty) {
+      return const _InternBundle(activeInterns: 0, avgOiScore: 0, departmentDistribution: <String, int>{});
+    }
+
+    final appsRows = await SupabaseService.client
+        .from('internship_applications')
+        .select('user_id')
+        .inFilter('internship_id', internshipIds)
+        .eq('status', 'accepted');
+
+    final userIds = (appsRows as List)
+        .map((e) => (e as Map<String, dynamic>)['user_id']?.toString())
+        .whereType<String>()
+        .where((e) => e.isNotEmpty)
+        .toSet()
+        .toList(growable: false);
+
+    if (userIds.isEmpty) {
+      return const _InternBundle(activeInterns: 0, avgOiScore: 0, departmentDistribution: <String, int>{});
+    }
+
+    final profRows = await SupabaseService.client.from('profiles').select('department').inFilter('id', userIds);
+    final dist = <String, int>{};
+    for (final r in (profRows as List)) {
+      final dept = ((r as Map<String, dynamic>)['department'] ?? '').toString().trim();
+      if (dept.isEmpty) continue;
+      dist[dept] = (dist[dept] ?? 0) + 1;
+    }
+
+    var avg = 0;
+    final oiRows = await SupabaseService.client.from('oi_scores').select('oi_score').inFilter('user_id', userIds);
+    var sum = 0;
+    var count = 0;
+    for (final r in (oiRows as List)) {
+      final v = (r as Map<String, dynamic>)['oi_score'];
+      final s = v is int ? v : int.tryParse(v?.toString() ?? '');
+      if (s == null) continue;
+      sum += s;
+      count++;
+    }
+    if (count > 0) avg = (sum / count).round();
+
+    return _InternBundle(activeInterns: userIds.length, avgOiScore: avg, departmentDistribution: dist);
   }
 
   @override
@@ -140,8 +254,52 @@ class _CompanyDashboardScreenState extends ConsumerState<CompanyDashboardScreen>
                       );
                     },
                   ),
+                  const SizedBox(height: 12),
+                  LayoutBuilder(
+                    builder: (_, c) {
+                      final crossAxis = c.maxWidth >= 980 ? 3 : c.maxWidth >= 720 ? 3 : 1;
+                      final pendingApprovals = _pendingEvidence + _pendingExcuses;
+                      return GridView.count(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        crossAxisCount: crossAxis,
+                        crossAxisSpacing: 12,
+                        mainAxisSpacing: 12,
+                        childAspectRatio: 1.55,
+                        children: [
+                          _StatCard(
+                            title: 'Active interns',
+                            value: _activeInterns.toString(),
+                            color: const Color(0xFF2563EB),
+                            icon: Icons.badge_outlined,
+                          ),
+                          _StatCard(
+                            title: 'Pending approvals',
+                            value: pendingApprovals.toString(),
+                            color: pendingApprovals > 0 ? const Color(0xFFDC2626) : const Color(0xFF6B7280),
+                            icon: Icons.notifications_active_outlined,
+                          ),
+                          _StatCard(
+                            title: 'Average OI score',
+                            value: _avgOiScore.toString(),
+                            color: const Color(0xFF16A34A),
+                            icon: Icons.insights_outlined,
+                          ),
+                        ],
+                      );
+                    },
+                  ),
                   const SizedBox(height: 18),
                   _QuickActions(),
+                  const SizedBox(height: 14),
+                  _NotificationFeed(
+                    items: _feed,
+                    onOpenEvidence: () => context.go(Routes.companyEvidence),
+                    onOpenExcuses: () => context.go(Routes.companyExcuses),
+                  ),
+                  const SizedBox(height: 14),
+                  if (_departmentDistribution.isNotEmpty)
+                    _DepartmentChart(distribution: _departmentDistribution),
                   const SizedBox(height: 20),
                   _PerformanceSummary(report: _report),
                 ],
@@ -370,6 +528,196 @@ class _QuickActions extends StatelessWidget {
           ],
         ),
       ],
+    );
+  }
+}
+
+enum _FeedKind { evidence, excuse }
+
+@immutable
+class _CompanyFeedItem {
+  const _CompanyFeedItem({
+    required this.kind,
+    required this.message,
+    required this.createdAt,
+  });
+
+  final _FeedKind kind;
+  final String message;
+  final DateTime createdAt;
+}
+
+@immutable
+class _InternBundle {
+  const _InternBundle({
+    required this.activeInterns,
+    required this.avgOiScore,
+    required this.departmentDistribution,
+  });
+
+  final int activeInterns;
+  final int avgOiScore;
+  final Map<String, int> departmentDistribution;
+}
+
+class _NotificationFeed extends StatelessWidget {
+  const _NotificationFeed({
+    required this.items,
+    required this.onOpenEvidence,
+    required this.onOpenExcuses,
+  });
+
+  final List<_CompanyFeedItem> items;
+  final VoidCallback onOpenEvidence;
+  final VoidCallback onOpenExcuses;
+
+  @override
+  Widget build(BuildContext context) {
+    if (items.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
+        boxShadow: const [BoxShadow(color: Color(0x07000000), blurRadius: 14, offset: Offset(0, 8))],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Expanded(
+                child: Text('Notification Feed', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
+              ),
+              TextButton(
+                onPressed: onOpenEvidence,
+                child: const Text('Evidence', style: TextStyle(fontWeight: FontWeight.w900)),
+              ),
+              const SizedBox(width: 6),
+              TextButton(
+                onPressed: onOpenExcuses,
+                child: const Text('Excuses', style: TextStyle(fontWeight: FontWeight.w900)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: items.length,
+            separatorBuilder: (context, index) => const SizedBox(height: 10),
+            itemBuilder: (_, i) {
+              final it = items[i];
+              final icon = it.kind == _FeedKind.evidence ? Icons.verified_outlined : Icons.event_busy_outlined;
+              final color = it.kind == _FeedKind.evidence ? const Color(0xFF7C3AED) : const Color(0xFFF59E0B);
+              final onTap = it.kind == _FeedKind.evidence ? onOpenEvidence : onOpenExcuses;
+              return InkWell(
+                borderRadius: BorderRadius.circular(14),
+                onTap: onTap,
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF9FAFB),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: const Color(0xFFE5E7EB)),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 38,
+                        height: 38,
+                        decoration: BoxDecoration(
+                          color: color.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(icon, color: color),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          it.message,
+                          style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF374151)),
+                        ),
+                      ),
+                      const Icon(Icons.chevron_right, color: Color(0xFF9CA3AF)),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DepartmentChart extends StatelessWidget {
+  const _DepartmentChart({required this.distribution});
+
+  final Map<String, int> distribution;
+
+  @override
+  Widget build(BuildContext context) {
+    final sorted = distribution.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+    final maxV = sorted.isEmpty ? 1 : sorted.first.value;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Department distribution', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
+          const SizedBox(height: 10),
+          for (final e in sorted.take(8)) ...[
+            Row(
+              children: [
+                SizedBox(
+                  width: 220,
+                  child: Text(
+                    e.key,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF374151)),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(999),
+                    child: LinearProgressIndicator(
+                      value: e.value / maxV,
+                      minHeight: 10,
+                      backgroundColor: const Color(0xFFE5E7EB),
+                      valueColor: const AlwaysStoppedAnimation(Color(0xFF6D28D9)),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                SizedBox(
+                  width: 28,
+                  child: Text(
+                    e.value.toString(),
+                    textAlign: TextAlign.right,
+                    style: const TextStyle(fontWeight: FontWeight.w900, color: Color(0xFF111827)),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+          ],
+        ],
+      ),
     );
   }
 }

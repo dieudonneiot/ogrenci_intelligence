@@ -14,7 +14,12 @@ class RouteGuards {
     Routes.profile,
     Routes.dashboard,
     Routes.settings,
+    Routes.excuseRequest,
     Routes.chat,
+    Routes.development,
+    Routes.caseAnalysis,
+    Routes.focusCheck,
+    Routes.evidence,
     Routes.debug,
   ];
 

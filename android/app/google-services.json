@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "240783397365",
+    "project_id": "ogrenciintelligence",
+    "storage_bucket": "ogrenciintelligence.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:240783397365:android:3ff3f026bb39de48bd10bc",
+        "android_client_info": {
+          "package_name": "com.ogrenciintelligence"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCd-GHqZG8vedeRjq5BzaPyJtyFypmgzcs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

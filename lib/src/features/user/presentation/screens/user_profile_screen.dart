@@ -1,11 +1,18 @@
+import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/localization/app_localizations.dart';
+import '../../../../core/routing/routes.dart';
 import '../../../../core/supabase/supabase_service.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
+import '../../../evidence/application/evidence_providers.dart';
+import '../../../evidence/domain/evidence_models.dart';
+import '../../../oi/application/oi_providers.dart';
+import '../../../oi/presentation/widgets/oi_widgets.dart';
 import '../../../points/application/points_providers.dart';
 
 class UserProfileScreen extends ConsumerStatefulWidget {
@@ -59,6 +66,7 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
     }
 
     final displayName = _displayName(user, _profile, fallback: l10n.t(AppText.commonStudent));
+    final oiAsync = ref.watch(myOiProfileProvider);
 
     return Container(
       color: const Color(0xFFF9FAFB),
@@ -74,6 +82,48 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
                   _ProfileHeader(
                     name: displayName,
                     email: user.email ?? '',
+                    avatarUrl: _profile?.avatarUrl,
+                    onChangeAvatar: _saving ? null : () => _pickAndUploadAvatar(user.id),
+                  ),
+                  const SizedBox(height: 16),
+                  oiAsync.when(
+                    loading: () => const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(12),
+                        child: SizedBox(width: 26, height: 26, child: CircularProgressIndicator(strokeWidth: 2.5)),
+                      ),
+                    ),
+                    error: (e, _) => Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFF1F2),
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(color: const Color(0xFFFECACA)),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.error_outline, color: Color(0xFFEF4444)),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              'OI Score unavailable: $e',
+                              style: const TextStyle(color: Color(0xFF991B1B), fontWeight: FontWeight.w700),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () => ref.read(myOiProfileProvider.notifier).refresh(),
+                            child: const Text('Retry'),
+                          ),
+                        ],
+                      ),
+                    ),
+                    data: (oi) => Column(
+                      children: [
+                        OiScoreCard(profile: oi),
+                        const SizedBox(height: 12),
+                        OiRadarCard(profile: oi),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 16),
                   _ProfileInfoCard(
@@ -94,6 +144,10 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
                   _CompletedCoursesCard(
                     completed: _completed,
                     courseMap: _courseMap,
+                  ),
+                  const SizedBox(height: 16),
+                  _EvidenceShowcaseCard(
+                    onOpenEvidence: () => context.go(Routes.evidence),
                   ),
                 ],
               ),
@@ -145,7 +199,7 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
   Future<_ProfileData> _loadProfile(User user) async {
     final row = await SupabaseService.client
         .from('profiles')
-        .select('email, department, full_name, phone, year')
+        .select('email, department, full_name, phone, year, avatar_url')
         .eq('id', user.id)
         .maybeSingle();
 
@@ -154,6 +208,7 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
         'id': user.id,
         'email': user.email,
         'department': '',
+        'avatar_url': null,
       });
       return _ProfileData(
         email: user.email ?? '',
@@ -161,10 +216,71 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
         fullName: null,
         phone: null,
         year: null,
+        avatarUrl: null,
       );
     }
 
     return _ProfileData.fromMap(row);
+  }
+
+  Future<void> _pickAndUploadAvatar(String uid) async {
+    final l10n = AppLocalizations.of(context);
+
+    final file = await openFile(
+      acceptedTypeGroups: const [
+        XTypeGroup(
+          label: 'Images',
+          extensions: <String>['png', 'jpg', 'jpeg', 'webp'],
+        ),
+      ],
+    );
+
+    if (file == null) return;
+
+    setState(() => _saving = true);
+    try {
+      final bytes = await file.readAsBytes();
+      final safe = file.name.trim().replaceAll(RegExp(r'[^a-zA-Z0-9._-]+'), '_');
+      final stamp = DateTime.now().toUtc().millisecondsSinceEpoch;
+      final path = '$uid/${stamp}_$safe';
+
+      await SupabaseService.client.storage.from('avatars').uploadBinary(
+            path,
+            bytes,
+            fileOptions: FileOptions(
+              upsert: true,
+              contentType: _contentTypeFromName(file.name) ?? 'image/png',
+            ),
+          );
+
+      final publicUrl = SupabaseService.client.storage.from('avatars').getPublicUrl(path);
+
+      await SupabaseService.client.from('profiles').update({'avatar_url': publicUrl}).eq('id', uid);
+
+      if (!mounted) return;
+      setState(() {
+        _profile = _profile?.copyWith(avatarUrl: publicUrl);
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Avatar updated.')),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.commonActionFailed(e.toString()))),
+      );
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
+
+  static String? _contentTypeFromName(String name) {
+    final lower = name.toLowerCase();
+    if (lower.endsWith('.png')) return 'image/png';
+    if (lower.endsWith('.jpg') || lower.endsWith('.jpeg')) return 'image/jpeg';
+    if (lower.endsWith('.webp')) return 'image/webp';
+    return null;
   }
 
   Future<List<_BadgeItem>> _fetchBadges(String uid) async {
@@ -306,10 +422,14 @@ class _ProfileHeader extends StatelessWidget {
   const _ProfileHeader({
     required this.name,
     required this.email,
+    required this.avatarUrl,
+    required this.onChangeAvatar,
   });
 
   final String name;
   final String email;
+  final String? avatarUrl;
+  final VoidCallback? onChangeAvatar;
 
   @override
   Widget build(BuildContext context) {
@@ -328,14 +448,45 @@ class _ProfileHeader extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Container(
-            width: 72,
-            height: 72,
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(999),
-            ),
-            child: const Icon(Icons.person, color: Colors.white, size: 36),
+          Stack(
+            children: [
+              Container(
+                width: 72,
+                height: 72,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(999),
+                  child: (avatarUrl != null && avatarUrl!.trim().isNotEmpty)
+                      ? Image.network(avatarUrl!, fit: BoxFit.cover)
+                      : const Icon(Icons.person, color: Colors.white, size: 36),
+                ),
+              ),
+              Positioned(
+                right: -2,
+                bottom: -2,
+                child: InkWell(
+                  onTap: onChangeAvatar,
+                  borderRadius: BorderRadius.circular(999),
+                  child: Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(999),
+                      border: Border.all(color: const Color(0xFFE5E7EB)),
+                      boxShadow: const [BoxShadow(color: Color(0x22000000), blurRadius: 10, offset: Offset(0, 6))],
+                    ),
+                    child: Icon(
+                      Icons.edit,
+                      size: 16,
+                      color: onChangeAvatar == null ? const Color(0xFF9CA3AF) : const Color(0xFF4F46E5),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -712,6 +863,183 @@ class _CompletedCoursesCard extends StatelessWidget {
   }
 }
 
+class _EvidenceShowcaseCard extends ConsumerWidget {
+  const _EvidenceShowcaseCard({required this.onOpenEvidence});
+
+  final VoidCallback onOpenEvidence;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final async = ref.watch(myEvidenceProvider);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
+        boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 18, offset: Offset(0, 8))],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.verified_outlined, color: Color(0xFF6D28D9)),
+              const SizedBox(width: 8),
+              const Expanded(
+                child: Text('Showcase', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+              ),
+              SizedBox(
+                height: 40,
+                child: ElevatedButton.icon(
+                  onPressed: onOpenEvidence,
+                  icon: const Icon(Icons.upload_file),
+                  label: const Text('Upload', style: TextStyle(fontWeight: FontWeight.w900)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF7C3AED),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          async.when(
+            loading: () =>
+                const Center(child: Padding(padding: EdgeInsets.all(12), child: CircularProgressIndicator())),
+            error: (e, _) => Row(
+              children: [
+                const Icon(Icons.error_outline, color: Color(0xFFEF4444)),
+                const SizedBox(width: 8),
+                Expanded(child: Text(e.toString(), style: const TextStyle(color: Color(0xFF6B7280)))),
+                TextButton(onPressed: () => ref.read(myEvidenceProvider.notifier).refresh(), child: const Text('Retry')),
+              ],
+            ),
+            data: (items) {
+              if (items.isEmpty) {
+                return const Text(
+                  'Upload project screenshots, certificates, or documents to verify your profile.',
+                  style: TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
+                );
+              }
+
+              final preview = items.take(6).toList(growable: false);
+              return LayoutBuilder(
+                builder: (_, c) {
+                  final w = c.maxWidth;
+                  final cols = w >= 820 ? 3 : 2;
+                  return GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: preview.length,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: cols,
+                      mainAxisSpacing: 12,
+                      crossAxisSpacing: 12,
+                      childAspectRatio: 1.25,
+                    ),
+                    itemBuilder: (_, i) => _EvidenceMiniCard(item: preview[i], onTap: onOpenEvidence),
+                  );
+                },
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _EvidenceMiniCard extends StatelessWidget {
+  const _EvidenceMiniCard({required this.item, required this.onTap});
+
+  final EvidenceItem item;
+  final VoidCallback onTap;
+
+  IconData _iconFor(String? mime) {
+    final m = (mime ?? '').toLowerCase();
+    if (m.contains('image')) return Icons.image_outlined;
+    if (m.contains('pdf')) return Icons.picture_as_pdf_outlined;
+    if (m.contains('zip')) return Icons.folder_zip_outlined;
+    return Icons.description_outlined;
+  }
+
+  Color _statusColor(EvidenceStatus status) {
+    switch (status) {
+      case EvidenceStatus.approved:
+        return const Color(0xFF16A34A);
+      case EvidenceStatus.rejected:
+        return const Color(0xFFDC2626);
+      case EvidenceStatus.pending:
+        return const Color(0xFFF59E0B);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final title = (item.title ?? '').trim();
+    final statusColor = _statusColor(item.status);
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF9FAFB),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: const Color(0xFFE5E7EB)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: const Color(0xFFE5E7EB)),
+                  ),
+                  child: Icon(_iconFor(item.mimeType), color: const Color(0xFF111827)),
+                ),
+                const Spacer(),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: statusColor.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Text(
+                    item.status.name,
+                    style: TextStyle(color: statusColor, fontWeight: FontWeight.w900, fontSize: 12),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Text(
+              title.isEmpty ? 'Evidence' : title,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontWeight: FontWeight.w900),
+            ),
+            const Spacer(),
+            const Text(
+              'Tap to view',
+              style: TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700, fontSize: 12),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _BadgeIcon extends StatelessWidget {
   const _BadgeIcon({required this.icon});
   final String? icon;
@@ -811,6 +1139,7 @@ class _ProfileData {
     required this.fullName,
     required this.phone,
     required this.year,
+    required this.avatarUrl,
   });
 
   final String email;
@@ -818,9 +1147,11 @@ class _ProfileData {
   final String? fullName;
   final String? phone;
   final int? year;
+  final String? avatarUrl;
 
   _ProfileData copyWith({
     String? department,
+    String? avatarUrl,
   }) {
     return _ProfileData(
       email: email,
@@ -828,6 +1159,7 @@ class _ProfileData {
       fullName: fullName,
       phone: phone,
       year: year,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
     );
   }
 
@@ -838,6 +1170,7 @@ class _ProfileData {
       fullName: (map['full_name'] as String?)?.trim(),
       phone: (map['phone'] as String?)?.trim(),
       year: (map['year'] as num?)?.toInt(),
+      avatarUrl: (map['avatar_url'] as String?)?.trim(),
     );
   }
 }

@@ -24,9 +24,11 @@ import '../../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/auth/presentation/screens/reset_password_screen.dart';
+import '../../features/case_analysis/presentation/screens/case_analysis_screen.dart';
 import '../../features/chat/presentation/screens/chat_screen.dart';
 import '../../features/company/presentation/screens/company_applications_screen.dart';
 import '../../features/company/presentation/screens/company_dashboard_screen.dart';
+import '../../features/company/presentation/screens/company_excuse_requests_screen.dart';
 import '../../features/company/presentation/screens/company_internship_applications_screen.dart';
 import '../../features/company/presentation/screens/company_internship_form_screen.dart';
 import '../../features/company/presentation/screens/company_internships_screen.dart';
@@ -36,11 +38,17 @@ import '../../features/company/presentation/screens/company_jobs_screen.dart';
 import '../../features/company/presentation/screens/company_pricing_screen.dart';
 import '../../features/company/presentation/screens/company_profile_screen.dart';
 import '../../features/company/presentation/screens/company_reports_screen.dart';
+import '../../features/company/presentation/screens/company_talent_mining_screen.dart';
 import '../../features/company/presentation/screens/register_company_screen.dart';
 import '../../features/company/presentation/widgets/company_status_check.dart';
 import '../../features/courses/presentation/screens/course_detail_screen.dart';
 import '../../features/courses/presentation/screens/courses_screen.dart';
+import '../../features/development/presentation/screens/development_screen.dart';
+import '../../features/evidence/presentation/screens/company_evidence_screen.dart';
+import '../../features/evidence/presentation/screens/evidence_screen.dart';
+import '../../features/excuse/presentation/screens/excuse_request_screen.dart';
 import '../../features/favorites/presentation/screens/favorites_screen.dart';
+import '../../features/focus_check/presentation/screens/focus_check_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/internships/presentation/screens/internship_detail_screen.dart';
 import '../../features/internships/presentation/screens/internships_screen.dart';
@@ -261,6 +269,23 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             path: Routes.chat,
             builder: (context, _) => const ChatScreen(),
           ),
+          GoRoute(
+            path: Routes.development,
+            builder: (context, _) => const DevelopmentScreen(),
+          ),
+          GoRoute(
+            path: Routes.caseAnalysis,
+            builder: (context, _) => const CaseAnalysisScreen(),
+          ),
+          GoRoute(
+            path: Routes.focusCheck,
+            builder: (context, state) =>
+                FocusCheckScreen(focusCheckId: state.uri.queryParameters['id']),
+          ),
+          GoRoute(
+            path: Routes.evidence,
+            builder: (context, _) => const EvidenceScreen(),
+          ),
 
           // Footer pages (public)
           GoRoute(
@@ -294,6 +319,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: Routes.settings,
             builder: (context, _) => const UserSettingsScreen(),
+          ),
+          GoRoute(
+            path: Routes.excuseRequest,
+            builder: (context, _) => const ExcuseRequestScreen(),
           ),
           GoRoute(
             path: Routes.courses,
@@ -408,8 +437,20 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             builder: (context, _) => const CompanyApplicationsScreen(),
           ),
           GoRoute(
+            path: Routes.companyEvidence,
+            builder: (context, _) => const CompanyEvidenceScreen(),
+          ),
+          GoRoute(
             path: Routes.companyPricing,
             builder: (context, _) => const CompanyPricingScreen(),
+          ),
+          GoRoute(
+            path: Routes.companyTalent,
+            builder: (context, _) => const CompanyTalentMiningScreen(),
+          ),
+          GoRoute(
+            path: Routes.companyExcuses,
+            builder: (context, _) => const CompanyExcuseRequestsScreen(),
           ),
         ],
       ),
@@ -586,4 +627,3 @@ class AdminShell extends StatelessWidget {
     );
   }
 }
-

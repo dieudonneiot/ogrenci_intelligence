@@ -1,7 +1,10 @@
+import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/localization/app_localizations.dart';
+import '../../../../core/supabase/supabase_service.dart';
 import '../../../auth/domain/auth_models.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
 import '../../../company/application/company_providers.dart';
@@ -15,16 +18,16 @@ class CompanyProfileScreen extends ConsumerStatefulWidget {
 
 class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
   static const _sectors = <String>[
-    'Yazilim',
+    'Yazılım',
     'Finans',
-    'Egitim',
-    'Saglik',
+    'Eğitim',
+    'Sağlık',
     'Üretim',
-    'Danismanlik',
+    'Danışmanlık',
     'E-ticaret',
     'Turizm',
     'Medya',
-    'Diger',
+    'Diğer',
   ];
 
   static const _companySizes = <String>[
@@ -50,6 +53,8 @@ class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
 
   String? _sector;
   String? _employeeCount;
+  String? _logoUrl;
+  String? _coverUrl;
   String _approvalStatus = '';
   String _rejectionReason = '';
 
@@ -107,11 +112,73 @@ class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
       _twitterCtrl.text = (company['twitter'] ?? '').toString();
       _facebookCtrl.text = (company['facebook'] ?? '').toString();
       _instagramCtrl.text = (company['instagram'] ?? '').toString();
+      final rawLogo = (company['logo_url'] as String?)?.trim();
+      final rawCover = (company['cover_image_url'] as String?)?.trim();
+      _logoUrl = (rawLogo == null || rawLogo.isEmpty) ? null : rawLogo;
+      _coverUrl = (rawCover == null || rawCover.isEmpty) ? null : rawCover;
       _approvalStatus = (company['approval_status'] ?? '').toString();
       _rejectionReason = (company['rejection_reason'] ?? '').toString();
     } finally {
       if (mounted) setState(() => _loading = false);
     }
+  }
+
+  Future<void> _pickAndUploadAsset({
+    required String companyId,
+    required String kind, // 'logo' | 'cover'
+  }) async {
+    final l10n = AppLocalizations.of(context);
+    final file = await openFile(
+      acceptedTypeGroups: const [
+        XTypeGroup(label: 'Images', extensions: <String>['png', 'jpg', 'jpeg', 'webp']),
+      ],
+    );
+    if (file == null) return;
+
+    setState(() => _saving = true);
+    try {
+      final bytes = await file.readAsBytes();
+      final safe = file.name.trim().replaceAll(RegExp(r'[^a-zA-Z0-9._-]+'), '_');
+      final stamp = DateTime.now().toUtc().millisecondsSinceEpoch;
+      final path = '$companyId/${kind}_${stamp}_$safe';
+
+      await SupabaseService.client.storage.from('company-assets').uploadBinary(
+            path,
+            bytes,
+            fileOptions: FileOptions(
+              upsert: true,
+              contentType: _contentTypeFromName(file.name) ?? 'image/png',
+            ),
+          );
+
+      final publicUrl = SupabaseService.client.storage.from('company-assets').getPublicUrl(path);
+
+      final updates = <String, dynamic>{};
+      if (kind == 'logo') updates['logo_url'] = publicUrl;
+      if (kind == 'cover') updates['cover_image_url'] = publicUrl;
+
+      await SupabaseService.client.from('companies').update(updates).eq('id', companyId);
+
+      if (!mounted) return;
+      setState(() {
+        if (kind == 'logo') _logoUrl = publicUrl;
+        if (kind == 'cover') _coverUrl = publicUrl;
+      });
+
+      _snack(l10n.t(AppText.companyProfileUpdated));
+    } catch (e) {
+      _snack(l10n.commonActionFailed(e.toString()), error: true);
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
+
+  static String? _contentTypeFromName(String name) {
+    final lower = name.toLowerCase();
+    if (lower.endsWith('.png')) return 'image/png';
+    if (lower.endsWith('.jpg') || lower.endsWith('.jpeg')) return 'image/jpeg';
+    if (lower.endsWith('.webp')) return 'image/webp';
+    return null;
   }
 
   Future<void> _save() async {
@@ -179,27 +246,48 @@ class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    return Container(
-      color: const Color(0xFFF9FAFB),
-      child: SingleChildScrollView(
-        child: Center(
-          child: ConstrainedBox(
+	    return Container(
+	      color: const Color(0xFFF9FAFB),
+	      child: SingleChildScrollView(
+	        child: Center(
+	          child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 1000),
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 22, 16, 28),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    l10n.t(AppText.companyProfileTitle),
-                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900),
-                  ),
-                  const SizedBox(height: 8),
-                  _StatusBanner(status: _approvalStatus, reason: _rejectionReason),
-                  const SizedBox(height: 16),
-                  _SectionCard(
-                    title: l10n.t(AppText.companyProfileSectionBasic),
-                    child: Column(
+	                children: [
+	                  Text(
+	                    l10n.t(AppText.companyProfileTitle),
+	                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900),
+	                  ),
+	                  const SizedBox(height: 8),
+	                  _StatusBanner(status: _approvalStatus, reason: _rejectionReason),
+	                  const SizedBox(height: 12),
+	                  _BrandAssetsCard(
+	                    logoUrl: _logoUrl,
+	                    coverUrl: _coverUrl,
+	                    onChangeLogo: _saving
+	                        ? null
+	                        : () {
+	                            final auth = ref.read(authViewStateProvider).value;
+	                            final companyId = auth?.companyId;
+	                            if (companyId == null) return;
+	                            _pickAndUploadAsset(companyId: companyId, kind: 'logo');
+	                          },
+	                    onChangeCover: _saving
+	                        ? null
+	                        : () {
+	                            final auth = ref.read(authViewStateProvider).value;
+	                            final companyId = auth?.companyId;
+	                            if (companyId == null) return;
+	                            _pickAndUploadAsset(companyId: companyId, kind: 'cover');
+	                          },
+	                  ),
+	                  const SizedBox(height: 16),
+	                  _SectionCard(
+	                    title: l10n.t(AppText.companyProfileSectionBasic),
+	                    child: Column(
                       children: [
                         _Field(label: l10n.t(AppText.companyProfileFieldNameRequired), controller: _nameCtrl),
                         _DropdownField(
@@ -418,6 +506,177 @@ class _StatusBanner extends StatelessWidget {
   }
 }
 
+class _BrandAssetsCard extends StatelessWidget {
+  const _BrandAssetsCard({
+    required this.logoUrl,
+    required this.coverUrl,
+    required this.onChangeLogo,
+    required this.onChangeCover,
+  });
+
+  final String? logoUrl;
+  final String? coverUrl;
+  final VoidCallback? onChangeLogo;
+  final VoidCallback? onChangeCover;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
+        boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 12, offset: Offset(0, 6))],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: SizedBox(
+          height: 180,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              if (coverUrl != null && coverUrl!.trim().isNotEmpty)
+                Image.network(coverUrl!, fit: BoxFit.cover)
+              else
+                const DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Color(0xFFEEF2FF), Color(0xFFF5F3FF)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  ),
+                ),
+              Positioned(
+                right: 12,
+                top: 12,
+                child: _AssetButton(
+                  icon: Icons.image_outlined,
+                  label: 'Cover',
+                  onTap: onChangeCover,
+                ),
+              ),
+              Positioned(
+                left: 14,
+                bottom: 14,
+                child: Row(
+                  children: [
+                    Stack(
+                      children: [
+                        Container(
+                          width: 76,
+                          height: 76,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(999),
+                            border: Border.all(color: const Color(0xFFE5E7EB), width: 2),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(999),
+                            child: (logoUrl != null && logoUrl!.trim().isNotEmpty)
+                                ? Image.network(logoUrl!, fit: BoxFit.cover)
+                                : const Icon(Icons.apartment_outlined, size: 34, color: Color(0xFF6D28D9)),
+                          ),
+                        ),
+                        Positioned(
+                          right: -2,
+                          bottom: -2,
+                          child: _IconFab(
+                            icon: Icons.edit,
+                            onTap: onChangeLogo,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(width: 12),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.45),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
+                      ),
+                      child: const Text(
+                        'Company branding',
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _AssetButton extends StatelessWidget {
+  const _AssetButton({required this.icon, required this.label, required this.onTap});
+
+  final IconData icon;
+  final String label;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final enabled = onTap != null;
+    return Opacity(
+      opacity: enabled ? 1 : 0.65,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            color: Colors.black.withValues(alpha: 0.45),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 18, color: Colors.white),
+              const SizedBox(width: 8),
+              Text(label, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _IconFab extends StatelessWidget {
+  const _IconFab({required this.icon, required this.onTap});
+
+  final IconData icon;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final enabled = onTap != null;
+    return Opacity(
+      opacity: enabled ? 1 : 0.6,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(999),
+        child: Container(
+          padding: const EdgeInsets.all(7),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(color: const Color(0xFFE5E7EB)),
+            boxShadow: const [BoxShadow(color: Color(0x22000000), blurRadius: 10, offset: Offset(0, 6))],
+          ),
+          child: Icon(icon, size: 16, color: const Color(0xFF4F46E5)),
+        ),
+      ),
+    );
+  }
+}
+
 class _SectionCard extends StatelessWidget {
   const _SectionCard({required this.title, required this.child});
   final String title;
@@ -488,13 +747,45 @@ class _DropdownField extends StatelessWidget {
   final List<String> items;
   final ValueChanged<String?> onChanged;
 
+  String _norm(String s) {
+    return s
+        .trim()
+        .toLowerCase()
+        // Turkish chars -> ascii-ish (to match older stored values)
+        .replaceAll('ı', 'i')
+        .replaceAll('İ', 'i')
+        .replaceAll('ş', 's')
+        .replaceAll('ğ', 'g')
+        .replaceAll('ü', 'u')
+        .replaceAll('ö', 'o')
+        .replaceAll('ç', 'c');
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Prevent DropdownButton assertion when DB value doesn't exactly match items.
+    final uniqueItems = items.map((e) => e.trim()).where((e) => e.isNotEmpty).toSet().toList()..sort();
+    final raw = value?.trim();
+
+    String? safeValue;
+    if (raw != null && raw.isNotEmpty) {
+      if (uniqueItems.contains(raw)) {
+        safeValue = raw;
+      } else {
+        // Try normalized match (e.g., "Yazılım" vs "Yazilim")
+        final n = _norm(raw);
+        safeValue = uniqueItems.cast<String?>().firstWhere(
+              (it) => it != null && _norm(it) == n,
+              orElse: () => null,
+            );
+      }
+    }
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: DropdownButtonFormField<String>(
-        initialValue: (value != null && value!.isNotEmpty) ? value : null,
-        items: items.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+        initialValue: safeValue,
+        items: uniqueItems.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
         onChanged: onChanged,
         decoration: InputDecoration(
           labelText: label,

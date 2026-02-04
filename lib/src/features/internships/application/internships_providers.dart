@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/supabase/supabase_service.dart';
 import '../../auth/presentation/controllers/auth_controller.dart';
 import '../data/internships_repository.dart';
 import '../domain/internship_models.dart';
@@ -53,11 +54,57 @@ class InternshipsController extends AutoDisposeAsyncNotifier<InternshipsViewMode
       ),
       repo.fetchMyFavoriteInternshipIds(userId: uid),
       repo.fetchMyApplicationStatusByInternshipId(userId: uid),
+      (() async => await SupabaseService.client.from('profiles').select('year').eq('id', uid).maybeSingle())(),
+      (() async => await SupabaseService.client.from('oi_scores').select('oi_score').eq('user_id', uid).maybeSingle())(),
     ]);
 
-    final internships = futures[0] as List<Internship>;
+    var internships = futures[0] as List<Internship>;
     final favoriteIds = futures[1] as Set<String>;
     final statusByInternshipId = futures[2] as Map<String, String>;
+    final profileRow = futures[3] as Map<String, dynamic>?;
+    final oiRow = futures[4] as Map<String, dynamic>?;
+
+    final year = int.tryParse((profileRow?['year'] ?? '').toString());
+    final oiScore = int.tryParse((oiRow?['oi_score'] ?? '').toString()) ?? 0;
+
+    int compatibilityFor(Internship i) {
+      var score = 0;
+
+      final idept = (i.department ?? '').trim();
+      if (idept.isEmpty) {
+        score += 10;
+      } else if (idept.toLowerCase() == dept.toLowerCase()) {
+        score += 40;
+      } else {
+        score += 8;
+      }
+
+      // If user has a year set, slightly boost longer internships.
+      // (No explicit year requirements exist in the internships schema.)
+      if (year != null && year > 0) {
+        if (i.durationMonths >= 6) score += 10;
+        if (i.durationMonths >= 12) score += 5;
+      }
+
+      score += ((oiScore.clamp(0, 100) / 100.0) * 40).round();
+
+      return score.clamp(0, 100);
+    }
+
+    internships = internships
+        .map((i) => i.copyWith(compatibility: compatibilityFor(i)))
+        .toList(growable: false)
+      ..sort((a, b) {
+        final c = b.compatibility.compareTo(a.compatibility);
+        if (c != 0) return c;
+        final ad = a.deadline ?? DateTime(2100);
+        final bd = b.deadline ?? DateTime(2100);
+        final d = ad.compareTo(bd);
+        if (d != 0) return d;
+        final ac = a.createdAt ?? DateTime(1970);
+        final bc = b.createdAt ?? DateTime(1970);
+        return bc.compareTo(ac);
+      });
 
     final items = internships
         .map((i) {

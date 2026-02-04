@@ -219,6 +219,13 @@ class _FiltersRow extends StatelessWidget {
           onClear: () => onChange(filters.copyWith(clearDepartment: true)),
         ),
         _DropdownFilter(
+          label: AppLocalizations.of(context).t(AppText.companyRegisterCityLabel),
+          value: filters.city,
+          items: vm.availableCities,
+          onChanged: (v) => onChange(filters.copyWith(city: v)),
+          onClear: () => onChange(filters.copyWith(clearCity: true)),
+        ),
+        _DropdownFilter(
           label: AppLocalizations.of(context).t(AppText.filterWorkType),
           value: filters.workType,
           items: vm.availableWorkTypes,
@@ -329,6 +336,7 @@ class _JobCard extends ConsumerWidget {
                           style: const TextStyle(fontWeight: FontWeight.w900),
                         ),
                       ),
+                      _CompatibilityPill(value: j.compatibility),
                       if (applied) _StatusPill(status: item.applicationStatus!),
                     ],
                   ),
@@ -384,6 +392,40 @@ class _JobCard extends ConsumerWidget {
 
   static String _fmtDate(DateTime d) =>
       '${d.day.toString().padLeft(2, '0')}.${d.month.toString().padLeft(2, '0')}.${d.year}';
+}
+
+class _CompatibilityPill extends StatelessWidget {
+  const _CompatibilityPill({required this.value});
+
+  final int value;
+
+  @override
+  Widget build(BuildContext context) {
+    final v = value.clamp(0, 100);
+    Color bg;
+    Color fg;
+
+    if (v >= 80) {
+      bg = const Color(0xFFDCFCE7);
+      fg = const Color(0xFF16A34A);
+    } else if (v >= 60) {
+      bg = const Color(0xFFFEF3C7);
+      fg = const Color(0xFFB45309);
+    } else {
+      bg = const Color(0xFFF3F4F6);
+      fg = const Color(0xFF374151);
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(left: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(999)),
+      child: Text(
+        '$v%',
+        style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: fg),
+      ),
+    );
+  }
 }
 
 class _Chip extends StatelessWidget {

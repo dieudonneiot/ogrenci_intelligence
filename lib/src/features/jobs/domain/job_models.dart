@@ -41,6 +41,7 @@ class Job {
     required this.workType,
     required this.isRemote,
     required this.isActive,
+    required this.compatibility,
     this.salaryMin,
     this.salaryMax,
     this.salaryText,
@@ -69,6 +70,7 @@ class Job {
 
   final bool isRemote;
   final bool isActive;
+  final int compatibility; // 0..100
 
   final int? salaryMin;
   final int? salaryMax;
@@ -79,6 +81,31 @@ class Job {
   final int? maxYear;
 
   final DateTime createdAt;
+
+  Job copyWith({int? compatibility}) {
+    return Job(
+      id: id,
+      title: title,
+      companyId: companyId,
+      companyName: companyName,
+      department: department,
+      location: location,
+      description: description,
+      requirements: requirements,
+      type: type,
+      workType: workType,
+      isRemote: isRemote,
+      isActive: isActive,
+      compatibility: (compatibility ?? this.compatibility).clamp(0, 100),
+      salaryMin: salaryMin,
+      salaryMax: salaryMax,
+      salaryText: salaryText,
+      deadline: deadline,
+      minYear: minYear,
+      maxYear: maxYear,
+      createdAt: createdAt,
+    );
+  }
 
   factory Job.fromMap(Map<String, dynamic> map) {
     return Job(
@@ -103,6 +130,7 @@ class Job {
       minYear: map['min_year'] == null ? null : _asInt(map['min_year']),
       maxYear: map['max_year'] == null ? null : _asInt(map['max_year']),
       createdAt: _asDate(map['created_at']) ?? DateTime.now(),
+      compatibility: 0,
     );
   }
 }
@@ -229,26 +257,31 @@ class JobsFilters {
   const JobsFilters({
     this.query = '',
     this.department,
+    this.city,
     this.workType,
     this.remoteOnly = false,
   });
 
   final String query;
   final String? department;
+  final String? city;
   final String? workType;
   final bool remoteOnly;
 
   JobsFilters copyWith({
     String? query,
     String? department,
+    String? city,
     String? workType,
     bool? remoteOnly,
     bool clearDepartment = false,
+    bool clearCity = false,
     bool clearWorkType = false,
   }) {
     return JobsFilters(
       query: query ?? this.query,
       department: clearDepartment ? null : (department ?? this.department),
+      city: clearCity ? null : (city ?? this.city),
       workType: clearWorkType ? null : (workType ?? this.workType),
       remoteOnly: remoteOnly ?? this.remoteOnly,
     );
@@ -330,11 +363,13 @@ class JobsViewModel {
   const JobsViewModel({
     required this.items,
     required this.availableDepartments,
+    required this.availableCities,
     required this.availableWorkTypes,
   });
 
   final List<JobCardVM> items;
   final List<String> availableDepartments;
+  final List<String> availableCities;
   final List<String> availableWorkTypes;
 }
 

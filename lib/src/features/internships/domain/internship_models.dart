@@ -101,6 +101,7 @@ class Internship {
     required this.benefits,
     required this.createdAt,
     this.isActive = true,
+    this.compatibility = 0,
   });
 
   final String id;
@@ -125,6 +126,30 @@ class Internship {
 
   final DateTime? createdAt;
   final bool isActive;
+  final int compatibility; // 0..100
+
+  Internship copyWith({int? compatibility}) {
+    return Internship(
+      id: id,
+      title: title,
+      companyName: companyName,
+      description: description,
+      department: department,
+      location: location,
+      durationMonths: durationMonths,
+      isRemote: isRemote,
+      deadline: deadline,
+      isPaid: isPaid,
+      monthlyStipend: monthlyStipend,
+      providesCertificate: providesCertificate,
+      possibilityOfEmployment: possibilityOfEmployment,
+      requirements: requirements,
+      benefits: benefits,
+      createdAt: createdAt,
+      isActive: isActive,
+      compatibility: (compatibility ?? this.compatibility).clamp(0, 100),
+    );
+  }
 
   factory Internship.fromMap(Map<String, dynamic> map) {
     return Internship(
@@ -145,6 +170,7 @@ class Internship {
       benefits: _asStringList(map['benefits']),
       createdAt: _asDate(map['created_at']),
       isActive: map.containsKey('is_active') ? _asBool(map['is_active']) : true,
+      compatibility: 0,
     );
   }
 

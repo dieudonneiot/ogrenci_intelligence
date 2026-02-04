@@ -87,6 +87,10 @@ class JobsRepository {
     if (dept.isNotEmpty) {
       q = q.eq('department', dept);
     }
+    final city = (filters.city ?? '').trim();
+    if (city.isNotEmpty) {
+      q = q.ilike('location', '%$city%');
+    }
     final wt = (filters.workType ?? '').trim();
     if (wt.isNotEmpty) {
       q = q.eq('work_type', wt);

@@ -138,46 +138,54 @@ Future<void> _submit() async {
     final busy = ref.watch(authActionLoadingProvider);
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.t(AppText.authLoginTitle))),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 520),
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Card(
-              child: Padding(
-                padding: const EdgeInsets.all(20),
+      backgroundColor: const Color(0xFFF9FAFB),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF4C1D95), Color(0xFF5B21B6), Color(0xFF1E3A8A)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 520),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Container(
+                padding: const EdgeInsets.all(22),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: const [
+                    BoxShadow(color: Color(0x24000000), blurRadius: 24, offset: Offset(0, 14)),
+                  ],
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Center(
                       child: Container(
-                        width: 72,
-                        height: 72,
+                        width: 74,
+                        height: 74,
                         decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.primaryContainer,
-                          shape: BoxShape.circle,
+                          color: const Color(0xFFEDE9FE),
+                          borderRadius: BorderRadius.circular(22),
                         ),
-                        child: Icon(
-                          Icons.lock_outline,
-                          size: 34,
-                          color: Theme.of(context).colorScheme.onPrimaryContainer,
-                        ),
+                        child: const Icon(Icons.school_outlined, size: 38, color: Color(0xFF7C3AED)),
                       ),
                     ),
                     const SizedBox(height: 14),
                     Text(
                       l10n.t(AppText.authWelcomeBack),
                       textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                            fontWeight: FontWeight.w700,
-                          ),
+                      style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900),
                     ),
                     const SizedBox(height: 6),
                     Text(
                       l10n.t(AppText.authStudentLoginSubtitle),
                       textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.bodyMedium,
+                      style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
                     ),
                     const SizedBox(height: 18),
 
@@ -187,6 +195,7 @@ Future<void> _submit() async {
                       decoration: InputDecoration(
                         labelText: l10n.t(AppText.commonEmail),
                         prefixIcon: const Icon(Icons.mail_outline),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -197,12 +206,10 @@ Future<void> _submit() async {
                       decoration: InputDecoration(
                         labelText: l10n.t(AppText.commonPassword),
                         prefixIcon: const Icon(Icons.lock_outline),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
                         suffixIcon: IconButton(
-                          onPressed: () =>
-                              setState(() => _showPassword = !_showPassword),
-                          icon: Icon(
-                            _showPassword ? Icons.visibility_off : Icons.visibility,
-                          ),
+                          onPressed: () => setState(() => _showPassword = !_showPassword),
+                          icon: Icon(_showPassword ? Icons.visibility_off : Icons.visibility),
                         ),
                       ),
                     ),
@@ -212,10 +219,9 @@ Future<void> _submit() async {
                       children: [
                         Checkbox(
                           value: _rememberMe,
-                          onChanged: (v) =>
-                              setState(() => _rememberMe = v ?? false),
+                          onChanged: (v) => setState(() => _rememberMe = v ?? false),
                         ),
-                        Text(l10n.t(AppText.commonRememberMe)),
+                        Text(l10n.t(AppText.commonRememberMe), style: const TextStyle(fontWeight: FontWeight.w600)),
                         const Spacer(),
                         TextButton(
                           onPressed: () => context.push(Routes.forgotPassword),
@@ -229,41 +235,58 @@ Future<void> _submit() async {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.red.withValues(alpha: 0.10),
+                          color: const Color(0xFFFEE2E2),
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.red.withValues(alpha: 0.25)),
+                          border: Border.all(color: const Color(0xFFFECACA)),
                         ),
-                        child: Text(
-                          _error!,
-                          style: const TextStyle(color: Colors.red),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.error_outline, color: Color(0xFFDC2626)),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(_error!, style: const TextStyle(color: Color(0xFF7F1D1D))),
+                            ),
+                          ],
                         ),
                       ),
                     ],
 
                     const SizedBox(height: 14),
 
-                    ElevatedButton(
-                      onPressed: busy ? null : _submit,
-                      child: busy
-                          ? const SizedBox(
-                              width: 18,
-                              height: 18,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : Text(l10n.t(AppText.authLoginTitle)),
+                    SizedBox(
+                      height: 48,
+                      child: ElevatedButton.icon(
+                        onPressed: busy ? null : _submit,
+                        icon: busy
+                            ? const SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                              )
+                            : const Icon(Icons.lock_outline),
+                        label: Text(l10n.t(AppText.authLoginTitle), style: const TextStyle(fontWeight: FontWeight.w900)),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF7C3AED),
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        ),
+                      ),
                     ),
 
-                    const SizedBox(height: 14),
-                    const Divider(),
-                    const SizedBox(height: 10),
-
-                    OutlinedButton(
-                      onPressed: () => context.push(Routes.companyAuth),
-                      child: Text(l10n.t(AppText.authLoginAsCompany)),
-                    ),
-
+                    const SizedBox(height: 16),
+                    Container(height: 1, color: const Color(0xFFE5E7EB)),
                     const SizedBox(height: 12),
 
+                    OutlinedButton.icon(
+                      onPressed: () => context.push(Routes.companyAuth),
+                      icon: const Icon(Icons.apartment_outlined),
+                      label: Text(l10n.t(AppText.authLoginAsCompany), style: const TextStyle(fontWeight: FontWeight.w800)),
+                      style: OutlinedButton.styleFrom(
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      ),
+                    ),
+
+                    const SizedBox(height: 6),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -273,6 +296,35 @@ Future<void> _submit() async {
                           child: Text(l10n.t(AppText.authRegisterCta)),
                         ),
                       ],
+                    ),
+
+                    const SizedBox(height: 10),
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF3F4F6),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.security, size: 18, color: Color(0xFF111827)),
+                          const SizedBox(width: 8),
+                          const Expanded(
+                            child: Text(
+                              'Admin panel',
+                              style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF111827)),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () => context.go(Routes.adminLogin),
+                            child: const Text('Login'),
+                          ),
+                          TextButton(
+                            onPressed: () => context.go(Routes.adminSetup),
+                            child: const Text('Setup'),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),

@@ -274,6 +274,7 @@ class CompanyApplication {
     required this.type,
     required this.status,
     required this.appliedAt,
+    required this.profileId,
     required this.profileName,
     required this.profileEmail,
     required this.profilePhone,
@@ -294,6 +295,7 @@ class CompanyApplication {
   final String status;
   final DateTime appliedAt;
 
+  final String? profileId;
   final String? profileName;
   final String? profileEmail;
   final String? profilePhone;
@@ -319,6 +321,7 @@ class CompanyApplication {
       type: 'job',
       status: (map['status'] ?? 'pending').toString(),
       appliedAt: _asDate(map['applied_at']) ?? _asDate(map['created_at']) ?? DateTime.now(),
+      profileId: _asTrimmedString(profile['id']),
       profileName: _asTrimmedString(profile['full_name']),
       profileEmail: _asTrimmedString(profile['email']),
       profilePhone: _asTrimmedString(profile['phone']),
@@ -343,6 +346,7 @@ class CompanyApplication {
       type: 'internship',
       status: (map['status'] ?? 'pending').toString(),
       appliedAt: _asDate(map['applied_at']) ?? _asDate(map['created_at']) ?? DateTime.now(),
+      profileId: _asTrimmedString(profile['id']),
       profileName: _asTrimmedString(profile['full_name']),
       profileEmail: _asTrimmedString(profile['email']),
       profilePhone: _asTrimmedString(profile['phone']),

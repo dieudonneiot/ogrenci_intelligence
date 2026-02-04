@@ -12,6 +12,100 @@ class ChatRepository {
 
   final SupabaseClient _client;
 
+  bool _isEdgeFunctionMissing(Object error) {
+    final s = error.toString().toLowerCase();
+    return s.contains('requested function was not found') || s.contains('not_found') || s.contains('status 404') || s.contains('(404)');
+  }
+
+  Future<String> _ensureSessionForFallback(String userId, {String? sessionId}) async {
+    final existing = (sessionId ?? '').trim();
+    if (existing.isNotEmpty) return existing;
+
+    final row = await _client.from('chat_sessions').insert({
+      'user_id': userId,
+      'started_at': DateTime.now().toUtc().toIso8601String(),
+      'message_count': 0,
+    }).select('id').single();
+
+    return (row['id'] ?? '').toString();
+  }
+
+  Future<void> _insertChatMessage({
+    required String userId,
+    required String sessionId,
+    required String message,
+    required String type, // user|bot
+  }) async {
+    await _client.from('chat_messages').insert({
+      'user_id': userId,
+      'session_id': sessionId,
+      'message': message,
+      'type': type,
+      'created_at': DateTime.now().toUtc().toIso8601String(),
+    });
+  }
+
+  Future<ChatAiResponse> _faqFallback({
+    required String message,
+    required String userId,
+    String? sessionId,
+    required String locale,
+  }) async {
+    final sid = await _ensureSessionForFallback(userId, sessionId: sessionId);
+
+    // Persist the user message.
+    await _insertChatMessage(userId: userId, sessionId: sid, message: message, type: 'user');
+
+    String reply;
+    try {
+      // Prefer full-text search when available (created by docs/sql/15_chatbot_ai.sql)
+      final rows = await _client
+          .from('chatbot_faqs')
+          .select('answer')
+          .eq('is_active', true)
+          .textSearch('search_vector', message, type: TextSearchType.plain, config: 'simple')
+          .limit(1);
+
+      final list = (rows as List).cast<Map<String, dynamic>>();
+      reply = list.isEmpty ? '' : (list.first['answer'] ?? '').toString();
+    } catch (_) {
+      reply = '';
+    }
+
+    if (reply.trim().isEmpty) {
+      // Soft fallback: try ILIKE over question/answer/keywords.
+      try {
+        final q = message.replaceAll('%', '').replaceAll('_', '').trim();
+        final pat = '%$q%';
+        final rows = await _client
+            .from('chatbot_faqs')
+            .select('answer')
+            .eq('is_active', true)
+            .or('question.ilike.$pat,answer.ilike.$pat')
+            .limit(1);
+        final list = (rows as List).cast<Map<String, dynamic>>();
+        reply = list.isEmpty ? '' : (list.first['answer'] ?? '').toString();
+      } catch (_) {
+        // ignore
+      }
+    }
+
+    if (reply.trim().isEmpty) {
+      reply = locale.toLowerCase().startsWith('en')
+          ? 'The AI service is not deployed for this project yet, and I could not find a matching FAQ.'
+          : 'AI servisi bu projede henuz yayinda degil ve uygun bir SSS cevabi bulunamadi.';
+    }
+
+    // Persist bot reply.
+    await _insertChatMessage(userId: userId, sessionId: sid, message: reply, type: 'bot');
+
+    return ChatAiResponse(
+      sessionId: sid,
+      reply: reply,
+      suggestions: const <String>[],
+    );
+  }
+
   Future<List<ChatMessage>> fetchHistory(String userId, {int limit = 50}) async {
     final res = await _client
         .from('chat_messages')
@@ -37,16 +131,27 @@ class ChatRepository {
       'faq_only': faqOnly,
     };
 
-    final response = await _client.functions.invoke('chatbot', body: payload);
-    if (response.data == null) {
-      throw const ChatRepositoryException('Empty response from AI service');
-    }
+    try {
+      final response = await _client.functions.invoke('chatbot', body: payload);
+      if (response.data == null) {
+        throw const ChatRepositoryException('Empty response from AI service');
+      }
 
-    final data = response.data as Map<String, dynamic>;
-    if (data['error'] != null) {
-      throw ChatRepositoryException(data['error'].toString());
+      final data = response.data as Map<String, dynamic>;
+      if (data['error'] != null) {
+        throw ChatRepositoryException(data['error'].toString());
+      }
+      return ChatAiResponse.fromMap(data);
+    } catch (e) {
+      if (_isEdgeFunctionMissing(e)) {
+        final uid = _client.auth.currentUser?.id;
+        if (uid == null || uid.isEmpty) {
+          throw const ChatRepositoryException('AI function missing and not authenticated for FAQ fallback');
+        }
+        return _faqFallback(message: message, userId: uid, sessionId: sessionId, locale: locale);
+      }
+      rethrow;
     }
-    return ChatAiResponse.fromMap(data);
   }
 
   Stream<ChatStreamEvent> streamMessage({
@@ -80,9 +185,31 @@ class ChatRepository {
       final response = await client.send(request);
       if (response.statusCode != 200) {
         final body = await response.stream.bytesToString();
-        throw ChatRepositoryException(
-          'Stream error (${response.statusCode}): $body',
-        );
+
+        // If the Edge Function is not deployed yet, fallback to FAQ using DB.
+        if (response.statusCode == 404 && body.toLowerCase().contains('not_found')) {
+          final uid = _client.auth.currentUser?.id;
+          if (uid == null || uid.isEmpty) {
+            throw const ChatRepositoryException('AI function missing and not authenticated for FAQ fallback');
+          }
+
+          final fallback = await _faqFallback(message: message, userId: uid, sessionId: sessionId, locale: locale);
+
+          // Emit a minimal stream-like response.
+          yield ChatStreamEvent(type: ChatStreamEventType.meta, data: {'session_id': fallback.sessionId});
+          final reply = fallback.reply;
+          const chunk = 64;
+          for (var i = 0; i < reply.length; i += chunk) {
+            yield ChatStreamEvent(
+              type: ChatStreamEventType.delta,
+              data: {'text': reply.substring(i, (i + chunk).clamp(0, reply.length))},
+            );
+          }
+          yield ChatStreamEvent(type: ChatStreamEventType.done, data: {'reply': reply, 'suggestions': fallback.suggestions});
+          return;
+        }
+
+        throw ChatRepositoryException('Stream error (${response.statusCode}): $body');
       }
 
       var buffer = '';

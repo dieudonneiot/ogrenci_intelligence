@@ -6,8 +6,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/deeplink/deep_link_service.dart';
 import '../core/localization/app_localizations.dart';
 import '../core/localization/locale_controller.dart';
+import '../core/push/push_service.dart';
 import '../core/routing/app_router.dart';
 import '../core/supabase/supabase_service.dart';
+import '../features/auth/presentation/controllers/auth_controller.dart';
 
 class App extends ConsumerStatefulWidget {
   const App({super.key});
@@ -18,6 +20,8 @@ class App extends ConsumerStatefulWidget {
 
 class _AppState extends ConsumerState<App> {
   DeepLinkService? _deepLinks;
+  PushService? _push;
+  ProviderSubscription<AsyncValue<AuthViewState>>? _authSub;
 
   @override
   void initState() {
@@ -31,11 +35,22 @@ class _AppState extends ConsumerState<App> {
     );
 
     unawaited(_deepLinks!.start());
+
+    _push = PushService(router: router);
+    unawaited(_push!.start());
+
+    _authSub = ref.listenManual<AsyncValue<AuthViewState>>(authViewStateProvider, (prev, next) {
+      final auth = next.valueOrNull;
+      if (auth == null) return;
+      unawaited(_push?.onAuthChanged(auth) ?? Future.value());
+    });
   }
 
   @override
   void dispose() {
     unawaited(_deepLinks?.stop() ?? Future.value());
+    unawaited(_push?.stop() ?? Future.value());
+    _authSub?.close();
     super.dispose();
   }
  
