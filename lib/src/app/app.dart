@@ -9,6 +9,7 @@ import '../core/localization/locale_controller.dart';
 import '../core/push/push_service.dart';
 import '../core/routing/app_router.dart';
 import '../core/supabase/supabase_service.dart';
+import '../core/theme/app_theme.dart';
 import '../features/auth/presentation/controllers/auth_controller.dart';
 
 class App extends ConsumerStatefulWidget {
@@ -71,6 +72,7 @@ class _AppState extends ConsumerState<App> {
       ],
       onGenerateTitle: (context) => AppLocalizations.of(context).t(AppText.brandName),
       title: AppLocalizations.of(context).t(AppText.brandName),
+      theme: AppTheme.light(),
       routerConfig: router,
     );
   }

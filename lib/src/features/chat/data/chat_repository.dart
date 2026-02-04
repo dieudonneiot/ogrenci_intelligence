@@ -12,6 +12,36 @@ class ChatRepository {
 
   final SupabaseClient _client;
 
+  bool _shouldRefreshSession(Session session) {
+    final expiresAt = session.expiresAt;
+    if (expiresAt == null) return session.isExpired;
+
+    final expiry = DateTime.fromMillisecondsSinceEpoch(expiresAt * 1000);
+    return DateTime.now().isAfter(expiry.subtract(const Duration(minutes: 2)));
+  }
+
+  Future<String> _accessToken({bool forceRefresh = false}) async {
+    final session = _client.auth.currentSession;
+    if (session == null) {
+      throw const ChatRepositoryException('Missing auth session');
+    }
+
+    if (forceRefresh || _shouldRefreshSession(session)) {
+      try {
+        await _client.auth.refreshSession();
+      } catch (_) {
+        // Ignore: if refresh fails we'll surface the real error below.
+      }
+    }
+
+    final token = _client.auth.currentSession?.accessToken;
+    if (token == null || token.isEmpty) {
+      throw const ChatRepositoryException('Missing auth token');
+    }
+
+    return token;
+  }
+
   bool _isEdgeFunctionMissing(Object error) {
     final s = error.toString().toLowerCase();
     return s.contains('requested function was not found') || s.contains('not_found') || s.contains('status 404') || s.contains('(404)');
@@ -160,56 +190,105 @@ class ChatRepository {
     String locale = 'tr',
     bool faqOnly = false,
   }) async* {
-    final token = _client.auth.currentSession?.accessToken;
-    if (token == null || token.isEmpty) {
-      throw const ChatRepositoryException('Missing auth token');
-    }
-
     final url = Uri.parse('${Env.supabaseUrl}/functions/v1/chatbot');
-    final request = http.Request('POST', url);
 
-    request.headers['Authorization'] = 'Bearer $token';
-    request.headers['apikey'] = Env.supabaseAnonKey;
-    request.headers['Content-Type'] = 'application/json';
+    Future<http.StreamedResponse> sendRequest(http.Client client, {required String token}) {
+      final request = http.Request('POST', url);
 
-    request.body = jsonEncode({
-      'message': message,
-      'session_id': sessionId,
-      'locale': locale,
-      'faq_only': faqOnly,
-      'stream': true,
-    });
+      request.headers['Authorization'] = 'Bearer $token';
+      request.headers['apikey'] = Env.supabaseAnonKey;
+      request.headers['Content-Type'] = 'application/json';
+      request.headers['Accept'] = 'text/event-stream';
+
+      request.body = jsonEncode({
+        'message': message,
+        'session_id': sessionId,
+        'locale': locale,
+        'faq_only': faqOnly,
+        'stream': true,
+      });
+
+      return client.send(request);
+    }
 
     final client = http.Client();
     try {
-      final response = await client.send(request);
-      if (response.statusCode != 200) {
-        final body = await response.stream.bytesToString();
+      final uid = _client.auth.currentUser?.id;
 
-        // If the Edge Function is not deployed yet, fallback to FAQ using DB.
-        if (response.statusCode == 404 && body.toLowerCase().contains('not_found')) {
-          final uid = _client.auth.currentUser?.id;
-          if (uid == null || uid.isEmpty) {
-            throw const ChatRepositoryException('AI function missing and not authenticated for FAQ fallback');
-          }
+      ChatRepositoryException fallbackOrThrow(int status, String body) {
+        final lower = body.toLowerCase();
 
-          final fallback = await _faqFallback(message: message, userId: uid, sessionId: sessionId, locale: locale);
-
-          // Emit a minimal stream-like response.
-          yield ChatStreamEvent(type: ChatStreamEventType.meta, data: {'session_id': fallback.sessionId});
-          final reply = fallback.reply;
-          const chunk = 64;
-          for (var i = 0; i < reply.length; i += chunk) {
-            yield ChatStreamEvent(
-              type: ChatStreamEventType.delta,
-              data: {'text': reply.substring(i, (i + chunk).clamp(0, reply.length))},
-            );
-          }
-          yield ChatStreamEvent(type: ChatStreamEventType.done, data: {'reply': reply, 'suggestions': fallback.suggestions});
-          return;
+        if (status == 404 && lower.contains('not_found')) {
+          return const ChatRepositoryException('__fallback_faq__');
         }
 
-        throw ChatRepositoryException('Stream error (${response.statusCode}): $body');
+        // If the Edge Function is deployed but not configured (missing AI key, etc),
+        // fallback to FAQ so the feature remains usable.
+        if (status >= 500 &&
+            (lower.contains('missing ai_api_key') ||
+                lower.contains('missing openai_api_key') ||
+                lower.contains('missing secrets') ||
+                lower.contains('missing ai provider'))) {
+          return const ChatRepositoryException('__fallback_faq__');
+        }
+
+        if (status == 401 && lower.contains('invalid jwt')) {
+          return const ChatRepositoryException('Your login session expired. Please log out and log in again.');
+        }
+
+        return ChatRepositoryException('Stream error ($status): $body');
+      }
+
+      Stream<ChatStreamEvent> faqFallbackStream() async* {
+        if (uid == null || uid.isEmpty) {
+          throw const ChatRepositoryException('Not authenticated for FAQ fallback');
+        }
+
+        final fallback = await _faqFallback(
+          message: message,
+          userId: uid,
+          sessionId: sessionId,
+          locale: locale,
+        );
+
+        yield ChatStreamEvent(type: ChatStreamEventType.meta, data: {'session_id': fallback.sessionId});
+        final reply = fallback.reply;
+        const chunk = 64;
+        for (var i = 0; i < reply.length; i += chunk) {
+          yield ChatStreamEvent(
+            type: ChatStreamEventType.delta,
+            data: {'text': reply.substring(i, (i + chunk).clamp(0, reply.length))},
+          );
+        }
+        yield ChatStreamEvent(
+          type: ChatStreamEventType.done,
+          data: {'reply': reply, 'suggestions': fallback.suggestions},
+        );
+      }
+
+      String token = await _accessToken();
+      http.StreamedResponse response = await sendRequest(client, token: token);
+
+      // Retry once on Invalid JWT by refreshing the session.
+      if (response.statusCode == 401) {
+        final body = await response.stream.bytesToString();
+        final lower = body.toLowerCase();
+        if (lower.contains('invalid jwt')) {
+          token = await _accessToken(forceRefresh: true);
+          response = await sendRequest(client, token: token);
+        } else {
+          throw fallbackOrThrow(response.statusCode, body);
+        }
+      }
+
+      if (response.statusCode != 200) {
+        final body = await response.stream.bytesToString();
+        final ex = fallbackOrThrow(response.statusCode, body);
+        if (ex.message == '__fallback_faq__') {
+          yield* faqFallbackStream();
+          return;
+        }
+        throw ex;
       }
 
       var buffer = '';

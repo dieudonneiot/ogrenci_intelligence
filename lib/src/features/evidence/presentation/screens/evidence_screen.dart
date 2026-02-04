@@ -57,7 +57,7 @@ class _EvidenceScreenState extends ConsumerState<EvidenceScreen> {
                       child: ElevatedButton.icon(
                         onPressed: _uploading ? null : () => _openUpload(uid),
                         icon: const Icon(Icons.upload_file),
-                        label: Text(_uploading ? 'Uploading…' : 'Upload'),
+                        label: Text(_uploading ? 'Uploading...' : 'Upload'),
                         style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6D28D9)),
                       ),
                     ),
