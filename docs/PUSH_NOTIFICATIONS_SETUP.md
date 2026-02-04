@@ -42,12 +42,14 @@ Deploy it to your Supabase project using the Supabase CLI:
 ## 4) Set Supabase Function secrets
 
 In Supabase dashboard -> **Project Settings -> Functions -> Secrets**, add:
-- `SUPABASE_URL` = your project URL
-- `SUPABASE_ANON_KEY` = your anon key
-- `SUPABASE_SERVICE_ROLE_KEY` = **service role key** (server-only)
+- `SERVICE_ROLE_KEY` = **service role key** (server-only)
 - `FIREBASE_SERVICE_ACCOUNT_JSON` = the full JSON content of a Firebase service account
   - Create one in Google Cloud -> IAM -> Service Accounts -> Create Key (JSON)
   - Paste the JSON as a single string value (keep it secret)
+
+Notes:
+- Many Supabase projects already inject `SUPABASE_URL` and `SUPABASE_ANON_KEY` into Edge Functions automatically, so you usually do **not** need to add them as secrets.
+- Some Supabase UIs block adding secrets that start with `SUPABASE_`. This repo’s function supports `SERVICE_ROLE_KEY` (recommended) and also accepts `BASE_SERVICE_ROLE_KEY` / `SUPABASE_SERVICE_ROLE_KEY` if you prefer.
 
 ## 5) How it works in the app
 

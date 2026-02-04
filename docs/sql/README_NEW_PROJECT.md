@@ -5,8 +5,8 @@ This repo contains SQL scripts under `docs/sql/` to bootstrap a fresh Supabase p
 ## 1) Configure env
 
 Update `.env` / `.env.example`:
-- `SUPABASE_URL`
-- `SUPABASE_ANON_KEY`
+- `SUPABASE_URL` (or `BASE_URL`)
+- `SUPABASE_ANON_KEY` (or `BASE_ANON_KEY`)
 
 ## 2) Run SQL in Supabase SQL editor (in this order)
 

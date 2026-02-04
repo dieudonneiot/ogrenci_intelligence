@@ -2,6 +2,11 @@
 cmake_minimum_required(VERSION 3.14)
 project(ogrenci_intelligence LANGUAGES CXX)
 
+# CMake 4.x removed compatibility with policy settings below 3.5. Some third-
+# party CMake projects (e.g. Firebase C++ SDK) still declare older minimum
+# versions, which causes configuration to fail unless this is set.
+set(CMAKE_POLICY_VERSION_MINIMUM 3.5 CACHE STRING "Minimum policy version for nested projects" FORCE)
+
 # The name of the executable created for the application. Change this to change
 # the on-disk name of your application.
 set(BINARY_NAME "ogrenci_intelligence")

@@ -2,10 +2,12 @@
 // Sends an FCM push for a focus check.
 //
 // Required secrets:
-// - SUPABASE_URL
-// - SUPABASE_ANON_KEY
-// - SUPABASE_SERVICE_ROLE_KEY
+// - SERVICE_ROLE_KEY (or BASE_SERVICE_ROLE_KEY / SUPABASE_SERVICE_ROLE_KEY)
 // - FIREBASE_SERVICE_ACCOUNT_JSON  (the full JSON string of a Firebase service account)
+//
+// Note: In hosted Supabase Edge Functions, SUPABASE_URL and SUPABASE_ANON_KEY are
+// typically provided automatically by the platform. If you're running locally,
+// you can provide SUPABASE_URL/SUPABASE_ANON_KEY (or BASE_URL/BASE_ANON_KEY).
 //
 // Call:
 //   POST /functions/v1/push { "focus_check_id": "<uuid>" }
@@ -22,6 +24,14 @@ function env(key: string): string {
   const v = Deno.env.get(key);
   if (!v || v.trim().length === 0) throw new Error(`Missing env: ${key}`);
   return v.trim();
+}
+
+function envAny(keys: string[]): string {
+  for (const key of keys) {
+    const v = Deno.env.get(key);
+    if (v && v.trim().length > 0) return v.trim();
+  }
+  throw new Error(`Missing env (any of): ${keys.join(", ")}`);
 }
 
 function jsonResponse(body: unknown, status = 200): Response {
@@ -113,9 +123,9 @@ Deno.serve(async (req) => {
   const focusCheckId = (payload["focus_check_id"] ?? "").toString().trim();
   if (!focusCheckId) return jsonResponse({ error: "focus_check_id required" }, 400);
 
-  const supabaseUrl = env("SUPABASE_URL");
-  const anonKey = env("SUPABASE_ANON_KEY");
-  const serviceKey = env("SUPABASE_SERVICE_ROLE_KEY");
+  const supabaseUrl = envAny(["SUPABASE_URL", "BASE_URL"]);
+  const anonKey = envAny(["SUPABASE_ANON_KEY", "BASE_ANON_KEY"]);
+  const serviceKey = envAny(["SERVICE_ROLE_KEY", "BASE_SERVICE_ROLE_KEY", "SUPABASE_SERVICE_ROLE_KEY"]);
 
   // 1) Use caller auth (RLS enforced) to validate access to that focus_check
   const userClient = createClient(supabaseUrl, anonKey, {
@@ -179,4 +189,3 @@ Deno.serve(async (req) => {
 
   return jsonResponse({ ok: failed === 0, sent, failed, results }, 200);
 });
-
