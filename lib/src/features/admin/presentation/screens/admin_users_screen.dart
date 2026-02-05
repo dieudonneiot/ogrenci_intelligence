@@ -65,12 +65,30 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _DetailRow(label: l10n.t(AppText.commonFullName), value: user.fullName ?? '-'),
-              _DetailRow(label: l10n.t(AppText.commonEmail), value: user.email ?? '-'),
-              _DetailRow(label: l10n.t(AppText.commonPhone), value: user.phone ?? '-'),
-              _DetailRow(label: l10n.t(AppText.commonUniversity), value: user.university ?? '-'),
-              _DetailRow(label: l10n.t(AppText.commonDepartment), value: user.department ?? '-'),
-              _DetailRow(label: l10n.t(AppText.adminUsersTableRegisteredAt), value: user.createdAtText),
+              _DetailRow(
+                label: l10n.t(AppText.commonFullName),
+                value: user.fullName ?? '-',
+              ),
+              _DetailRow(
+                label: l10n.t(AppText.commonEmail),
+                value: user.email ?? '-',
+              ),
+              _DetailRow(
+                label: l10n.t(AppText.commonPhone),
+                value: user.phone ?? '-',
+              ),
+              _DetailRow(
+                label: l10n.t(AppText.commonUniversity),
+                value: user.university ?? '-',
+              ),
+              _DetailRow(
+                label: l10n.t(AppText.commonDepartment),
+                value: user.department ?? '-',
+              ),
+              _DetailRow(
+                label: l10n.t(AppText.adminUsersTableRegisteredAt),
+                value: user.createdAtText,
+              ),
             ],
           ),
         ),
@@ -93,12 +111,17 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
     if (!ok) return;
 
     try {
-      await SupabaseService.client.from('profiles').update({
-        'is_banned': true,
-        'banned_at': DateTime.now().toUtc().toIso8601String(),
-      }).eq('id', user.id);
+      await SupabaseService.client
+          .from('profiles')
+          .update({
+            'is_banned': true,
+            'banned_at': DateTime.now().toUtc().toIso8601String(),
+          })
+          .eq('id', user.id);
 
-      await ref.read(adminActionControllerProvider.notifier).logAction(
+      await ref
+          .read(adminActionControllerProvider.notifier)
+          .logAction(
             actionType: 'user_ban',
             targetType: 'user',
             targetId: user.id,
@@ -120,12 +143,14 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
   Future<void> _unbanUser(_AdminUser user) async {
     final l10n = AppLocalizations.of(context);
     try {
-      await SupabaseService.client.from('profiles').update({
-        'is_banned': false,
-        'banned_at': null,
-      }).eq('id', user.id);
+      await SupabaseService.client
+          .from('profiles')
+          .update({'is_banned': false, 'banned_at': null})
+          .eq('id', user.id);
 
-      await ref.read(adminActionControllerProvider.notifier).logAction(
+      await ref
+          .read(adminActionControllerProvider.notifier)
+          .logAction(
             actionType: 'user_unban',
             targetType: 'user',
             targetId: user.id,
@@ -144,7 +169,10 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
     }
   }
 
-  Future<bool> _confirm({required String title, required String message}) async {
+  Future<bool> _confirm({
+    required String title,
+    required String message,
+  }) async {
     final result = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -157,7 +185,9 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
           ),
           ElevatedButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFDC2626)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFDC2626),
+            ),
             child: Text(AppLocalizations.of(ctx).t(AppText.commonConfirm)),
           ),
         ],
@@ -213,7 +243,12 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
           ),
           const SizedBox(height: 16),
           if (_loading)
-            const Center(child: Padding(padding: EdgeInsets.all(24), child: CircularProgressIndicator()))
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.all(24),
+                child: CircularProgressIndicator(),
+              ),
+            )
           else if (_error != null)
             _ErrorState(text: _error!, onRetry: _fetchUsers)
           else if (filtered.isEmpty)
@@ -259,8 +294,12 @@ class _UsersTable extends StatelessWidget {
           columns: [
             DataColumn(label: Text(l10n.t(AppText.adminUsersTableUser))),
             DataColumn(label: Text(l10n.t(AppText.adminUsersTableEducation))),
-            DataColumn(label: Text(l10n.t(AppText.adminUsersTableApplications))),
-            DataColumn(label: Text(l10n.t(AppText.adminUsersTableRegisteredAt))),
+            DataColumn(
+              label: Text(l10n.t(AppText.adminUsersTableApplications)),
+            ),
+            DataColumn(
+              label: Text(l10n.t(AppText.adminUsersTableRegisteredAt)),
+            ),
             DataColumn(label: Text(l10n.t(AppText.adminTableActions))),
           ],
           rows: users.map((user) {
@@ -274,7 +313,13 @@ class _UsersTable extends StatelessWidget {
                         user.fullName ?? l10n.t(AppText.commonUnnamedCandidate),
                         style: const TextStyle(fontWeight: FontWeight.w700),
                       ),
-                      Text(user.email ?? '-', style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280))),
+                      Text(
+                        user.email ?? '-',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Color(0xFF6B7280),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -282,29 +327,57 @@ class _UsersTable extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(user.university ?? '-', style: const TextStyle(fontSize: 12)),
-                      Text(user.department ?? '-', style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280))),
+                      Text(
+                        user.university ?? '-',
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                      Text(
+                        user.department ?? '-',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Color(0xFF6B7280),
+                        ),
+                      ),
                     ],
                   ),
                 ),
-                DataCell(Text('${user.applicationsCount}', style: const TextStyle(fontSize: 12))),
-                DataCell(Text(user.createdAtDate, style: const TextStyle(fontSize: 12))),
+                DataCell(
+                  Text(
+                    '${user.applicationsCount}',
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                ),
+                DataCell(
+                  Text(
+                    user.createdAtDate,
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                ),
                 DataCell(
                   Row(
                     children: [
                       IconButton(
                         onPressed: () => onOpen(user),
-                        icon: const Icon(Icons.remove_red_eye_outlined, color: Color(0xFF7C3AED)),
+                        icon: const Icon(
+                          Icons.remove_red_eye_outlined,
+                          color: Color(0xFF7C3AED),
+                        ),
                       ),
                       if (user.isBanned)
                         IconButton(
                           onPressed: () => onUnban(user),
-                          icon: const Icon(Icons.check_circle_outline, color: Color(0xFF16A34A)),
+                          icon: const Icon(
+                            Icons.check_circle_outline,
+                            color: Color(0xFF16A34A),
+                          ),
                         )
                       else
                         IconButton(
                           onPressed: () => onBan(user),
-                          icon: const Icon(Icons.block, color: Color(0xFFDC2626)),
+                          icon: const Icon(
+                            Icons.block,
+                            color: Color(0xFFDC2626),
+                          ),
                         ),
                     ],
                   ),
@@ -335,7 +408,10 @@ class _EmptyState extends StatelessWidget {
         children: [
           const Icon(Icons.group_outlined, size: 56, color: Color(0xFF9CA3AF)),
           const SizedBox(height: 8),
-          Text(l10n.t(AppText.noResults), style: const TextStyle(fontWeight: FontWeight.w800)),
+          Text(
+            l10n.t(AppText.noResults),
+            style: const TextStyle(fontWeight: FontWeight.w800),
+          ),
         ],
       ),
     );
@@ -358,9 +434,16 @@ class _ErrorState extends StatelessWidget {
           children: [
             const Icon(Icons.error_outline, size: 48, color: Color(0xFFEF4444)),
             const SizedBox(height: 10),
-            Text(text, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFF6B7280))),
+            Text(
+              text,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Color(0xFF6B7280)),
+            ),
             const SizedBox(height: 12),
-            ElevatedButton(onPressed: onRetry, child: Text(l10n.t(AppText.retry))),
+            ElevatedButton(
+              onPressed: onRetry,
+              child: Text(l10n.t(AppText.retry)),
+            ),
           ],
         ),
       ),
@@ -380,7 +463,10 @@ class _DetailRow extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: const TextStyle(color: Color(0xFF6B7280), fontSize: 12)),
+          Text(
+            label,
+            style: const TextStyle(color: Color(0xFF6B7280), fontSize: 12),
+          ),
           const SizedBox(height: 2),
           Text(value, style: const TextStyle(fontWeight: FontWeight.w700)),
         ],

@@ -263,7 +263,10 @@ class InternshipsViewModel {
     );
   }
 
-  static InternshipsViewModel empty({String? department, bool departmentMissing = false}) {
+  static InternshipsViewModel empty({
+    String? department,
+    bool departmentMissing = false,
+  }) {
     return InternshipsViewModel(
       department: department,
       departmentMissing: departmentMissing,
@@ -275,9 +278,7 @@ class InternshipsViewModel {
 
 @immutable
 class InternshipDetailViewModel {
-  const InternshipDetailViewModel({
-    required this.item,
-  });
+  const InternshipDetailViewModel({required this.item});
 
   final InternshipCardItem item;
 }

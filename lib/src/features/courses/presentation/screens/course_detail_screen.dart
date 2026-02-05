@@ -30,13 +30,20 @@ class CourseDetailScreen extends ConsumerWidget {
                 loading: () => const Center(
                   child: Padding(
                     padding: EdgeInsets.only(top: 40),
-                    child: SizedBox(width: 28, height: 28, child: CircularProgressIndicator(strokeWidth: 2.5)),
+                    child: SizedBox(
+                      width: 28,
+                      height: 28,
+                      child: CircularProgressIndicator(strokeWidth: 2.5),
+                    ),
                   ),
                 ),
-                error: (e, _) => _DetailError(e.toString(), onRetry: () {
-                  ref.invalidate(courseDetailProvider(courseId));
-                  ref.invalidate(myCourseEnrollmentProvider(courseId));
-                }),
+                error: (e, _) => _DetailError(
+                  e.toString(),
+                  onRetry: () {
+                    ref.invalidate(courseDetailProvider(courseId));
+                    ref.invalidate(myCourseEnrollmentProvider(courseId));
+                  },
+                ),
                 data: (course) {
                   return enrollmentAsync.when(
                     loading: () => _CourseDetailBody(
@@ -81,7 +88,10 @@ class CourseDetailScreen extends ConsumerWidget {
 
                       Future<void> doUpdateProgress(int p) async {
                         if (enrollment == null) return;
-                        await repo.updateProgress(enrollmentId: enrollment.id, progress: p);
+                        await repo.updateProgress(
+                          enrollmentId: enrollment.id,
+                          progress: p,
+                        );
                         ref.invalidate(myEnrolledCoursesProvider);
                         ref.invalidate(myCourseEnrollmentProvider(courseId));
                       }
@@ -92,7 +102,9 @@ class CourseDetailScreen extends ConsumerWidget {
                         enrolling: false,
                         onEnroll: doEnroll,
                         onUnenroll: enrollment == null ? null : doUnenroll,
-                        onUpdateProgress: enrollment == null ? null : doUpdateProgress,
+                        onUpdateProgress: enrollment == null
+                            ? null
+                            : doUpdateProgress,
                       );
                     },
                   );
@@ -145,8 +157,10 @@ class _CourseDetailBody extends StatelessWidget {
               tooltip: l10n.t(AppText.commonBack),
             ),
             const SizedBox(width: 6),
-            Text(l10n.t(AppText.courseDetailTitle),
-                style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18)),
+            Text(
+              l10n.t(AppText.courseDetailTitle),
+              style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18),
+            ),
           ],
         ),
         const SizedBox(height: 10),
@@ -170,12 +184,24 @@ class _CourseDetailBody extends StatelessWidget {
             color: Colors.white,
             borderRadius: BorderRadius.circular(18),
             border: Border.all(color: const Color(0xFFE5E7EB)),
-            boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 18, offset: Offset(0, 8))],
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x0A000000),
+                blurRadius: 18,
+                offset: Offset(0, 8),
+              ),
+            ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(course.title, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900)),
+              Text(
+                course.title,
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
               const SizedBox(height: 10),
               Wrap(
                 spacing: 8,
@@ -190,14 +216,25 @@ class _CourseDetailBody extends StatelessWidget {
               const SizedBox(height: 12),
               Text(
                 course.description ?? l10n.t(AppText.commonNoDescription),
-                style: const TextStyle(color: Color(0xFF374151), fontWeight: FontWeight.w600, height: 1.45),
+                style: const TextStyle(
+                  color: Color(0xFF374151),
+                  fontWeight: FontWeight.w600,
+                  height: 1.45,
+                ),
               ),
               const SizedBox(height: 14),
 
-              if (course.videoUrl != null && course.videoUrl!.trim().isNotEmpty) ...[
-                Text(l10n.t(AppText.courseDetailVideoUrl), style: const TextStyle(fontWeight: FontWeight.w900)),
+              if (course.videoUrl != null &&
+                  course.videoUrl!.trim().isNotEmpty) ...[
+                Text(
+                  l10n.t(AppText.courseDetailVideoUrl),
+                  style: const TextStyle(fontWeight: FontWeight.w900),
+                ),
                 const SizedBox(height: 6),
-                SelectableText(course.videoUrl!, style: const TextStyle(color: Color(0xFF6D28D9))),
+                SelectableText(
+                  course.videoUrl!,
+                  style: const TextStyle(color: Color(0xFF6D28D9)),
+                ),
                 const SizedBox(height: 12),
               ],
 
@@ -208,16 +245,22 @@ class _CourseDetailBody extends StatelessWidget {
                 SizedBox(
                   height: 44,
                   child: ElevatedButton.icon(
-                    onPressed: (enrolling || onEnroll == null) ? null : () async => onEnroll!(),
+                    onPressed: (enrolling || onEnroll == null)
+                        ? null
+                        : () async => onEnroll!(),
                     icon: const Icon(Icons.add),
                     label: Text(
-                      enrolling ? l10n.t(AppText.commonLoading) : l10n.t(AppText.courseDetailEnroll),
+                      enrolling
+                          ? l10n.t(AppText.commonLoading)
+                          : l10n.t(AppText.courseDetailEnroll),
                       style: const TextStyle(fontWeight: FontWeight.w900),
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF6D28D9),
                       foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
                       elevation: 0,
                     ),
                   ),
@@ -229,7 +272,10 @@ class _CourseDetailBody extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(l10n.t(AppText.courseDetailProgress), style: const TextStyle(fontWeight: FontWeight.w900)),
+                          Text(
+                            l10n.t(AppText.courseDetailProgress),
+                            style: const TextStyle(fontWeight: FontWeight.w900),
+                          ),
                           const SizedBox(height: 6),
                           ClipRRect(
                             borderRadius: BorderRadius.circular(999),
@@ -237,12 +283,19 @@ class _CourseDetailBody extends StatelessWidget {
                               value: progress / 100,
                               minHeight: 10,
                               backgroundColor: const Color(0xFFE5E7EB),
-                              valueColor: const AlwaysStoppedAnimation(Color(0xFF2563EB)),
+                              valueColor: const AlwaysStoppedAnimation(
+                                Color(0xFF2563EB),
+                              ),
                             ),
                           ),
                           const SizedBox(height: 6),
-                          Text(l10n.dashboardCourseProgress(progress),
-                              style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w800)),
+                          Text(
+                            l10n.dashboardCourseProgress(progress),
+                            style: const TextStyle(
+                              color: Color(0xFF6B7280),
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -300,7 +353,14 @@ class _Meta extends StatelessWidget {
         children: [
           Icon(icon, size: 14, color: const Color(0xFF4B5563)),
           const SizedBox(width: 6),
-          Text(text, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12, color: Color(0xFF374151))),
+          Text(
+            text,
+            style: const TextStyle(
+              fontWeight: FontWeight.w800,
+              fontSize: 12,
+              color: Color(0xFF374151),
+            ),
+          ),
         ],
       ),
     );
@@ -323,11 +383,21 @@ class _DetailError extends StatelessWidget {
           children: [
             const Icon(Icons.error_outline, size: 54),
             const SizedBox(height: 10),
-            Text(l10n.t(AppText.courseDetailLoadFailedTitle), style: const TextStyle(fontWeight: FontWeight.w900)),
+            Text(
+              l10n.t(AppText.courseDetailLoadFailedTitle),
+              style: const TextStyle(fontWeight: FontWeight.w900),
+            ),
             const SizedBox(height: 8),
-            Text(message, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFF6B7280))),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Color(0xFF6B7280)),
+            ),
             const SizedBox(height: 10),
-            ElevatedButton(onPressed: onRetry, child: Text(l10n.t(AppText.retry))),
+            ElevatedButton(
+              onPressed: onRetry,
+              child: Text(l10n.t(AppText.retry)),
+            ),
           ],
         ),
       ),

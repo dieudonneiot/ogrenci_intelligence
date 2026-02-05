@@ -62,7 +62,8 @@ class EvidenceItem {
       id: (map['id'] ?? '').toString(),
       userId: (map['user_id'] ?? '').toString(),
       companyId: (map['company_id'] ?? '').toString(),
-      internshipApplicationId: (map['internship_application_id'] ?? '').toString(),
+      internshipApplicationId: (map['internship_application_id'] ?? '')
+          .toString(),
       filePath: (map['file_path'] ?? '').toString(),
       title: (map['title'] as String?)?.trim(),
       description: (map['description'] as String?)?.trim(),
@@ -87,4 +88,3 @@ class EvidenceUploadDraft {
   final String title;
   final String description;
 }
-

@@ -12,7 +12,8 @@ class ExcuseRequestScreen extends ConsumerStatefulWidget {
   const ExcuseRequestScreen({super.key});
 
   @override
-  ConsumerState<ExcuseRequestScreen> createState() => _ExcuseRequestScreenState();
+  ConsumerState<ExcuseRequestScreen> createState() =>
+      _ExcuseRequestScreenState();
 }
 
 class _ExcuseRequestScreenState extends ConsumerState<ExcuseRequestScreen> {
@@ -57,9 +58,10 @@ class _ExcuseRequestScreenState extends ConsumerState<ExcuseRequestScreen> {
         _accepted = accepted;
         _requests = requests;
         _selectedApplicationId =
-            (_selectedApplicationId != null && accepted.any((e) => e.applicationId == _selectedApplicationId))
-                ? _selectedApplicationId
-                : (accepted.isNotEmpty ? accepted.first.applicationId : null);
+            (_selectedApplicationId != null &&
+                accepted.any((e) => e.applicationId == _selectedApplicationId))
+            ? _selectedApplicationId
+            : (accepted.isNotEmpty ? accepted.first.applicationId : null);
       });
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -90,15 +92,15 @@ class _ExcuseRequestScreenState extends ConsumerState<ExcuseRequestScreen> {
 
       if (!mounted) return;
       _detailsCtrl.clear();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Request submitted.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Request submitted.')));
       await _load();
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Failed: $e')));
     } finally {
       if (mounted) setState(() => _submitting = false);
     }
@@ -115,7 +117,12 @@ class _ExcuseRequestScreenState extends ConsumerState<ExcuseRequestScreen> {
     }
 
     if (_loading) {
-      return const Center(child: Padding(padding: EdgeInsets.all(24), child: CircularProgressIndicator()));
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(24),
+          child: CircularProgressIndicator(),
+        ),
+      );
     }
 
     return Container(
@@ -132,14 +139,19 @@ class _ExcuseRequestScreenState extends ConsumerState<ExcuseRequestScreen> {
                   Row(
                     children: [
                       IconButton(
-                        onPressed: () => context.canPop() ? context.pop() : context.go(Routes.settings),
+                        onPressed: () => context.canPop()
+                            ? context.pop()
+                            : context.go(Routes.settings),
                         icon: const Icon(Icons.arrow_back),
                       ),
                       const SizedBox(width: 6),
                       const Expanded(
                         child: Text(
                           'Report Excuse / Freeze Term',
-                          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900),
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w900,
+                          ),
                         ),
                       ),
                       IconButton(
@@ -160,7 +172,10 @@ class _ExcuseRequestScreenState extends ConsumerState<ExcuseRequestScreen> {
                     child: const Text(
                       'If you have a serious reason (illness, family emergency, etc.), you can request a term freeze. '
                       'Your company will review and approve/reject it.',
-                      style: TextStyle(color: Color(0xFF4B5563), fontWeight: FontWeight.w700),
+                      style: TextStyle(
+                        color: Color(0xFF4B5563),
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 14),
@@ -174,7 +189,10 @@ class _ExcuseRequestScreenState extends ConsumerState<ExcuseRequestScreen> {
                       ),
                       child: const Text(
                         'No accepted internship found. Excuse requests require an accepted internship.',
-                        style: TextStyle(color: Color(0xFF92400E), fontWeight: FontWeight.w800),
+                        style: TextStyle(
+                          color: Color(0xFF92400E),
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
                     )
                   else
@@ -182,24 +200,40 @@ class _ExcuseRequestScreenState extends ConsumerState<ExcuseRequestScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('New Request', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
+                          const Text(
+                            'New Request',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w900,
+                              fontSize: 16,
+                            ),
+                          ),
                           const SizedBox(height: 10),
                           DropdownButtonFormField<String>(
-                            key: ValueKey<String?>('app:$_selectedApplicationId'),
+                            key: ValueKey<String?>(
+                              'app:$_selectedApplicationId',
+                            ),
                             initialValue: _selectedApplicationId,
                             decoration: InputDecoration(
                               labelText: 'Internship',
-                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
                             ),
                             items: _accepted
                                 .map(
                                   (e) => DropdownMenuItem(
                                     value: e.applicationId,
-                                    child: Text('${e.internshipTitle} — ${e.companyName}'),
+                                    child: Text(
+                                      '${e.internshipTitle} — ${e.companyName}',
+                                    ),
                                   ),
                                 )
                                 .toList(growable: false),
-                            onChanged: _submitting ? null : (v) => setState(() => _selectedApplicationId = v),
+                            onChanged: _submitting
+                                ? null
+                                : (v) => setState(
+                                    () => _selectedApplicationId = v,
+                                  ),
                           ),
                           const SizedBox(height: 12),
                           DropdownButtonFormField<String>(
@@ -207,14 +241,28 @@ class _ExcuseRequestScreenState extends ConsumerState<ExcuseRequestScreen> {
                             initialValue: _reason,
                             decoration: InputDecoration(
                               labelText: 'Reason',
-                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
                             ),
                             items: const [
-                              DropdownMenuItem(value: 'illness', child: Text('Illness')),
-                              DropdownMenuItem(value: 'family_emergency', child: Text('Family emergency')),
-                              DropdownMenuItem(value: 'other', child: Text('Other')),
+                              DropdownMenuItem(
+                                value: 'illness',
+                                child: Text('Illness'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'family_emergency',
+                                child: Text('Family emergency'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'other',
+                                child: Text('Other'),
+                              ),
                             ],
-                            onChanged: _submitting ? null : (v) => setState(() => _reason = v ?? 'illness'),
+                            onChanged: _submitting
+                                ? null
+                                : (v) =>
+                                      setState(() => _reason = v ?? 'illness'),
                           ),
                           const SizedBox(height: 12),
                           TextField(
@@ -223,7 +271,9 @@ class _ExcuseRequestScreenState extends ConsumerState<ExcuseRequestScreen> {
                             maxLines: 6,
                             decoration: InputDecoration(
                               labelText: 'Details (optional)',
-                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
                             ),
                           ),
                           const SizedBox(height: 12),
@@ -233,12 +283,20 @@ class _ExcuseRequestScreenState extends ConsumerState<ExcuseRequestScreen> {
                             child: ElevatedButton.icon(
                               onPressed: _submitting ? null : _submit,
                               icon: const Icon(Icons.send),
-                              label: Text(_submitting ? 'Submitting...' : 'Submit request',
-                                  style: const TextStyle(fontWeight: FontWeight.w900)),
+                              label: Text(
+                                _submitting
+                                    ? 'Submitting...'
+                                    : 'Submit request',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFF6D28D9),
                                 foregroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
                                 elevation: 0,
                               ),
                             ),
@@ -251,20 +309,31 @@ class _ExcuseRequestScreenState extends ConsumerState<ExcuseRequestScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Your Requests', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
+                        const Text(
+                          'Your Requests',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w900,
+                            fontSize: 16,
+                          ),
+                        ),
                         const SizedBox(height: 10),
                         if (_requests.isEmpty)
                           const Text(
                             'No requests yet.',
-                            style: TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
+                            style: TextStyle(
+                              color: Color(0xFF6B7280),
+                              fontWeight: FontWeight.w700,
+                            ),
                           )
                         else
                           ListView.separated(
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
                             itemCount: _requests.length,
-                            separatorBuilder: (context, index) => const SizedBox(height: 10),
-                            itemBuilder: (_, i) => _MyRequestRow(item: _requests[i]),
+                            separatorBuilder: (context, index) =>
+                                const SizedBox(height: 10),
+                            itemBuilder: (_, i) =>
+                                _MyRequestRow(item: _requests[i]),
                           ),
                       ],
                     ),
@@ -291,7 +360,13 @@ class _Card extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: const [BoxShadow(color: Color(0x07000000), blurRadius: 14, offset: Offset(0, 8))],
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x07000000),
+            blurRadius: 14,
+            offset: Offset(0, 8),
+          ),
+        ],
       ),
       child: child,
     );
@@ -324,11 +399,21 @@ class _MyRequestRow extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 if (item.details != null && item.details!.isNotEmpty)
-                  Text(item.details!, style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600)),
+                  Text(
+                    item.details!,
+                    style: const TextStyle(
+                      color: Color(0xFF6B7280),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 const SizedBox(height: 6),
                 Text(
                   'Created: ${item.createdAt.toLocal()}',
-                  style: const TextStyle(color: Color(0xFF9CA3AF), fontWeight: FontWeight.w600, fontSize: 12),
+                  style: const TextStyle(
+                    color: Color(0xFF9CA3AF),
+                    fontWeight: FontWeight.w600,
+                    fontSize: 12,
+                  ),
                 ),
               ],
             ),
@@ -376,8 +461,14 @@ class _StatusPill extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(999)),
-      child: Text(label, style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: fg)),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: fg),
+      ),
     );
   }
 }

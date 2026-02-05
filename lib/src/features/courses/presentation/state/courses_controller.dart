@@ -66,8 +66,10 @@ class CoursesState {
       completed: completed ?? this.completed,
       progressByCourse: progressByCourse ?? this.progressByCourse,
       earnedPoints: earnedPoints ?? this.earnedPoints,
-      enrollmentPointsGiven: enrollmentPointsGiven ?? this.enrollmentPointsGiven,
-      completionPointsGiven: completionPointsGiven ?? this.completionPointsGiven,
+      enrollmentPointsGiven:
+          enrollmentPointsGiven ?? this.enrollmentPointsGiven,
+      completionPointsGiven:
+          completionPointsGiven ?? this.completionPointsGiven,
     );
   }
 }
@@ -156,10 +158,17 @@ class CoursesController extends StateNotifier<CoursesState> {
     );
   }
 
-  void markModuleComplete(String courseId, int moduleIndex, {int totalModules = 5}) {
+  void markModuleComplete(
+    String courseId,
+    int moduleIndex, {
+    int totalModules = 5,
+  }) {
     if (!state.enrolled.contains(courseId)) return;
 
-    final target = (((moduleIndex + 1) / totalModules) * 100).round().clamp(0, 100);
+    final target = (((moduleIndex + 1) / totalModules) * 100).round().clamp(
+      0,
+      100,
+    );
     final current = state.progressByCourse[courseId] ?? 0;
     if (target <= current) return;
 

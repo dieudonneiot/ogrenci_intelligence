@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -71,7 +71,9 @@ class _CompanyJobsScreenState extends ConsumerState<CompanyJobsScreen> {
     }
 
     final auth = authAsync.value;
-    if (auth == null || !auth.isAuthenticated || auth.userType != UserType.company) {
+    if (auth == null ||
+        !auth.isAuthenticated ||
+        auth.userType != UserType.company) {
       return Center(child: Text(l10n.t(AppText.companyPanelLoginRequired)));
     }
 
@@ -104,14 +106,21 @@ class _CompanyJobsScreenState extends ConsumerState<CompanyJobsScreen> {
                     children: [
                       const Icon(Icons.work_outline, color: Color(0xFF6D28D9)),
                       const SizedBox(width: 8),
-                      Text(l10n.t(AppText.companyJobsTitle),
-                          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900)),
+                      Text(
+                        l10n.t(AppText.companyJobsTitle),
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
                       const Spacer(),
                       ElevatedButton.icon(
                         onPressed: () => context.go(Routes.companyJobsCreate),
                         icon: const Icon(Icons.add),
                         label: Text(l10n.t(AppText.newListing)),
-                        style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6D28D9)),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF6D28D9),
+                        ),
                       ),
                     ],
                   ),
@@ -120,10 +129,22 @@ class _CompanyJobsScreenState extends ConsumerState<CompanyJobsScreen> {
                     spacing: 12,
                     runSpacing: 12,
                     children: [
-                      _MiniStat(label: l10n.t(AppText.commonTotal), value: _jobs.length),
-                      _MiniStat(label: l10n.t(AppText.commonActive), value: activeCount),
-                      _MiniStat(label: l10n.t(AppText.commonInactive), value: inactiveCount),
-                      _MiniStat(label: l10n.t(AppText.commonApplications), value: totalApps),
+                      _MiniStat(
+                        label: l10n.t(AppText.commonTotal),
+                        value: _jobs.length,
+                      ),
+                      _MiniStat(
+                        label: l10n.t(AppText.commonActive),
+                        value: activeCount,
+                      ),
+                      _MiniStat(
+                        label: l10n.t(AppText.commonInactive),
+                        value: inactiveCount,
+                      ),
+                      _MiniStat(
+                        label: l10n.t(AppText.commonApplications),
+                        value: totalApps,
+                      ),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -136,7 +157,12 @@ class _CompanyJobsScreenState extends ConsumerState<CompanyJobsScreen> {
                   ),
                   const SizedBox(height: 16),
                   if (_loading)
-                    const Center(child: Padding(padding: EdgeInsets.all(24), child: CircularProgressIndicator()))
+                    const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(24),
+                        child: CircularProgressIndicator(),
+                      ),
+                    )
                   else if (filtered.isEmpty)
                     _EmptyState(
                       onCreate: () => context.go(Routes.companyJobsCreate),
@@ -148,8 +174,12 @@ class _CompanyJobsScreenState extends ConsumerState<CompanyJobsScreen> {
                         for (final job in filtered)
                           _JobCard(
                             job: job,
-                            onEdit: () => context.go('${Routes.companyJobs}/${job.id}/edit'),
-                            onApplications: () => context.go('${Routes.companyJobs}/${job.id}/applications'),
+                            onEdit: () => context.go(
+                              '${Routes.companyJobs}/${job.id}/edit',
+                            ),
+                            onApplications: () => context.go(
+                              '${Routes.companyJobs}/${job.id}/applications',
+                            ),
                             onToggle: (v) => _toggleStatus(job, v),
                           ),
                       ],
@@ -200,7 +230,9 @@ class _FiltersBar extends StatelessWidget {
               decoration: InputDecoration(
                 prefixIcon: const Icon(Icons.search),
                 hintText: l10n.t(AppText.companyJobsSearchHint),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 isDense: true,
               ),
               onChanged: onSearch,
@@ -280,9 +312,18 @@ class _MiniStat extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(value.toString(), style: const TextStyle(fontWeight: FontWeight.w900)),
+          Text(
+            value.toString(),
+            style: const TextStyle(fontWeight: FontWeight.w900),
+          ),
           const SizedBox(width: 8),
-          Text(label, style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600)),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Color(0xFF6B7280),
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ],
       ),
     );
@@ -316,7 +357,13 @@ class _JobCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: const [BoxShadow(color: Color(0x08000000), blurRadius: 12, offset: Offset(0, 6))],
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x08000000),
+            blurRadius: 12,
+            offset: Offset(0, 6),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -324,7 +371,10 @@ class _JobCard extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: Text(job.title, style: const TextStyle(fontWeight: FontWeight.w900)),
+                child: Text(
+                  job.title,
+                  style: const TextStyle(fontWeight: FontWeight.w900),
+                ),
               ),
               Switch(
                 value: job.isActive,
@@ -336,7 +386,10 @@ class _JobCard extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             '${job.department ?? '—'} • ${job.location ?? '—'}',
-            style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
+            style: const TextStyle(
+              color: Color(0xFF6B7280),
+              fontWeight: FontWeight.w600,
+            ),
           ),
           const SizedBox(height: 10),
           Wrap(
@@ -344,7 +397,8 @@ class _JobCard extends StatelessWidget {
             children: [
               _InfoChip(
                 icon: Icons.people_outline,
-                text: '${l10n.t(AppText.commonApplications)}: ${job.applicationsCount}',
+                text:
+                    '${l10n.t(AppText.commonApplications)}: ${job.applicationsCount}',
               ),
               _InfoChip(
                 icon: Icons.check_circle_outline,
@@ -354,7 +408,10 @@ class _JobCard extends StatelessWidget {
                 icon: Icons.visibility_outlined,
                 text: '${l10n.t(AppText.commonViews)}: ${job.viewsCount}',
               ),
-              _InfoChip(icon: Icons.event_outlined, text: '${l10n.t(AppText.deadline)}: $deadlineText'),
+              _InfoChip(
+                icon: Icons.event_outlined,
+                text: '${l10n.t(AppText.deadline)}: $deadlineText',
+              ),
             ],
           ),
           const SizedBox(height: 12),
@@ -392,7 +449,10 @@ class _InfoChip extends StatelessWidget {
       children: [
         Icon(icon, size: 14, color: const Color(0xFF6B7280)),
         const SizedBox(width: 4),
-        Text(text, style: const TextStyle(color: Color(0xFF6B7280), fontSize: 12)),
+        Text(
+          text,
+          style: const TextStyle(color: Color(0xFF6B7280), fontSize: 12),
+        ),
       ],
     );
   }
@@ -419,8 +479,13 @@ class _EmptyState extends StatelessWidget {
           const Icon(Icons.work_outline, size: 44, color: Color(0xFFD1D5DB)),
           const SizedBox(height: 10),
           Text(
-            hasSearch ? l10n.t(AppText.noResults) : l10n.t(AppText.companyJobsEmptyNoListings),
-            style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF6B7280)),
+            hasSearch
+                ? l10n.t(AppText.noResults)
+                : l10n.t(AppText.companyJobsEmptyNoListings),
+            style: const TextStyle(
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF6B7280),
+            ),
           ),
           const SizedBox(height: 10),
           if (!hasSearch)
@@ -428,11 +493,12 @@ class _EmptyState extends StatelessWidget {
               onPressed: onCreate,
               icon: const Icon(Icons.add),
               label: Text(l10n.t(AppText.newListing)),
-              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6D28D9)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF6D28D9),
+              ),
             ),
         ],
       ),
     );
   }
 }
-

@@ -13,7 +13,8 @@ class RegisterCompanyScreen extends ConsumerStatefulWidget {
   const RegisterCompanyScreen({super.key});
 
   @override
-  ConsumerState<RegisterCompanyScreen> createState() => _RegisterCompanyScreenState();
+  ConsumerState<RegisterCompanyScreen> createState() =>
+      _RegisterCompanyScreenState();
 }
 
 class _RegisterCompanyScreenState extends ConsumerState<RegisterCompanyScreen> {
@@ -159,7 +160,10 @@ class _RegisterCompanyScreenState extends ConsumerState<RegisterCompanyScreen> {
                     const SizedBox(width: 8),
                     Text(
                       l10n.t(AppText.companyRegisterTitle),
-                      style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900),
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w900,
+                      ),
                     ),
                   ],
                 ),
@@ -173,15 +177,24 @@ class _RegisterCompanyScreenState extends ConsumerState<RegisterCompanyScreen> {
                   ),
                   child: Column(
                     children: [
-                      _Field(label: l10n.t(AppText.companyRegisterCompanyNameLabel), controller: _nameCtrl),
+                      _Field(
+                        label: l10n.t(AppText.companyRegisterCompanyNameLabel),
+                        controller: _nameCtrl,
+                      ),
                       _DropdownField(
                         label: l10n.t(AppText.companyRegisterSectorLabel),
                         value: _sector,
                         items: _sectors,
                         onChanged: (v) => setState(() => _sector = v),
                       ),
-                      _Field(label: l10n.t(AppText.companyRegisterTaxNumberLabel), controller: _taxCtrl),
-                      _Field(label: l10n.t(AppText.companyRegisterPhoneLabel), controller: _phoneCtrl),
+                      _Field(
+                        label: l10n.t(AppText.companyRegisterTaxNumberLabel),
+                        controller: _taxCtrl,
+                      ),
+                      _Field(
+                        label: l10n.t(AppText.companyRegisterPhoneLabel),
+                        controller: _phoneCtrl,
+                      ),
                       _DropdownField(
                         label: l10n.t(AppText.companyRegisterCityLabel),
                         value: _city,
@@ -197,13 +210,19 @@ class _RegisterCompanyScreenState extends ConsumerState<RegisterCompanyScreen> {
                               ? const SizedBox(
                                   width: 16,
                                   height: 16,
-                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
                                 )
                               : const Icon(Icons.verified_outlined),
                           label: Text(
-                            _loading ? l10n.t(AppText.commonSaving) : l10n.t(AppText.companyRegisterSubmit),
+                            _loading
+                                ? l10n.t(AppText.commonSaving)
+                                : l10n.t(AppText.companyRegisterSubmit),
                           ),
-                          style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6D28D9)),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF6D28D9),
+                          ),
                         ),
                       ),
                     ],
@@ -258,7 +277,9 @@ class _DropdownField extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 12),
       child: DropdownButtonFormField<String>(
         initialValue: value,
-        items: items.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+        items: items
+            .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+            .toList(),
         onChanged: onChanged,
         decoration: InputDecoration(
           labelText: label,

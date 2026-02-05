@@ -1,4 +1,4 @@
-﻿import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart';
 
 DateTime? _asDate(dynamic v) {
   if (v == null) return null;
@@ -73,13 +73,13 @@ class CompanyStats {
   final int activeInternships;
 
   factory CompanyStats.empty() => const CompanyStats(
-        totalJobs: 0,
-        activeJobs: 0,
-        totalApplications: 0,
-        pendingApplications: 0,
-        totalInternships: 0,
-        activeInternships: 0,
-      );
+    totalJobs: 0,
+    activeJobs: 0,
+    totalApplications: 0,
+    pendingApplications: 0,
+    totalInternships: 0,
+    activeInternships: 0,
+  );
 }
 
 @immutable
@@ -107,16 +107,16 @@ class CompanyReportSummary {
   final int activeInternships;
 
   factory CompanyReportSummary.empty() => const CompanyReportSummary(
-        totalViews: 0,
-        uniqueVisitors: 0,
-        totalApplications: 0,
-        acceptedApplications: 0,
-        rejectedApplications: 0,
-        avgResponseTimeHours: 0,
-        conversionRate: 0,
-        activeJobs: 0,
-        activeInternships: 0,
-      );
+    totalViews: 0,
+    uniqueVisitors: 0,
+    totalApplications: 0,
+    acceptedApplications: 0,
+    rejectedApplications: 0,
+    avgResponseTimeHours: 0,
+    conversionRate: 0,
+    activeJobs: 0,
+    activeInternships: 0,
+  );
 
   factory CompanyReportSummary.fromMetrics(Map<String, dynamic> map) {
     return CompanyReportSummary(
@@ -156,11 +156,11 @@ class CompanyReportTrends {
   final CompanyFunnel funnel;
 
   factory CompanyReportTrends.empty() => CompanyReportTrends(
-        views: const [],
-        applications: const [],
-        departmentCounts: const {},
-        funnel: CompanyFunnel.empty(),
-      );
+    views: const [],
+    applications: const [],
+    departmentCounts: const {},
+    funnel: CompanyFunnel.empty(),
+  );
 }
 
 @immutable
@@ -175,11 +175,8 @@ class CompanyFunnel {
   final int applications;
   final int accepted;
 
-  factory CompanyFunnel.empty() => const CompanyFunnel(
-        views: 0,
-        applications: 0,
-        accepted: 0,
-      );
+  factory CompanyFunnel.empty() =>
+      const CompanyFunnel(views: 0, applications: 0, accepted: 0);
 }
 
 @immutable
@@ -209,8 +206,11 @@ class CompanyJobItem {
   final int viewsCount;
 
   factory CompanyJobItem.fromMap(Map<String, dynamic> map) {
-    final apps = (map['job_applications'] as List?)?.cast<dynamic>() ?? const [];
-    final accepted = apps.where((a) => (a as Map<String, dynamic>)['status'] == 'accepted').length;
+    final apps =
+        (map['job_applications'] as List?)?.cast<dynamic>() ?? const [];
+    final accepted = apps
+        .where((a) => (a as Map<String, dynamic>)['status'] == 'accepted')
+        .length;
     return CompanyJobItem(
       id: (map['id'] ?? '').toString(),
       title: (map['title'] ?? '').toString(),
@@ -251,8 +251,11 @@ class CompanyInternshipItem {
   final int acceptedCount;
 
   factory CompanyInternshipItem.fromMap(Map<String, dynamic> map) {
-    final apps = (map['internship_applications'] as List?)?.cast<dynamic>() ?? const [];
-    final accepted = apps.where((a) => (a as Map<String, dynamic>)['status'] == 'accepted').length;
+    final apps =
+        (map['internship_applications'] as List?)?.cast<dynamic>() ?? const [];
+    final accepted = apps
+        .where((a) => (a as Map<String, dynamic>)['status'] == 'accepted')
+        .length;
     return CompanyInternshipItem(
       id: (map['id'] ?? '').toString(),
       title: (map['title'] ?? '').toString(),
@@ -320,7 +323,10 @@ class CompanyApplication {
       id: (map['id'] ?? '').toString(),
       type: 'job',
       status: (map['status'] ?? 'pending').toString(),
-      appliedAt: _asDate(map['applied_at']) ?? _asDate(map['created_at']) ?? DateTime.now(),
+      appliedAt:
+          _asDate(map['applied_at']) ??
+          _asDate(map['created_at']) ??
+          DateTime.now(),
       profileId: _asTrimmedString(profile['id']),
       profileName: _asTrimmedString(profile['full_name']),
       profileEmail: _asTrimmedString(profile['email']),
@@ -345,7 +351,10 @@ class CompanyApplication {
       id: (map['id'] ?? '').toString(),
       type: 'internship',
       status: (map['status'] ?? 'pending').toString(),
-      appliedAt: _asDate(map['applied_at']) ?? _asDate(map['created_at']) ?? DateTime.now(),
+      appliedAt:
+          _asDate(map['applied_at']) ??
+          _asDate(map['created_at']) ??
+          DateTime.now(),
       profileId: _asTrimmedString(profile['id']),
       profileName: _asTrimmedString(profile['full_name']),
       profileEmail: _asTrimmedString(profile['email']),
@@ -363,4 +372,3 @@ class CompanyApplication {
     );
   }
 }
-

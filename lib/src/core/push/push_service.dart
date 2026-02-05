@@ -18,9 +18,7 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 class PushService {
-  PushService({
-    required this.router,
-  });
+  PushService({required this.router});
 
   final GoRouter router;
   StreamSubscription<String>? _tokenSub;
@@ -30,7 +28,10 @@ class PushService {
   static bool _firebaseReady = false;
 
   static bool get isSupported {
-    if (kIsWeb) return false; // web requires FirebaseOptions + SW; keep mobile-only for now
+    if (kIsWeb) {
+      // web requires FirebaseOptions + SW; keep mobile-only for now
+      return false;
+    }
     return defaultTargetPlatform == TargetPlatform.android ||
         defaultTargetPlatform == TargetPlatform.iOS;
   }
@@ -59,11 +60,12 @@ class PushService {
         badge: true,
         sound: true,
       );
-      await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
-        alert: true,
-        badge: true,
-        sound: true,
-      );
+      await FirebaseMessaging.instance
+          .setForegroundNotificationPresentationOptions(
+            alert: true,
+            badge: true,
+            sound: true,
+          );
     }
 
     // Handle app opened from terminated by notification
@@ -115,7 +117,9 @@ class PushService {
     if (user == null || session == null) return;
     if (user.emailConfirmedAt == null) return;
 
-    final platform = defaultTargetPlatform == TargetPlatform.iOS ? 'ios' : 'android';
+    final platform = defaultTargetPlatform == TargetPlatform.iOS
+        ? 'ios'
+        : 'android';
     try {
       await SupabaseService.client.rpc(
         'upsert_my_push_token',

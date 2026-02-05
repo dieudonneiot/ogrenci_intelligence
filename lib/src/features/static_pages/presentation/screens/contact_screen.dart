@@ -50,7 +50,10 @@ class _ContactScreenState extends State<ContactScreen> {
 
   void _snack(String msg, {bool isError = false}) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(msg), backgroundColor: isError ? Colors.red : null),
+      SnackBar(
+        content: Text(msg),
+        backgroundColor: isError ? Colors.red : null,
+      ),
     );
   }
 
@@ -91,10 +94,15 @@ class _ContactScreenState extends State<ContactScreen> {
                                 color: const Color(0xFF7C3AED),
                                 title: l10n.t(AppText.contactEmailTitle),
                                 child: InkWell(
-                                  onTap: () => _launch('mailto:info@ogrenciintelligence.com'),
+                                  onTap: () => _launch(
+                                    'mailto:info@ogrenciintelligence.com',
+                                  ),
                                   child: const Text(
                                     'info@ogrenciintelligence.com',
-                                    style: TextStyle(color: Color(0xFF7C3AED), fontWeight: FontWeight.w700),
+                                    style: TextStyle(
+                                      color: Color(0xFF7C3AED),
+                                      fontWeight: FontWeight.w700,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -106,7 +114,10 @@ class _ContactScreenState extends State<ContactScreen> {
                                   onTap: () => _launch('tel:+905524635992'),
                                   child: const Text(
                                     '+90 (552) 463 59 92',
-                                    style: TextStyle(color: Color(0xFF16A34A), fontWeight: FontWeight.w700),
+                                    style: TextStyle(
+                                      color: Color(0xFF16A34A),
+                                      fontWeight: FontWeight.w700,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -114,15 +125,23 @@ class _ContactScreenState extends State<ContactScreen> {
                                 icon: Icons.location_on_outlined,
                                 color: Color(0xFF2563EB),
                                 title: l10n.t(AppText.contactAddressTitle),
-                                child: Text(l10n.t(AppText.contactAddressBody),
-                                    style: const TextStyle(color: Color(0xFF6B7280))),
+                                child: Text(
+                                  l10n.t(AppText.contactAddressBody),
+                                  style: const TextStyle(
+                                    color: Color(0xFF6B7280),
+                                  ),
+                                ),
                               ),
                               _InfoCard(
                                 icon: Icons.schedule,
                                 color: Color(0xFFF59E0B),
                                 title: l10n.t(AppText.contactHoursTitle),
-                                child: Text(l10n.t(AppText.contactHoursBody),
-                                    style: const TextStyle(color: Color(0xFF6B7280))),
+                                child: Text(
+                                  l10n.t(AppText.contactHoursBody),
+                                  style: const TextStyle(
+                                    color: Color(0xFF6B7280),
+                                  ),
+                                ),
                               ),
                             ],
                           ),
@@ -136,7 +155,8 @@ class _ContactScreenState extends State<ContactScreen> {
                                 emailCtrl: _emailCtrl,
                                 messageCtrl: _messageCtrl,
                                 subject: _subject,
-                                onSubjectChanged: (v) => setState(() => _subject = v ?? ''),
+                                onSubjectChanged: (v) =>
+                                    setState(() => _subject = v ?? ''),
                                 sending: _sending,
                                 onSend: _send,
                               ),
@@ -176,7 +196,11 @@ class _Hero extends StatelessWidget {
         ),
         borderRadius: BorderRadius.circular(24),
         boxShadow: const [
-          BoxShadow(color: Color(0x26000000), blurRadius: 20, offset: Offset(0, 10)),
+          BoxShadow(
+            color: Color(0x26000000),
+            blurRadius: 20,
+            offset: Offset(0, 10),
+          ),
         ],
       ),
       child: Stack(
@@ -184,18 +208,30 @@ class _Hero extends StatelessWidget {
           Positioned(
             right: -40,
             top: -30,
-            child: _GlowCircle(color: Colors.white.withValues(alpha: 0.08), size: 140),
+            child: _GlowCircle(
+              color: Colors.white.withValues(alpha: 0.08),
+              size: 140,
+            ),
           ),
           Positioned(
             left: -30,
             bottom: -30,
-            child: _GlowCircle(color: Colors.white.withValues(alpha: 0.06), size: 120),
+            child: _GlowCircle(
+              color: Colors.white.withValues(alpha: 0.06),
+              size: 120,
+            ),
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(l10n.t(AppText.contactHeroTitle),
-                  style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w900, color: Colors.white)),
+              Text(
+                l10n.t(AppText.contactHeroTitle),
+                style: const TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.w900,
+                  color: Colors.white,
+                ),
+              ),
               const SizedBox(height: 10),
               Text(
                 l10n.t(AppText.contactHeroSubtitle),
@@ -264,7 +300,10 @@ class _InfoCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: const TextStyle(fontWeight: FontWeight.w800)),
+                Text(
+                  title,
+                  style: const TextStyle(fontWeight: FontWeight.w800),
+                ),
                 const SizedBox(height: 4),
                 child,
               ],
@@ -304,7 +343,13 @@ class _FormCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 12, offset: Offset(0, 6))],
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0A000000),
+            blurRadius: 12,
+            offset: Offset(0, 6),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -313,7 +358,13 @@ class _FormCard extends StatelessWidget {
             children: [
               const Icon(Icons.chat_bubble_outline, color: Color(0xFF6D28D9)),
               const SizedBox(width: 8),
-              Text(l10n.t(AppText.contactFormTitle), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
+              Text(
+                l10n.t(AppText.contactFormTitle),
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 16),
@@ -350,15 +401,32 @@ class _FormCard extends StatelessWidget {
             initialValue: subject.isEmpty ? null : subject,
             onChanged: onSubjectChanged,
             items: [
-              DropdownMenuItem(value: 'general', child: Text(l10n.t(AppText.contactSubjectGeneral))),
-              DropdownMenuItem(value: 'support', child: Text(l10n.t(AppText.contactSubjectSupport))),
-              DropdownMenuItem(value: 'partnership', child: Text(l10n.t(AppText.contactSubjectPartnership))),
-              DropdownMenuItem(value: 'feedback', child: Text(l10n.t(AppText.contactSubjectFeedback))),
-              DropdownMenuItem(value: 'other', child: Text(l10n.t(AppText.contactSubjectOther))),
+              DropdownMenuItem(
+                value: 'general',
+                child: Text(l10n.t(AppText.contactSubjectGeneral)),
+              ),
+              DropdownMenuItem(
+                value: 'support',
+                child: Text(l10n.t(AppText.contactSubjectSupport)),
+              ),
+              DropdownMenuItem(
+                value: 'partnership',
+                child: Text(l10n.t(AppText.contactSubjectPartnership)),
+              ),
+              DropdownMenuItem(
+                value: 'feedback',
+                child: Text(l10n.t(AppText.contactSubjectFeedback)),
+              ),
+              DropdownMenuItem(
+                value: 'other',
+                child: Text(l10n.t(AppText.contactSubjectOther)),
+              ),
             ],
             decoration: InputDecoration(
               labelText: l10n.t(AppText.contactSubjectLabelRequired),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
           ),
           const SizedBox(height: 12),
@@ -371,7 +439,10 @@ class _FormCard extends StatelessWidget {
           const SizedBox(height: 12),
           Row(
             children: [
-              Text(l10n.t(AppText.contactRequiredNote), style: const TextStyle(color: Color(0xFF6B7280))),
+              Text(
+                l10n.t(AppText.contactRequiredNote),
+                style: const TextStyle(color: Color(0xFF6B7280)),
+              ),
               const Spacer(),
               ElevatedButton.icon(
                 onPressed: sending ? null : onSend,
@@ -379,11 +450,20 @@ class _FormCard extends StatelessWidget {
                     ? const SizedBox(
                         width: 16,
                         height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
                       )
                     : const Icon(Icons.send),
-                label: Text(sending ? l10n.t(AppText.commonSending) : l10n.t(AppText.commonSend)),
-                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6D28D9)),
+                label: Text(
+                  sending
+                      ? l10n.t(AppText.commonSending)
+                      : l10n.t(AppText.commonSend),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF6D28D9),
+                ),
               ),
             ],
           ),
@@ -394,7 +474,12 @@ class _FormCard extends StatelessWidget {
 }
 
 class _Field extends StatelessWidget {
-  const _Field({required this.label, required this.controller, required this.hint, this.maxLines = 1});
+  const _Field({
+    required this.label,
+    required this.controller,
+    required this.hint,
+    this.maxLines = 1,
+  });
 
   final String label;
   final TextEditingController controller;
@@ -430,7 +515,10 @@ class _FaqCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(l10n.t(AppText.contactFaqTitle), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+          Text(
+            l10n.t(AppText.contactFaqTitle),
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+          ),
           const SizedBox(height: 10),
           _FaqItem(
             question: l10n.t(AppText.contactFaqQ1),
@@ -488,9 +576,16 @@ class _MapPlaceholder extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.location_on_outlined, size: 48, color: Color(0xFF9CA3AF)),
+            const Icon(
+              Icons.location_on_outlined,
+              size: 48,
+              color: Color(0xFF9CA3AF),
+            ),
             const SizedBox(height: 8),
-            Text(l10n.t(AppText.contactMapPlaceholder), style: const TextStyle(color: Color(0xFF6B7280))),
+            Text(
+              l10n.t(AppText.contactMapPlaceholder),
+              style: const TextStyle(color: Color(0xFF6B7280)),
+            ),
           ],
         ),
       ),

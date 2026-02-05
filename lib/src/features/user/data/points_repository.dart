@@ -24,7 +24,10 @@ class PointsRepository {
   }
 
   /// user_points.user_id -> auth.users.id
-  Future<List<UserPoint>> fetchUserPoints({required String userId, int limit = 80}) async {
+  Future<List<UserPoint>> fetchUserPoints({
+    required String userId,
+    int limit = 80,
+  }) async {
     final rows = await SupabaseService.client
         .from('user_points')
         .select('id, source, description, points, created_at')
@@ -52,7 +55,9 @@ class PointsRepository {
   Future<List<UserBadge>> fetchBadges({required String userId}) async {
     final rows = await SupabaseService.client
         .from('user_badges')
-        .select('id, badge_type, badge_title, badge_description, icon, earned_at, points_awarded')
+        .select(
+          'id, badge_type, badge_title, badge_description, icon, earned_at, points_awarded',
+        )
         .eq('user_id', userId) // user_badges has user_id
         .order('earned_at', ascending: false);
 
@@ -70,10 +75,10 @@ class PointsRepository {
   Future<void> addActivityAndPoints({
     required String userId,
     required String category, // activity_logs.category (ex: "platform")
-    required String action,   // activity_logs.action (human text shown in UI)
+    required String action, // activity_logs.action (human text shown in UI)
     required int points,
-    required String source,   // user_points.source (ex: "platform")
-    String? description,      // user_points.description
+    required String source, // user_points.source (ex: "platform")
+    String? description, // user_points.description
     Map<String, dynamic>? metadata, // activity_logs.metadata
   }) async {
     final before = await fetchTotalPoints(userId: userId);
@@ -149,8 +154,10 @@ class PointsRepository {
   Future<bool> checkWeeklyStreakBonus({required String userId}) async {
     final nowUtc = DateTime.now().toUtc();
     final todayStart = DateTime.utc(nowUtc.year, nowUtc.month, nowUtc.day);
-    final windowStart = todayStart.subtract(const Duration(days: 6)); // 7 calendar days incl. today
-    final windowEnd = todayStart.add(const Duration(days: 1));        // tomorrow 00:00
+    final windowStart = todayStart.subtract(
+      const Duration(days: 6),
+    ); // 7 calendar days incl. today
+    final windowEnd = todayStart.add(const Duration(days: 1)); // tomorrow 00:00
 
     final dailyLogs = await SupabaseService.client
         .from('activity_logs')
@@ -168,9 +175,11 @@ class PointsRepository {
       if (dt == null) continue;
 
       final d = dt.toUtc();
-      uniqueDays.add('${d.year.toString().padLeft(4, '0')}-'
-          '${d.month.toString().padLeft(2, '0')}-'
-          '${d.day.toString().padLeft(2, '0')}');
+      uniqueDays.add(
+        '${d.year.toString().padLeft(4, '0')}-'
+        '${d.month.toString().padLeft(2, '0')}-'
+        '${d.day.toString().padLeft(2, '0')}',
+      );
     }
 
     if (uniqueDays.length < 7) return false;

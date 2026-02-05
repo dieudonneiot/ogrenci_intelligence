@@ -1,4 +1,4 @@
-﻿// lib/src/features/chat/domain/chat_models.dart
+// lib/src/features/chat/domain/chat_models.dart
 
 enum ChatMessageType { user, bot }
 
@@ -100,10 +100,7 @@ class ChatAiResponse {
 enum ChatStreamEventType { meta, delta, done, error }
 
 class ChatStreamEvent {
-  const ChatStreamEvent({
-    required this.type,
-    required this.data,
-  });
+  const ChatStreamEvent({required this.type, required this.data});
 
   final ChatStreamEventType type;
   final Map<String, dynamic> data;

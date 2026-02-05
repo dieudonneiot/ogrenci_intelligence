@@ -36,19 +36,21 @@ final initialLocaleProvider = Provider<Locale?>((ref) => null);
 
 class LocaleController extends StateNotifier<Locale> {
   LocaleController({required Locale? initialLocale})
-      : super(_supportedOrFallback(initialLocale ?? _deviceLocale())) {
+    : super(_supportedOrFallback(initialLocale ?? _deviceLocale())) {
     // If main() provided an initial locale, we skip async load to avoid flicker.
     if (initialLocale == null) {
       _loadSavedLocale();
     }
   }
 
-  static Locale _deviceLocale() => WidgetsBinding.instance.platformDispatcher.locale;
+  static Locale _deviceLocale() =>
+      WidgetsBinding.instance.platformDispatcher.locale;
 
   static Locale _supportedOrFallback(Locale locale) {
     for (final supported in AppLocalizations.supportedLocales) {
       if (supported.languageCode == locale.languageCode &&
-          (supported.countryCode == null || supported.countryCode == locale.countryCode)) {
+          (supported.countryCode == null ||
+              supported.countryCode == locale.countryCode)) {
         return supported;
       }
     }

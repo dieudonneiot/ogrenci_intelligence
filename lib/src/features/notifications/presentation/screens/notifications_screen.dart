@@ -11,7 +11,8 @@ class NotificationsScreen extends ConsumerStatefulWidget {
   const NotificationsScreen({super.key});
 
   @override
-  ConsumerState<NotificationsScreen> createState() => _NotificationsScreenState();
+  ConsumerState<NotificationsScreen> createState() =>
+      _NotificationsScreenState();
 }
 
 class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
@@ -79,10 +80,17 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                         crossAxisAlignment: WrapCrossAlignment.center,
                         spacing: 10,
                         children: [
-                          const Icon(Icons.notifications, color: Color(0xFF6D28D9), size: 28),
+                          const Icon(
+                            Icons.notifications,
+                            color: Color(0xFF6D28D9),
+                            size: 28,
+                          ),
                           Text(
                             l10n.t(AppText.navNotifications),
-                            style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900),
+                            style: const TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.w900,
+                            ),
                           ),
                         ],
                       );
@@ -91,7 +99,9 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                           ? TextButton.icon(
                               onPressed: _markAllAsRead,
                               icon: const Icon(Icons.check, size: 16),
-                              label: Text(l10n.t(AppText.notificationsMarkAllRead)),
+                              label: Text(
+                                l10n.t(AppText.notificationsMarkAllRead),
+                              ),
                             )
                           : const SizedBox.shrink();
 
@@ -110,10 +120,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
 
                       return Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          titleRow,
-                          action,
-                        ],
+                        children: [titleRow, action],
                       );
                     },
                   ),
@@ -130,10 +137,16 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                         crossAxisAlignment: WrapCrossAlignment.center,
                         spacing: 10,
                         children: [
-                          const Icon(Icons.notifications_active, color: Color(0xFF6D28D9)),
+                          const Icon(
+                            Icons.notifications_active,
+                            color: Color(0xFF6D28D9),
+                          ),
                           Text(
                             l10n.notificationsUnreadCount(unreadCount),
-                            style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF6D28D9)),
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF6D28D9),
+                            ),
                           ),
                         ],
                       ),
@@ -214,7 +227,11 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
             if (!mounted) return;
             setState(() => _items = [item, ..._items]);
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(AppLocalizations.of(context).t(AppText.notificationsNewSnack))),
+              SnackBar(
+                content: Text(
+                  AppLocalizations.of(context).t(AppText.notificationsNewSnack),
+                ),
+              ),
             );
           },
         )
@@ -246,7 +263,11 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context).notificationsLoadFailed(e.toString()))),
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(context).notificationsLoadFailed(e.toString()),
+          ),
+        ),
       );
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -270,7 +291,11 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context).commonActionFailed(e.toString()))),
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(context).commonActionFailed(e.toString()),
+          ),
+        ),
       );
     } finally {
       if (mounted) setState(() => _markingId = null);
@@ -288,14 +313,24 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
           .inFilter('id', ids);
 
       if (!mounted) return;
-      setState(() => _items = _items.map((e) => e.copyWith(isRead: true)).toList());
+      setState(
+        () => _items = _items.map((e) => e.copyWith(isRead: true)).toList(),
+      );
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context).t(AppText.notificationsAllMarkedRead))),
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(context).t(AppText.notificationsAllMarkedRead),
+          ),
+        ),
       );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context).commonActionFailed(e.toString()))),
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(context).commonActionFailed(e.toString()),
+          ),
+        ),
       );
     }
   }
@@ -306,12 +341,22 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       if (!mounted) return;
       setState(() => _items = _items.where((e) => e.id != id).toList());
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context).t(AppText.notificationsDeleted))),
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(context).t(AppText.notificationsDeleted),
+          ),
+        ),
       );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context).notificationsDeleteFailed(e.toString()))),
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(
+              context,
+            ).notificationsDeleteFailed(e.toString()),
+          ),
+        ),
       );
     }
   }
@@ -388,7 +433,9 @@ class _TabButton extends StatelessWidget {
     return TextButton(
       onPressed: onTap,
       style: TextButton.styleFrom(
-        foregroundColor: active ? const Color(0xFF6D28D9) : const Color(0xFF6B7280),
+        foregroundColor: active
+            ? const Color(0xFF6D28D9)
+            : const Color(0xFF6B7280),
       ),
       child: Text(label, style: const TextStyle(fontWeight: FontWeight.w800)),
     );
@@ -415,16 +462,28 @@ class _NotificationCard extends StatelessWidget {
     final date = item.createdAt.toLocal();
     final material = MaterialLocalizations.of(context);
     final dateText = material.formatShortDate(date);
-    final timeText =
-        material.formatTimeOfDay(TimeOfDay.fromDateTime(date), alwaysUse24HourFormat: MediaQuery.alwaysUse24HourFormatOf(context));
+    final timeText = material.formatTimeOfDay(
+      TimeOfDay.fromDateTime(date),
+      alwaysUse24HourFormat: MediaQuery.alwaysUse24HourFormatOf(context),
+    );
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: item.isRead ? Colors.white : const Color(0xFFF5F3FF),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: item.isRead ? const Color(0xFFE5E7EB) : const Color(0xFFD8B4FE)),
-        boxShadow: const [BoxShadow(color: Color(0x07000000), blurRadius: 12, offset: Offset(0, 6))],
+        border: Border.all(
+          color: item.isRead
+              ? const Color(0xFFE5E7EB)
+              : const Color(0xFFD8B4FE),
+        ),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x07000000),
+            blurRadius: 12,
+            offset: Offset(0, 6),
+          ),
+        ],
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -435,23 +494,39 @@ class _NotificationCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(item.title, style: const TextStyle(fontWeight: FontWeight.w800)),
+                Text(
+                  item.title,
+                  style: const TextStyle(fontWeight: FontWeight.w800),
+                ),
                 const SizedBox(height: 6),
-                Text(item.message, style: const TextStyle(color: Color(0xFF6B7280))),
+                Text(
+                  item.message,
+                  style: const TextStyle(color: Color(0xFF6B7280)),
+                ),
                 const SizedBox(height: 8),
                 Row(
                   children: [
                     Text(
                       '$dateText $timeText',
-                      style: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 12),
+                      style: const TextStyle(
+                        color: Color(0xFF9CA3AF),
+                        fontSize: 12,
+                      ),
                     ),
                     if (item.actionUrl != null) ...[
                       const SizedBox(width: 8),
-                      const Text('•', style: TextStyle(color: Color(0xFF9CA3AF))),
+                      const Text(
+                        '•',
+                        style: TextStyle(color: Color(0xFF9CA3AF)),
+                      ),
                       const SizedBox(width: 8),
                       TextButton(
                         onPressed: onOpen,
-                        child: Text(AppLocalizations.of(context).t(AppText.commonViewDetailsArrow)),
+                        child: Text(
+                          AppLocalizations.of(
+                            context,
+                          ).t(AppText.commonViewDetailsArrow),
+                        ),
                       ),
                     ],
                   ],
@@ -512,8 +587,8 @@ class _EmptyState extends StatelessWidget {
     final text = filter == 'unread'
         ? l10n.t(AppText.notificationsEmptyUnread)
         : filter == 'read'
-            ? l10n.t(AppText.notificationsEmptyRead)
-            : l10n.t(AppText.notificationsEmptyAll);
+        ? l10n.t(AppText.notificationsEmptyRead)
+        : l10n.t(AppText.notificationsEmptyAll);
 
     return Container(
       padding: const EdgeInsets.all(18),
@@ -524,7 +599,11 @@ class _EmptyState extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const Icon(Icons.notifications_off_outlined, size: 44, color: Color(0xFFD1D5DB)),
+          const Icon(
+            Icons.notifications_off_outlined,
+            size: 44,
+            color: Color(0xFFD1D5DB),
+          ),
           const SizedBox(height: 8),
           Text(text, style: const TextStyle(color: Color(0xFF6B7280))),
         ],
@@ -547,11 +626,20 @@ class _GuestView extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.lock_outline, size: 46, color: Color(0xFF6B7280)),
+              const Icon(
+                Icons.lock_outline,
+                size: 46,
+                color: Color(0xFF6B7280),
+              ),
               const SizedBox(height: 10),
-              Text(title,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF374151))),
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w800,
+                  color: Color(0xFF374151),
+                ),
+              ),
             ],
           ),
         ),
@@ -603,7 +691,9 @@ class _NotificationItem {
       type: map['type'] as String?,
       icon: map['icon'] as String?,
       isRead: (map['is_read'] as bool?) ?? false,
-      createdAt: DateTime.tryParse(map['created_at']?.toString() ?? '') ?? DateTime.now(),
+      createdAt:
+          DateTime.tryParse(map['created_at']?.toString() ?? '') ??
+          DateTime.now(),
       actionUrl: map['action_url'] as String?,
     );
   }

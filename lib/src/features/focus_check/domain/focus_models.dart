@@ -17,7 +17,9 @@ class AcceptedInternshipApplication {
   final String companyName;
 
   factory AcceptedInternshipApplication.fromMap(Map<String, dynamic> map) {
-    final internship = (map['internship'] as Map<String, dynamic>?) ?? const <String, dynamic>{};
+    final internship =
+        (map['internship'] as Map<String, dynamic>?) ??
+        const <String, dynamic>{};
     return AcceptedInternshipApplication(
       applicationId: (map['id'] ?? '').toString(),
       internshipId: (map['internship_id'] ?? '').toString(),
@@ -41,7 +43,9 @@ class FocusCheckSession {
   final DateTime expiresAt;
 
   factory FocusCheckSession.fromMap(Map<String, dynamic> map) {
-    final expires = DateTime.tryParse((map['expires_at'] ?? '').toString())?.toUtc() ?? DateTime.now().toUtc();
+    final expires =
+        DateTime.tryParse((map['expires_at'] ?? '').toString())?.toUtc() ??
+        DateTime.now().toUtc();
     return FocusCheckSession(
       id: (map['focus_check_id'] ?? map['id'] ?? '').toString(),
       question: (map['question'] ?? '').toString(),
@@ -49,4 +53,3 @@ class FocusCheckSession {
     );
   }
 }
-

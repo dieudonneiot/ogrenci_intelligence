@@ -4,13 +4,18 @@ import '../../../core/supabase/supabase_service.dart';
 import '../domain/job_models.dart';
 
 class JobsRepository {
-  JobsRepository({SupabaseClient? client}) : _client = client ?? SupabaseService.client;
+  JobsRepository({SupabaseClient? client})
+    : _client = client ?? SupabaseService.client;
 
   final SupabaseClient _client;
 
   String _safeLike(String input) {
     // prevent wildcard injection (%, _) and commas breaking PostgREST "or()" syntax
-    return input.replaceAll('%', '').replaceAll('_', '').replaceAll(',', ' ').trim();
+    return input
+        .replaceAll('%', '')
+        .replaceAll('_', '')
+        .replaceAll(',', ' ')
+        .trim();
   }
 
   Future<List<JobSummary>> fetchJobs({
@@ -178,7 +183,10 @@ class JobsRepository {
         .eq('job_id', jobId);
   }
 
-  Future<bool> isJobFavorited({required String userId, required String jobId}) async {
+  Future<bool> isJobFavorited({
+    required String userId,
+    required String jobId,
+  }) async {
     final row = await _client
         .from('favorites')
         .select('id')
@@ -189,7 +197,10 @@ class JobsRepository {
     return row != null;
   }
 
-  Future<bool> toggleFavorite({required String userId, required String jobId}) async {
+  Future<bool> toggleFavorite({
+    required String userId,
+    required String jobId,
+  }) async {
     final exists = await _client
         .from('favorites')
         .select('id')
@@ -211,7 +222,10 @@ class JobsRepository {
     return true;
   }
 
-  Future<bool> hasApplied({required String userId, required String jobId}) async {
+  Future<bool> hasApplied({
+    required String userId,
+    required String jobId,
+  }) async {
     final row = await _client
         .from('job_applications')
         .select('id,status')
@@ -267,7 +281,9 @@ class JobsRepository {
     await _client.from('job_applications').insert({
       'user_id': userId,
       'job_id': jobId,
-      'cover_letter': (coverLetter?.trim().isEmpty ?? true) ? null : coverLetter!.trim(),
+      'cover_letter': (coverLetter?.trim().isEmpty ?? true)
+          ? null
+          : coverLetter!.trim(),
       'cv_url': (cvUrl?.trim().isEmpty ?? true) ? null : cvUrl!.trim(),
       'status': 'pending',
     });

@@ -73,64 +73,64 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     return uri.toString();
   }
 
-Future<void> _submit() async {
-  final l10n = AppLocalizations.of(context);
-  setState(() => _error = null);
+  Future<void> _submit() async {
+    final l10n = AppLocalizations.of(context);
+    setState(() => _error = null);
 
-  final email = _email.text.trim();
-  final pass = _password.text;
+    final email = _email.text.trim();
+    final pass = _password.text;
 
-  if (email.isEmpty || pass.isEmpty) {
-    setState(() => _error = l10n.t(AppText.commonFillAllFields));
-    return;
-  }
-  final emailRegex = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
-  if (!emailRegex.hasMatch(email)) {
-    setState(() => _error = l10n.t(AppText.commonInvalidEmail));
-    return;
-  }
+    if (email.isEmpty || pass.isEmpty) {
+      setState(() => _error = l10n.t(AppText.commonFillAllFields));
+      return;
+    }
+    final emailRegex = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
+    if (!emailRegex.hasMatch(email)) {
+      setState(() => _error = l10n.t(AppText.commonInvalidEmail));
+      return;
+    }
 
-  final err = await ref
-      .read(authActionLoadingProvider.notifier)
-      .signIn(email, pass);
+    final err = await ref
+        .read(authActionLoadingProvider.notifier)
+        .signIn(email, pass);
 
-  if (!mounted) return;
+    if (!mounted) return;
 
-  if (err != null) {
-    setState(() => _error = err);
-    return;
-  }
+    if (err != null) {
+      setState(() => _error = err);
+      return;
+    }
 
-  // If auth state is already updated, navigate immediately.
-  final current = ref.read(authViewStateProvider).valueOrNull;
-  if (current?.isAuthenticated == true) {
+    // If auth state is already updated, navigate immediately.
+    final current = ref.read(authViewStateProvider).valueOrNull;
+    if (current?.isAuthenticated == true) {
+      context.go(_resolveFromTarget());
+      return;
+    }
+
+    // Otherwise wait a bit for auth to update (but never hang forever).
+    final completer = Completer<void>();
+    final sub = ref.listenManual<AsyncValue<AuthViewState>>(
+      authViewStateProvider,
+      (_, next) {
+        final value = next.valueOrNull;
+        if (value?.isAuthenticated == true && !completer.isCompleted) {
+          completer.complete();
+        }
+      },
+    );
+
+    try {
+      await completer.future.timeout(const Duration(seconds: 2));
+    } catch (_) {
+      // ignore timeout; router redirect will handle if needed
+    } finally {
+      sub.close();
+    }
+
+    if (!mounted) return;
     context.go(_resolveFromTarget());
-    return;
   }
-
-  // Otherwise wait a bit for auth to update (but never hang forever).
-  final completer = Completer<void>();
-  final sub = ref.listenManual<AsyncValue<AuthViewState>>(
-    authViewStateProvider,
-    (_, next) {
-      final value = next.valueOrNull;
-      if (value?.isAuthenticated == true && !completer.isCompleted) {
-        completer.complete();
-      }
-    },
-  );
-
-  try {
-    await completer.future.timeout(const Duration(seconds: 2));
-  } catch (_) {
-    // ignore timeout; router redirect will handle if needed
-  } finally {
-    sub.close();
-  }
-
-  if (!mounted) return;
-  context.go(_resolveFromTarget());
-}
 
   @override
   Widget build(BuildContext context) {
@@ -158,7 +158,11 @@ Future<void> _submit() async {
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: const [
-                    BoxShadow(color: Color(0x24000000), blurRadius: 24, offset: Offset(0, 14)),
+                    BoxShadow(
+                      color: Color(0x24000000),
+                      blurRadius: 24,
+                      offset: Offset(0, 14),
+                    ),
                   ],
                 ),
                 child: Column(
@@ -172,20 +176,30 @@ Future<void> _submit() async {
                           color: const Color(0xFFEDE9FE),
                           borderRadius: BorderRadius.circular(22),
                         ),
-                        child: const Icon(Icons.school_outlined, size: 38, color: Color(0xFF7C3AED)),
+                        child: const Icon(
+                          Icons.school_outlined,
+                          size: 38,
+                          color: Color(0xFF7C3AED),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 14),
                     Text(
                       l10n.t(AppText.authWelcomeBack),
                       textAlign: TextAlign.center,
-                      style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900),
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w900,
+                      ),
                     ),
                     const SizedBox(height: 6),
                     Text(
                       l10n.t(AppText.authStudentLoginSubtitle),
                       textAlign: TextAlign.center,
-                      style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
+                      style: const TextStyle(
+                        color: Color(0xFF6B7280),
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     const SizedBox(height: 18),
 
@@ -195,7 +209,9 @@ Future<void> _submit() async {
                       decoration: InputDecoration(
                         labelText: l10n.t(AppText.commonEmail),
                         prefixIcon: const Icon(Icons.mail_outline),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -206,10 +222,17 @@ Future<void> _submit() async {
                       decoration: InputDecoration(
                         labelText: l10n.t(AppText.commonPassword),
                         prefixIcon: const Icon(Icons.lock_outline),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
                         suffixIcon: IconButton(
-                          onPressed: () => setState(() => _showPassword = !_showPassword),
-                          icon: Icon(_showPassword ? Icons.visibility_off : Icons.visibility),
+                          onPressed: () =>
+                              setState(() => _showPassword = !_showPassword),
+                          icon: Icon(
+                            _showPassword
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                          ),
                         ),
                       ),
                     ),
@@ -219,9 +242,13 @@ Future<void> _submit() async {
                       children: [
                         Checkbox(
                           value: _rememberMe,
-                          onChanged: (v) => setState(() => _rememberMe = v ?? false),
+                          onChanged: (v) =>
+                              setState(() => _rememberMe = v ?? false),
                         ),
-                        Text(l10n.t(AppText.commonRememberMe), style: const TextStyle(fontWeight: FontWeight.w600)),
+                        Text(
+                          l10n.t(AppText.commonRememberMe),
+                          style: const TextStyle(fontWeight: FontWeight.w600),
+                        ),
                         const Spacer(),
                         TextButton(
                           onPressed: () => context.push(Routes.forgotPassword),
@@ -241,10 +268,18 @@ Future<void> _submit() async {
                         ),
                         child: Row(
                           children: [
-                            const Icon(Icons.error_outline, color: Color(0xFFDC2626)),
+                            const Icon(
+                              Icons.error_outline,
+                              color: Color(0xFFDC2626),
+                            ),
                             const SizedBox(width: 8),
                             Expanded(
-                              child: Text(_error!, style: const TextStyle(color: Color(0xFF7F1D1D))),
+                              child: Text(
+                                _error!,
+                                style: const TextStyle(
+                                  color: Color(0xFF7F1D1D),
+                                ),
+                              ),
                             ),
                           ],
                         ),
@@ -261,14 +296,22 @@ Future<void> _submit() async {
                             ? const SizedBox(
                                 width: 16,
                                 height: 16,
-                                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
                               )
                             : const Icon(Icons.lock_outline),
-                        label: Text(l10n.t(AppText.authLoginTitle), style: const TextStyle(fontWeight: FontWeight.w900)),
+                        label: Text(
+                          l10n.t(AppText.authLoginTitle),
+                          style: const TextStyle(fontWeight: FontWeight.w900),
+                        ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF7C3AED),
                           foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
                         ),
                       ),
                     ),
@@ -280,9 +323,14 @@ Future<void> _submit() async {
                     OutlinedButton.icon(
                       onPressed: () => context.push(Routes.companyAuth),
                       icon: const Icon(Icons.apartment_outlined),
-                      label: Text(l10n.t(AppText.authLoginAsCompany), style: const TextStyle(fontWeight: FontWeight.w800)),
+                      label: Text(
+                        l10n.t(AppText.authLoginAsCompany),
+                        style: const TextStyle(fontWeight: FontWeight.w800),
+                      ),
                       style: OutlinedButton.styleFrom(
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
                       ),
                     ),
 
@@ -302,17 +350,26 @@ Future<void> _submit() async {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF3F4F6),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(14),
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.security, size: 18, color: Color(0xFF111827)),
+                          Icon(
+                            Icons.security,
+                            size: 18,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
                           const SizedBox(width: 8),
-                          const Expanded(
+                          Expanded(
                             child: Text(
                               'Admin panel',
-                              style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF111827)),
+                              style: TextStyle(
+                                fontWeight: FontWeight.w800,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
                             ),
                           ),
                           TextButton(

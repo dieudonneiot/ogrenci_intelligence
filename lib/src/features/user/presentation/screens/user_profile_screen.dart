@@ -49,9 +49,7 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
     final isLoggedIn = auth?.isAuthenticated ?? false;
 
     if (!isLoggedIn || user == null) {
-      return _GuestView(
-        title: l10n.t(AppText.profileLoginRequired),
-      );
+      return _GuestView(title: l10n.t(AppText.profileLoginRequired));
     }
 
     _ensureLoaded(user.id);
@@ -65,7 +63,11 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
       );
     }
 
-    final displayName = _displayName(user, _profile, fallback: l10n.t(AppText.commonStudent));
+    final displayName = _displayName(
+      user,
+      _profile,
+      fallback: l10n.t(AppText.commonStudent),
+    );
     final oiAsync = ref.watch(myOiProfileProvider);
 
     return Container(
@@ -83,14 +85,20 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
                     name: displayName,
                     email: user.email ?? '',
                     avatarUrl: _profile?.avatarUrl,
-                    onChangeAvatar: _saving ? null : () => _pickAndUploadAvatar(user.id),
+                    onChangeAvatar: _saving
+                        ? null
+                        : () => _pickAndUploadAvatar(user.id),
                   ),
                   const SizedBox(height: 16),
                   oiAsync.when(
                     loading: () => const Center(
                       child: Padding(
                         padding: EdgeInsets.all(12),
-                        child: SizedBox(width: 26, height: 26, child: CircularProgressIndicator(strokeWidth: 2.5)),
+                        child: SizedBox(
+                          width: 26,
+                          height: 26,
+                          child: CircularProgressIndicator(strokeWidth: 2.5),
+                        ),
                       ),
                     ),
                     error: (e, _) => Container(
@@ -102,16 +110,24 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.error_outline, color: Color(0xFFEF4444)),
+                          const Icon(
+                            Icons.error_outline,
+                            color: Color(0xFFEF4444),
+                          ),
                           const SizedBox(width: 10),
                           Expanded(
                             child: Text(
                               'OI Score unavailable: $e',
-                              style: const TextStyle(color: Color(0xFF991B1B), fontWeight: FontWeight.w700),
+                              style: const TextStyle(
+                                color: Color(0xFF991B1B),
+                                fontWeight: FontWeight.w700,
+                              ),
                             ),
                           ),
                           TextButton(
-                            onPressed: () => ref.read(myOiProfileProvider.notifier).refresh(),
+                            onPressed: () => ref
+                                .read(myOiProfileProvider.notifier)
+                                .refresh(),
                             child: const Text('Retry'),
                           ),
                         ],
@@ -135,7 +151,8 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
                       _editingDept = false;
                       _tempDepartment = _profile?.department ?? '';
                     }),
-                    onDepartmentChanged: (v) => setState(() => _tempDepartment = v),
+                    onDepartmentChanged: (v) =>
+                        setState(() => _tempDepartment = v),
                     onSave: _saving ? null : _saveDepartment,
                   ),
                   const SizedBox(height: 16),
@@ -189,7 +206,11 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context).profileLoadFailed(e.toString()))),
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(context).profileLoadFailed(e.toString()),
+          ),
+        ),
       );
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -240,11 +261,16 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
     setState(() => _saving = true);
     try {
       final bytes = await file.readAsBytes();
-      final safe = file.name.trim().replaceAll(RegExp(r'[^a-zA-Z0-9._-]+'), '_');
+      final safe = file.name.trim().replaceAll(
+        RegExp(r'[^a-zA-Z0-9._-]+'),
+        '_',
+      );
       final stamp = DateTime.now().toUtc().millisecondsSinceEpoch;
       final path = '$uid/${stamp}_$safe';
 
-      await SupabaseService.client.storage.from('avatars').uploadBinary(
+      await SupabaseService.client.storage
+          .from('avatars')
+          .uploadBinary(
             path,
             bytes,
             fileOptions: FileOptions(
@@ -253,18 +279,23 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
             ),
           );
 
-      final publicUrl = SupabaseService.client.storage.from('avatars').getPublicUrl(path);
+      final publicUrl = SupabaseService.client.storage
+          .from('avatars')
+          .getPublicUrl(path);
 
-      await SupabaseService.client.from('profiles').update({'avatar_url': publicUrl}).eq('id', uid);
+      await SupabaseService.client
+          .from('profiles')
+          .update({'avatar_url': publicUrl})
+          .eq('id', uid);
 
       if (!mounted) return;
       setState(() {
         _profile = _profile?.copyWith(avatarUrl: publicUrl);
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Avatar updated.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Avatar updated.')));
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -348,9 +379,9 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
         _editingDept = false;
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.t(AppText.profileUpdated))),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.t(AppText.profileUpdated))));
 
       final updated = _profile;
       if (updated != null) {
@@ -380,7 +411,9 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
 
     if ((existing as List).isNotEmpty) return;
 
-    await ref.read(pointsRepositoryProvider).addActivityAndPoints(
+    await ref
+        .read(pointsRepositoryProvider)
+        .addActivityAndPoints(
           userId: uid,
           category: 'platform',
           action: 'profile_completion',
@@ -392,7 +425,9 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
 
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(l10n.profileCompletionAwarded(_profileCompletionPoints))),
+      SnackBar(
+        content: Text(l10n.profileCompletionAwarded(_profileCompletionPoints)),
+      ),
     );
   }
 
@@ -404,10 +439,15 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
     return hasName && hasDept && hasPhone && hasYear;
   }
 
-  static String _displayName(User user, _ProfileData? profile, {required String fallback}) {
+  static String _displayName(
+    User user,
+    _ProfileData? profile, {
+    required String fallback,
+  }) {
     final meta = user.userMetadata;
-    final metaName =
-        (meta is Map<String, dynamic>) ? (meta['full_name'] as String?)?.trim() : null;
+    final metaName = (meta is Map<String, dynamic>)
+        ? (meta['full_name'] as String?)?.trim()
+        : null;
     if (metaName != null && metaName.isNotEmpty) return metaName;
     if (profile?.fullName != null && profile!.fullName!.trim().isNotEmpty) {
       return profile.fullName!.trim();
@@ -443,7 +483,11 @@ class _ProfileHeader extends StatelessWidget {
           end: Alignment.bottomRight,
         ),
         boxShadow: const [
-          BoxShadow(color: Color(0x22000000), blurRadius: 22, offset: Offset(0, 10)),
+          BoxShadow(
+            color: Color(0x22000000),
+            blurRadius: 22,
+            offset: Offset(0, 10),
+          ),
         ],
       ),
       child: Row(
@@ -476,12 +520,20 @@ class _ProfileHeader extends StatelessWidget {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(999),
                       border: Border.all(color: const Color(0xFFE5E7EB)),
-                      boxShadow: const [BoxShadow(color: Color(0x22000000), blurRadius: 10, offset: Offset(0, 6))],
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Color(0x22000000),
+                          blurRadius: 10,
+                          offset: Offset(0, 6),
+                        ),
+                      ],
                     ),
                     child: Icon(
                       Icons.edit,
                       size: 16,
-                      color: onChangeAvatar == null ? const Color(0xFF9CA3AF) : const Color(0xFF4F46E5),
+                      color: onChangeAvatar == null
+                          ? const Color(0xFF9CA3AF)
+                          : const Color(0xFF4F46E5),
                     ),
                   ),
                 ),
@@ -495,18 +547,29 @@ class _ProfileHeader extends StatelessWidget {
               children: [
                 Text(
                   name,
-                  style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w900,
+                  ),
                 ),
                 const SizedBox(height: 6),
                 Row(
                   children: [
-                    const Icon(Icons.mail_outline, color: Color(0xCCFFFFFF), size: 16),
+                    const Icon(
+                      Icons.mail_outline,
+                      color: Color(0xCCFFFFFF),
+                      size: 16,
+                    ),
                     const SizedBox(width: 6),
                     Expanded(
                       child: Text(
                         email,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(color: Color(0xCCFFFFFF), fontWeight: FontWeight.w700),
+                        style: const TextStyle(
+                          color: Color(0xCCFFFFFF),
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
                   ],
@@ -548,7 +611,13 @@ class _ProfileInfoCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 18, offset: Offset(0, 8))],
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0A000000),
+            blurRadius: 18,
+            offset: Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -557,8 +626,13 @@ class _ProfileInfoCard extends StatelessWidget {
             children: [
               const Icon(Icons.school_outlined, color: Color(0xFF6D28D9)),
               const SizedBox(width: 8),
-              Text(l10n.t(AppText.profileInfoTitle),
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+              Text(
+                l10n.t(AppText.profileInfoTitle),
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 14),
@@ -566,9 +640,16 @@ class _ProfileInfoCard extends StatelessWidget {
             label: l10n.t(AppText.profileEmailAddressLabel),
             child: Row(
               children: [
-                const Icon(Icons.mail_outline, size: 18, color: Color(0xFF9CA3AF)),
+                const Icon(
+                  Icons.mail_outline,
+                  size: 18,
+                  color: Color(0xFF9CA3AF),
+                ),
                 const SizedBox(width: 8),
-                Text(profile.email, style: const TextStyle(color: Color(0xFF4B5563))),
+                Text(
+                  profile.email,
+                  style: const TextStyle(color: Color(0xFF4B5563)),
+                ),
               ],
             ),
           ),
@@ -580,23 +661,36 @@ class _ProfileInfoCard extends StatelessWidget {
                     children: [
                       Expanded(
                         child: DropdownButtonFormField<String>(
-                          initialValue: tempDepartment.isEmpty ? null : tempDepartment,
+                          initialValue: tempDepartment.isEmpty
+                              ? null
+                              : tempDepartment,
                           decoration: InputDecoration(
-                            hintText: l10n.t(AppText.profileSelectDepartmentHint),
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                            hintText: l10n.t(
+                              AppText.profileSelectDepartmentHint,
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 10,
+                            ),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                              borderSide: const BorderSide(
+                                color: Color(0xFFE5E7EB),
+                              ),
                             ),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                              borderSide: const BorderSide(
+                                color: Color(0xFFE5E7EB),
+                              ),
                             ),
                           ),
                           items: [
                             DropdownMenuItem<String>(
                               value: '',
-                              child: Text(l10n.t(AppText.profileSelectDepartmentHint)),
+                              child: Text(
+                                l10n.t(AppText.profileSelectDepartmentHint),
+                              ),
                             ),
                             for (final dept in _departmentOptions)
                               DropdownMenuItem<String>(
@@ -610,7 +704,10 @@ class _ProfileInfoCard extends StatelessWidget {
                       const SizedBox(width: 8),
                       IconButton(
                         onPressed: onSave,
-                        icon: const Icon(Icons.check_circle, color: Color(0xFF16A34A)),
+                        icon: const Icon(
+                          Icons.check_circle,
+                          color: Color(0xFF16A34A),
+                        ),
                       ),
                       IconButton(
                         onPressed: onCancel,
@@ -620,7 +717,11 @@ class _ProfileInfoCard extends StatelessWidget {
                   )
                 : Row(
                     children: [
-                      const Icon(Icons.school_outlined, size: 18, color: Color(0xFF9CA3AF)),
+                      const Icon(
+                        Icons.school_outlined,
+                        size: 18,
+                        color: Color(0xFF9CA3AF),
+                      ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
@@ -660,7 +761,13 @@ class _BadgesCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 18, offset: Offset(0, 8))],
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0A000000),
+            blurRadius: 18,
+            offset: Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -669,13 +776,21 @@ class _BadgesCard extends StatelessWidget {
             children: [
               const Icon(Icons.emoji_events_outlined, color: Color(0xFFF59E0B)),
               const SizedBox(width: 8),
-              Text(l10n.t(AppText.profileBadgesTitle),
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+              Text(
+                l10n.t(AppText.profileBadgesTitle),
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 12),
           if (badges.isEmpty)
-            Text(l10n.t(AppText.profileNoBadges), style: const TextStyle(color: Color(0xFF6B7280)))
+            Text(
+              l10n.t(AppText.profileNoBadges),
+              style: const TextStyle(color: Color(0xFF6B7280)),
+            )
           else
             LayoutBuilder(
               builder: (_, c) {
@@ -700,7 +815,10 @@ class _BadgesCard extends StatelessWidget {
                         Text(
                           b.title,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(fontSize: 11, color: Color(0xFF6B7280)),
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: Color(0xFF6B7280),
+                          ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -756,13 +874,27 @@ class _CompletedCoursesCard extends StatelessWidget {
             ),
             child: Column(
               children: [
-                const Icon(Icons.menu_book_outlined, size: 44, color: Color(0xFFD1D5DB)),
+                const Icon(
+                  Icons.menu_book_outlined,
+                  size: 44,
+                  color: Color(0xFFD1D5DB),
+                ),
                 const SizedBox(height: 8),
-                Text(l10n.t(AppText.profileNoCompletedCoursesTitle),
-                    style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600)),
+                Text(
+                  l10n.t(AppText.profileNoCompletedCoursesTitle),
+                  style: const TextStyle(
+                    color: Color(0xFF6B7280),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
                 const SizedBox(height: 4),
-                Text(l10n.t(AppText.profileNoCompletedCoursesSubtitle),
-                    style: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 12)),
+                Text(
+                  l10n.t(AppText.profileNoCompletedCoursesSubtitle),
+                  style: const TextStyle(
+                    color: Color(0xFF9CA3AF),
+                    fontSize: 12,
+                  ),
+                ),
               ],
             ),
           )
@@ -792,7 +924,11 @@ class _CompletedCoursesCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(color: const Color(0xFFE5E7EB)),
                       boxShadow: const [
-                        BoxShadow(color: Color(0x08000000), blurRadius: 12, offset: Offset(0, 6)),
+                        BoxShadow(
+                          color: Color(0x08000000),
+                          blurRadius: 12,
+                          offset: Offset(0, 6),
+                        ),
                       ],
                     ),
                     child: Column(
@@ -807,18 +943,29 @@ class _CompletedCoursesCard extends StatelessWidget {
                                 color: const Color(0xFFEDE9FE),
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              child: const Icon(Icons.menu_book_outlined, color: Color(0xFF6D28D9)),
+                              child: const Icon(
+                                Icons.menu_book_outlined,
+                                color: Color(0xFF6D28D9),
+                              ),
                             ),
                             const Spacer(),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 5,
+                              ),
                               decoration: BoxDecoration(
                                 color: const Color(0xFFDCFCE7),
                                 borderRadius: BorderRadius.circular(999),
                               ),
-                              child: Text(l10n.t(AppText.profileCourseCompleted),
-                                  style: const TextStyle(
-                                      color: Color(0xFF16A34A), fontWeight: FontWeight.w900, fontSize: 11)),
+                              child: Text(
+                                l10n.t(AppText.profileCourseCompleted),
+                                style: const TextStyle(
+                                  color: Color(0xFF16A34A),
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 11,
+                                ),
+                              ),
                             ),
                           ],
                         ),
@@ -831,19 +978,31 @@ class _CompletedCoursesCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          course?.description ?? l10n.t(AppText.profileCourseInfoNotFound),
+                          course?.description ??
+                              l10n.t(AppText.profileCourseInfoNotFound),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600, fontSize: 12),
+                          style: const TextStyle(
+                            color: Color(0xFF6B7280),
+                            fontWeight: FontWeight.w600,
+                            fontSize: 12,
+                          ),
                         ),
                         const Spacer(),
                         Row(
                           children: [
-                            const Icon(Icons.calendar_month, size: 14, color: Color(0xFF6B7280)),
+                            const Icon(
+                              Icons.calendar_month,
+                              size: 14,
+                              color: Color(0xFF6B7280),
+                            ),
                             const SizedBox(width: 6),
                             Text(
                               _fmtDate(context, item.completedAt),
-                              style: const TextStyle(color: Color(0xFF6B7280), fontSize: 12),
+                              style: const TextStyle(
+                                color: Color(0xFF6B7280),
+                                fontSize: 12,
+                              ),
                             ),
                           ],
                         ),
@@ -878,7 +1037,13 @@ class _EvidenceShowcaseCard extends ConsumerWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 18, offset: Offset(0, 8))],
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0A000000),
+            blurRadius: 18,
+            offset: Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -888,18 +1053,26 @@ class _EvidenceShowcaseCard extends ConsumerWidget {
               const Icon(Icons.verified_outlined, color: Color(0xFF6D28D9)),
               const SizedBox(width: 8),
               const Expanded(
-                child: Text('Showcase', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+                child: Text(
+                  'Showcase',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+                ),
               ),
               SizedBox(
                 height: 40,
                 child: ElevatedButton.icon(
                   onPressed: onOpenEvidence,
                   icon: const Icon(Icons.upload_file),
-                  label: const Text('Upload', style: TextStyle(fontWeight: FontWeight.w900)),
+                  label: const Text(
+                    'Upload',
+                    style: TextStyle(fontWeight: FontWeight.w900),
+                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF7C3AED),
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                 ),
               ),
@@ -907,21 +1080,37 @@ class _EvidenceShowcaseCard extends ConsumerWidget {
           ),
           const SizedBox(height: 12),
           async.when(
-            loading: () =>
-                const Center(child: Padding(padding: EdgeInsets.all(12), child: CircularProgressIndicator())),
+            loading: () => const Center(
+              child: Padding(
+                padding: EdgeInsets.all(12),
+                child: CircularProgressIndicator(),
+              ),
+            ),
             error: (e, _) => Row(
               children: [
                 const Icon(Icons.error_outline, color: Color(0xFFEF4444)),
                 const SizedBox(width: 8),
-                Expanded(child: Text(e.toString(), style: const TextStyle(color: Color(0xFF6B7280)))),
-                TextButton(onPressed: () => ref.read(myEvidenceProvider.notifier).refresh(), child: const Text('Retry')),
+                Expanded(
+                  child: Text(
+                    e.toString(),
+                    style: const TextStyle(color: Color(0xFF6B7280)),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () =>
+                      ref.read(myEvidenceProvider.notifier).refresh(),
+                  child: const Text('Retry'),
+                ),
               ],
             ),
             data: (items) {
               if (items.isEmpty) {
                 return const Text(
                   'Upload project screenshots, certificates, or documents to verify your profile.',
-                  style: TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                    color: Color(0xFF6B7280),
+                    fontWeight: FontWeight.w600,
+                  ),
                 );
               }
 
@@ -940,7 +1129,10 @@ class _EvidenceShowcaseCard extends ConsumerWidget {
                       crossAxisSpacing: 12,
                       childAspectRatio: 1.25,
                     ),
-                    itemBuilder: (_, i) => _EvidenceMiniCard(item: preview[i], onTap: onOpenEvidence),
+                    itemBuilder: (_, i) => _EvidenceMiniCard(
+                      item: preview[i],
+                      onTap: onOpenEvidence,
+                    ),
                   );
                 },
               );
@@ -1005,18 +1197,28 @@ class _EvidenceMiniCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(color: const Color(0xFFE5E7EB)),
                   ),
-                  child: Icon(_iconFor(item.mimeType), color: const Color(0xFF111827)),
+                  child: Icon(
+                    _iconFor(item.mimeType),
+                    color: const Color(0xFF1F2937),
+                  ),
                 ),
                 const Spacer(),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: statusColor.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(999),
                   ),
                   child: Text(
                     item.status.name,
-                    style: TextStyle(color: statusColor, fontWeight: FontWeight.w900, fontSize: 12),
+                    style: TextStyle(
+                      color: statusColor,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 12,
+                    ),
                   ),
                 ),
               ],
@@ -1031,7 +1233,11 @@ class _EvidenceMiniCard extends StatelessWidget {
             const Spacer(),
             const Text(
               'Tap to view',
-              style: TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700, fontSize: 12),
+              style: TextStyle(
+                color: Color(0xFF6B7280),
+                fontWeight: FontWeight.w700,
+                fontSize: 12,
+              ),
             ),
           ],
         ),
@@ -1048,22 +1254,16 @@ class _BadgeIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     final raw = icon?.trim();
     if (raw == null || raw.isEmpty) {
-      return const _BadgeCircle(child: Icon(Icons.emoji_events_outlined, size: 26));
-    }
-
-    if (raw.startsWith('<svg')) {
-      return _BadgeCircle(
-        child: SvgPicture.string(
-          raw,
-          width: 28,
-          height: 28,
-        ),
+      return const _BadgeCircle(
+        child: Icon(Icons.emoji_events_outlined, size: 26),
       );
     }
 
-    return _BadgeCircle(
-      child: Text(raw, style: const TextStyle(fontSize: 24)),
-    );
+    if (raw.startsWith('<svg')) {
+      return _BadgeCircle(child: SvgPicture.string(raw, width: 28, height: 28));
+    }
+
+    return _BadgeCircle(child: Text(raw, style: const TextStyle(fontSize: 24)));
   }
 }
 
@@ -1097,7 +1297,13 @@ class _LabeledRow extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700)),
+        Text(
+          label,
+          style: const TextStyle(
+            color: Color(0xFF6B7280),
+            fontWeight: FontWeight.w700,
+          ),
+        ),
         const SizedBox(height: 8),
         child,
       ],
@@ -1119,11 +1325,20 @@ class _GuestView extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.lock_outline, size: 46, color: Color(0xFF6B7280)),
+              const Icon(
+                Icons.lock_outline,
+                size: 46,
+                color: Color(0xFF6B7280),
+              ),
               const SizedBox(height: 10),
-              Text(title,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF374151))),
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w800,
+                  color: Color(0xFF374151),
+                ),
+              ),
             ],
           ),
         ),
@@ -1149,10 +1364,7 @@ class _ProfileData {
   final int? year;
   final String? avatarUrl;
 
-  _ProfileData copyWith({
-    String? department,
-    String? avatarUrl,
-  }) {
+  _ProfileData copyWith({String? department, String? avatarUrl}) {
     return _ProfileData(
       email: email,
       department: department ?? this.department,
@@ -1176,11 +1388,7 @@ class _ProfileData {
 }
 
 class _BadgeItem {
-  const _BadgeItem({
-    required this.id,
-    required this.title,
-    required this.icon,
-  });
+  const _BadgeItem({required this.id, required this.title, required this.icon});
 
   final String id;
   final String title;
@@ -1196,10 +1404,7 @@ class _BadgeItem {
 }
 
 class _CompletedCourse {
-  const _CompletedCourse({
-    required this.courseId,
-    required this.completedAt,
-  });
+  const _CompletedCourse({required this.courseId, required this.completedAt});
 
   final String courseId;
   final DateTime completedAt;
@@ -1234,10 +1439,7 @@ class _CourseLite {
 }
 
 class _CompletedCoursesBundle {
-  const _CompletedCoursesBundle({
-    required this.items,
-    required this.courseMap,
-  });
+  const _CompletedCoursesBundle({required this.items, required this.courseMap});
 
   final List<_CompletedCourse> items;
   final Map<String, _CourseLite> courseMap;

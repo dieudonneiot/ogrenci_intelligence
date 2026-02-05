@@ -7,12 +7,15 @@ final nanoLearningRepositoryProvider = Provider<NanoLearningRepository>((ref) {
   return NanoLearningRepository();
 });
 
-final nanoLearningFeedProvider = FutureProvider.autoDispose<List<NanoVideoCourse>>((ref) async {
-  return ref.watch(nanoLearningRepositoryProvider).listFeed(limit: 25);
-});
+final nanoLearningFeedProvider =
+    FutureProvider.autoDispose<List<NanoVideoCourse>>((ref) async {
+      return ref.watch(nanoLearningRepositoryProvider).listFeed(limit: 25);
+    });
 
-final nanoQuizQuestionProvider = FutureProvider.autoDispose.family<NanoQuizQuestion?, String>((ref, courseId) async {
-  if (courseId.trim().isEmpty) return null;
-  return ref.watch(nanoLearningRepositoryProvider).getQuizQuestion(courseId: courseId);
-});
-
+final nanoQuizQuestionProvider = FutureProvider.autoDispose
+    .family<NanoQuizQuestion?, String>((ref, courseId) async {
+      if (courseId.trim().isEmpty) return null;
+      return ref
+          .watch(nanoLearningRepositoryProvider)
+          .getQuizQuestion(courseId: courseId);
+    });

@@ -34,39 +34,64 @@ class TermsOfServiceScreen extends StatelessWidget {
                         'Öğrenci Intelligence platformunu kullanarak aşağıdaki kullanım şartlarını kabul etmiş sayılırsınız. Lütfen bu şartları dikkatlice okuyunuz.',
                       ),
                       SizedBox(height: 18),
-                      _SectionTitle(icon: Icons.person_outline, title: 'Hesap ve Üyelik'),
-                      _BulletList(items: [
-                        'Kayıt sırasında doğru ve güncel bilgiler vermelisiniz.',
-                        'Bir kişi yalnızca bir hesap açabilir.',
-                        'Hesap güvenliğinizden siz sorumlusunuz.',
-                        '18 yaş altı kullanıcılar veli izniyle kayıt olabilir.',
-                      ]),
+                      _SectionTitle(
+                        icon: Icons.person_outline,
+                        title: 'Hesap ve Üyelik',
+                      ),
+                      _BulletList(
+                        items: [
+                          'Kayıt sırasında doğru ve güncel bilgiler vermelisiniz.',
+                          'Bir kişi yalnızca bir hesap açabilir.',
+                          'Hesap güvenliğinizden siz sorumlusunuz.',
+                          '18 yaş altı kullanıcılar veli izniyle kayıt olabilir.',
+                        ],
+                      ),
                       SizedBox(height: 18),
-                      _SectionTitle(icon: Icons.fact_check_outlined, title: 'Platform Kullanımı'),
-                      _Paragraph('Platform, eğitim ve kariyer gelişimi amaçlı kullanılmalıdır:'),
-                      _HighlightBox(items: [
-                        'İçerikleri kişisel kullanım için görüntüleyebilirsiniz.',
-                        'Paylaşımlarınızın doğruluğundan siz sorumlusunuz.',
-                        'Diğer kullanıcılara saygılı davranmalısınız.',
-                      ]),
+                      _SectionTitle(
+                        icon: Icons.fact_check_outlined,
+                        title: 'Platform Kullanımı',
+                      ),
+                      _Paragraph(
+                        'Platform, eğitim ve kariyer gelişimi amaçlı kullanılmalıdır:',
+                      ),
+                      _HighlightBox(
+                        items: [
+                          'İçerikleri kişisel kullanım için görüntüleyebilirsiniz.',
+                          'Paylaşımlarınızın doğruluğundan siz sorumlusunuz.',
+                          'Diğer kullanıcılara saygılı davranmalısınız.',
+                        ],
+                      ),
                       SizedBox(height: 18),
-                      _SectionTitle(icon: Icons.workspace_premium_outlined, title: 'Puan ve Ödül Sistemi'),
-                      _BulletList(items: [
-                        'Puan kazanmak için hile veya bot kullanımı yasaktır.',
-                        'Puanlar devredilemez ve üçüncü kişilerle takas edilemez.',
-                        'Şüpheli puan artışları incelenir ve geri alınabilir.',
-                      ]),
+                      _SectionTitle(
+                        icon: Icons.workspace_premium_outlined,
+                        title: 'Puan ve Ödül Sistemi',
+                      ),
+                      _BulletList(
+                        items: [
+                          'Puan kazanmak için hile veya bot kullanımı yasaktır.',
+                          'Puanlar devredilemez ve üçüncü kişilerle takas edilemez.',
+                          'Şüpheli puan artışları incelenir ve geri alınabilir.',
+                        ],
+                      ),
                       SizedBox(height: 18),
-                      _SectionTitle(icon: Icons.report_gmailerrorred, title: 'Yasaklı Davranışlar'),
-                      _BulletList(items: [
-                        'Sahte veya yanıltıcı profil oluşturmak',
-                        'Hakaret, tehdit veya taciz içerikleri paylaşmak',
-                        'Telif haklarını ihlal eden içerikler yayımlamak',
-                        'Platformun güvenliğini tehlikeye atmak',
-                        'Yasalara aykırı faaliyetlerde bulunmak',
-                      ]),
+                      _SectionTitle(
+                        icon: Icons.report_gmailerrorred,
+                        title: 'Yasaklı Davranışlar',
+                      ),
+                      _BulletList(
+                        items: [
+                          'Sahte veya yanıltıcı profil oluşturmak',
+                          'Hakaret, tehdit veya taciz içerikleri paylaşmak',
+                          'Telif haklarını ihlal eden içerikler yayımlamak',
+                          'Platformun güvenliğini tehlikeye atmak',
+                          'Yasalara aykırı faaliyetlerde bulunmak',
+                        ],
+                      ),
                       SizedBox(height: 18),
-                      _SectionTitle(icon: Icons.shield_outlined, title: 'İçerik Hakları'),
+                      _SectionTitle(
+                        icon: Icons.shield_outlined,
+                        title: 'İçerik Hakları',
+                      ),
                       _SubTitle('Kullanıcı İçerikleri'),
                       _Paragraph(
                         'Platforma yüklediğiniz içeriklerin (CV, proje, yorum vb.) sorumluluğu size aittir. Bu içerikleri yükleyerek, platformun bunları görüntüleme ve hizmet sunma amacıyla kullanma hakkını kabul etmiş olursunuz.',
@@ -84,13 +109,17 @@ class TermsOfServiceScreen extends StatelessWidget {
                       ),
                       SizedBox(height: 18),
                       _SectionTitle(title: 'Askıya Alma ve Fesih'),
-                      _Paragraph('Aşağıdaki durumlarda hesabınız askıya alınabilir veya kapatılabilir:'),
-                      _BulletList(items: [
-                        'Kullanım şartlarının ihlali',
-                        'Sahte veya yanıltıcı bilgi paylaşımı',
-                        'Diğer kullanıcıları taciz veya rahatsız etme',
-                        'Platform güvenliğini tehdit eden davranışlar',
-                      ]),
+                      _Paragraph(
+                        'Aşağıdaki durumlarda hesabınız askıya alınabilir veya kapatılabilir:',
+                      ),
+                      _BulletList(
+                        items: [
+                          'Kullanım şartlarının ihlali',
+                          'Sahte veya yanıltıcı bilgi paylaşımı',
+                          'Diğer kullanıcıları taciz veya rahatsız etme',
+                          'Platform güvenliğini tehdit eden davranışlar',
+                        ],
+                      ),
                       SizedBox(height: 18),
                       _SectionTitle(title: 'Değişiklikler'),
                       _Paragraph(
@@ -100,7 +129,9 @@ class TermsOfServiceScreen extends StatelessWidget {
                       Divider(),
                       SizedBox(height: 8),
                       _SectionTitle(title: 'İletişim'),
-                      _Paragraph('Kullanım şartları hakkında sorularınız için:'),
+                      _Paragraph(
+                        'Kullanım şartları hakkında sorularınız için:',
+                      ),
                       _ContactBox(),
                     ],
                   ),
@@ -121,7 +152,9 @@ class _Hero extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final lastUpdated = DateTime(2026, 2, 2);
-    final dateText = MaterialLocalizations.of(context).formatFullDate(lastUpdated);
+    final dateText = MaterialLocalizations.of(
+      context,
+    ).formatFullDate(lastUpdated);
     return Container(
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
@@ -134,17 +167,30 @@ class _Hero extends StatelessWidget {
           const CircleAvatar(
             radius: 28,
             backgroundColor: Color(0xFFEDE9FE),
-            child: Icon(Icons.description_outlined, color: Color(0xFF6D28D9), size: 28),
+            child: Icon(
+              Icons.description_outlined,
+              color: Color(0xFF6D28D9),
+              size: 28,
+            ),
           ),
           const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(l10n.t(AppText.linkTerms),
-                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Color(0xFF111827))),
+                Text(
+                  l10n.t(AppText.linkTerms),
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w900,
+                    color: Color(0xFF1F2937),
+                  ),
+                ),
                 const SizedBox(height: 4),
-                Text(l10n.legalLastUpdated(dateText), style: const TextStyle(color: Color(0xFF6B7280))),
+                Text(
+                  l10n.legalLastUpdated(dateText),
+                  style: const TextStyle(color: Color(0xFF6B7280)),
+                ),
               ],
             ),
           ),
@@ -174,7 +220,13 @@ class _NoticeCard extends StatelessWidget {
           const Icon(Icons.info_outline, color: Color(0xFFB45309)),
           const SizedBox(width: 10),
           Expanded(
-            child: Text(text, style: const TextStyle(color: Color(0xFF92400E), fontWeight: FontWeight.w600)),
+            child: Text(
+              text,
+              style: const TextStyle(
+                color: Color(0xFF92400E),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
         ],
       ),
@@ -222,7 +274,13 @@ class _Chip extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(999),
       ),
-      child: Text(label, style: const TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF6D28D9))),
+      child: Text(
+        label,
+        style: const TextStyle(
+          fontWeight: FontWeight.w600,
+          color: Color(0xFF6D28D9),
+        ),
+      ),
     );
   }
 }
@@ -260,7 +318,10 @@ class _SectionTitle extends StatelessWidget {
           Icon(icon, color: const Color(0xFF6D28D9)),
           const SizedBox(width: 8),
         ],
-        Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
+        Text(
+          title,
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
+        ),
       ],
     );
   }
@@ -287,7 +348,10 @@ class _Paragraph extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(text, style: const TextStyle(color: Color(0xFF6B7280), height: 1.5));
+    return Text(
+      text,
+      style: const TextStyle(color: Color(0xFF6B7280), height: 1.5),
+    );
   }
 }
 
@@ -307,7 +371,12 @@ class _BulletList extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text('• ', style: TextStyle(color: Color(0xFF6B7280))),
-                  Expanded(child: Text(item, style: const TextStyle(color: Color(0xFF6B7280)))),
+                  Expanded(
+                    child: Text(
+                      item,
+                      style: const TextStyle(color: Color(0xFF6B7280)),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -339,11 +408,20 @@ class _HighlightBox extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.check_circle, size: 16, color: Color(0xFF7C3AED)),
+                  const Icon(
+                    Icons.check_circle,
+                    size: 16,
+                    color: Color(0xFF7C3AED),
+                  ),
                   const SizedBox(width: 6),
                   Expanded(
-                    child: Text(item,
-                        style: const TextStyle(color: Color(0xFF4C1D95), fontWeight: FontWeight.w600)),
+                    child: Text(
+                      item,
+                      style: const TextStyle(
+                        color: Color(0xFF4C1D95),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -368,7 +446,10 @@ class _WarningBox extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: const Color(0xFFFCD34D)),
       ),
-      child: Text(text, style: const TextStyle(color: Color(0xFF92400E), height: 1.4)),
+      child: Text(
+        text,
+        style: const TextStyle(color: Color(0xFF92400E), height: 1.4),
+      ),
     );
   }
 }
@@ -389,11 +470,15 @@ class _ContactBox extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('${l10n.t(AppText.contactEmailTitle)}: info@ogrenciintelligence.com',
-              style: const TextStyle(color: Color(0xFF374151))),
+          Text(
+            '${l10n.t(AppText.contactEmailTitle)}: info@ogrenciintelligence.com',
+            style: const TextStyle(color: Color(0xFF374151)),
+          ),
           const SizedBox(height: 4),
-          Text('${l10n.t(AppText.contactPhoneTitle)}: +90 (212) 345 67 89',
-              style: const TextStyle(color: Color(0xFF374151))),
+          Text(
+            '${l10n.t(AppText.contactPhoneTitle)}: +90 (212) 345 67 89',
+            style: const TextStyle(color: Color(0xFF374151)),
+          ),
         ],
       ),
     );

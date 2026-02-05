@@ -40,161 +40,217 @@ class _AppFooterState extends State<AppFooter> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
+    final cs = theme.colorScheme;
     final year = DateTime.now().year;
 
-    return Container(
-      color: const Color(0xFF111827),
-      padding: const EdgeInsets.symmetric(vertical: 22),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1100),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                LayoutBuilder(
-                  builder: (context, c) {
-                    final isNarrow = c.maxWidth < 820;
-                    final sectionWidth = isNarrow ? c.maxWidth : 220.0;
+    final fg = cs.onPrimary;
+    final fgMuted = fg.withAlpha(210);
 
-                    return Wrap(
-                      spacing: 18,
-                      runSpacing: 18,
-                      children: [
-                        SizedBox(
-                          width: sectionWidth,
-                          child: _FooterSection(
-                            title: l10n.t(AppText.footerPlatformTitle),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  l10n.t(AppText.footerPlatformDesc),
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                    color: const Color(0xFF9CA3AF),
-                                    height: 1.35,
-                                    fontSize: 12,
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [cs.primary, cs.secondary],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 22),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 1100),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  LayoutBuilder(
+                    builder: (context, c) {
+                      final isNarrow = c.maxWidth < 820;
+                      final sectionWidth = isNarrow ? c.maxWidth : 220.0;
+
+                      return Wrap(
+                        spacing: 18,
+                        runSpacing: 18,
+                        children: [
+                          SizedBox(
+                            width: sectionWidth,
+                            child: _FooterSection(
+                              title: l10n.t(AppText.footerPlatformTitle),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    l10n.t(AppText.footerPlatformDesc),
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: fgMuted,
+                                      height: 1.35,
+                                      fontSize: 12,
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(height: 10),
-                                Wrap(
-                                  spacing: 10,
-                                  children: const [
-                                    _SocialIcon(icon: Icons.facebook, tooltip: 'Facebook'),
-                                    _SocialIcon(icon: Icons.alternate_email, tooltip: 'X / Twitter'),
-                                    _SocialIcon(icon: Icons.camera_alt, tooltip: 'Instagram'),
-                                    _SocialIcon(icon: Icons.business_center, tooltip: 'LinkedIn'),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          width: sectionWidth,
-                          child: _FooterSection(
-                            title: l10n.t(AppText.footerQuickLinks),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _FooterLink(label: l10n.t(AppText.navCourses), route: Routes.courses),
-                                _FooterLink(label: l10n.t(AppText.navJobs), route: Routes.jobs),
-                                _FooterLink(
-                                  label: l10n.t(AppText.linkInternshipListings),
-                                  route: Routes.internships,
-                                ),
-                                _FooterLink(
-                                  label: l10n.t(AppText.linkLeaderboard),
-                                  route: Routes.leaderboard,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          width: sectionWidth,
-                          child: _FooterSection(
-                            title: l10n.t(AppText.footerMore),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _FooterLink(label: l10n.t(AppText.linkHowItWorks), route: Routes.howItWorks),
-                                _FooterLink(label: l10n.t(AppText.linkAbout), route: Routes.about),
-                                _FooterLink(label: l10n.t(AppText.linkContact), route: Routes.contact),
-                                _FooterLink(label: l10n.t(AppText.linkPrivacy), route: Routes.privacy),
-                                _FooterLink(label: l10n.t(AppText.linkTerms), route: Routes.terms),
-                              ],
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          width: isNarrow ? c.maxWidth : 280,
-                          child: _FooterSection(
-                            title: l10n.t(AppText.footerNewsletter),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  l10n.t(AppText.footerNewsletterDesc),
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                    color: const Color(0xFF9CA3AF),
-                                    height: 1.35,
-                                    fontSize: 12,
+                                  const SizedBox(height: 10),
+                                  Wrap(
+                                    spacing: 10,
+                                    children: const [
+                                      _SocialIcon(
+                                        icon: Icons.facebook,
+                                        tooltip: 'Facebook',
+                                      ),
+                                      _SocialIcon(
+                                        icon: Icons.alternate_email,
+                                        tooltip: 'X / Twitter',
+                                      ),
+                                      _SocialIcon(
+                                        icon: Icons.camera_alt,
+                                        tooltip: 'Instagram',
+                                      ),
+                                      _SocialIcon(
+                                        icon: Icons.business_center,
+                                        tooltip: 'LinkedIn',
+                                      ),
+                                    ],
                                   ),
-                                ),
-                                const SizedBox(height: 8),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: TextField(
-                                        controller: _emailCtrl,
-                                        style: const TextStyle(color: Colors.white),
-                                        decoration: InputDecoration(
-                                          hintText: l10n.t(AppText.footerEmailHint),
-                                          hintStyle: const TextStyle(color: Color(0xFF9CA3AF)),
-                                          filled: true,
-                                          fillColor: const Color(0xFF1F2937),
-                                          border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(12),
-                                            borderSide: BorderSide.none,
+                                ],
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            width: sectionWidth,
+                            child: _FooterSection(
+                              title: l10n.t(AppText.footerQuickLinks),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  _FooterLink(
+                                    label: l10n.t(AppText.navCourses),
+                                    route: Routes.courses,
+                                  ),
+                                  _FooterLink(
+                                    label: l10n.t(AppText.navJobs),
+                                    route: Routes.jobs,
+                                  ),
+                                  _FooterLink(
+                                    label: l10n.t(
+                                      AppText.linkInternshipListings,
+                                    ),
+                                    route: Routes.internships,
+                                  ),
+                                  _FooterLink(
+                                    label: l10n.t(AppText.linkLeaderboard),
+                                    route: Routes.leaderboard,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            width: sectionWidth,
+                            child: _FooterSection(
+                              title: l10n.t(AppText.footerMore),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  _FooterLink(
+                                    label: l10n.t(AppText.linkHowItWorks),
+                                    route: Routes.howItWorks,
+                                  ),
+                                  _FooterLink(
+                                    label: l10n.t(AppText.linkAbout),
+                                    route: Routes.about,
+                                  ),
+                                  _FooterLink(
+                                    label: l10n.t(AppText.linkContact),
+                                    route: Routes.contact,
+                                  ),
+                                  _FooterLink(
+                                    label: l10n.t(AppText.linkPrivacy),
+                                    route: Routes.privacy,
+                                  ),
+                                  _FooterLink(
+                                    label: l10n.t(AppText.linkTerms),
+                                    route: Routes.terms,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            width: isNarrow ? c.maxWidth : 280,
+                            child: _FooterSection(
+                              title: l10n.t(AppText.footerNewsletter),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    l10n.t(AppText.footerNewsletterDesc),
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: fgMuted,
+                                      height: 1.35,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: TextField(
+                                          controller: _emailCtrl,
+                                          style: TextStyle(color: fg),
+                                          decoration: InputDecoration(
+                                            hintText: l10n.t(
+                                              AppText.footerEmailHint,
+                                            ),
+                                            hintStyle: TextStyle(
+                                              color: fg.withAlpha(170),
+                                            ),
+                                            filled: true,
+                                            fillColor: fg.withAlpha(26),
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                              borderSide: BorderSide.none,
+                                            ),
+                                            contentPadding:
+                                                const EdgeInsets.symmetric(
+                                                  horizontal: 12,
+                                                  vertical: 10,
+                                                ),
                                           ),
-                                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                                         ),
                                       ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    IconButton(
-                                      onPressed: _subscribe,
-                                      icon: const Icon(Icons.send, color: Colors.white),
-                                      style: IconButton.styleFrom(
-                                        backgroundColor: const Color(0xFF7C3AED),
-                                        padding: const EdgeInsets.all(10),
+                                      const SizedBox(width: 8),
+                                      IconButton(
+                                        onPressed: _subscribe,
+                                        icon: Icon(Icons.send, color: fg),
+                                        style: IconButton.styleFrom(
+                                          backgroundColor: fg.withAlpha(26),
+                                          padding: const EdgeInsets.all(10),
+                                        ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    );
-                  },
-                ),
-                const SizedBox(height: 14),
-                const Divider(color: Color(0xFF1F2937)),
-                const SizedBox(height: 10),
-                Center(
-                  child: Text(
-                    l10n.footerCopyright('$year'),
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: const Color(0xFF9CA3AF),
-                      fontSize: 12,
+                        ],
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 14),
+                  Divider(color: fg.withAlpha(40)),
+                  const SizedBox(height: 10),
+                  Center(
+                    child: Text(
+                      l10n.footerCopyright('$year'),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: fgMuted,
+                        fontSize: 12,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -211,13 +267,14 @@ class _FooterSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final fg = Theme.of(context).colorScheme.onPrimary;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           title,
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: fg,
             fontWeight: FontWeight.w800,
             fontSize: 15,
           ),
@@ -237,14 +294,15 @@ class _FooterLink extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final fg = Theme.of(context).colorScheme.onPrimary;
     return InkWell(
       onTap: () => context.go(route),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 4),
         child: Text(
           label,
-          style: const TextStyle(
-            color: Color(0xFF9CA3AF),
+          style: TextStyle(
+            color: fg.withAlpha(210),
             fontWeight: FontWeight.w600,
             fontSize: 13,
           ),
@@ -262,22 +320,24 @@ class _SocialIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final fg = cs.onPrimary;
     final l10n = AppLocalizations.of(context);
     return Tooltip(
       message: tooltip,
       child: InkWell(
         onTap: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(l10n.linkComingSoon(tooltip))),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(l10n.linkComingSoon(tooltip))));
         },
         child: Container(
           padding: const EdgeInsets.all(6),
           decoration: BoxDecoration(
-            color: const Color(0xFF1F2937),
+            color: fg.withAlpha(26),
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Icon(icon, color: Colors.white, size: 16),
+          child: Icon(icon, color: fg, size: 16),
         ),
       ),
     );

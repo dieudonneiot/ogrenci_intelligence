@@ -9,6 +9,7 @@ import '../core/localization/locale_controller.dart';
 import '../core/push/push_service.dart';
 import '../core/routing/app_router.dart';
 import '../core/supabase/supabase_service.dart';
+import '../core/theme/app_scroll_behavior.dart';
 import '../core/theme/app_theme.dart';
 import '../features/auth/presentation/controllers/auth_controller.dart';
 
@@ -40,11 +41,14 @@ class _AppState extends ConsumerState<App> {
     _push = PushService(router: router);
     unawaited(_push!.start());
 
-    _authSub = ref.listenManual<AsyncValue<AuthViewState>>(authViewStateProvider, (prev, next) {
-      final auth = next.valueOrNull;
-      if (auth == null) return;
-      unawaited(_push?.onAuthChanged(auth) ?? Future.value());
-    });
+    _authSub = ref.listenManual<AsyncValue<AuthViewState>>(
+      authViewStateProvider,
+      (prev, next) {
+        final auth = next.valueOrNull;
+        if (auth == null) return;
+        unawaited(_push?.onAuthChanged(auth) ?? Future.value());
+      },
+    );
   }
 
   @override
@@ -54,7 +58,7 @@ class _AppState extends ConsumerState<App> {
     _authSub?.close();
     super.dispose();
   }
- 
+
   @override
   Widget build(BuildContext context) {
     final router = ref.watch(goRouterProvider);
@@ -70,9 +74,17 @@ class _AppState extends ConsumerState<App> {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      onGenerateTitle: (context) => AppLocalizations.of(context).t(AppText.brandName),
+      onGenerateTitle: (context) =>
+          AppLocalizations.of(context).t(AppText.brandName),
       title: AppLocalizations.of(context).t(AppText.brandName),
       theme: AppTheme.light(),
+      themeMode: ThemeMode.light,
+      builder: (context, child) {
+        return ScrollConfiguration(
+          behavior: const AppScrollBehavior(),
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
       routerConfig: router,
     );
   }

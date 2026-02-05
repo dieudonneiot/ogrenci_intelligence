@@ -15,11 +15,13 @@ final leaderboardRepositoryProvider = Provider<LeaderboardRepository>((ref) {
 });
 
 final leaderboardProvider =
-    AutoDisposeAsyncNotifierProvider<LeaderboardController, LeaderboardViewModel>(
-  LeaderboardController.new,
-);
+    AutoDisposeAsyncNotifierProvider<
+      LeaderboardController,
+      LeaderboardViewModel
+    >(LeaderboardController.new);
 
-class LeaderboardController extends AutoDisposeAsyncNotifier<LeaderboardViewModel> {
+class LeaderboardController
+    extends AutoDisposeAsyncNotifier<LeaderboardViewModel> {
   @override
   Future<LeaderboardViewModel> build() async {
     return _load();
@@ -49,8 +51,14 @@ class LeaderboardController extends AutoDisposeAsyncNotifier<LeaderboardViewMode
     final overall = futures[0];
     final deptList = futures.length > 1 ? futures[1] : <LeaderboardEntry>[];
 
-    final overallRank = overall.where((e) => e.userId == uid).map((e) => e.rank).firstOrNull;
-    final deptRank = deptList.where((e) => e.userId == uid).map((e) => e.rank).firstOrNull;
+    final overallRank = overall
+        .where((e) => e.userId == uid)
+        .map((e) => e.rank)
+        .firstOrNull;
+    final deptRank = deptList
+        .where((e) => e.userId == uid)
+        .map((e) => e.rank)
+        .firstOrNull;
 
     return LeaderboardViewModel(
       meId: uid,

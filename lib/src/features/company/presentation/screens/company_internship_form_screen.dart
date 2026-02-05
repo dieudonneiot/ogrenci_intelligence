@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -14,10 +14,12 @@ class CompanyInternshipFormScreen extends ConsumerStatefulWidget {
   final String? internshipId;
 
   @override
-  ConsumerState<CompanyInternshipFormScreen> createState() => _CompanyInternshipFormScreenState();
+  ConsumerState<CompanyInternshipFormScreen> createState() =>
+      _CompanyInternshipFormScreenState();
 }
 
-class _CompanyInternshipFormScreenState extends ConsumerState<CompanyInternshipFormScreen> {
+class _CompanyInternshipFormScreenState
+    extends ConsumerState<CompanyInternshipFormScreen> {
   static const _departments = <String>[
     'Bilgisayar Mühendisliği',
     'Elektrik-Elektronik Mühendisliği',
@@ -88,9 +90,11 @@ class _CompanyInternshipFormScreenState extends ConsumerState<CompanyInternshipF
         if (internship != null) {
           _titleCtrl.text = (internship['title'] ?? '').toString();
           _descriptionCtrl.text = (internship['description'] ?? '').toString();
-          _requirementsCtrl.text = (internship['requirements'] ?? '').toString();
+          _requirementsCtrl.text = (internship['requirements'] ?? '')
+              .toString();
           _locationCtrl.text = (internship['location'] ?? '').toString();
-          _department = (internship['department'] ?? '').toString().trim().isEmpty
+          _department =
+              (internship['department'] ?? '').toString().trim().isEmpty
               ? null
               : (internship['department'] ?? '').toString();
           _workType = (internship['work_type'] ?? _workType).toString();
@@ -98,16 +102,20 @@ class _CompanyInternshipFormScreenState extends ConsumerState<CompanyInternshipF
               ? null
               : int.tryParse(internship['duration_months'].toString());
           _quotaCtrl.text = internship['quota']?.toString() ?? '';
-          _monthlyStipendCtrl.text = (internship['monthly_stipend'] ?? '').toString();
+          _monthlyStipendCtrl.text = (internship['monthly_stipend'] ?? '')
+              .toString();
           _benefitsCtrl.text = (internship['benefits'] ?? '').toString();
           _isPaid = internship['is_paid'] == true;
           _providesCertificate = internship['provides_certificate'] != false;
-          _possibilityOfEmployment = internship['possibility_of_employment'] == true;
+          _possibilityOfEmployment =
+              internship['possibility_of_employment'] == true;
           _isActive = internship['is_active'] != false;
           final startRaw = internship['start_date']?.toString();
           final deadlineRaw = internship['deadline']?.toString();
           _startDate = startRaw == null ? null : DateTime.tryParse(startRaw);
-          _deadline = deadlineRaw == null ? null : DateTime.tryParse(deadlineRaw);
+          _deadline = deadlineRaw == null
+              ? null
+              : DateTime.tryParse(deadlineRaw);
         }
       }
     } finally {
@@ -122,47 +130,78 @@ class _CompanyInternshipFormScreenState extends ConsumerState<CompanyInternshipF
     if (auth == null || user == null || companyId == null) return;
 
     final l10n = AppLocalizations.of(context);
-    if (_titleCtrl.text.trim().isEmpty || _descriptionCtrl.text.trim().isEmpty) {
-      _snack(l10n.t(AppText.companyInternshipFormValidationTitleDesc), error: true);
+    if (_titleCtrl.text.trim().isEmpty ||
+        _descriptionCtrl.text.trim().isEmpty) {
+      _snack(
+        l10n.t(AppText.companyInternshipFormValidationTitleDesc),
+        error: true,
+      );
       return;
     }
     if (_requirementsCtrl.text.trim().isEmpty) {
-      _snack(l10n.t(AppText.companyInternshipFormValidationRequirements), error: true);
+      _snack(
+        l10n.t(AppText.companyInternshipFormValidationRequirements),
+        error: true,
+      );
       return;
     }
     if (_department == null || _department!.trim().isEmpty) {
-      _snack(l10n.t(AppText.companyInternshipFormValidationDepartment), error: true);
+      _snack(
+        l10n.t(AppText.companyInternshipFormValidationDepartment),
+        error: true,
+      );
       return;
     }
     if (_locationCtrl.text.trim().isEmpty) {
-      _snack(l10n.t(AppText.companyInternshipFormValidationLocation), error: true);
+      _snack(
+        l10n.t(AppText.companyInternshipFormValidationLocation),
+        error: true,
+      );
       return;
     }
     if (_durationMonths == null) {
-      _snack(l10n.t(AppText.companyInternshipFormValidationDuration), error: true);
+      _snack(
+        l10n.t(AppText.companyInternshipFormValidationDuration),
+        error: true,
+      );
       return;
     }
     if (_startDate == null) {
-      _snack(l10n.t(AppText.companyInternshipFormValidationStartDate), error: true);
+      _snack(
+        l10n.t(AppText.companyInternshipFormValidationStartDate),
+        error: true,
+      );
       return;
     }
     if (_deadline == null) {
-      _snack(l10n.t(AppText.companyInternshipFormValidationDeadline), error: true);
+      _snack(
+        l10n.t(AppText.companyInternshipFormValidationDeadline),
+        error: true,
+      );
       return;
     }
     if (_quotaCtrl.text.trim().isEmpty) {
-      _snack(l10n.t(AppText.companyInternshipFormValidationQuotaRequired), error: true);
+      _snack(
+        l10n.t(AppText.companyInternshipFormValidationQuotaRequired),
+        error: true,
+      );
       return;
     }
 
     final quota = int.tryParse(_quotaCtrl.text.trim());
     if (quota == null || quota < 1) {
-      _snack(l10n.t(AppText.companyInternshipFormValidationQuotaValid), error: true);
+      _snack(
+        l10n.t(AppText.companyInternshipFormValidationQuotaValid),
+        error: true,
+      );
       return;
     }
 
     if (_isPaid && _monthlyStipendCtrl.text.trim().isEmpty) {
-      _snack(l10n.t(AppText.companyInternshipFormValidationPaidStipend), error: true);
+      _snack(
+        l10n.t(AppText.companyInternshipFormValidationPaidStipend),
+        error: true,
+      );
       return;
     }
 
@@ -183,7 +222,9 @@ class _CompanyInternshipFormScreenState extends ConsumerState<CompanyInternshipF
         'start_date': _startDate!.toIso8601String(),
         'quota': quota,
         'monthly_stipend': _isPaid ? _monthlyStipendCtrl.text.trim() : null,
-        'benefits': _benefitsCtrl.text.trim().isEmpty ? null : _benefitsCtrl.text.trim(),
+        'benefits': _benefitsCtrl.text.trim().isEmpty
+            ? null
+            : _benefitsCtrl.text.trim(),
         'deadline': _deadline!.toIso8601String(),
         'is_paid': _isPaid,
         'provides_certificate': _providesCertificate,
@@ -278,7 +319,10 @@ class _CompanyInternshipFormScreenState extends ConsumerState<CompanyInternshipF
                         widget.internshipId == null
                             ? l10n.t(AppText.companyInternshipFormCreateTitle)
                             : l10n.t(AppText.companyInternshipFormEditTitle),
-                        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900),
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w900,
+                        ),
                       ),
                     ],
                   ),
@@ -286,33 +330,54 @@ class _CompanyInternshipFormScreenState extends ConsumerState<CompanyInternshipF
                   _Card(
                     child: Column(
                       children: [
-                        _Field(label: l10n.t(AppText.companyInternshipFormTitleLabel), controller: _titleCtrl),
                         _Field(
-                          label: l10n.t(AppText.companyInternshipFormDescriptionLabel),
+                          label: l10n.t(
+                            AppText.companyInternshipFormTitleLabel,
+                          ),
+                          controller: _titleCtrl,
+                        ),
+                        _Field(
+                          label: l10n.t(
+                            AppText.companyInternshipFormDescriptionLabel,
+                          ),
                           controller: _descriptionCtrl,
                           maxLines: 4,
                         ),
                         _Field(
-                          label: l10n.t(AppText.companyInternshipFormRequirementsLabel),
+                          label: l10n.t(
+                            AppText.companyInternshipFormRequirementsLabel,
+                          ),
                           controller: _requirementsCtrl,
                           maxLines: 3,
                         ),
                         _DropdownField(
-                          label: l10n.t(AppText.companyInternshipFormDepartmentLabel),
+                          label: l10n.t(
+                            AppText.companyInternshipFormDepartmentLabel,
+                          ),
                           value: _department,
                           items: _departments,
                           onChanged: (v) => setState(() => _department = v),
                         ),
-                        _Field(label: l10n.t(AppText.companyInternshipFormLocationLabel), controller: _locationCtrl),
+                        _Field(
+                          label: l10n.t(
+                            AppText.companyInternshipFormLocationLabel,
+                          ),
+                          controller: _locationCtrl,
+                        ),
                         _DropdownField(
-                          label: l10n.t(AppText.companyInternshipFormWorkModeLabel),
+                          label: l10n.t(
+                            AppText.companyInternshipFormWorkModeLabel,
+                          ),
                           value: _workType,
                           items: _workTypes,
-                          onChanged: (v) => setState(() => _workType = v ?? _workType),
+                          onChanged: (v) =>
+                              setState(() => _workType = v ?? _workType),
                           itemLabel: (v) => _workModeLabel(l10n, v),
                         ),
                         _DropdownFieldInt(
-                          label: l10n.t(AppText.companyInternshipFormDurationLabel),
+                          label: l10n.t(
+                            AppText.companyInternshipFormDurationLabel,
+                          ),
                           value: _durationMonths,
                           items: _durations,
                           onChanged: (v) => setState(() => _durationMonths = v),
@@ -325,12 +390,18 @@ class _CompanyInternshipFormScreenState extends ConsumerState<CompanyInternshipF
                               return Column(
                                 children: [
                                   _DateField(
-                                    label: l10n.t(AppText.companyInternshipFormStartDateLabel),
+                                    label: l10n.t(
+                                      AppText
+                                          .companyInternshipFormStartDateLabel,
+                                    ),
                                     value: _startDate,
                                     onPick: _pickStartDate,
                                   ),
                                   _DateField(
-                                    label: l10n.t(AppText.companyInternshipFormDeadlineLabel),
+                                    label: l10n.t(
+                                      AppText
+                                          .companyInternshipFormDeadlineLabel,
+                                    ),
                                     value: _deadline,
                                     onPick: _pickDeadline,
                                   ),
@@ -341,7 +412,10 @@ class _CompanyInternshipFormScreenState extends ConsumerState<CompanyInternshipF
                               children: [
                                 Expanded(
                                   child: _DateField(
-                                    label: l10n.t(AppText.companyInternshipFormStartDateLabel),
+                                    label: l10n.t(
+                                      AppText
+                                          .companyInternshipFormStartDateLabel,
+                                    ),
                                     value: _startDate,
                                     onPick: _pickStartDate,
                                   ),
@@ -349,7 +423,10 @@ class _CompanyInternshipFormScreenState extends ConsumerState<CompanyInternshipF
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: _DateField(
-                                    label: l10n.t(AppText.companyInternshipFormDeadlineLabel),
+                                    label: l10n.t(
+                                      AppText
+                                          .companyInternshipFormDeadlineLabel,
+                                    ),
                                     value: _deadline,
                                     onPick: _pickDeadline,
                                   ),
@@ -359,44 +436,65 @@ class _CompanyInternshipFormScreenState extends ConsumerState<CompanyInternshipF
                           },
                         ),
                         _Field(
-                          label: l10n.t(AppText.companyInternshipFormQuotaLabel),
+                          label: l10n.t(
+                            AppText.companyInternshipFormQuotaLabel,
+                          ),
                           controller: _quotaCtrl,
                           keyboardType: TextInputType.number,
                         ),
                         SwitchListTile(
                           value: _isPaid,
                           onChanged: (v) => setState(() => _isPaid = v),
-                          title: Text(l10n.t(AppText.companyInternshipFormPaidLabel)),
+                          title: Text(
+                            l10n.t(AppText.companyInternshipFormPaidLabel),
+                          ),
                           contentPadding: EdgeInsets.zero,
                         ),
                         if (_isPaid)
                           _Field(
-                            label: l10n.t(AppText.companyInternshipFormMonthlyStipendLabel),
+                            label: l10n.t(
+                              AppText.companyInternshipFormMonthlyStipendLabel,
+                            ),
                             controller: _monthlyStipendCtrl,
                             keyboardType: TextInputType.number,
                           ),
                         _Field(
-                          label: l10n.t(AppText.companyInternshipFormBenefitsLabel),
+                          label: l10n.t(
+                            AppText.companyInternshipFormBenefitsLabel,
+                          ),
                           controller: _benefitsCtrl,
                           maxLines: 2,
                         ),
                         SwitchListTile(
                           value: _providesCertificate,
-                          onChanged: (v) => setState(() => _providesCertificate = v),
-                          title: Text(l10n.t(AppText.companyInternshipFormCertificateLabel)),
+                          onChanged: (v) =>
+                              setState(() => _providesCertificate = v),
+                          title: Text(
+                            l10n.t(
+                              AppText.companyInternshipFormCertificateLabel,
+                            ),
+                          ),
                           contentPadding: EdgeInsets.zero,
                         ),
                         SwitchListTile(
                           value: _possibilityOfEmployment,
-                          onChanged: (v) => setState(() => _possibilityOfEmployment = v),
-                          title: Text(l10n.t(AppText.companyInternshipFormEmploymentPossibilityLabel)),
+                          onChanged: (v) =>
+                              setState(() => _possibilityOfEmployment = v),
+                          title: Text(
+                            l10n.t(
+                              AppText
+                                  .companyInternshipFormEmploymentPossibilityLabel,
+                            ),
+                          ),
                           contentPadding: EdgeInsets.zero,
                         ),
                         if (widget.internshipId != null)
                           SwitchListTile(
                             value: _isActive,
                             onChanged: (v) => setState(() => _isActive = v),
-                            title: Text(l10n.t(AppText.companyInternshipFormActiveLabel)),
+                            title: Text(
+                              l10n.t(AppText.companyInternshipFormActiveLabel),
+                            ),
                             contentPadding: EdgeInsets.zero,
                           ),
                         const SizedBox(height: 16),
@@ -408,11 +506,19 @@ class _CompanyInternshipFormScreenState extends ConsumerState<CompanyInternshipF
                                 ? const SizedBox(
                                     width: 16,
                                     height: 16,
-                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
                                   )
                                 : const Icon(Icons.save),
-                            label: Text(_saving ? l10n.t(AppText.commonSaving) : l10n.t(AppText.commonSave)),
-                            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6D28D9)),
+                            label: Text(
+                              _saving
+                                  ? l10n.t(AppText.commonSaving)
+                                  : l10n.t(AppText.commonSave),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF6D28D9),
+                            ),
                           ),
                         ),
                       ],
@@ -453,7 +559,13 @@ class _Card extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 12, offset: Offset(0, 6))],
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0A000000),
+            blurRadius: 12,
+            offset: Offset(0, 6),
+          ),
+        ],
       ),
       child: child,
     );
@@ -512,10 +624,12 @@ class _DropdownField extends StatelessWidget {
       child: DropdownButtonFormField<String>(
         initialValue: (value != null && value!.isNotEmpty) ? value : null,
         items: items
-            .map((e) => DropdownMenuItem(
-                  value: e,
-                  child: Text(itemLabel == null ? e : itemLabel!(e)),
-                ))
+            .map(
+              (e) => DropdownMenuItem(
+                value: e,
+                child: Text(itemLabel == null ? e : itemLabel!(e)),
+              ),
+            )
             .toList(),
         onChanged: onChanged,
         decoration: InputDecoration(
@@ -549,10 +663,12 @@ class _DropdownFieldInt extends StatelessWidget {
       child: DropdownButtonFormField<int>(
         initialValue: value,
         items: items
-            .map((e) => DropdownMenuItem(
-                  value: e,
-                  child: Text(itemLabel == null ? '$e' : itemLabel!(e)),
-                ))
+            .map(
+              (e) => DropdownMenuItem(
+                value: e,
+                child: Text(itemLabel == null ? '$e' : itemLabel!(e)),
+              ),
+            )
             .toList(),
         onChanged: onChanged,
         decoration: InputDecoration(
@@ -578,8 +694,9 @@ class _DateField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final text =
-        value == null ? l10n.t(AppText.commonNotSpecified) : MaterialLocalizations.of(context).formatShortDate(value!);
+    final text = value == null
+        ? l10n.t(AppText.commonNotSpecified)
+        : MaterialLocalizations.of(context).formatShortDate(value!);
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: InkWell(
@@ -592,7 +709,11 @@ class _DateField extends StatelessWidget {
           ),
           child: Row(
             children: [
-              const Icon(Icons.calendar_today_outlined, size: 18, color: Color(0xFF6B7280)),
+              const Icon(
+                Icons.calendar_today_outlined,
+                size: 18,
+                color: Color(0xFF6B7280),
+              ),
               const SizedBox(width: 8),
               Text(text),
             ],

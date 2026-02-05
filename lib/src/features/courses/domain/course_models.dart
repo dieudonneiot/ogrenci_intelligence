@@ -24,14 +24,14 @@ class Course {
 
   final String? description;
   final String? department;
-  final String? duration;   // e.g. "4 saat"
-  final String? level;      // e.g. "Başlangıç"
+  final String? duration; // e.g. "4 saat"
+  final String? level; // e.g. "Başlangıç"
   final String? instructor; // e.g. "Dr. X"
-  final String? category;   // derived/optional (React concept)
+  final String? category; // derived/optional (React concept)
 
-  final double rating;      // derived/optional
-  final int totalRatings;   // derived/optional
-  final int enrolledCount;  // derived/optional
+  final double rating; // derived/optional
+  final int totalRatings; // derived/optional
+  final int enrolledCount; // derived/optional
 
   final String? videoUrl;
 
@@ -89,10 +89,7 @@ class CourseEnrollment {
 
 @immutable
 class EnrolledCourse {
-  const EnrolledCourse({
-    required this.course,
-    required this.enrollment,
-  });
+  const EnrolledCourse({required this.course, required this.enrollment});
 
   final Course course;
   final CourseEnrollment enrollment;

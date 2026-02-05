@@ -20,7 +20,8 @@ class _EvidenceScreenState extends ConsumerState<EvidenceScreen> {
   Widget build(BuildContext context) {
     final auth = ref.watch(authViewStateProvider).value;
     final uid = auth?.user?.id;
-    final isLoggedIn = auth?.isAuthenticated == true && uid != null && uid.isNotEmpty;
+    final isLoggedIn =
+        auth?.isAuthenticated == true && uid != null && uid.isNotEmpty;
 
     if (!isLoggedIn) {
       return const Scaffold(
@@ -43,12 +44,22 @@ class _EvidenceScreenState extends ConsumerState<EvidenceScreen> {
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.verified_outlined, color: Color(0xFF6D28D9)),
+                    const Icon(
+                      Icons.verified_outlined,
+                      color: Color(0xFF6D28D9),
+                    ),
                     const SizedBox(width: 10),
-                    const Text('Evidence', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900)),
+                    const Text(
+                      'Evidence',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
                     const Spacer(),
                     IconButton(
-                      onPressed: () => ref.read(myEvidenceProvider.notifier).refresh(),
+                      onPressed: () =>
+                          ref.read(myEvidenceProvider.notifier).refresh(),
                       icon: const Icon(Icons.refresh),
                     ),
                     const SizedBox(width: 6),
@@ -58,7 +69,9 @@ class _EvidenceScreenState extends ConsumerState<EvidenceScreen> {
                         onPressed: _uploading ? null : () => _openUpload(uid),
                         icon: const Icon(Icons.upload_file),
                         label: Text(_uploading ? 'Uploading...' : 'Upload'),
-                        style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6D28D9)),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF6D28D9),
+                        ),
                       ),
                     ),
                   ],
@@ -66,20 +79,27 @@ class _EvidenceScreenState extends ConsumerState<EvidenceScreen> {
                 const SizedBox(height: 12),
                 const Text(
                   'Upload proof of your work. Your company will approve or reject it.',
-                  style: TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
+                  style: TextStyle(
+                    color: Color(0xFF6B7280),
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
                 const SizedBox(height: 14),
                 Expanded(
                   child: asyncList.when(
-                    loading: () => const Center(child: CircularProgressIndicator()),
+                    loading: () =>
+                        const Center(child: CircularProgressIndicator()),
                     error: (e, _) => Center(child: Text('Failed to load: $e')),
                     data: (items) {
                       if (items.isEmpty) {
-                        return const Center(child: Text('No evidence uploaded yet.'));
+                        return const Center(
+                          child: Text('No evidence uploaded yet.'),
+                        );
                       }
                       return ListView.separated(
                         itemCount: items.length,
-                        separatorBuilder: (_, index) => const SizedBox(height: 10),
+                        separatorBuilder: (_, index) =>
+                            const SizedBox(height: 10),
                         itemBuilder: (_, i) => _EvidenceCard(item: items[i]),
                       );
                     },
@@ -102,7 +122,11 @@ class _EvidenceScreenState extends ConsumerState<EvidenceScreen> {
       if (!mounted) return;
       if (internships.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('You need an accepted internship to upload evidence.')),
+          const SnackBar(
+            content: Text(
+              'You need an accepted internship to upload evidence.',
+            ),
+          ),
         );
         return;
       }
@@ -111,7 +135,9 @@ class _EvidenceScreenState extends ConsumerState<EvidenceScreen> {
         context: context,
         isScrollControlled: true,
         backgroundColor: Colors.white,
-        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
         builder: (ctx) => _UploadSheet(internships: internships),
       );
 
@@ -129,7 +155,9 @@ class _EvidenceScreenState extends ConsumerState<EvidenceScreen> {
 
       ref.invalidate(myEvidenceProvider);
       if (!mounted) return;
-      messenger.showSnackBar(const SnackBar(content: Text('Uploaded. Pending approval.')));
+      messenger.showSnackBar(
+        const SnackBar(content: Text('Uploaded. Pending approval.')),
+      );
     } catch (e) {
       if (!mounted) return;
       messenger.showSnackBar(SnackBar(content: Text('Upload failed: $e')));
@@ -172,7 +200,13 @@ class _EvidenceCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: const [BoxShadow(color: Color(0x07000000), blurRadius: 14, offset: Offset(0, 8))],
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x07000000),
+            blurRadius: 14,
+            offset: Offset(0, 8),
+          ),
+        ],
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -184,7 +218,10 @@ class _EvidenceCard extends StatelessWidget {
               color: const Color(0xFFEDE9FE),
               borderRadius: BorderRadius.circular(14),
             ),
-            child: const Icon(Icons.insert_drive_file_outlined, color: Color(0xFF6D28D9)),
+            child: const Icon(
+              Icons.insert_drive_file_outlined,
+              color: Color(0xFF6D28D9),
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -195,29 +232,52 @@ class _EvidenceCard extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        (item.title == null || item.title!.isEmpty) ? 'Evidence' : item.title!,
+                        (item.title == null || item.title!.isEmpty)
+                            ? 'Evidence'
+                            : item.title!,
                         style: const TextStyle(fontWeight: FontWeight.w900),
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
                         color: tagBg,
                         borderRadius: BorderRadius.circular(999),
-                        border: Border.all(color: tagFg.withValues(alpha: 0.25)),
+                        border: Border.all(
+                          color: tagFg.withValues(alpha: 0.25),
+                        ),
                       ),
-                      child: Text(tag, style: TextStyle(color: tagFg, fontWeight: FontWeight.w900)),
+                      child: Text(
+                        tag,
+                        style: TextStyle(
+                          color: tagFg,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
                     ),
                   ],
                 ),
                 if ((item.description ?? '').trim().isNotEmpty) ...[
                   const SizedBox(height: 6),
-                  Text(item.description!, style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600)),
+                  Text(
+                    item.description!,
+                    style: const TextStyle(
+                      color: Color(0xFF6B7280),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ],
                 const SizedBox(height: 10),
                 Text(
                   'Uploaded: ${item.createdAt.toLocal()}',
-                  style: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 12, fontWeight: FontWeight.w600),
+                  style: const TextStyle(
+                    color: Color(0xFF9CA3AF),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ],
             ),
@@ -273,9 +333,15 @@ class _UploadSheetState extends State<_UploadSheet> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Upload Evidence', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18)),
+          const Text(
+            'Upload Evidence',
+            style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18),
+          ),
           const SizedBox(height: 10),
-          const Text('Select your internship and choose a file.', style: TextStyle(color: Color(0xFF6B7280))),
+          const Text(
+            'Select your internship and choose a file.',
+            style: TextStyle(color: Color(0xFF6B7280)),
+          ),
           const SizedBox(height: 14),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -339,7 +405,9 @@ class _UploadSheetState extends State<_UploadSheet> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF6D28D9),
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
               ),
             ),
           ),

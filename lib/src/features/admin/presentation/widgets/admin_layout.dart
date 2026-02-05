@@ -85,13 +85,19 @@ class AdminPageHeader extends StatelessWidget {
                     children: [
                       Text(
                         title,
-                        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900),
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w900,
+                        ),
                       ),
                       if (subtitle != null) ...[
                         const SizedBox(height: 4),
                         Text(
                           subtitle!,
-                          style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
+                          style: const TextStyle(
+                            color: Color(0xFF6B7280),
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ],
                     ],
@@ -127,18 +133,30 @@ class AdminPlaceholderCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 16, offset: Offset(0, 8))],
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0A000000),
+            blurRadius: 16,
+            offset: Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         children: [
           Icon(icon, size: 56, color: const Color(0xFF9CA3AF)),
           const SizedBox(height: 12),
-          Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+          Text(
+            title,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+          ),
           const SizedBox(height: 6),
           Text(
             subtitle,
             textAlign: TextAlign.center,
-            style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
+            style: const TextStyle(
+              color: Color(0xFF6B7280),
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ],
       ),

@@ -45,7 +45,6 @@ class RouteGuards {
       Routes.forgotPassword,
       Routes.emailVerification,
       Routes.resetPassword, // deep link recovery must be public
-
       // Company auth (public)
       Routes.companyAuth,
 

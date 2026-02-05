@@ -13,7 +13,8 @@ class CompanyProfileScreen extends ConsumerStatefulWidget {
   const CompanyProfileScreen({super.key});
 
   @override
-  ConsumerState<CompanyProfileScreen> createState() => _CompanyProfileScreenState();
+  ConsumerState<CompanyProfileScreen> createState() =>
+      _CompanyProfileScreenState();
 }
 
 class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
@@ -87,7 +88,9 @@ class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
   Future<void> _load() async {
     final auth = ref.read(authViewStateProvider).value;
     final companyId = auth?.companyId;
-    if (auth == null || auth.userType != UserType.company || companyId == null) return;
+    if (auth == null || auth.userType != UserType.company || companyId == null) {
+      return;
+    }
 
     try {
       final repo = ref.read(companyRepositoryProvider);
@@ -105,7 +108,8 @@ class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
       _addressCtrl.text = (company['address'] ?? '').toString();
       _descriptionCtrl.text = (company['description'] ?? '').toString();
       _foundedYearCtrl.text = (company['founded_year'] ?? '').toString();
-      _employeeCount = (company['employee_count'] ?? '').toString().trim().isEmpty
+      _employeeCount =
+          (company['employee_count'] ?? '').toString().trim().isEmpty
           ? null
           : (company['employee_count'] ?? '').toString();
       _linkedinCtrl.text = (company['linkedin'] ?? '').toString();
@@ -130,7 +134,10 @@ class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
     final l10n = AppLocalizations.of(context);
     final file = await openFile(
       acceptedTypeGroups: const [
-        XTypeGroup(label: 'Images', extensions: <String>['png', 'jpg', 'jpeg', 'webp']),
+        XTypeGroup(
+          label: 'Images',
+          extensions: <String>['png', 'jpg', 'jpeg', 'webp'],
+        ),
       ],
     );
     if (file == null) return;
@@ -138,11 +145,16 @@ class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
     setState(() => _saving = true);
     try {
       final bytes = await file.readAsBytes();
-      final safe = file.name.trim().replaceAll(RegExp(r'[^a-zA-Z0-9._-]+'), '_');
+      final safe = file.name.trim().replaceAll(
+        RegExp(r'[^a-zA-Z0-9._-]+'),
+        '_',
+      );
       final stamp = DateTime.now().toUtc().millisecondsSinceEpoch;
       final path = '$companyId/${kind}_${stamp}_$safe';
 
-      await SupabaseService.client.storage.from('company-assets').uploadBinary(
+      await SupabaseService.client.storage
+          .from('company-assets')
+          .uploadBinary(
             path,
             bytes,
             fileOptions: FileOptions(
@@ -151,13 +163,18 @@ class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
             ),
           );
 
-      final publicUrl = SupabaseService.client.storage.from('company-assets').getPublicUrl(path);
+      final publicUrl = SupabaseService.client.storage
+          .from('company-assets')
+          .getPublicUrl(path);
 
       final updates = <String, dynamic>{};
       if (kind == 'logo') updates['logo_url'] = publicUrl;
       if (kind == 'cover') updates['cover_image_url'] = publicUrl;
 
-      await SupabaseService.client.from('companies').update(updates).eq('id', companyId);
+      await SupabaseService.client
+          .from('companies')
+          .update(updates)
+          .eq('id', companyId);
 
       if (!mounted) return;
       setState(() {
@@ -184,7 +201,9 @@ class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
   Future<void> _save() async {
     final auth = ref.read(authViewStateProvider).value;
     final companyId = auth?.companyId;
-    if (auth == null || auth.userType != UserType.company || companyId == null) return;
+    if (auth == null || auth.userType != UserType.company || companyId == null) {
+      return;
+    }
 
     final l10n = AppLocalizations.of(context);
     if (_nameCtrl.text.trim().isEmpty) {
@@ -192,11 +211,17 @@ class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
       return;
     }
     if (_sector == null || _sector!.trim().isEmpty) {
-      _snack(l10n.t(AppText.companyProfileValidationSectorRequired), error: true);
+      _snack(
+        l10n.t(AppText.companyProfileValidationSectorRequired),
+        error: true,
+      );
       return;
     }
     if (_phoneCtrl.text.trim().isEmpty) {
-      _snack(l10n.t(AppText.companyProfileValidationPhoneRequired), error: true);
+      _snack(
+        l10n.t(AppText.companyProfileValidationPhoneRequired),
+        error: true,
+      );
       return;
     }
     if (_cityCtrl.text.trim().isEmpty) {
@@ -212,16 +237,30 @@ class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
         'sector': _sector,
         'phone': _phoneCtrl.text.trim(),
         'email': _emailCtrl.text.trim().isEmpty ? null : _emailCtrl.text.trim(),
-        'website': _websiteCtrl.text.trim().isEmpty ? null : _websiteCtrl.text.trim(),
+        'website': _websiteCtrl.text.trim().isEmpty
+            ? null
+            : _websiteCtrl.text.trim(),
         'city': _cityCtrl.text.trim(),
-        'address': _addressCtrl.text.trim().isEmpty ? null : _addressCtrl.text.trim(),
-        'description': _descriptionCtrl.text.trim().isEmpty ? null : _descriptionCtrl.text.trim(),
+        'address': _addressCtrl.text.trim().isEmpty
+            ? null
+            : _addressCtrl.text.trim(),
+        'description': _descriptionCtrl.text.trim().isEmpty
+            ? null
+            : _descriptionCtrl.text.trim(),
         'founded_year': int.tryParse(_foundedYearCtrl.text.trim()),
         'employee_count': _employeeCount,
-        'linkedin': _linkedinCtrl.text.trim().isEmpty ? null : _linkedinCtrl.text.trim(),
-        'twitter': _twitterCtrl.text.trim().isEmpty ? null : _twitterCtrl.text.trim(),
-        'facebook': _facebookCtrl.text.trim().isEmpty ? null : _facebookCtrl.text.trim(),
-        'instagram': _instagramCtrl.text.trim().isEmpty ? null : _instagramCtrl.text.trim(),
+        'linkedin': _linkedinCtrl.text.trim().isEmpty
+            ? null
+            : _linkedinCtrl.text.trim(),
+        'twitter': _twitterCtrl.text.trim().isEmpty
+            ? null
+            : _twitterCtrl.text.trim(),
+        'facebook': _facebookCtrl.text.trim().isEmpty
+            ? null
+            : _facebookCtrl.text.trim(),
+        'instagram': _instagramCtrl.text.trim().isEmpty
+            ? null
+            : _instagramCtrl.text.trim(),
         'updated_at': DateTime.now().toIso8601String(),
       });
       if (!mounted) return;
@@ -246,52 +285,71 @@ class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
       return const Center(child: CircularProgressIndicator());
     }
 
-	    return Container(
-	      color: const Color(0xFFF9FAFB),
-	      child: SingleChildScrollView(
-	        child: Center(
-	          child: ConstrainedBox(
+    return Container(
+      color: const Color(0xFFF9FAFB),
+      child: SingleChildScrollView(
+        child: Center(
+          child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 1000),
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 22, 16, 28),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-	                children: [
-	                  Text(
-	                    l10n.t(AppText.companyProfileTitle),
-	                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900),
-	                  ),
-	                  const SizedBox(height: 8),
-	                  _StatusBanner(status: _approvalStatus, reason: _rejectionReason),
-	                  const SizedBox(height: 12),
-	                  _BrandAssetsCard(
-	                    logoUrl: _logoUrl,
-	                    coverUrl: _coverUrl,
-	                    onChangeLogo: _saving
-	                        ? null
-	                        : () {
-	                            final auth = ref.read(authViewStateProvider).value;
-	                            final companyId = auth?.companyId;
-	                            if (companyId == null) return;
-	                            _pickAndUploadAsset(companyId: companyId, kind: 'logo');
-	                          },
-	                    onChangeCover: _saving
-	                        ? null
-	                        : () {
-	                            final auth = ref.read(authViewStateProvider).value;
-	                            final companyId = auth?.companyId;
-	                            if (companyId == null) return;
-	                            _pickAndUploadAsset(companyId: companyId, kind: 'cover');
-	                          },
-	                  ),
-	                  const SizedBox(height: 16),
-	                  _SectionCard(
-	                    title: l10n.t(AppText.companyProfileSectionBasic),
-	                    child: Column(
+                children: [
+                  Text(
+                    l10n.t(AppText.companyProfileTitle),
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  _StatusBanner(
+                    status: _approvalStatus,
+                    reason: _rejectionReason,
+                  ),
+                  const SizedBox(height: 12),
+                  _BrandAssetsCard(
+                    logoUrl: _logoUrl,
+                    coverUrl: _coverUrl,
+                    onChangeLogo: _saving
+                        ? null
+                        : () {
+                            final auth = ref.read(authViewStateProvider).value;
+                            final companyId = auth?.companyId;
+                            if (companyId == null) return;
+                            _pickAndUploadAsset(
+                              companyId: companyId,
+                              kind: 'logo',
+                            );
+                          },
+                    onChangeCover: _saving
+                        ? null
+                        : () {
+                            final auth = ref.read(authViewStateProvider).value;
+                            final companyId = auth?.companyId;
+                            if (companyId == null) return;
+                            _pickAndUploadAsset(
+                              companyId: companyId,
+                              kind: 'cover',
+                            );
+                          },
+                  ),
+                  const SizedBox(height: 16),
+                  _SectionCard(
+                    title: l10n.t(AppText.companyProfileSectionBasic),
+                    child: Column(
                       children: [
-                        _Field(label: l10n.t(AppText.companyProfileFieldNameRequired), controller: _nameCtrl),
+                        _Field(
+                          label: l10n.t(
+                            AppText.companyProfileFieldNameRequired,
+                          ),
+                          controller: _nameCtrl,
+                        ),
                         _DropdownField(
-                          label: l10n.t(AppText.companyProfileFieldSectorRequired),
+                          label: l10n.t(
+                            AppText.companyProfileFieldSectorRequired,
+                          ),
                           value: _sector,
                           items: _sectors,
                           onChanged: (v) => setState(() => _sector = v),
@@ -302,8 +360,18 @@ class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
                             if (narrow) {
                               return Column(
                                 children: [
-                                  _Field(label: l10n.t(AppText.companyProfileFieldPhoneRequired), controller: _phoneCtrl),
-                                  _Field(label: l10n.t(AppText.companyProfileFieldEmail), controller: _emailCtrl),
+                                  _Field(
+                                    label: l10n.t(
+                                      AppText.companyProfileFieldPhoneRequired,
+                                    ),
+                                    controller: _phoneCtrl,
+                                  ),
+                                  _Field(
+                                    label: l10n.t(
+                                      AppText.companyProfileFieldEmail,
+                                    ),
+                                    controller: _emailCtrl,
+                                  ),
                                 ],
                               );
                             }
@@ -311,14 +379,18 @@ class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
                               children: [
                                 Expanded(
                                   child: _Field(
-                                    label: l10n.t(AppText.companyProfileFieldPhoneRequired),
+                                    label: l10n.t(
+                                      AppText.companyProfileFieldPhoneRequired,
+                                    ),
                                     controller: _phoneCtrl,
                                   ),
                                 ),
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: _Field(
-                                    label: l10n.t(AppText.companyProfileFieldEmail),
+                                    label: l10n.t(
+                                      AppText.companyProfileFieldEmail,
+                                    ),
                                     controller: _emailCtrl,
                                   ),
                                 ),
@@ -332,8 +404,18 @@ class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
                             if (narrow) {
                               return Column(
                                 children: [
-                                  _Field(label: l10n.t(AppText.companyProfileFieldWebsite), controller: _websiteCtrl),
-                                  _Field(label: l10n.t(AppText.companyProfileFieldCityRequired), controller: _cityCtrl),
+                                  _Field(
+                                    label: l10n.t(
+                                      AppText.companyProfileFieldWebsite,
+                                    ),
+                                    controller: _websiteCtrl,
+                                  ),
+                                  _Field(
+                                    label: l10n.t(
+                                      AppText.companyProfileFieldCityRequired,
+                                    ),
+                                    controller: _cityCtrl,
+                                  ),
                                 ],
                               );
                             }
@@ -341,14 +423,18 @@ class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
                               children: [
                                 Expanded(
                                   child: _Field(
-                                    label: l10n.t(AppText.companyProfileFieldWebsite),
+                                    label: l10n.t(
+                                      AppText.companyProfileFieldWebsite,
+                                    ),
                                     controller: _websiteCtrl,
                                   ),
                                 ),
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: _Field(
-                                    label: l10n.t(AppText.companyProfileFieldCityRequired),
+                                    label: l10n.t(
+                                      AppText.companyProfileFieldCityRequired,
+                                    ),
                                     controller: _cityCtrl,
                                   ),
                                 ),
@@ -356,7 +442,11 @@ class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
                             );
                           },
                         ),
-                        _Field(label: l10n.t(AppText.companyProfileFieldAddress), controller: _addressCtrl, maxLines: 2),
+                        _Field(
+                          label: l10n.t(AppText.companyProfileFieldAddress),
+                          controller: _addressCtrl,
+                          maxLines: 2,
+                        ),
                       ],
                     ),
                   ),
@@ -377,15 +467,20 @@ class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
                               return Column(
                                 children: [
                                   _Field(
-                                    label: l10n.t(AppText.companyProfileFieldFoundedYear),
+                                    label: l10n.t(
+                                      AppText.companyProfileFieldFoundedYear,
+                                    ),
                                     controller: _foundedYearCtrl,
                                     keyboardType: TextInputType.number,
                                   ),
                                   _DropdownField(
-                                    label: l10n.t(AppText.companyProfileFieldCompanySize),
+                                    label: l10n.t(
+                                      AppText.companyProfileFieldCompanySize,
+                                    ),
                                     value: _employeeCount,
                                     items: _companySizes,
-                                    onChanged: (v) => setState(() => _employeeCount = v),
+                                    onChanged: (v) =>
+                                        setState(() => _employeeCount = v),
                                   ),
                                 ],
                               );
@@ -394,7 +489,9 @@ class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
                               children: [
                                 Expanded(
                                   child: _Field(
-                                    label: l10n.t(AppText.companyProfileFieldFoundedYear),
+                                    label: l10n.t(
+                                      AppText.companyProfileFieldFoundedYear,
+                                    ),
                                     controller: _foundedYearCtrl,
                                     keyboardType: TextInputType.number,
                                   ),
@@ -402,10 +499,13 @@ class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: _DropdownField(
-                                    label: l10n.t(AppText.companyProfileFieldCompanySize),
+                                    label: l10n.t(
+                                      AppText.companyProfileFieldCompanySize,
+                                    ),
                                     value: _employeeCount,
                                     items: _companySizes,
-                                    onChanged: (v) => setState(() => _employeeCount = v),
+                                    onChanged: (v) =>
+                                        setState(() => _employeeCount = v),
                                   ),
                                 ),
                               ],
@@ -439,8 +539,14 @@ class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
                           : const Icon(Icons.save),
-                      label: Text(_saving ? l10n.t(AppText.commonSaving) : l10n.t(AppText.commonSave)),
-                      style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6D28D9)),
+                      label: Text(
+                        _saving
+                            ? l10n.t(AppText.commonSaving)
+                            : l10n.t(AppText.commonSave),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF6D28D9),
+                      ),
                     ),
                   ),
                 ],
@@ -498,7 +604,10 @@ class _StatusBanner extends StatelessWidget {
           Icon(Icons.info_outline, color: fg),
           const SizedBox(width: 8),
           Expanded(
-            child: Text(text, style: TextStyle(color: fg, fontWeight: FontWeight.w600)),
+            child: Text(
+              text,
+              style: TextStyle(color: fg, fontWeight: FontWeight.w600),
+            ),
           ),
         ],
       ),
@@ -526,7 +635,13 @@ class _BrandAssetsCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 12, offset: Offset(0, 6))],
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0A000000),
+            blurRadius: 12,
+            offset: Offset(0, 6),
+          ),
+        ],
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
@@ -569,13 +684,21 @@ class _BrandAssetsCard extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(999),
-                            border: Border.all(color: const Color(0xFFE5E7EB), width: 2),
+                            border: Border.all(
+                              color: const Color(0xFFE5E7EB),
+                              width: 2,
+                            ),
                           ),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(999),
-                            child: (logoUrl != null && logoUrl!.trim().isNotEmpty)
+                            child:
+                                (logoUrl != null && logoUrl!.trim().isNotEmpty)
                                 ? Image.network(logoUrl!, fit: BoxFit.cover)
-                                : const Icon(Icons.apartment_outlined, size: 34, color: Color(0xFF6D28D9)),
+                                : const Icon(
+                                    Icons.apartment_outlined,
+                                    size: 34,
+                                    color: Color(0xFF6D28D9),
+                                  ),
                           ),
                         ),
                         Positioned(
@@ -590,15 +713,25 @@ class _BrandAssetsCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 12),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
+                      ),
                       decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.45),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.primary.withValues(alpha: 0.45),
                         borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.16),
+                        ),
                       ),
                       child: const Text(
                         'Company branding',
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w900,
+                        ),
                       ),
                     ),
                   ],
@@ -613,7 +746,11 @@ class _BrandAssetsCard extends StatelessWidget {
 }
 
 class _AssetButton extends StatelessWidget {
-  const _AssetButton({required this.icon, required this.label, required this.onTap});
+  const _AssetButton({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
 
   final IconData icon;
   final String label;
@@ -630,7 +767,9 @@ class _AssetButton extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: 0.45),
+            color: Theme.of(
+              context,
+            ).colorScheme.primary.withValues(alpha: 0.45),
             borderRadius: BorderRadius.circular(14),
             border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
           ),
@@ -639,7 +778,13 @@ class _AssetButton extends StatelessWidget {
             children: [
               Icon(icon, size: 18, color: Colors.white),
               const SizedBox(width: 8),
-              Text(label, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900)),
+              Text(
+                label,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
             ],
           ),
         ),
@@ -668,7 +813,13 @@ class _IconFab extends StatelessWidget {
             color: Colors.white,
             borderRadius: BorderRadius.circular(999),
             border: Border.all(color: const Color(0xFFE5E7EB)),
-            boxShadow: const [BoxShadow(color: Color(0x22000000), blurRadius: 10, offset: Offset(0, 6))],
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x22000000),
+                blurRadius: 10,
+                offset: Offset(0, 6),
+              ),
+            ],
           ),
           child: Icon(icon, size: 16, color: const Color(0xFF4F46E5)),
         ),
@@ -690,7 +841,13 @@ class _SectionCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 12, offset: Offset(0, 6))],
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0A000000),
+            blurRadius: 12,
+            offset: Offset(0, 6),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -764,7 +921,9 @@ class _DropdownField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Prevent DropdownButton assertion when DB value doesn't exactly match items.
-    final uniqueItems = items.map((e) => e.trim()).where((e) => e.isNotEmpty).toSet().toList()..sort();
+    final uniqueItems =
+        items.map((e) => e.trim()).where((e) => e.isNotEmpty).toSet().toList()
+          ..sort();
     final raw = value?.trim();
 
     String? safeValue;
@@ -775,9 +934,9 @@ class _DropdownField extends StatelessWidget {
         // Try normalized match (e.g., "Yazılım" vs "Yazilim")
         final n = _norm(raw);
         safeValue = uniqueItems.cast<String?>().firstWhere(
-              (it) => it != null && _norm(it) == n,
-              orElse: () => null,
-            );
+          (it) => it != null && _norm(it) == n,
+          orElse: () => null,
+        );
       }
     }
 
@@ -785,7 +944,9 @@ class _DropdownField extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 12),
       child: DropdownButtonFormField<String>(
         initialValue: safeValue,
-        items: uniqueItems.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+        items: uniqueItems
+            .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+            .toList(),
         onChanged: onChanged,
         decoration: InputDecoration(
           labelText: label,

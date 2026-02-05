@@ -51,7 +51,7 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen>
     final myCoursesAsync = ref.watch(myEnrolledCoursesProvider);
 
     // For "Enrolled" badges in ALL tab
-// Real progress for enrolled courses (used in ALL tab too)
+    // Real progress for enrolled courses (used in ALL tab too)
     final progressByCourseId = myCoursesAsync.maybeWhen(
       data: (list) => <String, int>{
         for (final e in list) e.course.id: e.enrollment.progress.clamp(0, 100),
@@ -71,7 +71,10 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen>
                 children: [
                   Text(
                     l10n.t(AppText.navCourses),
-                    style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900),
+                    style: const TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.w900,
+                    ),
                   ),
                   const SizedBox(height: 6),
                   Text(
@@ -99,19 +102,24 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen>
                   const SizedBox(height: 14),
 
                   // Tabs
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
+                  Card(
+                    shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: const Color(0xFFE5E7EB)),
+                      side: BorderSide(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.outlineVariant.withAlpha(150),
+                      ),
                     ),
                     child: TabBar(
                       controller: _tabs,
                       isScrollable: true,
-                      labelColor: const Color(0xFF111827),
-                      unselectedLabelColor: const Color(0xFF6B7280),
+                      labelColor: Theme.of(context).colorScheme.onSurface,
+                      unselectedLabelColor: Theme.of(
+                        context,
+                      ).colorScheme.onSurfaceVariant,
                       labelStyle: const TextStyle(fontWeight: FontWeight.w900),
-                      indicatorColor: const Color(0xFF6D28D9),
+                      indicatorColor: Theme.of(context).colorScheme.primary,
                       tabs: [
                         Tab(text: l10n.t(AppText.commonAll)),
                         Tab(text: l10n.t(AppText.coursesMyEnrolledTab)),
@@ -122,7 +130,8 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen>
                   const SizedBox(height: 14),
 
                   SizedBox(
-                    height: 720, // keeps layout stable inside SingleChildScrollView
+                    height:
+                        720, // keeps layout stable inside SingleChildScrollView
                     child: TabBarView(
                       controller: _tabs,
                       children: [
@@ -144,19 +153,21 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen>
                             }
 
                             // Build dynamic filter chips (departments + levels) from dataset
-                            final departments = courses
-                                .map((c) => (c.department ?? '').trim())
-                                .where((d) => d.isNotEmpty)
-                                .toSet()
-                                .toList()
-                              ..sort();
+                            final departments =
+                                courses
+                                    .map((c) => (c.department ?? '').trim())
+                                    .where((d) => d.isNotEmpty)
+                                    .toSet()
+                                    .toList()
+                                  ..sort();
 
-                            final levels = courses
-                                .map((c) => (c.level ?? '').trim())
-                                .where((d) => d.isNotEmpty)
-                                .toSet()
-                                .toList()
-                              ..sort();
+                            final levels =
+                                courses
+                                    .map((c) => (c.level ?? '').trim())
+                                    .where((d) => d.isNotEmpty)
+                                    .toSet()
+                                    .toList()
+                                  ..sort();
 
                             return Column(
                               children: [
@@ -170,14 +181,17 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen>
                                     itemCount: courses.length,
                                     itemBuilder: (_, i) {
                                       final c = courses[i];
-                                      final progress = progressByCourseId[c.id]; // null if not enrolled
+                                      final progress =
+                                          progressByCourseId[c
+                                              .id]; // null if not enrolled
                                       final isEnrolled = progress != null;
 
                                       return _CourseCard(
                                         course: c,
                                         enrolled: isEnrolled,
                                         progress: progress,
-                                        onOpen: () => context.push('/courses/${c.id}'),
+                                        onOpen: () =>
+                                            context.push('/courses/${c.id}'),
                                       );
                                     },
                                   ),
@@ -193,7 +207,8 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen>
                           error: (e, _) => _ErrorBlock(
                             title: l10n.t(AppText.coursesMyLoadFailedTitle),
                             message: e.toString(),
-                            onRetry: () => ref.invalidate(myEnrolledCoursesProvider),
+                            onRetry: () =>
+                                ref.invalidate(myEnrolledCoursesProvider),
                           ),
                           data: (myCourses) {
                             if (myCourses.isEmpty) {
@@ -201,7 +216,9 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen>
                                 icon: Icons.school_outlined,
                                 title: l10n.t(AppText.coursesMyEmptyTitle),
                                 message: l10n.t(AppText.coursesMyEmptySubtitle),
-                                actionLabel: l10n.t(AppText.coursesExploreAction),
+                                actionLabel: l10n.t(
+                                  AppText.coursesExploreAction,
+                                ),
                                 onAction: () => _tabs.animateTo(0),
                               );
                             }
@@ -212,7 +229,9 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen>
                                 final item = myCourses[i];
                                 return _EnrolledCourseCard(
                                   item: item,
-                                  onOpen: () => context.push('/courses/${item.course.id}'),
+                                  onOpen: () => context.push(
+                                    '/courses/${item.course.id}',
+                                  ),
                                 );
                               },
                             );
@@ -258,7 +277,11 @@ class _FiltersCard extends ConsumerWidget {
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: const Color(0xFFE5E7EB)),
         boxShadow: const [
-          BoxShadow(color: Color(0x0A000000), blurRadius: 18, offset: Offset(0, 8)),
+          BoxShadow(
+            color: Color(0x0A000000),
+            blurRadius: 18,
+            offset: Offset(0, 8),
+          ),
         ],
       ),
       child: Column(
@@ -296,11 +319,15 @@ class _FiltersCard extends ConsumerWidget {
             children: [
               _SmallPill(
                 icon: Icons.filter_alt_outlined,
-                text: dept == null ? l10n.t(AppText.coursesDepartmentAll) : l10n.coursesDepartmentSelected(dept),
+                text: dept == null
+                    ? l10n.t(AppText.coursesDepartmentAll)
+                    : l10n.coursesDepartmentSelected(dept),
               ),
               _SmallPill(
                 icon: Icons.bar_chart_outlined,
-                text: level == null ? l10n.t(AppText.coursesLevelAll) : l10n.coursesLevelSelected(level),
+                text: level == null
+                    ? l10n.t(AppText.coursesLevelAll)
+                    : l10n.coursesLevelSelected(level),
               ),
               TextButton.icon(
                 onPressed: () => context.go(Routes.pointsSystem),
@@ -316,10 +343,7 @@ class _FiltersCard extends ConsumerWidget {
 }
 
 class _QuickChipsRow extends ConsumerWidget {
-  const _QuickChipsRow({
-    required this.departments,
-    required this.levels,
-  });
+  const _QuickChipsRow({required this.departments, required this.levels});
 
   final List<String> departments;
   final List<String> levels;
@@ -334,7 +358,10 @@ class _QuickChipsRow extends ConsumerWidget {
       spacing: 8,
       runSpacing: 8,
       children: [
-        Text(l10n.t(AppText.coursesQuickFilterLabel), style: const TextStyle(fontWeight: FontWeight.w900)),
+        Text(
+          l10n.t(AppText.coursesQuickFilterLabel),
+          style: const TextStyle(fontWeight: FontWeight.w900),
+        ),
         const SizedBox(width: 6),
 
         // Departments
@@ -344,7 +371,9 @@ class _QuickChipsRow extends ConsumerWidget {
             selected: selected,
             label: Text(d),
             onSelected: (_) {
-              ref.read(coursesDepartmentProvider.notifier).state = selected ? null : d;
+              ref.read(coursesDepartmentProvider.notifier).state = selected
+                  ? null
+                  : d;
               ref.invalidate(coursesListProvider);
             },
           );
@@ -357,7 +386,9 @@ class _QuickChipsRow extends ConsumerWidget {
             selected: selected,
             label: Text(l),
             onSelected: (_) {
-              ref.read(coursesLevelProvider.notifier).state = selected ? null : l;
+              ref.read(coursesLevelProvider.notifier).state = selected
+                  ? null
+                  : l;
               ref.invalidate(coursesListProvider);
             },
           );
@@ -392,7 +423,13 @@ class _CourseCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: const [BoxShadow(color: Color(0x08000000), blurRadius: 14, offset: Offset(0, 8))],
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x08000000),
+            blurRadius: 14,
+            offset: Offset(0, 8),
+          ),
+        ],
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -404,7 +441,10 @@ class _CourseCard extends StatelessWidget {
               color: const Color(0xFFEDE9FE),
               borderRadius: BorderRadius.circular(16),
             ),
-            child: const Icon(Icons.menu_book_outlined, color: Color(0xFF6D28D9)),
+            child: const Icon(
+              Icons.menu_book_outlined,
+              color: Color(0xFF6D28D9),
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -416,19 +456,29 @@ class _CourseCard extends StatelessWidget {
                     Expanded(
                       child: Text(
                         course.title,
-                        style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w900,
+                          fontSize: 16,
+                        ),
                       ),
                     ),
                     if (enrolled)
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 6,
+                        ),
                         decoration: BoxDecoration(
                           color: const Color(0xFFDCFCE7),
                           borderRadius: BorderRadius.circular(999),
                         ),
                         child: Text(
                           l10n.t(AppText.coursesEnrolledPill),
-                          style: const TextStyle(color: Color(0xFF16A34A), fontWeight: FontWeight.w900, fontSize: 12),
+                          style: const TextStyle(
+                            color: Color(0xFF16A34A),
+                            fontWeight: FontWeight.w900,
+                            fontSize: 12,
+                          ),
                         ),
                       ),
                   ],
@@ -438,16 +488,28 @@ class _CourseCard extends StatelessWidget {
                   (course.description ?? l10n.t(AppText.commonNoDescription)),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
+                  style: const TextStyle(
+                    color: Color(0xFF6B7280),
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 const SizedBox(height: 10),
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
                   children: [
-                    _MetaChip(icon: Icons.school_outlined, text: course.department ?? '—'),
-                    _MetaChip(icon: Icons.bar_chart_outlined, text: course.level ?? '—'),
-                    _MetaChip(icon: Icons.access_time, text: course.duration ?? '—'),
+                    _MetaChip(
+                      icon: Icons.school_outlined,
+                      text: course.department ?? '—',
+                    ),
+                    _MetaChip(
+                      icon: Icons.bar_chart_outlined,
+                      text: course.level ?? '—',
+                    ),
+                    _MetaChip(
+                      icon: Icons.access_time,
+                      text: course.duration ?? '—',
+                    ),
                   ],
                 ),
                 if (enrolled) ...[
@@ -458,7 +520,9 @@ class _CourseCard extends StatelessWidget {
                       value: p / 100,
                       minHeight: 8,
                       backgroundColor: const Color(0xFFE5E7EB),
-                      valueColor: const AlwaysStoppedAnimation(Color(0xFF2563EB)),
+                      valueColor: const AlwaysStoppedAnimation(
+                        Color(0xFF2563EB),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -470,7 +534,7 @@ class _CourseCard extends StatelessWidget {
                       fontSize: 12,
                     ),
                   ),
-                ]
+                ],
               ],
             ),
           ),
@@ -480,7 +544,9 @@ class _CourseCard extends StatelessWidget {
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF6D28D9),
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
               elevation: 0,
             ),
             child: Text(
@@ -522,9 +588,18 @@ class _EnrolledCourseCard extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: Text(c.title, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
+                child: Text(
+                  c.title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 16,
+                  ),
+                ),
               ),
-              TextButton(onPressed: onOpen, child: Text(l10n.t(AppText.commonOpenArrow))),
+              TextButton(
+                onPressed: onOpen,
+                child: Text(l10n.t(AppText.commonOpenArrow)),
+              ),
             ],
           ),
           const SizedBox(height: 6),
@@ -532,7 +607,10 @@ class _EnrolledCourseCard extends StatelessWidget {
             c.description ?? l10n.t(AppText.commonNoDescription),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
+            style: const TextStyle(
+              color: Color(0xFF6B7280),
+              fontWeight: FontWeight.w600,
+            ),
           ),
           const SizedBox(height: 10),
           ClipRRect(
@@ -547,7 +625,11 @@ class _EnrolledCourseCard extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             l10n.dashboardCourseProgress(p),
-            style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w800, fontSize: 12),
+            style: const TextStyle(
+              color: Color(0xFF6B7280),
+              fontWeight: FontWeight.w800,
+              fontSize: 12,
+            ),
           ),
         ],
       ),
@@ -562,7 +644,6 @@ class _MetaChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
       decoration: BoxDecoration(
@@ -576,7 +657,11 @@ class _MetaChip extends StatelessWidget {
           const SizedBox(width: 6),
           Text(
             text,
-            style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12, color: Color(0xFF374151)),
+            style: const TextStyle(
+              fontWeight: FontWeight.w800,
+              fontSize: 12,
+              color: Color(0xFF374151),
+            ),
           ),
         ],
       ),
@@ -591,7 +676,6 @@ class _SmallPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
@@ -604,7 +688,10 @@ class _SmallPill extends StatelessWidget {
         children: [
           Icon(icon, size: 16, color: const Color(0xFF4B5563)),
           const SizedBox(width: 6),
-          Text(text, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12)),
+          Text(
+            text,
+            style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12),
+          ),
         ],
       ),
     );
@@ -616,7 +703,6 @@ class _LoadingBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return const Center(
       child: SizedBox(
         width: 28,
@@ -644,7 +730,6 @@ class _EmptyBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 520),
@@ -655,12 +740,28 @@ class _EmptyBlock extends StatelessWidget {
             children: [
               Icon(icon, size: 56, color: const Color(0xFFD1D5DB)),
               const SizedBox(height: 10),
-              Text(title, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w900,
+                  fontSize: 16,
+                ),
+              ),
               const SizedBox(height: 6),
-              Text(message, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600)),
+              Text(
+                message,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Color(0xFF6B7280),
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
               if (actionLabel != null && onAction != null) ...[
                 const SizedBox(height: 10),
-                OutlinedButton(onPressed: onAction, child: Text('$actionLabel →')),
+                OutlinedButton(
+                  onPressed: onAction,
+                  child: Text('$actionLabel →'),
+                ),
               ],
             ],
           ),
@@ -694,7 +795,13 @@ class _ErrorBlock extends StatelessWidget {
             children: [
               const Icon(Icons.error_outline, size: 54),
               const SizedBox(height: 10),
-              Text(title, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w900,
+                  fontSize: 16,
+                ),
+              ),
               const SizedBox(height: 6),
               Text(
                 message,
@@ -702,7 +809,10 @@ class _ErrorBlock extends StatelessWidget {
                 style: const TextStyle(color: Color(0xFF6B7280)),
               ),
               const SizedBox(height: 10),
-              ElevatedButton(onPressed: onRetry, child: Text(l10n.t(AppText.retry))),
+              ElevatedButton(
+                onPressed: onRetry,
+                child: Text(l10n.t(AppText.retry)),
+              ),
             ],
           ),
         ),
@@ -710,4 +820,3 @@ class _ErrorBlock extends StatelessWidget {
     );
   }
 }
-

@@ -57,8 +57,10 @@ class OiProfile {
     final social = _asInt(map['social'], fallback: 50).clamp(0, 100);
     final fieldFit = _asInt(map['field_fit'], fallback: 50).clamp(0, 100);
     final consistency = _asInt(map['consistency'], fallback: 50).clamp(0, 100);
-    final score = _asInt(map['oi_score'], fallback: ((technical + social + fieldFit + consistency) / 4).round())
-        .clamp(0, 100);
+    final score = _asInt(
+      map['oi_score'],
+      fallback: ((technical + social + fieldFit + consistency) / 4).round(),
+    ).clamp(0, 100);
     return OiProfile(
       userId: uid,
       oiScore: score,
@@ -75,10 +77,7 @@ class OiProfile {
 
 @immutable
 class OiHistoryPoint {
-  const OiHistoryPoint({
-    required this.month,
-    required this.oiScore,
-  });
+  const OiHistoryPoint({required this.month, required this.oiScore});
 
   final DateTime month; // month start (UTC)
   final int oiScore;

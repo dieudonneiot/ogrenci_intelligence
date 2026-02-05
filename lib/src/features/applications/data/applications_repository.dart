@@ -19,7 +19,11 @@ class ApplicationsRepository {
         .limit(limit);
 
     return (rows as List)
-        .map((e) => ApplicationListItem.fromJobApplicationMap(e as Map<String, dynamic>))
+        .map(
+          (e) => ApplicationListItem.fromJobApplicationMap(
+            e as Map<String, dynamic>,
+          ),
+        )
         .toList();
   }
 
@@ -38,7 +42,11 @@ class ApplicationsRepository {
         .limit(limit);
 
     return (rows as List)
-        .map((e) => ApplicationListItem.fromInternshipApplicationMap(e as Map<String, dynamic>))
+        .map(
+          (e) => ApplicationListItem.fromInternshipApplicationMap(
+            e as Map<String, dynamic>,
+          ),
+        )
         .toList();
   }
 
@@ -68,14 +76,19 @@ class ApplicationsRepository {
       final m = r as Map<String, dynamic>;
       final cid = (m['course_id'] ?? '').toString();
       if (cid.isEmpty) continue;
-      completedAtByCourse[cid] = DateTime.tryParse((m['completed_at'] ?? '').toString()) ?? DateTime.now();
+      completedAtByCourse[cid] =
+          DateTime.tryParse((m['completed_at'] ?? '').toString()) ??
+          DateTime.now();
     }
 
     return (enrollRows as List).map((e) {
       final m = e as Map<String, dynamic>;
       final cid = (m['course_id'] ?? '').toString();
       final completedAt = completedAtByCourse[cid];
-      return ApplicationListItem.fromCourseEnrollmentMap(m, completedAt: completedAt);
+      return ApplicationListItem.fromCourseEnrollmentMap(
+        m,
+        completedAt: completedAt,
+      );
     }).toList();
   }
 }

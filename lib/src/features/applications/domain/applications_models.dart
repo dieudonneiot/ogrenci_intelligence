@@ -90,8 +90,12 @@ class ApplicationListItem {
     return ApplicationStatus.active;
   }
 
-  factory ApplicationListItem.fromInternshipApplicationMap(Map<String, dynamic> map) {
-    final internship = (map['internship'] as Map?)?.cast<String, dynamic>() ?? const <String, dynamic>{};
+  factory ApplicationListItem.fromInternshipApplicationMap(
+    Map<String, dynamic> map,
+  ) {
+    final internship =
+        (map['internship'] as Map?)?.cast<String, dynamic>() ??
+        const <String, dynamic>{};
 
     final title = (internship['title'] ?? '') as String;
     final company = (internship['company_name'] ?? '') as String;
@@ -112,7 +116,9 @@ class ApplicationListItem {
   }
 
   factory ApplicationListItem.fromJobApplicationMap(Map<String, dynamic> map) {
-    final job = (map['job'] as Map?)?.cast<String, dynamic>() ?? const <String, dynamic>{};
+    final job =
+        (map['job'] as Map?)?.cast<String, dynamic>() ??
+        const <String, dynamic>{};
 
     final title = (job['title'] ?? '') as String;
     final company = (job['company'] ?? '') as String;
@@ -136,12 +142,17 @@ class ApplicationListItem {
     Map<String, dynamic> map, {
     required DateTime? completedAt,
   }) {
-    final course = (map['course'] as Map?)?.cast<String, dynamic>() ?? const <String, dynamic>{};
+    final course =
+        (map['course'] as Map?)?.cast<String, dynamic>() ??
+        const <String, dynamic>{};
 
     final title = (course['title'] ?? '') as String;
 
     final progress = _asInt(map['progress']);
-    final status = _statusFromCourse(progress: progress, completed: completedAt != null);
+    final status = _statusFromCourse(
+      progress: progress,
+      completed: completedAt != null,
+    );
 
     return ApplicationListItem(
       kind: ApplicationKind.course,
@@ -167,7 +178,8 @@ class ApplicationsBundle {
   final List<ApplicationListItem> internships;
   final List<ApplicationListItem> courses;
 
-  factory ApplicationsBundle.empty() => const ApplicationsBundle(jobs: [], internships: [], courses: []);
+  factory ApplicationsBundle.empty() =>
+      const ApplicationsBundle(jobs: [], internships: [], courses: []);
 
   List<ApplicationListItem> get all {
     final list = <ApplicationListItem>[...jobs, ...internships, ...courses];
@@ -177,5 +189,6 @@ class ApplicationsBundle {
 
   int get total => jobs.length + internships.length + courses.length;
 
-  int countStatus(ApplicationStatus s) => all.where((e) => e.status == s).length;
+  int countStatus(ApplicationStatus s) =>
+      all.where((e) => e.status == s).length;
 }

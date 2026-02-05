@@ -319,23 +319,20 @@ class JobFilters {
   }
 
   bool get isDefault =>
-      query.trim().isEmpty && department == null && remoteOnly == false && workType == null;
+      query.trim().isEmpty &&
+      department == null &&
+      remoteOnly == false &&
+      workType == null;
 }
 
 @immutable
 class JobsListVm {
-  const JobsListVm({
-    required this.items,
-    required this.favoriteJobIds,
-  });
+  const JobsListVm({required this.items, required this.favoriteJobIds});
 
   final List<JobSummary> items;
   final Set<String> favoriteJobIds;
 
-  JobsListVm copyWith({
-    List<JobSummary>? items,
-    Set<String>? favoriteJobIds,
-  }) {
+  JobsListVm copyWith({List<JobSummary>? items, Set<String>? favoriteJobIds}) {
     return JobsListVm(
       items: items ?? this.items,
       favoriteJobIds: favoriteJobIds ?? this.favoriteJobIds,
@@ -385,11 +382,7 @@ class JobDetailVm {
   final bool isFavorited;
   final bool hasApplied;
 
-  JobDetailVm copyWith({
-    JobDetail? job,
-    bool? isFavorited,
-    bool? hasApplied,
-  }) {
+  JobDetailVm copyWith({JobDetail? job, bool? isFavorited, bool? hasApplied}) {
     return JobDetailVm(
       job: job ?? this.job,
       isFavorited: isFavorited ?? this.isFavorited,

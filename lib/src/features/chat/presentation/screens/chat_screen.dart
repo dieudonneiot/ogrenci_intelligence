@@ -18,7 +18,8 @@ class ChatScreen extends ConsumerStatefulWidget {
   ConsumerState<ChatScreen> createState() => _ChatScreenState();
 }
 
-class _ChatScreenState extends ConsumerState<ChatScreen> with SingleTickerProviderStateMixin {
+class _ChatScreenState extends ConsumerState<ChatScreen>
+    with SingleTickerProviderStateMixin {
   final _inputCtrl = TextEditingController();
   final _scrollCtrl = ScrollController();
   final _focusNode = FocusNode();
@@ -65,7 +66,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with SingleTickerProvid
 
     final l10n = AppLocalizations.of(context);
     final locale = ref.watch(appLocaleProvider);
-    final localeCode = (locale.countryCode == null || locale.countryCode!.isEmpty)
+    final localeCode =
+        (locale.countryCode == null || locale.countryCode!.isEmpty)
         ? locale.languageCode
         : '${locale.languageCode}-${locale.countryCode}';
     final greeting = l10n.chatGreeting(_displayNameFromUser(user));
@@ -76,10 +78,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with SingleTickerProvid
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ref
             .read(chatControllerProvider(userId).notifier)
-            .loadHistory(
-              greetingMessage: greeting,
-              suggestions: suggestions,
-            );
+            .loadHistory(greetingMessage: greeting, suggestions: suggestions);
       });
     }
 
@@ -91,8 +90,17 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with SingleTickerProvid
       WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
     }
 
-    return Container(
-      color: const Color(0xFFF6F4FF),
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [cs.surface, cs.primaryContainer.withAlpha(28)],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
+      ),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 980),
@@ -110,11 +118,17 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with SingleTickerProvid
                 Expanded(
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: cs.surface,
                       borderRadius: BorderRadius.circular(18),
-                      border: Border.all(color: const Color(0xFFE5E7EB)),
-                      boxShadow: const [
-                        BoxShadow(color: Color(0x0D000000), blurRadius: 20, offset: Offset(0, 10)),
+                      border: Border.all(
+                        color: cs.outlineVariant.withAlpha(160),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: cs.primary.withAlpha(14),
+                          blurRadius: 22,
+                          offset: const Offset(0, 10),
+                        ),
                       ],
                     ),
                     child: Column(
@@ -123,7 +137,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with SingleTickerProvid
                           child: ListView.builder(
                             controller: _scrollCtrl,
                             padding: const EdgeInsets.fromLTRB(16, 18, 16, 12),
-                            itemCount: state.messages.length +
+                            itemCount:
+                                state.messages.length +
                                 (_shouldShowTyping(state) ? 1 : 0),
                             itemBuilder: (context, index) {
                               if (_shouldShowTyping(state) &&
@@ -132,8 +147,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with SingleTickerProvid
                               }
 
                               final message = state.messages[index];
-                              final isLast =
-                                  index == state.messages.length - 1;
+                              final isLast = index == state.messages.length - 1;
                               final showStreaming =
                                   isLast && !message.isUser && state.isTyping;
                               return _MessageBubble(
@@ -160,15 +174,19 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with SingleTickerProvid
                                 () {
                                   final raw = state.error ?? '';
                                   if (raw.startsWith('history|')) {
-                                    return l10n.chatHistoryLoadFailed(raw.substring('history|'.length));
+                                    return l10n.chatHistoryLoadFailed(
+                                      raw.substring('history|'.length),
+                                    );
                                   }
                                   if (raw.startsWith('reply|')) {
-                                    return l10n.chatReplyFailed(raw.substring('reply|'.length));
+                                    return l10n.chatReplyFailed(
+                                      raw.substring('reply|'.length),
+                                    );
                                   }
                                   return raw;
                                 }(),
-                                style: const TextStyle(
-                                  color: Color(0xFFEF4444),
+                                style: TextStyle(
+                                  color: cs.error,
                                   fontSize: 12,
                                   fontWeight: FontWeight.w700,
                                 ),
@@ -179,8 +197,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with SingleTickerProvid
                           controller: _inputCtrl,
                           focusNode: _focusNode,
                           isTyping: state.isTyping,
-                          onSend: () => _handleSend(controller, localeCode, l10n),
-                          onSubmit: () => _handleSend(controller, localeCode, l10n),
+                          onSend: () =>
+                              _handleSend(controller, localeCode, l10n),
+                          onSubmit: () =>
+                              _handleSend(controller, localeCode, l10n),
                         ),
                       ],
                     ),
@@ -194,7 +214,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with SingleTickerProvid
     );
   }
 
-  void _handleSend(ChatController controller, String localeCode, AppLocalizations l10n) {
+  void _handleSend(
+    ChatController controller,
+    String localeCode,
+    AppLocalizations l10n,
+  ) {
     final text = _inputCtrl.text.trim();
     if (text.isEmpty) return;
 
@@ -245,16 +269,23 @@ class _ChatHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
-        gradient: const LinearGradient(
-          colors: [Color(0xFF7C3AED), Color(0xFF4F46E5)],
+        gradient: LinearGradient(
+          colors: [cs.primary, cs.secondary],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        boxShadow: const [BoxShadow(color: Color(0x22000000), blurRadius: 20, offset: Offset(0, 10))],
+        boxShadow: [
+          BoxShadow(
+            color: cs.primary.withAlpha(24),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -265,7 +296,11 @@ class _ChatHeader extends StatelessWidget {
               color: Colors.white.withAlpha((0.18 * 255).round()),
               borderRadius: BorderRadius.circular(14),
             ),
-            child: const Icon(Icons.smart_toy_outlined, color: Colors.white, size: 28),
+            child: const Icon(
+              Icons.smart_toy_outlined,
+              color: Colors.white,
+              size: 28,
+            ),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -274,12 +309,19 @@ class _ChatHeader extends StatelessWidget {
               children: [
                 Text(
                   AppLocalizations.of(context).t(AppText.chatHeaderTitle),
-                  style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900),
+                  style: TextStyle(
+                    color: cs.onPrimary,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                  ),
                 ),
                 SizedBox(height: 4),
                 Text(
                   AppLocalizations.of(context).t(AppText.chatHeaderSubtitle),
-                  style: TextStyle(color: Color(0xDDFFFFFF), fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                    color: cs.onPrimary.withAlpha(220),
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ],
             ),
@@ -296,9 +338,11 @@ class _ChatHeader extends StatelessWidget {
                     onPressed: onReset,
                     icon: const Icon(Icons.restart_alt),
                     style: IconButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: const Color(0xFF6D28D9),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      backgroundColor: cs.surface,
+                      foregroundColor: cs.primary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                   ),
                 );
@@ -314,10 +358,12 @@ class _ChatHeader extends StatelessWidget {
                     style: const TextStyle(fontWeight: FontWeight.w800),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: const Color(0xFF6D28D9),
+                    backgroundColor: cs.surface,
+                    foregroundColor: cs.primary,
                     elevation: 0,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                 ),
               );
@@ -330,18 +376,18 @@ class _ChatHeader extends StatelessWidget {
 }
 
 class _MessageBubble extends StatelessWidget {
-  const _MessageBubble({
-    required this.message,
-    required this.showStreaming,
-  });
+  const _MessageBubble({required this.message, required this.showStreaming});
 
   final ChatMessage message;
   final bool showStreaming;
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     final isUser = message.isUser;
-    final time = DateFormat.Hm(Localizations.localeOf(context).toString()).format(message.createdAt);
+    final time = DateFormat.Hm(
+      Localizations.localeOf(context).toString(),
+    ).format(message.createdAt);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
@@ -351,24 +397,32 @@ class _MessageBubble extends StatelessWidget {
           constraints: const BoxConstraints(maxWidth: 560),
           child: DecoratedBox(
             decoration: BoxDecoration(
-              color: isUser ? const Color(0xFF7C3AED) : const Color(0xFFF3F4F6),
+              color: isUser ? cs.primary : cs.surfaceContainerHighest,
               borderRadius: BorderRadius.only(
                 topLeft: const Radius.circular(16),
                 topRight: const Radius.circular(16),
                 bottomLeft: Radius.circular(isUser ? 16 : 4),
                 bottomRight: Radius.circular(isUser ? 4 : 16),
               ),
-              boxShadow: const [BoxShadow(color: Color(0x12000000), blurRadius: 10, offset: Offset(0, 6))],
+              boxShadow: [
+                BoxShadow(
+                  color: cs.primary.withAlpha(14),
+                  blurRadius: 10,
+                  offset: const Offset(0, 6),
+                ),
+              ],
             ),
             child: Padding(
               padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
               child: Column(
-                crossAxisAlignment: isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                crossAxisAlignment: isUser
+                    ? CrossAxisAlignment.end
+                    : CrossAxisAlignment.start,
                 children: [
                   Text(
                     message.message,
                     style: TextStyle(
-                      color: isUser ? Colors.white : const Color(0xFF111827),
+                      color: isUser ? cs.onPrimary : cs.onSurface,
                       fontWeight: FontWeight.w600,
                       height: 1.4,
                     ),
@@ -381,8 +435,8 @@ class _MessageBubble extends StatelessWidget {
                         time,
                         style: TextStyle(
                           color: isUser
-                              ? Colors.white70
-                              : const Color(0xFF9CA3AF),
+                              ? cs.onPrimary.withAlpha(190)
+                              : cs.onSurfaceVariant,
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
                         ),
@@ -408,22 +462,30 @@ class _TypingBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.only(bottom: 12),
+    final cs = Theme.of(context).colorScheme;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
       child: Align(
         alignment: Alignment.centerLeft,
         child: DecoratedBox(
           decoration: BoxDecoration(
-            color: Color(0xFFF3F4F6),
-            borderRadius: BorderRadius.only(
+            color: cs.surfaceContainerHighest,
+            borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(16),
               topRight: Radius.circular(16),
               bottomLeft: Radius.circular(4),
               bottomRight: Radius.circular(16),
             ),
-            boxShadow: [BoxShadow(color: Color(0x12000000), blurRadius: 10, offset: Offset(0, 6))],
+            boxShadow: [
+              BoxShadow(
+                color: cs.primary.withAlpha(14),
+                blurRadius: 10,
+                offset: const Offset(0, 6),
+              ),
+            ],
           ),
-          child: Padding(
+          child: const Padding(
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: _TypingDots(),
           ),
@@ -445,22 +507,23 @@ class _StreamingBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: const Color(0xFFEDE9FE),
+        color: cs.primaryContainer,
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: const Color(0xFFC4B5FD)),
+        border: Border.all(color: cs.outlineVariant.withAlpha(180)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.bolt, size: 12, color: Color(0xFF6D28D9)),
+          Icon(Icons.bolt, size: 12, color: cs.onPrimaryContainer),
           const SizedBox(width: 4),
           Text(
             AppLocalizations.of(context).t(AppText.chatTyping),
-            style: const TextStyle(
-              color: Color(0xFF5B21B6),
+            style: TextStyle(
+              color: cs.onPrimaryContainer,
               fontWeight: FontWeight.w800,
               fontSize: 10,
             ),
@@ -526,13 +589,14 @@ class _StreamingDotsState extends State<_StreamingDots>
   }
 
   Widget _dot(double opacity) {
+    final cs = Theme.of(context).colorScheme;
     return Opacity(
       opacity: opacity.clamp(0.2, 1.0),
       child: Container(
         width: 5,
         height: 5,
-        decoration: const BoxDecoration(
-          color: Color(0xFF6D28D9),
+        decoration: BoxDecoration(
+          color: cs.onPrimaryContainer,
           shape: BoxShape.circle,
         ),
       ),
@@ -540,7 +604,8 @@ class _StreamingDotsState extends State<_StreamingDots>
   }
 }
 
-class _TypingDotsState extends State<_TypingDots> with SingleTickerProviderStateMixin {
+class _TypingDotsState extends State<_TypingDots>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
 
   @override
@@ -585,13 +650,14 @@ class _TypingDotsState extends State<_TypingDots> with SingleTickerProviderState
   }
 
   Widget _dot(double opacity) {
+    final cs = Theme.of(context).colorScheme;
     return Opacity(
       opacity: opacity.clamp(0.2, 1.0),
       child: Container(
         width: 8,
         height: 8,
-        decoration: const BoxDecoration(
-          color: Color(0xFF6B7280),
+        decoration: BoxDecoration(
+          color: cs.onSurfaceVariant,
           shape: BoxShape.circle,
         ),
       ),
@@ -607,6 +673,7 @@ class _SuggestionChips extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
       child: Align(
@@ -620,15 +687,18 @@ class _SuggestionChips extends StatelessWidget {
                 borderRadius: BorderRadius.circular(999),
                 onTap: () => onTap(suggestion),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF3E8FF),
+                    color: cs.secondaryContainer,
                     borderRadius: BorderRadius.circular(999),
                   ),
                   child: Text(
                     suggestion,
-                    style: const TextStyle(
-                      color: Color(0xFF6D28D9),
+                    style: TextStyle(
+                      color: cs.onSecondaryContainer,
                       fontWeight: FontWeight.w700,
                       fontSize: 12,
                     ),
@@ -659,10 +729,13 @@ class _InputBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
-      decoration: const BoxDecoration(
-        border: Border(top: BorderSide(color: Color(0xFFE5E7EB))),
+      decoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(color: cs.outlineVariant.withAlpha(160)),
+        ),
       ),
       child: Row(
         children: [
@@ -676,20 +749,6 @@ class _InputBar extends StatelessWidget {
               maxLines: 4,
               decoration: InputDecoration(
                 hintText: AppLocalizations.of(context).t(AppText.chatInputHint),
-                filled: true,
-                fillColor: const Color(0xFFF9FAFB),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: const BorderSide(color: Color(0xFF7C3AED), width: 1.4),
-                ),
               ),
             ),
           ),
@@ -700,9 +759,9 @@ class _InputBar extends StatelessWidget {
             child: ElevatedButton(
               onPressed: isTyping ? null : onSend,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF7C3AED),
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
                 elevation: 0,
                 padding: EdgeInsets.zero,
               ),

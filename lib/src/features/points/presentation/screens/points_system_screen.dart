@@ -12,7 +12,8 @@ class PointsSystemScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authAsync = ref.watch(authViewStateProvider);
-    final isLoggedIn = (!authAsync.isLoading) && (authAsync.value?.isAuthenticated ?? false);
+    final isLoggedIn =
+        (!authAsync.isLoading) && (authAsync.value?.isAuthenticated ?? false);
 
     return Container(
       color: const Color(0xFFF9FAFB),
@@ -22,7 +23,9 @@ class PointsSystemScreen extends ConsumerWidget {
             constraints: const BoxConstraints(maxWidth: 1120),
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 22, 16, 28),
-              child: isLoggedIn ? const _AuthedPointsView() : const _GuestPointsView(),
+              child: isLoggedIn
+                  ? const _AuthedPointsView()
+                  : const _GuestPointsView(),
             ),
           ),
         ),
@@ -40,11 +43,17 @@ class _GuestPointsView extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(l10n.t(AppText.pointsSystem), style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900)),
+        Text(
+          l10n.t(AppText.pointsSystem),
+          style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900),
+        ),
         const SizedBox(height: 6),
         Text(
           l10n.t(AppText.pointsSystemGuestSubtitle),
-          style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
+          style: const TextStyle(
+            color: Color(0xFF6B7280),
+            fontWeight: FontWeight.w700,
+          ),
         ),
         const SizedBox(height: 16),
         _Card(
@@ -57,7 +66,10 @@ class _GuestPointsView extends StatelessWidget {
               const SizedBox(height: 10),
               Text(
                 l10n.t(AppText.pointsSystemGuestSignInHint),
-                style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
+                style: const TextStyle(
+                  color: Color(0xFF6B7280),
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ],
           ),
@@ -81,11 +93,17 @@ class _AuthedPointsView extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(l10n.t(AppText.pointsSystem), style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900)),
+        Text(
+          l10n.t(AppText.pointsSystem),
+          style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900),
+        ),
         const SizedBox(height: 6),
         Text(
           l10n.t(AppText.pointsSystemAuthedSubtitle),
-          style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
+          style: const TextStyle(
+            color: Color(0xFF6B7280),
+            fontWeight: FontWeight.w700,
+          ),
         ),
         const SizedBox(height: 14),
 
@@ -93,11 +111,13 @@ class _AuthedPointsView extends ConsumerWidget {
         _Card(
           child: totalPointsAsync.when(
             loading: () => const _MiniLoading(height: 84),
-            error: (e, _) => _MiniError(l10n.pointsSystemLoadFailed(e.toString())),
+            error: (e, _) =>
+                _MiniError(l10n.pointsSystemLoadFailed(e.toString())),
             data: (total) {
               return rewardsAsync.when(
                 loading: () => _Summary(totalPoints: total, next: null),
-                error: (error, stackTrace) => _Summary(totalPoints: total, next: null),
+                error: (error, stackTrace) =>
+                    _Summary(totalPoints: total, next: null),
                 data: (rewards) {
                   final next = _findNextReward(total, rewards);
                   return _Summary(totalPoints: total, next: next);
@@ -121,7 +141,7 @@ class _AuthedPointsView extends ConsumerWidget {
                 ),
                 child: TabBar(
                   isScrollable: true,
-                  labelColor: const Color(0xFF111827),
+                  labelColor: const Color(0xFF1F2937),
                   unselectedLabelColor: const Color(0xFF6B7280),
                   labelStyle: const TextStyle(fontWeight: FontWeight.w900),
                   indicatorColor: const Color(0xFF6D28D9),
@@ -138,41 +158,65 @@ class _AuthedPointsView extends ConsumerWidget {
                 child: TabBarView(
                   children: [
                     // History
-                      historyAsync.when(
-                        loading: () => const Center(child: CircularProgressIndicator(strokeWidth: 2.5)),
-                        error: (e, _) => _MiniError(l10n.pointsSystemHistoryLoadFailed(e.toString())),
-                        data: (items) => items.isEmpty
-                            ? _Empty(text: l10n.t(AppText.pointsSystemHistoryEmpty))
-                            : ListView.builder(
-                                itemCount: items.length,
-                                itemBuilder: (_, i) => _PointRow(p: items[i]),
-                              ),
+                    historyAsync.when(
+                      loading: () => const Center(
+                        child: CircularProgressIndicator(strokeWidth: 2.5),
                       ),
+                      error: (e, _) => _MiniError(
+                        l10n.pointsSystemHistoryLoadFailed(e.toString()),
+                      ),
+                      data: (items) => items.isEmpty
+                          ? _Empty(
+                              text: l10n.t(AppText.pointsSystemHistoryEmpty),
+                            )
+                          : ListView.builder(
+                              itemCount: items.length,
+                              itemBuilder: (_, i) => _PointRow(p: items[i]),
+                            ),
+                    ),
 
                     // Rewards
                     rewardsAsync.when(
-                      loading: () => const Center(child: CircularProgressIndicator(strokeWidth: 2.5)),
-                      error: (e, _) => _MiniError(l10n.pointsSystemRewardsLoadFailed(e.toString())),
+                      loading: () => const Center(
+                        child: CircularProgressIndicator(strokeWidth: 2.5),
+                      ),
+                      error: (e, _) => _MiniError(
+                        l10n.pointsSystemRewardsLoadFailed(e.toString()),
+                      ),
                       data: (items) => items.isEmpty
-                          ? _Empty(text: l10n.t(AppText.pointsSystemRewardsEmpty))
+                          ? _Empty(
+                              text: l10n.t(AppText.pointsSystemRewardsEmpty),
+                            )
                           : totalPointsAsync.maybeWhen(
                               data: (total) => ListView.builder(
                                 itemCount: items.length,
-                                itemBuilder: (_, i) => _RewardCard(reward: items[i], totalPoints: total),
+                                itemBuilder: (_, i) => _RewardCard(
+                                  reward: items[i],
+                                  totalPoints: total,
+                                ),
                               ),
                               orElse: () => ListView.builder(
                                 itemCount: items.length,
-                                itemBuilder: (_, i) => _RewardCard(reward: items[i], totalPoints: 0),
+                                itemBuilder: (_, i) => _RewardCard(
+                                  reward: items[i],
+                                  totalPoints: 0,
+                                ),
                               ),
                             ),
                     ),
 
                     // Badges
                     badgesAsync.when(
-                      loading: () => const Center(child: CircularProgressIndicator(strokeWidth: 2.5)),
-                      error: (e, _) => _MiniError(l10n.pointsSystemBadgesLoadFailed(e.toString())),
+                      loading: () => const Center(
+                        child: CircularProgressIndicator(strokeWidth: 2.5),
+                      ),
+                      error: (e, _) => _MiniError(
+                        l10n.pointsSystemBadgesLoadFailed(e.toString()),
+                      ),
                       data: (items) => items.isEmpty
-                          ? _Empty(text: l10n.t(AppText.pointsSystemBadgesEmpty))
+                          ? _Empty(
+                              text: l10n.t(AppText.pointsSystemBadgesEmpty),
+                            )
                           : ListView.builder(
                               itemCount: items.length,
                               itemBuilder: (_, i) => _BadgeCard(b: items[i]),
@@ -210,7 +254,13 @@ class _Card extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 18, offset: Offset(0, 8))],
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0A000000),
+            blurRadius: 18,
+            offset: Offset(0, 8),
+          ),
+        ],
       ),
       child: child,
     );
@@ -239,21 +289,39 @@ class _Summary extends StatelessWidget {
             color: const Color(0xFFEDE9FE),
             borderRadius: BorderRadius.circular(16),
           ),
-          child: const Icon(Icons.track_changes_outlined, color: Color(0xFF6D28D9)),
+          child: const Icon(
+            Icons.track_changes_outlined,
+            color: Color(0xFF6D28D9),
+          ),
         ),
         const SizedBox(width: 12),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(l10n.t(AppText.dashboardTotalPoints), style: const TextStyle(fontWeight: FontWeight.w900)),
+              Text(
+                l10n.t(AppText.dashboardTotalPoints),
+                style: const TextStyle(fontWeight: FontWeight.w900),
+              ),
               const SizedBox(height: 2),
-              Text('$totalPoints', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900)),
+              Text(
+                '$totalPoints',
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
               const SizedBox(height: 8),
               if (next != null) ...[
                 Text(
-                  l10n.pointsSystemNextReward(title: next!.title, points: next!.requiredPoints),
-                  style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
+                  l10n.pointsSystemNextReward(
+                    title: next!.title,
+                    points: next!.requiredPoints,
+                  ),
+                  style: const TextStyle(
+                    color: Color(0xFF6B7280),
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
                 const SizedBox(height: 6),
                 ClipRRect(
@@ -268,7 +336,10 @@ class _Summary extends StatelessWidget {
               ] else ...[
                 Text(
                   l10n.t(AppText.pointsSystemAllRewardsUnlocked),
-                  style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
+                  style: const TextStyle(
+                    color: Color(0xFF6B7280),
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ],
             ],
@@ -300,12 +371,16 @@ class _PointRow extends StatelessWidget {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: isPositive ? const Color(0xFFDCFCE7) : const Color(0xFFFEE2E2),
+              color: isPositive
+                  ? const Color(0xFFDCFCE7)
+                  : const Color(0xFFFEE2E2),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Icon(
               isPositive ? Icons.add : Icons.remove,
-              color: isPositive ? const Color(0xFF16A34A) : const Color(0xFFDC2626),
+              color: isPositive
+                  ? const Color(0xFF16A34A)
+                  : const Color(0xFFDC2626),
             ),
           ),
           const SizedBox(width: 12),
@@ -313,11 +388,17 @@ class _PointRow extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(p.description, style: const TextStyle(fontWeight: FontWeight.w900)),
+                Text(
+                  p.description,
+                  style: const TextStyle(fontWeight: FontWeight.w900),
+                ),
                 const SizedBox(height: 4),
                 Text(
                   '${p.source} • ${_fmt(p.createdAt)}',
-                  style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
+                  style: const TextStyle(
+                    color: Color(0xFF6B7280),
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ],
             ),
@@ -327,7 +408,9 @@ class _PointRow extends StatelessWidget {
             (isPositive ? '+' : '') + p.points.toString(),
             style: TextStyle(
               fontWeight: FontWeight.w900,
-              color: isPositive ? const Color(0xFF16A34A) : const Color(0xFFDC2626),
+              color: isPositive
+                  ? const Color(0xFF16A34A)
+                  : const Color(0xFFDC2626),
             ),
           ),
         ],
@@ -335,7 +418,8 @@ class _PointRow extends StatelessWidget {
     );
   }
 
-  String _fmt(DateTime d) => '${d.day.toString().padLeft(2, '0')}.${d.month.toString().padLeft(2, '0')}.${d.year}';
+  String _fmt(DateTime d) =>
+      '${d.day.toString().padLeft(2, '0')}.${d.month.toString().padLeft(2, '0')}.${d.year}';
 }
 
 class _RewardCard extends StatelessWidget {
@@ -363,12 +447,16 @@ class _RewardCard extends StatelessWidget {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: unlocked ? const Color(0xFFDCFCE7) : const Color(0xFFEDE9FE),
+              color: unlocked
+                  ? const Color(0xFFDCFCE7)
+                  : const Color(0xFFEDE9FE),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Icon(
               unlocked ? Icons.lock_open_outlined : Icons.lock_outline,
-              color: unlocked ? const Color(0xFF16A34A) : const Color(0xFF6D28D9),
+              color: unlocked
+                  ? const Color(0xFF16A34A)
+                  : const Color(0xFF6D28D9),
             ),
           ),
           const SizedBox(width: 12),
@@ -379,20 +467,32 @@ class _RewardCard extends StatelessWidget {
                 Row(
                   children: [
                     Expanded(
-                      child: Text(reward.title, style: const TextStyle(fontWeight: FontWeight.w900)),
+                      child: Text(
+                        reward.title,
+                        style: const TextStyle(fontWeight: FontWeight.w900),
+                      ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
-                        color: unlocked ? const Color(0xFFDCFCE7) : const Color(0xFFF3F4F6),
+                        color: unlocked
+                            ? const Color(0xFFDCFCE7)
+                            : const Color(0xFFF3F4F6),
                         borderRadius: BorderRadius.circular(999),
                       ),
                       child: Text(
-                        unlocked ? l10n.t(AppText.commonUnlocked) : l10n.t(AppText.commonLocked),
+                        unlocked
+                            ? l10n.t(AppText.commonUnlocked)
+                            : l10n.t(AppText.commonLocked),
                         style: TextStyle(
                           fontWeight: FontWeight.w900,
                           fontSize: 12,
-                          color: unlocked ? const Color(0xFF16A34A) : const Color(0xFF6B7280),
+                          color: unlocked
+                              ? const Color(0xFF16A34A)
+                              : const Color(0xFF6B7280),
                         ),
                       ),
                     ),
@@ -403,7 +503,10 @@ class _RewardCard extends StatelessWidget {
                   reward.description,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
+                  style: const TextStyle(
+                    color: Color(0xFF6B7280),
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -425,7 +528,9 @@ class _BadgeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dateText = MaterialLocalizations.of(context).formatShortDate(b.earnedAt);
+    final dateText = MaterialLocalizations.of(
+      context,
+    ).formatShortDate(b.earnedAt);
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(14),
@@ -443,23 +548,36 @@ class _BadgeCard extends StatelessWidget {
               color: const Color(0xFFFFF7ED),
               borderRadius: BorderRadius.circular(14),
             ),
-            child: const Icon(Icons.emoji_events_outlined, color: Color(0xFFF97316)),
+            child: const Icon(
+              Icons.emoji_events_outlined,
+              color: Color(0xFFF97316),
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(b.badgeTitle, style: const TextStyle(fontWeight: FontWeight.w900)),
+                Text(
+                  b.badgeTitle,
+                  style: const TextStyle(fontWeight: FontWeight.w900),
+                ),
                 const SizedBox(height: 4),
                 Text(
                   (b.badgeDescription ?? b.badgeType),
-                  style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
+                  style: const TextStyle(
+                    color: Color(0xFF6B7280),
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 const SizedBox(height: 6),
                 Text(
                   '+${b.pointsAwarded} • $dateText',
-                  style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w800, fontSize: 12),
+                  style: const TextStyle(
+                    color: Color(0xFF6B7280),
+                    fontWeight: FontWeight.w800,
+                    fontSize: 12,
+                  ),
                 ),
               ],
             ),
@@ -489,7 +607,13 @@ class _MiniError extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(text, style: const TextStyle(color: Color(0xFFDC2626), fontWeight: FontWeight.w700));
+    return Text(
+      text,
+      style: const TextStyle(
+        color: Color(0xFFDC2626),
+        fontWeight: FontWeight.w700,
+      ),
+    );
   }
 }
 
@@ -500,7 +624,13 @@ class _Empty extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Text(text, style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700)),
+      child: Text(
+        text,
+        style: const TextStyle(
+          color: Color(0xFF6B7280),
+          fontWeight: FontWeight.w700,
+        ),
+      ),
     );
   }
 }
@@ -515,9 +645,18 @@ class _Bullet extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
         children: [
-          const Icon(Icons.check_circle_outline, size: 18, color: Color(0xFF16A34A)),
+          const Icon(
+            Icons.check_circle_outline,
+            size: 18,
+            color: Color(0xFF16A34A),
+          ),
           const SizedBox(width: 8),
-          Expanded(child: Text(text, style: const TextStyle(fontWeight: FontWeight.w800))),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(fontWeight: FontWeight.w800),
+            ),
+          ),
         ],
       ),
     );

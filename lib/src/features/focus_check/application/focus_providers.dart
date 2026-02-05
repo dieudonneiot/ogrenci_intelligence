@@ -5,14 +5,18 @@ import '../../oi/application/oi_providers.dart';
 import '../data/focus_repository.dart';
 import '../domain/focus_models.dart';
 
-final focusRepositoryProvider = Provider<FocusRepository>((ref) => const FocusRepository());
-
-final acceptedInternshipsProvider =
-    AutoDisposeAsyncNotifierProvider<AcceptedInternshipsController, List<AcceptedInternshipApplication>>(
-  AcceptedInternshipsController.new,
+final focusRepositoryProvider = Provider<FocusRepository>(
+  (ref) => const FocusRepository(),
 );
 
-class AcceptedInternshipsController extends AutoDisposeAsyncNotifier<List<AcceptedInternshipApplication>> {
+final acceptedInternshipsProvider =
+    AutoDisposeAsyncNotifierProvider<
+      AcceptedInternshipsController,
+      List<AcceptedInternshipApplication>
+    >(AcceptedInternshipsController.new);
+
+class AcceptedInternshipsController
+    extends AutoDisposeAsyncNotifier<List<AcceptedInternshipApplication>> {
   @override
   Future<List<AcceptedInternshipApplication>> build() async {
     final auth = ref.watch(authViewStateProvider).value;
@@ -36,18 +40,24 @@ class FocusActions {
   FocusActions(this.ref);
   final Ref ref;
 
-  Future<FocusCheckSession> start({required String internshipApplicationId}) async {
+  Future<FocusCheckSession> start({
+    required String internshipApplicationId,
+  }) async {
     final repo = ref.read(focusRepositoryProvider);
-    final session = await repo.startFocusCheck(internshipApplicationId: internshipApplicationId);
+    final session = await repo.startFocusCheck(
+      internshipApplicationId: internshipApplicationId,
+    );
     ref.read(focusSessionProvider.notifier).state = session;
     return session;
   }
 
-  Future<void> submit({required String focusCheckId, required String answer}) async {
+  Future<void> submit({
+    required String focusCheckId,
+    required String answer,
+  }) async {
     final repo = ref.read(focusRepositoryProvider);
     await repo.submitFocusAnswer(focusCheckId: focusCheckId, answer: answer);
     ref.read(focusSessionProvider.notifier).state = null;
     ref.invalidate(myOiProfileProvider);
   }
 }
-

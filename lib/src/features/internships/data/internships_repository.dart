@@ -73,7 +73,9 @@ class InternshipsRepository {
         .toList(growable: false);
   }
 
-  Future<Set<String>> fetchMyFavoriteInternshipIds({required String userId}) async {
+  Future<Set<String>> fetchMyFavoriteInternshipIds({
+    required String userId,
+  }) async {
     final rows = await SupabaseService.client
         .from('favorites')
         .select('internship_id')
@@ -154,7 +156,9 @@ class InternshipsRepository {
   }) async {
     final row = await SupabaseService.client
         .from('internship_applications')
-        .select('id, user_id, internship_id, status, applied_at, motivation_letter')
+        .select(
+          'id, user_id, internship_id, status, applied_at, motivation_letter',
+        )
         .eq('user_id', userId)
         .eq('internship_id', internshipId)
         .maybeSingle();

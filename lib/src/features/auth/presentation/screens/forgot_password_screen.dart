@@ -12,7 +12,8 @@ class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({super.key});
 
   @override
-  ConsumerState<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
+  ConsumerState<ForgotPasswordScreen> createState() =>
+      _ForgotPasswordScreenState();
 }
 
 class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
@@ -62,7 +63,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
       return;
     }
 
-    final err = await ref.read(authActionLoadingProvider.notifier).resetPassword(email);
+    final err = await ref
+        .read(authActionLoadingProvider.notifier)
+        .resetPassword(email);
 
     if (!mounted) return;
 
@@ -103,8 +106,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                       Text(
                         l10n.t(AppText.authEmailSentTitle),
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.w700,
-                            ),
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                       const SizedBox(height: 8),
                       Text(
@@ -117,7 +120,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                         decoration: BoxDecoration(
                           color: Colors.amber.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.amber.withValues(alpha: 0.35)),
+                          border: Border.all(
+                            color: Colors.amber.withValues(alpha: 0.35),
+                          ),
                         ),
                         child: Text(
                           l10n.t(AppText.authCheckSpam),
@@ -170,7 +175,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                         child: Icon(
                           Icons.mail_outline,
                           size: 34,
-                          color: Theme.of(context).colorScheme.onPrimaryContainer,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onPrimaryContainer,
                         ),
                       ),
                     ),
@@ -178,9 +185,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                     Text(
                       l10n.t(AppText.authForgotTitle),
                       textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                            fontWeight: FontWeight.w700,
-                          ),
+                      style: Theme.of(context).textTheme.headlineSmall
+                          ?.copyWith(fontWeight: FontWeight.w700),
                     ),
                     const SizedBox(height: 6),
                     Text(
@@ -206,7 +212,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                         decoration: BoxDecoration(
                           color: Colors.red.withValues(alpha: 0.10),
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.red.withValues(alpha: 0.25)),
+                          border: Border.all(
+                            color: Colors.red.withValues(alpha: 0.25),
+                          ),
                         ),
                         child: Text(
                           _error!,

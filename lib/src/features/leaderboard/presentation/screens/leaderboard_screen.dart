@@ -48,11 +48,18 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.error_outline, size: 48, color: Color(0xFFEF4444)),
+              const Icon(
+                Icons.error_outline,
+                size: 48,
+                color: Color(0xFFEF4444),
+              ),
               const SizedBox(height: 12),
               Text(
                 l10n.t(AppText.leaderboardLoadFailedTitle),
-                style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+                style: const TextStyle(
+                  fontWeight: FontWeight.w900,
+                  fontSize: 16,
+                ),
               ),
               const SizedBox(height: 8),
               Text(
@@ -64,7 +71,8 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
               SizedBox(
                 height: 44,
                 child: ElevatedButton(
-                  onPressed: () => ref.read(leaderboardProvider.notifier).refresh(),
+                  onPressed: () =>
+                      ref.read(leaderboardProvider.notifier).refresh(),
                   child: Text(l10n.t(AppText.retry)),
                 ),
               ),
@@ -92,18 +100,28 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                       children: [
                         Row(
                           children: [
-                            const Icon(Icons.emoji_events, color: Color(0xFFF59E0B), size: 30),
+                            const Icon(
+                              Icons.emoji_events,
+                              color: Color(0xFFF59E0B),
+                              size: 30,
+                            ),
                             const SizedBox(width: 10),
                             Text(
                               l10n.t(AppText.linkLeaderboard),
-                              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900),
+                              style: const TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.w900,
+                              ),
                             ),
                           ],
                         ),
                         const SizedBox(height: 6),
                         Text(
                           l10n.t(AppText.leaderboardSubtitle),
-                          style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
+                          style: const TextStyle(
+                            color: Color(0xFF6B7280),
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                         const SizedBox(height: 16),
 
@@ -122,13 +140,17 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                           child: TabBar(
                             controller: _tabs,
                             isScrollable: true,
-                            labelColor: const Color(0xFF111827),
+                            labelColor: const Color(0xFF1F2937),
                             unselectedLabelColor: const Color(0xFF6B7280),
-                            labelStyle: const TextStyle(fontWeight: FontWeight.w900),
+                            labelStyle: const TextStyle(
+                              fontWeight: FontWeight.w900,
+                            ),
                             indicatorColor: const Color(0xFF6D28D9),
                             tabs: [
                               Tab(text: l10n.t(AppText.leaderboardTabOverall)),
-                              Tab(text: l10n.t(AppText.leaderboardTabDepartment)),
+                              Tab(
+                                text: l10n.t(AppText.leaderboardTabDepartment),
+                              ),
                             ],
                           ),
                         ),
@@ -151,7 +173,10 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                                 children: [
                                   if (hasDept) ...[
                                     Padding(
-                                      padding: const EdgeInsets.only(left: 2, bottom: 10),
+                                      padding: const EdgeInsets.only(
+                                        left: 2,
+                                        bottom: 10,
+                                      ),
                                       child: Text(
                                         l10n.leaderboardDepartmentLabel(dept),
                                         style: const TextStyle(
@@ -167,8 +192,13 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                                       showDepartment: false,
                                       entries: vm.departmentList,
                                       emptyText: !hasDept
-                                          ? l10n.t(AppText.leaderboardNoDepartment)
-                                          : l10n.t(AppText.leaderboardNoDepartmentData),
+                                          ? l10n.t(
+                                              AppText.leaderboardNoDepartment,
+                                            )
+                                          : l10n.t(
+                                              AppText
+                                                  .leaderboardNoDepartmentData,
+                                            ),
                                     ),
                                   ),
                                 ],
@@ -213,20 +243,31 @@ class _UserStatsHero extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        boxShadow: const [BoxShadow(color: Color(0x22000000), blurRadius: 22, offset: Offset(0, 10))],
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x22000000),
+            blurRadius: 22,
+            offset: Offset(0, 10),
+          ),
+        ],
       ),
       child: LayoutBuilder(
         builder: (_, c) {
           final wide = c.maxWidth >= 860;
 
           final items = <Widget>[
-            _HeroMetric(title: l10n.t(AppText.leaderboardHeroMyPoints), value: '${vm.totalPoints}'),
             _HeroMetric(
-                title: l10n.t(AppText.leaderboardHeroOverallRank),
-                value: vm.overallRank != null ? '${vm.overallRank}.' : '—'),
+              title: l10n.t(AppText.leaderboardHeroMyPoints),
+              value: '${vm.totalPoints}',
+            ),
             _HeroMetric(
-                title: l10n.t(AppText.leaderboardHeroDepartmentRank),
-                value: vm.departmentRank != null ? '${vm.departmentRank}.' : '—'),
+              title: l10n.t(AppText.leaderboardHeroOverallRank),
+              value: vm.overallRank != null ? '${vm.overallRank}.' : '—',
+            ),
+            _HeroMetric(
+              title: l10n.t(AppText.leaderboardHeroDepartmentRank),
+              value: vm.departmentRank != null ? '${vm.departmentRank}.' : '—',
+            ),
           ];
 
           if (wide) {
@@ -243,7 +284,9 @@ class _UserStatsHero extends StatelessWidget {
           return Wrap(
             spacing: 10,
             runSpacing: 10,
-            children: items.map((w) => SizedBox(width: (c.maxWidth - 10) / 2, child: w)).toList(),
+            children: items
+                .map((w) => SizedBox(width: (c.maxWidth - 10) / 2, child: w))
+                .toList(),
           );
         },
       ),
@@ -267,11 +310,23 @@ class _HeroMetric extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Text(title,
-              style: const TextStyle(color: Color(0xCCFFFFFF), fontWeight: FontWeight.w800, fontSize: 12)),
+          Text(
+            title,
+            style: const TextStyle(
+              color: Color(0xCCFFFFFF),
+              fontWeight: FontWeight.w800,
+              fontSize: 12,
+            ),
+          ),
           const SizedBox(height: 6),
-          Text(value,
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 18)),
+          Text(
+            value,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w900,
+              fontSize: 18,
+            ),
+          ),
         ],
       ),
     );
@@ -300,7 +355,10 @@ class _LeaderboardList extends StatelessWidget {
           padding: const EdgeInsets.all(24),
           child: Text(
             emptyText,
-            style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
+            style: const TextStyle(
+              color: Color(0xFF6B7280),
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ),
       );
@@ -320,7 +378,13 @@ class _LeaderboardList extends StatelessWidget {
             color: isMe ? const Color(0xFFF3E8FF) : Colors.white,
             borderRadius: BorderRadius.circular(18),
             border: Border.all(color: const Color(0xFFE5E7EB)),
-            boxShadow: const [BoxShadow(color: Color(0x07000000), blurRadius: 14, offset: Offset(0, 8))],
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x07000000),
+                blurRadius: 14,
+                offset: Offset(0, 8),
+              ),
+            ],
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -334,7 +398,11 @@ class _LeaderboardList extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        _Avatar(letter: e.displayName.isNotEmpty ? e.displayName[0].toUpperCase() : '?'),
+                        _Avatar(
+                          letter: e.displayName.isNotEmpty
+                              ? e.displayName[0].toUpperCase()
+                              : '?',
+                        ),
                         const SizedBox(width: 10),
                         Expanded(
                           child: Row(
@@ -343,13 +411,18 @@ class _LeaderboardList extends StatelessWidget {
                                 child: Text(
                                   e.displayName,
                                   overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(fontWeight: FontWeight.w900),
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w900,
+                                  ),
                                 ),
                               ),
                               if (isMe) ...[
                                 const SizedBox(width: 8),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 5,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: const Color(0xFF7C3AED),
                                     borderRadius: BorderRadius.circular(999),
@@ -372,8 +445,14 @@ class _LeaderboardList extends StatelessWidget {
                     if (showDepartment) ...[
                       const SizedBox(height: 8),
                       Text(
-                        e.department?.isNotEmpty == true ? e.department! : l10n.t(AppText.commonNotSpecified),
-                        style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700, fontSize: 12),
+                        e.department?.isNotEmpty == true
+                            ? e.department!
+                            : l10n.t(AppText.commonNotSpecified),
+                        style: const TextStyle(
+                          color: Color(0xFF6B7280),
+                          fontWeight: FontWeight.w700,
+                          fontSize: 12,
+                        ),
                       ),
                     ],
                   ],
@@ -387,7 +466,11 @@ class _LeaderboardList extends StatelessWidget {
                 children: [
                   Text(
                     '${e.totalPoints}',
-                    style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: Color(0xFF6D28D9)),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w900,
+                      fontSize: 18,
+                      color: Color(0xFF6D28D9),
+                    ),
                   ),
                   const SizedBox(height: 6),
                   _LevelPill(points: e.totalPoints, rank: e.rank),
@@ -427,7 +510,9 @@ class _RankBadge extends StatelessWidget {
             '$rank',
             style: TextStyle(
               fontWeight: FontWeight.w900,
-              color: (rank <= 3) ? const Color(0xFF111827) : const Color(0xFF6B7280),
+              color: (rank <= 3)
+                  ? const Color(0xFF1F2937)
+                  : const Color(0xFF6B7280),
             ),
           ),
         ],
@@ -465,7 +550,13 @@ class _Avatar extends StatelessWidget {
         border: Border.all(color: const Color(0xFFE5E7EB)),
       ),
       alignment: Alignment.center,
-      child: Text(letter, style: const TextStyle(fontWeight: FontWeight.w900, color: Color(0xFF6D28D9))),
+      child: Text(
+        letter,
+        style: const TextStyle(
+          fontWeight: FontWeight.w900,
+          color: Color(0xFF6D28D9),
+        ),
+      ),
     );
   }
 }
@@ -481,18 +572,24 @@ class _LevelPill extends StatelessWidget {
     final label = points >= 1000
         ? l10n.t(AppText.leaderboardLevelExpert)
         : points >= 500
-            ? l10n.t(AppText.leaderboardLevelAdvanced)
-            : points >= 100
-                ? l10n.t(AppText.leaderboardLevelIntermediate)
-                : l10n.t(AppText.leaderboardLevelBeginner);
+        ? l10n.t(AppText.leaderboardLevelAdvanced)
+        : points >= 100
+        ? l10n.t(AppText.leaderboardLevelIntermediate)
+        : l10n.t(AppText.leaderboardLevelBeginner);
 
     final bg = rank <= 3 ? const Color(0xFFFEF3C7) : const Color(0xFFF3F4F6);
     final fg = rank <= 3 ? const Color(0xFF92400E) : const Color(0xFF374151);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(999)),
-      child: Text(label, style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: fg)),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: fg),
+      ),
     );
   }
 }
@@ -514,7 +611,11 @@ class _InfoCard extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.tips_and_updates, color: Color(0xFF6D28D9), size: 28),
+          const Icon(
+            Icons.tips_and_updates,
+            color: Color(0xFF6D28D9),
+            size: 28,
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -522,12 +623,18 @@ class _InfoCard extends StatelessWidget {
               children: [
                 Text(
                   l10n.t(AppText.dashboardHowToEarnPoints),
-                  style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 16,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   l10n.t(AppText.leaderboardHowToEarnPointsBullets),
-                  style: const TextStyle(color: Color(0xFF4B5563), fontWeight: FontWeight.w600),
+                  style: const TextStyle(
+                    color: Color(0xFF4B5563),
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 const SizedBox(height: 12),
                 Align(

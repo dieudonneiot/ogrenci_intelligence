@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -14,7 +14,8 @@ class CompanyJobFormScreen extends ConsumerStatefulWidget {
   final String? jobId;
 
   @override
-  ConsumerState<CompanyJobFormScreen> createState() => _CompanyJobFormScreenState();
+  ConsumerState<CompanyJobFormScreen> createState() =>
+      _CompanyJobFormScreenState();
 }
 
 class _CompanyJobFormScreenState extends ConsumerState<CompanyJobFormScreen> {
@@ -89,7 +90,10 @@ class _CompanyJobFormScreenState extends ConsumerState<CompanyJobFormScreen> {
       }
 
       if (widget.jobId != null) {
-        final job = await repo.getJobById(jobId: widget.jobId!, companyId: companyId);
+        final job = await repo.getJobById(
+          jobId: widget.jobId!,
+          companyId: companyId,
+        );
         if (job != null) {
           _titleCtrl.text = (job['title'] ?? '').toString();
           _descriptionCtrl.text = (job['description'] ?? '').toString();
@@ -104,9 +108,12 @@ class _CompanyJobFormScreenState extends ConsumerState<CompanyJobFormScreen> {
           _maxYearCtrl.text = job['max_year']?.toString() ?? '';
           _salaryCtrl.text = (job['salary'] ?? '').toString();
           _benefitsCtrl.text = (job['benefits'] ?? '').toString();
-          _contactEmailCtrl.text = (job['contact_email'] ?? _contactEmailCtrl.text).toString();
+          _contactEmailCtrl.text =
+              (job['contact_email'] ?? _contactEmailCtrl.text).toString();
           final deadlineRaw = job['deadline']?.toString();
-          _deadline = deadlineRaw == null ? null : DateTime.tryParse(deadlineRaw);
+          _deadline = deadlineRaw == null
+              ? null
+              : DateTime.tryParse(deadlineRaw);
         }
       }
     } finally {
@@ -121,7 +128,8 @@ class _CompanyJobFormScreenState extends ConsumerState<CompanyJobFormScreen> {
     if (auth == null || user == null || companyId == null) return;
 
     final l10n = AppLocalizations.of(context);
-    if (_titleCtrl.text.trim().isEmpty || _descriptionCtrl.text.trim().isEmpty) {
+    if (_titleCtrl.text.trim().isEmpty ||
+        _descriptionCtrl.text.trim().isEmpty) {
       _snack(l10n.t(AppText.companyJobFormValidationTitleDesc), error: true);
       return;
     }
@@ -151,16 +159,24 @@ class _CompanyJobFormScreenState extends ConsumerState<CompanyJobFormScreen> {
       final payload = <String, dynamic>{
         'title': _titleCtrl.text.trim(),
         'description': _descriptionCtrl.text.trim(),
-        'requirements': _requirementsCtrl.text.trim().isEmpty ? null : _requirementsCtrl.text.trim(),
+        'requirements': _requirementsCtrl.text.trim().isEmpty
+            ? null
+            : _requirementsCtrl.text.trim(),
         'department': _department,
         'location': _locationCtrl.text.trim(),
         'work_type': _workType,
         'type': _workType == 'part-time' ? 'part-time' : 'departmental',
         'min_year': int.tryParse(_minYearCtrl.text.trim()) ?? 0,
         'max_year': int.tryParse(_maxYearCtrl.text.trim()) ?? 5,
-        'salary': _salaryCtrl.text.trim().isEmpty ? null : _salaryCtrl.text.trim(),
-        'benefits': _benefitsCtrl.text.trim().isEmpty ? null : _benefitsCtrl.text.trim(),
-        'contact_email': _contactEmailCtrl.text.trim().isEmpty ? null : _contactEmailCtrl.text.trim(),
+        'salary': _salaryCtrl.text.trim().isEmpty
+            ? null
+            : _salaryCtrl.text.trim(),
+        'benefits': _benefitsCtrl.text.trim().isEmpty
+            ? null
+            : _benefitsCtrl.text.trim(),
+        'contact_email': _contactEmailCtrl.text.trim().isEmpty
+            ? null
+            : _contactEmailCtrl.text.trim(),
         'deadline': _deadline!.toIso8601String(),
         'is_remote': _isRemote,
       };
@@ -178,7 +194,11 @@ class _CompanyJobFormScreenState extends ConsumerState<CompanyJobFormScreen> {
       }
 
       if (!mounted) return;
-      _snack(widget.jobId == null ? l10n.t(AppText.companyJobFormCreated) : l10n.t(AppText.companyJobFormUpdated));
+      _snack(
+        widget.jobId == null
+            ? l10n.t(AppText.companyJobFormCreated)
+            : l10n.t(AppText.companyJobFormUpdated),
+      );
       context.go(Routes.companyJobs);
     } catch (e) {
       _snack(l10n.commonActionFailed('$e'), error: true);
@@ -235,7 +255,10 @@ class _CompanyJobFormScreenState extends ConsumerState<CompanyJobFormScreen> {
                         widget.jobId == null
                             ? l10n.t(AppText.companyJobFormCreateTitle)
                             : l10n.t(AppText.companyJobFormEditTitle),
-                        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900),
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w900,
+                        ),
                       ),
                     ],
                   ),
@@ -243,14 +266,21 @@ class _CompanyJobFormScreenState extends ConsumerState<CompanyJobFormScreen> {
                   _Card(
                     child: Column(
                       children: [
-                        _Field(label: l10n.t(AppText.companyJobFormPositionTitleLabel), controller: _titleCtrl),
+                        _Field(
+                          label: l10n.t(
+                            AppText.companyJobFormPositionTitleLabel,
+                          ),
+                          controller: _titleCtrl,
+                        ),
                         _Field(
                           label: l10n.t(AppText.companyJobFormDescriptionLabel),
                           controller: _descriptionCtrl,
                           maxLines: 5,
                         ),
                         _Field(
-                          label: l10n.t(AppText.companyJobFormRequirementsLabel),
+                          label: l10n.t(
+                            AppText.companyJobFormRequirementsLabel,
+                          ),
                           controller: _requirementsCtrl,
                           maxLines: 4,
                         ),
@@ -261,12 +291,16 @@ class _CompanyJobFormScreenState extends ConsumerState<CompanyJobFormScreen> {
                           onChanged: (v) => setState(() => _department = v),
                           itemLabel: (v) => _departmentLabel(l10n, v),
                         ),
-                        _Field(label: l10n.t(AppText.companyJobFormLocationLabel), controller: _locationCtrl),
+                        _Field(
+                          label: l10n.t(AppText.companyJobFormLocationLabel),
+                          controller: _locationCtrl,
+                        ),
                         _DropdownField(
                           label: l10n.t(AppText.companyJobFormWorkTypeLabel),
                           value: _workType,
                           items: _workTypes,
-                          onChanged: (v) => setState(() => _workType = v ?? _workType),
+                          onChanged: (v) =>
+                              setState(() => _workType = v ?? _workType),
                           itemLabel: (v) => _workTypeLabel(l10n, v),
                         ),
                         SwitchListTile(
@@ -282,12 +316,16 @@ class _CompanyJobFormScreenState extends ConsumerState<CompanyJobFormScreen> {
                               return Column(
                                 children: [
                                   _Field(
-                                    label: l10n.t(AppText.companyJobFormMinExperienceLabel),
+                                    label: l10n.t(
+                                      AppText.companyJobFormMinExperienceLabel,
+                                    ),
                                     controller: _minYearCtrl,
                                     keyboardType: TextInputType.number,
                                   ),
                                   _Field(
-                                    label: l10n.t(AppText.companyJobFormMaxExperienceLabel),
+                                    label: l10n.t(
+                                      AppText.companyJobFormMaxExperienceLabel,
+                                    ),
                                     controller: _maxYearCtrl,
                                     keyboardType: TextInputType.number,
                                   ),
@@ -298,7 +336,9 @@ class _CompanyJobFormScreenState extends ConsumerState<CompanyJobFormScreen> {
                               children: [
                                 Expanded(
                                   child: _Field(
-                                    label: l10n.t(AppText.companyJobFormMinExperienceLabel),
+                                    label: l10n.t(
+                                      AppText.companyJobFormMinExperienceLabel,
+                                    ),
                                     controller: _minYearCtrl,
                                     keyboardType: TextInputType.number,
                                   ),
@@ -306,7 +346,9 @@ class _CompanyJobFormScreenState extends ConsumerState<CompanyJobFormScreen> {
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: _Field(
-                                    label: l10n.t(AppText.companyJobFormMaxExperienceLabel),
+                                    label: l10n.t(
+                                      AppText.companyJobFormMaxExperienceLabel,
+                                    ),
                                     controller: _maxYearCtrl,
                                     keyboardType: TextInputType.number,
                                   ),
@@ -315,14 +357,23 @@ class _CompanyJobFormScreenState extends ConsumerState<CompanyJobFormScreen> {
                             );
                           },
                         ),
-                        _Field(label: l10n.t(AppText.companyJobFormSalaryOptionalLabel), controller: _salaryCtrl),
                         _Field(
-                          label: l10n.t(AppText.companyJobFormBenefitsOptionalLabel),
+                          label: l10n.t(
+                            AppText.companyJobFormSalaryOptionalLabel,
+                          ),
+                          controller: _salaryCtrl,
+                        ),
+                        _Field(
+                          label: l10n.t(
+                            AppText.companyJobFormBenefitsOptionalLabel,
+                          ),
                           controller: _benefitsCtrl,
                           maxLines: 3,
                         ),
                         _Field(
-                          label: l10n.t(AppText.companyJobFormContactEmailLabel),
+                          label: l10n.t(
+                            AppText.companyJobFormContactEmailLabel,
+                          ),
                           controller: _contactEmailCtrl,
                           keyboardType: TextInputType.emailAddress,
                         ),
@@ -332,9 +383,14 @@ class _CompanyJobFormScreenState extends ConsumerState<CompanyJobFormScreen> {
                             Expanded(
                               child: Text(
                                 _deadline == null
-                                    ? l10n.t(AppText.companyJobFormDeadlineNotSelected)
+                                    ? l10n.t(
+                                        AppText
+                                            .companyJobFormDeadlineNotSelected,
+                                      )
                                     : l10n.companyJobFormDeadlineSelected(
-                                        MaterialLocalizations.of(context).formatShortDate(_deadline!),
+                                        MaterialLocalizations.of(
+                                          context,
+                                        ).formatShortDate(_deadline!),
                                       ),
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
@@ -343,7 +399,9 @@ class _CompanyJobFormScreenState extends ConsumerState<CompanyJobFormScreen> {
                             TextButton.icon(
                               onPressed: _pickDeadline,
                               icon: const Icon(Icons.calendar_today_outlined),
-                              label: Text(l10n.t(AppText.companyJobFormPickDate)),
+                              label: Text(
+                                l10n.t(AppText.companyJobFormPickDate),
+                              ),
                             ),
                           ],
                         ),
@@ -353,12 +411,22 @@ class _CompanyJobFormScreenState extends ConsumerState<CompanyJobFormScreen> {
                           child: ElevatedButton.icon(
                             onPressed: _saving ? null : _save,
                             icon: _saving
-                                ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                                ? const SizedBox(
+                                    width: 16,
+                                    height: 16,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
                                 : const Icon(Icons.save),
                             label: Text(
-                              _saving ? l10n.t(AppText.commonSaving) : l10n.t(AppText.commonSave),
+                              _saving
+                                  ? l10n.t(AppText.commonSaving)
+                                  : l10n.t(AppText.commonSave),
                             ),
-                            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6D28D9)),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF6D28D9),
+                            ),
                           ),
                         ),
                       ],
@@ -428,7 +496,13 @@ class _Card extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 12, offset: Offset(0, 6))],
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0A000000),
+            blurRadius: 12,
+            offset: Offset(0, 6),
+          ),
+        ],
       ),
       child: child,
     );
@@ -487,10 +561,12 @@ class _DropdownField extends StatelessWidget {
       child: DropdownButtonFormField<String>(
         initialValue: (value != null && value!.isNotEmpty) ? value : null,
         items: items
-            .map((e) => DropdownMenuItem(
-                  value: e,
-                  child: Text(itemLabel == null ? e : itemLabel!(e)),
-                ))
+            .map(
+              (e) => DropdownMenuItem(
+                value: e,
+                child: Text(itemLabel == null ? e : itemLabel!(e)),
+              ),
+            )
             .toList(),
         onChanged: onChanged,
         decoration: InputDecoration(

@@ -9,14 +9,14 @@ import '../../../auth/presentation/controllers/auth_controller.dart';
 class HowItWorksSection extends ConsumerWidget {
   const HowItWorksSection({super.key});
 
-  static const _bg = Color(0xFFF9FAFB); // gray-50
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
+    final cs = Theme.of(context).colorScheme;
     final authAsync = ref.watch(authViewStateProvider);
     final isLoading = authAsync.isLoading;
-    final isLoggedIn = (!isLoading) && (authAsync.value?.isAuthenticated ?? false);
+    final isLoggedIn =
+        (!isLoading) && (authAsync.value?.isAuthenticated ?? false);
 
     final w = MediaQuery.of(context).size.width;
 
@@ -65,7 +65,7 @@ class HowItWorksSection extends ConsumerWidget {
 
     return Container(
       width: double.infinity,
-      color: _bg,
+      color: cs.surfaceContainerLowest,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 56),
       child: Center(
         child: ConstrainedBox(
@@ -77,9 +77,9 @@ class HowItWorksSection extends ConsumerWidget {
                 l10n.t(AppText.howItWorksTitle),
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
-                      color: const Color(0xFF1F2937),
-                    ),
+                  fontWeight: FontWeight.w800,
+                  color: cs.onSurface,
+                ),
               ),
               const SizedBox(height: 12),
               ConstrainedBox(
@@ -88,9 +88,9 @@ class HowItWorksSection extends ConsumerWidget {
                   l10n.t(AppText.howItWorksSubtitle),
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: const Color(0xFF6B7280),
-                        height: 1.5,
-                      ),
+                    color: cs.onSurfaceVariant,
+                    height: 1.5,
+                  ),
                 ),
               ),
               const SizedBox(height: 28),
@@ -128,9 +128,8 @@ class HowItWorksSection extends ConsumerWidget {
                 label: isLoggedIn
                     ? l10n.t(AppText.howItWorksCtaDashboard)
                     : l10n.t(AppText.howItWorksCtaStart),
-                onTap: () => context.go(
-                  isLoggedIn ? Routes.dashboard : Routes.register,
-                ),
+                onTap: () =>
+                    context.go(isLoggedIn ? Routes.dashboard : Routes.register),
               ),
             ],
           ),
@@ -200,7 +199,7 @@ class _HowStepCardState extends State<_HowStepCard> {
                         blurRadius: 18,
                         offset: Offset(0, 10),
                         color: Color(0x1A000000),
-                      )
+                      ),
                     ]
                   : const [],
             ),
@@ -212,17 +211,17 @@ class _HowStepCardState extends State<_HowStepCard> {
                 Text(
                   widget.step.title,
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w800,
-                        color: const Color(0xFF1F2937),
-                      ),
+                    fontWeight: FontWeight.w800,
+                    color: const Color(0xFF1F2937),
+                  ),
                 ),
                 const SizedBox(height: 10),
                 Text(
                   widget.step.description,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: const Color(0xFF4B5563),
-                        height: 1.45,
-                      ),
+                    color: const Color(0xFF4B5563),
+                    height: 1.45,
+                  ),
                 ),
               ],
             ),
@@ -236,7 +235,7 @@ class _HowStepCardState extends State<_HowStepCard> {
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                color: const Color(0xFF111827),
+                color: Theme.of(context).colorScheme.primary,
                 borderRadius: BorderRadius.circular(999),
               ),
               alignment: Alignment.center,
@@ -304,13 +303,18 @@ class _CtaButtonState extends State<_CtaButton> {
             backgroundColor: _hover ? _purpleHover : _purple,
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
             elevation: 10,
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(widget.label, style: const TextStyle(fontWeight: FontWeight.w800)),
+              Text(
+                widget.label,
+                style: const TextStyle(fontWeight: FontWeight.w800),
+              ),
               const SizedBox(width: 10),
               const Icon(Icons.arrow_forward, size: 18),
             ],

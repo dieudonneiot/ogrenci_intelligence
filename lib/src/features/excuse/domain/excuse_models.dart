@@ -88,7 +88,8 @@ class CompanyExcuseRequest {
     return CompanyExcuseRequest(
       id: (map['id'] ?? '').toString(),
       userId: (map['user_id'] ?? '').toString(),
-      internshipApplicationId: (map['internship_application_id'] ?? '').toString(),
+      internshipApplicationId: (map['internship_application_id'] ?? '')
+          .toString(),
       reasonType: (map['reason_type'] ?? '').toString(),
       details: (map['details'] as String?)?.trim(),
       status: (map['status'] ?? 'pending').toString(),
@@ -101,4 +102,3 @@ class CompanyExcuseRequest {
     );
   }
 }
-

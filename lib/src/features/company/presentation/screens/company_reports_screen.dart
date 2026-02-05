@@ -14,7 +14,8 @@ class CompanyReportsScreen extends ConsumerStatefulWidget {
   const CompanyReportsScreen({super.key});
 
   @override
-  ConsumerState<CompanyReportsScreen> createState() => _CompanyReportsScreenState();
+  ConsumerState<CompanyReportsScreen> createState() =>
+      _CompanyReportsScreenState();
 }
 
 class _CompanyReportsScreenState extends ConsumerState<CompanyReportsScreen> {
@@ -49,7 +50,9 @@ class _CompanyReportsScreenState extends ConsumerState<CompanyReportsScreen> {
   Future<void> _load() async {
     final auth = ref.read(authViewStateProvider).value;
     final companyId = auth?.companyId;
-    if (auth == null || auth.userType != UserType.company || companyId == null) return;
+    if (auth == null || auth.userType != UserType.company || companyId == null) {
+      return;
+    }
 
     setState(() => _loading = true);
     try {
@@ -99,12 +102,24 @@ class _CompanyReportsScreenState extends ConsumerState<CompanyReportsScreen> {
     buffer.writeln('Range,$rangeLabel');
     buffer.writeln('');
     buffer.writeln('Metrics');
-    buffer.writeln('${l10n.t(AppText.companyReportsMetricTotalViews)},${_summary.totalViews}');
-    buffer.writeln('${l10n.t(AppText.companyReportsMetricUniqueVisitors)},${_summary.uniqueVisitors}');
-    buffer.writeln('${l10n.t(AppText.companyReportsMetricTotalApplications)},${_summary.totalApplications}');
-    buffer.writeln('${l10n.t(AppText.companyReportsMetricAccepted)},${_summary.acceptedApplications}');
-    buffer.writeln('${l10n.t(AppText.companyReportsMetricRejected)},${_summary.rejectedApplications}');
-    buffer.writeln('${l10n.t(AppText.companyReportsMetricConversionRate)},%${_summary.conversionRate.toStringAsFixed(1)}');
+    buffer.writeln(
+      '${l10n.t(AppText.companyReportsMetricTotalViews)},${_summary.totalViews}',
+    );
+    buffer.writeln(
+      '${l10n.t(AppText.companyReportsMetricUniqueVisitors)},${_summary.uniqueVisitors}',
+    );
+    buffer.writeln(
+      '${l10n.t(AppText.companyReportsMetricTotalApplications)},${_summary.totalApplications}',
+    );
+    buffer.writeln(
+      '${l10n.t(AppText.companyReportsMetricAccepted)},${_summary.acceptedApplications}',
+    );
+    buffer.writeln(
+      '${l10n.t(AppText.companyReportsMetricRejected)},${_summary.rejectedApplications}',
+    );
+    buffer.writeln(
+      '${l10n.t(AppText.companyReportsMetricConversionRate)},%${_summary.conversionRate.toStringAsFixed(1)}',
+    );
     buffer.writeln(
       '${l10n.t(AppText.companyReportsMetricAvgResponseTime)},${_summary.avgResponseTimeHours.toStringAsFixed(1)} ${l10n.t(AppText.companyReportsHoursUnit)}',
     );
@@ -115,7 +130,9 @@ class _CompanyReportsScreenState extends ConsumerState<CompanyReportsScreen> {
       buffer.writeln('${_fmtDate(p.date)},${p.count}');
     }
     buffer.writeln('');
-    buffer.writeln('${l10n.t(AppText.companyReportsChartApplicationsTrend)} (7 days)');
+    buffer.writeln(
+      '${l10n.t(AppText.companyReportsChartApplicationsTrend)} (7 days)',
+    );
     buffer.writeln('Date,Count');
     for (final p in _trends.applications) {
       buffer.writeln('${_fmtDate(p.date)},${p.count}');
@@ -148,7 +165,9 @@ class _CompanyReportsScreenState extends ConsumerState<CompanyReportsScreen> {
     }
 
     final auth = authAsync.value;
-    if (auth == null || !auth.isAuthenticated || auth.userType != UserType.company) {
+    if (auth == null ||
+        !auth.isAuthenticated ||
+        auth.userType != UserType.company) {
       return Center(child: Text(l10n.t(AppText.companyReportsLoginRequired)));
     }
 
@@ -168,10 +187,18 @@ class _CompanyReportsScreenState extends ConsumerState<CompanyReportsScreen> {
                       final isNarrow = c.maxWidth < 640;
                       final titleRow = Row(
                         children: [
-                          const Icon(Icons.bar_chart_outlined, color: Color(0xFF6D28D9)),
+                          const Icon(
+                            Icons.bar_chart_outlined,
+                            color: Color(0xFF6D28D9),
+                          ),
                           const SizedBox(width: 8),
-                          Text(l10n.t(AppText.companyReportsTitle),
-                              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900)),
+                          Text(
+                            l10n.t(AppText.companyReportsTitle),
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
                         ],
                       );
                       final actions = Wrap(
@@ -186,11 +213,36 @@ class _CompanyReportsScreenState extends ConsumerState<CompanyReportsScreen> {
                               _load();
                             },
                             items: [
-                              DropdownMenuItem(value: 'today', child: Text(l10n.t(AppText.companyReportsRangeToday))),
-                              DropdownMenuItem(value: 'last7', child: Text(l10n.t(AppText.companyReportsRangeLast7))),
-                              DropdownMenuItem(value: 'last30', child: Text(l10n.t(AppText.companyReportsRangeLast30))),
-                              DropdownMenuItem(value: 'last90', child: Text(l10n.t(AppText.companyReportsRangeLast90))),
-                              DropdownMenuItem(value: 'all', child: Text(l10n.t(AppText.companyReportsRangeAll))),
+                              DropdownMenuItem(
+                                value: 'today',
+                                child: Text(
+                                  l10n.t(AppText.companyReportsRangeToday),
+                                ),
+                              ),
+                              DropdownMenuItem(
+                                value: 'last7',
+                                child: Text(
+                                  l10n.t(AppText.companyReportsRangeLast7),
+                                ),
+                              ),
+                              DropdownMenuItem(
+                                value: 'last30',
+                                child: Text(
+                                  l10n.t(AppText.companyReportsRangeLast30),
+                                ),
+                              ),
+                              DropdownMenuItem(
+                                value: 'last90',
+                                child: Text(
+                                  l10n.t(AppText.companyReportsRangeLast90),
+                                ),
+                              ),
+                              DropdownMenuItem(
+                                value: 'all',
+                                child: Text(
+                                  l10n.t(AppText.companyReportsRangeAll),
+                                ),
+                              ),
                             ],
                           ),
                           IconButton(
@@ -200,7 +252,9 @@ class _CompanyReportsScreenState extends ConsumerState<CompanyReportsScreen> {
                           ElevatedButton.icon(
                             onPressed: _exportCsv,
                             icon: const Icon(Icons.download_outlined),
-                            label: Text(l10n.t(AppText.companyReportsExportCsv)),
+                            label: Text(
+                              l10n.t(AppText.companyReportsExportCsv),
+                            ),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF6D28D9),
                             ),
@@ -219,26 +273,25 @@ class _CompanyReportsScreenState extends ConsumerState<CompanyReportsScreen> {
                         );
                       }
 
-                      return Row(
-                        children: [
-                          titleRow,
-                          const Spacer(),
-                          actions,
-                        ],
-                      );
+                      return Row(children: [titleRow, const Spacer(), actions]);
                     },
                   ),
                   const SizedBox(height: 16),
                   if (_loading)
-                    const Center(child: Padding(padding: EdgeInsets.all(24), child: CircularProgressIndicator()))
+                    const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(24),
+                        child: CircularProgressIndicator(),
+                      ),
+                    )
                   else ...[
                     LayoutBuilder(
                       builder: (_, c) {
                         final crossAxis = c.maxWidth >= 980
                             ? 4
                             : c.maxWidth >= 720
-                                ? 2
-                                : 1;
+                            ? 2
+                            : 1;
                         return GridView.count(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
@@ -248,64 +301,86 @@ class _CompanyReportsScreenState extends ConsumerState<CompanyReportsScreen> {
                           childAspectRatio: 1.25,
                           children: [
                             _MetricCard(
-                              title: l10n.t(AppText.companyReportsMetricTotalViews),
+                              title: l10n.t(
+                                AppText.companyReportsMetricTotalViews,
+                              ),
                               value: _summary.totalViews.toString(),
                               icon: Icons.visibility_outlined,
                               color: const Color(0xFF3B82F6),
                             ),
                             _MetricCard(
-                              title: l10n.t(AppText.companyReportsMetricUniqueVisitors),
+                              title: l10n.t(
+                                AppText.companyReportsMetricUniqueVisitors,
+                              ),
                               value: _summary.uniqueVisitors.toString(),
                               icon: Icons.people_outline,
                               color: const Color(0xFF10B981),
                             ),
                             _MetricCard(
-                              title: l10n.t(AppText.companyReportsMetricTotalApplications),
+                              title: l10n.t(
+                                AppText.companyReportsMetricTotalApplications,
+                              ),
                               value: _summary.totalApplications.toString(),
                               icon: Icons.assignment_turned_in_outlined,
                               color: const Color(0xFF7C3AED),
                             ),
                             _MetricCard(
-                              title: l10n.t(AppText.companyReportsMetricConversionRate),
-                              value: '%${_summary.conversionRate.toStringAsFixed(1)}',
+                              title: l10n.t(
+                                AppText.companyReportsMetricConversionRate,
+                              ),
+                              value:
+                                  '%${_summary.conversionRate.toStringAsFixed(1)}',
                               icon: Icons.trending_up,
                               color: const Color(0xFFF59E0B),
                             ),
                             _MetricCard(
-                              title: l10n.t(AppText.companyReportsMetricAvgResponseTime),
+                              title: l10n.t(
+                                AppText.companyReportsMetricAvgResponseTime,
+                              ),
                               value:
                                   '${_summary.avgResponseTimeHours.toStringAsFixed(1)} ${l10n.t(AppText.companyReportsHoursUnit)}',
                               icon: Icons.schedule,
                               color: const Color(0xFF6366F1),
                             ),
                             _MetricCard(
-                              title: l10n.t(AppText.companyReportsMetricAccepted),
+                              title: l10n.t(
+                                AppText.companyReportsMetricAccepted,
+                              ),
                               value: _summary.acceptedApplications.toString(),
                               icon: Icons.check_circle_outline,
                               color: const Color(0xFF16A34A),
                             ),
                             _MetricCard(
-                              title: l10n.t(AppText.companyReportsMetricRejected),
+                              title: l10n.t(
+                                AppText.companyReportsMetricRejected,
+                              ),
                               value: _summary.rejectedApplications.toString(),
                               icon: Icons.cancel_outlined,
                               color: const Color(0xFFDC2626),
                             ),
                             _MetricCard(
-                              title: l10n.t(AppText.companyReportsMetricActiveListings),
+                              title: l10n.t(
+                                AppText.companyReportsMetricActiveListings,
+                              ),
                               value: l10n.companyReportsActiveListingsValue(
                                 _summary.activeJobs,
                                 _summary.activeInternships,
                               ),
                               icon: Icons.work_outline,
-                              color: const Color(0xFF111827),
+                              color: const Color(0xFF1F2937),
                             ),
                           ],
                         );
                       },
                     ),
                     const SizedBox(height: 20),
-                    Text(l10n.t(AppText.companyReportsTrendsTitle),
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+                    Text(
+                      l10n.t(AppText.companyReportsTrendsTitle),
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
                     const SizedBox(height: 12),
                     LayoutBuilder(
                       builder: (_, c) {
@@ -319,12 +394,16 @@ class _CompanyReportsScreenState extends ConsumerState<CompanyReportsScreen> {
                           childAspectRatio: 1.6,
                           children: [
                             _TrendCard(
-                              title: l10n.t(AppText.companyReportsChartViewsTrend),
+                              title: l10n.t(
+                                AppText.companyReportsChartViewsTrend,
+                              ),
                               points: _trends.views,
                               color: const Color(0xFF3B82F6),
                             ),
                             _TrendCard(
-                              title: l10n.t(AppText.companyReportsChartApplicationsTrend),
+                              title: l10n.t(
+                                AppText.companyReportsChartApplicationsTrend,
+                              ),
                               points: _trends.applications,
                               color: const Color(0xFF7C3AED),
                             ),
@@ -394,7 +473,13 @@ class _MetricCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 12, offset: Offset(0, 6))],
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0A000000),
+            blurRadius: 12,
+            offset: Offset(0, 6),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -409,9 +494,18 @@ class _MetricCard extends StatelessWidget {
             child: Icon(icon, color: color),
           ),
           const Spacer(),
-          Text(value, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
+          Text(
+            value,
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
+          ),
           const SizedBox(height: 6),
-          Text(title, style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600)),
+          Text(
+            title,
+            style: const TextStyle(
+              color: Color(0xFF6B7280),
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ],
       ),
     );
@@ -437,7 +531,13 @@ class _TrendCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 12, offset: Offset(0, 6))],
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0A000000),
+            blurRadius: 12,
+            offset: Offset(0, 6),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -462,7 +562,9 @@ class _LineChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (points.isEmpty) {
-      return Center(child: Text(AppLocalizations.of(context).t(AppText.commonNoData)));
+      return Center(
+        child: Text(AppLocalizations.of(context).t(AppText.commonNoData)),
+      );
     }
 
     return Column(
@@ -481,7 +583,10 @@ class _LineChart extends StatelessWidget {
                 child: Text(
                   '${p.date.day}',
                   textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 11, color: Color(0xFF6B7280)),
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: Color(0xFF6B7280),
+                  ),
                 ),
               ),
           ],
@@ -562,16 +667,32 @@ class _DistributionCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 12, offset: Offset(0, 6))],
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0A000000),
+            blurRadius: 12,
+            offset: Offset(0, 6),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(AppLocalizations.of(context).t(AppText.companyReportsDepartmentDistribution),
-              style: const TextStyle(fontWeight: FontWeight.w900)),
+          Text(
+            AppLocalizations.of(
+              context,
+            ).t(AppText.companyReportsDepartmentDistribution),
+            style: const TextStyle(fontWeight: FontWeight.w900),
+          ),
           const SizedBox(height: 12),
           if (top.isEmpty)
-            Expanded(child: Center(child: Text(AppLocalizations.of(context).t(AppText.commonNoData))))
+            Expanded(
+              child: Center(
+                child: Text(
+                  AppLocalizations.of(context).t(AppText.commonNoData),
+                ),
+              ),
+            )
           else
             Expanded(
               child: ListView.separated(
@@ -589,12 +710,16 @@ class _DistributionCard extends StatelessWidget {
                           Expanded(
                             child: Text(
                               entry.key,
-                              style: const TextStyle(fontWeight: FontWeight.w700),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w700,
+                              ),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          Text(entry.value.toString(),
-                              style: const TextStyle(color: Color(0xFF6B7280))),
+                          Text(
+                            entry.value.toString(),
+                            style: const TextStyle(color: Color(0xFF6B7280)),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 4),
@@ -604,7 +729,9 @@ class _DistributionCard extends StatelessWidget {
                           value: ratio,
                           minHeight: 6,
                           backgroundColor: const Color(0xFFE5E7EB),
-                          valueColor: const AlwaysStoppedAnimation(Color(0xFF6D28D9)),
+                          valueColor: const AlwaysStoppedAnimation(
+                            Color(0xFF6D28D9),
+                          ),
                         ),
                       ),
                     ],
@@ -632,28 +759,44 @@ class _FunnelCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 12, offset: Offset(0, 6))],
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0A000000),
+            blurRadius: 12,
+            offset: Offset(0, 6),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(AppLocalizations.of(context).t(AppText.companyReportsConversionFunnel),
-              style: const TextStyle(fontWeight: FontWeight.w900)),
+          Text(
+            AppLocalizations.of(
+              context,
+            ).t(AppText.companyReportsConversionFunnel),
+            style: const TextStyle(fontWeight: FontWeight.w900),
+          ),
           const SizedBox(height: 12),
           _FunnelRow(
-            label: AppLocalizations.of(context).t(AppText.companyReportsMetricTotalViews),
+            label: AppLocalizations.of(
+              context,
+            ).t(AppText.companyReportsMetricTotalViews),
             value: funnel.views,
             max: maxValue,
           ),
           const SizedBox(height: 10),
           _FunnelRow(
-            label: AppLocalizations.of(context).t(AppText.companyReportsMetricTotalApplications),
+            label: AppLocalizations.of(
+              context,
+            ).t(AppText.companyReportsMetricTotalApplications),
             value: funnel.applications,
             max: maxValue,
           ),
           const SizedBox(height: 10),
           _FunnelRow(
-            label: AppLocalizations.of(context).t(AppText.companyReportsMetricAccepted),
+            label: AppLocalizations.of(
+              context,
+            ).t(AppText.companyReportsMetricAccepted),
             value: funnel.accepted,
             max: maxValue,
           ),
@@ -683,9 +826,15 @@ class _FunnelRow extends StatelessWidget {
         Row(
           children: [
             Expanded(
-              child: Text(label, style: const TextStyle(fontWeight: FontWeight.w700)),
+              child: Text(
+                label,
+                style: const TextStyle(fontWeight: FontWeight.w700),
+              ),
             ),
-            Text(value.toString(), style: const TextStyle(color: Color(0xFF6B7280))),
+            Text(
+              value.toString(),
+              style: const TextStyle(color: Color(0xFF6B7280)),
+            ),
           ],
         ),
         const SizedBox(height: 4),

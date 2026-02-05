@@ -1,4 +1,4 @@
-﻿// lib/src/features/chat/presentation/controllers/chat_controller.dart
+// lib/src/features/chat/presentation/controllers/chat_controller.dart
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -57,14 +57,12 @@ final chatRepositoryProvider = Provider<ChatRepository>((ref) {
   return ChatRepository(SupabaseService.client);
 });
 
-final chatControllerProvider =
-    StateNotifierProvider.autoDispose.family<ChatController, ChatState, String>(
-  (ref, userId) {
-    final controller = ChatController(ref, userId);
-    ref.onDispose(controller.close);
-    return controller;
-  },
-);
+final chatControllerProvider = StateNotifierProvider.autoDispose
+    .family<ChatController, ChatState, String>((ref, userId) {
+      final controller = ChatController(ref, userId);
+      ref.onDispose(controller.close);
+      return controller;
+    });
 
 class ChatController extends StateNotifier<ChatState> {
   ChatController(this._ref, this._userId) : super(ChatState.initial());
@@ -193,9 +191,7 @@ class ChatController extends StateNotifier<ChatState> {
               sessionId: _activeSessionId,
               isLocal: true,
             );
-            state = state.copyWith(
-              messages: [...state.messages, botMessage],
-            );
+            state = state.copyWith(messages: [...state.messages, botMessage]);
           } else if (botId != null) {
             _updateBotMessage(botId, buffer);
           }
@@ -224,7 +220,9 @@ class ChatController extends StateNotifier<ChatState> {
           );
           break;
         case ChatStreamEventType.error:
-          throw ChatRepositoryException(event.data['error']?.toString() ?? 'Stream error');
+          throw ChatRepositoryException(
+            event.data['error']?.toString() ?? 'Stream error',
+          );
       }
     }
 
@@ -255,7 +253,9 @@ class ChatController extends StateNotifier<ChatState> {
   void close() {
     final sessionId = _activeSessionId;
     if (sessionId != null) {
-      unawaited(_repo.endSession(sessionId, messageCount: state.messages.length));
+      unawaited(
+        _repo.endSession(sessionId, messageCount: state.messages.length),
+      );
     }
   }
 

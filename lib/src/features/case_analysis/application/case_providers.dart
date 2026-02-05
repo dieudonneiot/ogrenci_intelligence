@@ -4,14 +4,18 @@ import '../../oi/application/oi_providers.dart';
 import '../data/case_repository.dart';
 import '../domain/case_models.dart';
 
-final caseRepositoryProvider = Provider<CaseRepository>((ref) => const CaseRepository());
-
-final caseScenariosProvider =
-    AutoDisposeAsyncNotifierProvider<CaseScenariosController, List<CaseScenario>>(
-  CaseScenariosController.new,
+final caseRepositoryProvider = Provider<CaseRepository>(
+  (ref) => const CaseRepository(),
 );
 
-class CaseScenariosController extends AutoDisposeAsyncNotifier<List<CaseScenario>> {
+final caseScenariosProvider =
+    AutoDisposeAsyncNotifierProvider<
+      CaseScenariosController,
+      List<CaseScenario>
+    >(CaseScenariosController.new);
+
+class CaseScenariosController
+    extends AutoDisposeAsyncNotifier<List<CaseScenario>> {
   @override
   Future<List<CaseScenario>> build() async {
     final repo = ref.watch(caseRepositoryProvider);
@@ -34,4 +38,3 @@ class CaseScenariosController extends AutoDisposeAsyncNotifier<List<CaseScenario
     ref.invalidate(myOiProfileProvider);
   }
 }
-

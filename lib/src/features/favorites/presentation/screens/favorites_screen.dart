@@ -63,15 +63,29 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.favorite, color: Color(0xFFEF4444), size: 28),
+                      const Icon(
+                        Icons.favorite,
+                        color: Color(0xFFEF4444),
+                        size: 28,
+                      ),
                       const SizedBox(width: 10),
-                      Text(l10n.t(AppText.navFavorites),
-                          style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900)),
+                      Text(
+                        l10n.t(AppText.navFavorites),
+                        style: const TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 6),
-                  Text(l10n.t(AppText.favoritesSubtitle),
-                      style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600)),
+                  Text(
+                    l10n.t(AppText.favoritesSubtitle),
+                    style: const TextStyle(
+                      color: Color(0xFF6B7280),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                   const SizedBox(height: 16),
                   _FiltersBar(
                     activeTab: _activeTab,
@@ -161,14 +175,21 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context).favoritesLoadFailed(e.toString()))),
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(context).favoritesLoadFailed(e.toString()),
+          ),
+        ),
       );
     } finally {
       if (mounted) setState(() => _loading = false);
     }
   }
 
-  Future<Map<String, dynamic>?> _fetchDetails(String type, Map<String, dynamic> fav) async {
+  Future<Map<String, dynamic>?> _fetchDetails(
+    String type,
+    Map<String, dynamic> fav,
+  ) async {
     try {
       if (type == 'course' && fav['course_id'] != null) {
         return await SupabaseService.client
@@ -205,12 +226,20 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
         _items = _items.where((e) => e.id != id).toList();
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context).t(AppText.favoritesRemoved))),
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(context).t(AppText.favoritesRemoved),
+          ),
+        ),
       );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context).commonActionFailed(e.toString()))),
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(context).commonActionFailed(e.toString()),
+          ),
+        ),
       );
     } finally {
       if (mounted) setState(() => _removingId = null);
@@ -243,7 +272,11 @@ class _FiltersBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final tabs = <_TabItem>[
-      _TabItem(id: 'all', label: l10n.t(AppText.commonAll), count: items.length),
+      _TabItem(
+        id: 'all',
+        label: l10n.t(AppText.commonAll),
+        count: items.length,
+      ),
       _TabItem(
         id: 'course',
         label: l10n.t(AppText.navCourses),
@@ -267,7 +300,13 @@ class _FiltersBar extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 18, offset: Offset(0, 8))],
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0A000000),
+            blurRadius: 18,
+            offset: Offset(0, 8),
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -279,21 +318,32 @@ class _FiltersBar extends StatelessWidget {
                   TextButton(
                     onPressed: () => onTab(t.id),
                     style: TextButton.styleFrom(
-                      foregroundColor: activeTab == t.id ? const Color(0xFF6D28D9) : const Color(0xFF6B7280),
+                      foregroundColor: activeTab == t.id
+                          ? const Color(0xFF6D28D9)
+                          : const Color(0xFF6B7280),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(t.label, style: const TextStyle(fontWeight: FontWeight.w800)),
+                        Text(
+                          t.label,
+                          style: const TextStyle(fontWeight: FontWeight.w800),
+                        ),
                         if (t.count > 0) ...[
                           const SizedBox(width: 6),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 2,
+                            ),
                             decoration: BoxDecoration(
                               color: const Color(0xFFF3F4F6),
                               borderRadius: BorderRadius.circular(999),
                             ),
-                            child: Text('${t.count}', style: const TextStyle(fontSize: 11)),
+                            child: Text(
+                              '${t.count}',
+                              style: const TextStyle(fontSize: 11),
+                            ),
                           ),
                         ],
                       ],
@@ -306,12 +356,16 @@ class _FiltersBar extends StatelessWidget {
           IconButton(
             onPressed: () => onView(_ViewMode.grid),
             icon: const Icon(Icons.grid_view),
-            color: viewMode == _ViewMode.grid ? const Color(0xFF6D28D9) : const Color(0xFF9CA3AF),
+            color: viewMode == _ViewMode.grid
+                ? const Color(0xFF6D28D9)
+                : const Color(0xFF9CA3AF),
           ),
           IconButton(
             onPressed: () => onView(_ViewMode.list),
             icon: const Icon(Icons.view_list),
-            color: viewMode == _ViewMode.list ? const Color(0xFF6D28D9) : const Color(0xFF9CA3AF),
+            color: viewMode == _ViewMode.list
+                ? const Color(0xFF6D28D9)
+                : const Color(0xFF9CA3AF),
           ),
         ],
       ),
@@ -337,7 +391,11 @@ class _FavoritesGrid extends StatelessWidget {
     return LayoutBuilder(
       builder: (_, c) {
         final w = c.maxWidth;
-        final crossAxis = w >= 1024 ? 3 : w >= 768 ? 2 : 1;
+        final crossAxis = w >= 1024
+            ? 3
+            : w >= 768
+            ? 2
+            : 1;
 
         return GridView.builder(
           shrinkWrap: true,
@@ -411,7 +469,13 @@ class _FavoriteCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: const [BoxShadow(color: Color(0x08000000), blurRadius: 12, offset: Offset(0, 6))],
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x08000000),
+            blurRadius: 12,
+            offset: Offset(0, 6),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -441,7 +505,9 @@ class _FavoriteCard extends StatelessWidget {
           const Spacer(),
           TextButton(
             onPressed: onOpen,
-            child: Text(AppLocalizations.of(context).t(AppText.commonViewDetailsArrow)),
+            child: Text(
+              AppLocalizations.of(context).t(AppText.commonViewDetailsArrow),
+            ),
           ),
         ],
       ),
@@ -471,7 +537,13 @@ class _FavoriteListRow extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: const [BoxShadow(color: Color(0x08000000), blurRadius: 12, offset: Offset(0, 6))],
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x08000000),
+            blurRadius: 12,
+            offset: Offset(0, 6),
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -503,8 +575,12 @@ class _FavoriteListRow extends StatelessWidget {
           const SizedBox(width: 10),
           ElevatedButton(
             onPressed: onOpen,
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6D28D9)),
-            child: Text(AppLocalizations.of(context).t(AppText.commonViewDetails)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF6D28D9),
+            ),
+            child: Text(
+              AppLocalizations.of(context).t(AppText.commonViewDetails),
+            ),
           ),
           const SizedBox(width: 8),
           IconButton(
@@ -528,7 +604,10 @@ class _DetailsBlock extends StatelessWidget {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _DetailRow(icon: Icons.groups_outlined, text: '${item.enrolledCount} öğrenci'),
+          _DetailRow(
+            icon: Icons.groups_outlined,
+            text: '${item.enrolledCount} öğrenci',
+          ),
           const SizedBox(height: 6),
           _DetailRow(icon: Icons.star, text: '${item.rating}/5'),
         ],
@@ -540,7 +619,10 @@ class _DetailsBlock extends StatelessWidget {
       children: [
         _DetailRow(icon: Icons.business, text: item.company ?? '—'),
         const SizedBox(height: 6),
-        _DetailRow(icon: Icons.location_on_outlined, text: item.location ?? '—'),
+        _DetailRow(
+          icon: Icons.location_on_outlined,
+          text: item.location ?? '—',
+        ),
       ],
     );
   }
@@ -558,7 +640,11 @@ class _DetailsInline extends StatelessWidget {
 
     return Text(
       meta,
-      style: const TextStyle(color: Color(0xFF6B7280), fontSize: 12, fontWeight: FontWeight.w600),
+      style: const TextStyle(
+        color: Color(0xFF6B7280),
+        fontSize: 12,
+        fontWeight: FontWeight.w600,
+      ),
     );
   }
 }
@@ -577,7 +663,11 @@ class _DetailRow extends StatelessWidget {
         Expanded(
           child: Text(
             text,
-            style: const TextStyle(color: Color(0xFF6B7280), fontSize: 12, fontWeight: FontWeight.w600),
+            style: const TextStyle(
+              color: Color(0xFF6B7280),
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
       ],
@@ -657,8 +747,14 @@ class _TypePill extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(999)),
-      child: Text(label, style: TextStyle(color: fg, fontWeight: FontWeight.w800, fontSize: 11)),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(color: fg, fontWeight: FontWeight.w800, fontSize: 11),
+      ),
     );
   }
 }
@@ -688,15 +784,29 @@ class _EmptyFavorites extends StatelessWidget {
         children: [
           const Icon(Icons.favorite_border, size: 44, color: Color(0xFFD1D5DB)),
           const SizedBox(height: 8),
-          Text(l10n.t(AppText.favoritesEmptyTitle),
-              style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600)),
+          Text(
+            l10n.t(AppText.favoritesEmptyTitle),
+            style: const TextStyle(
+              color: Color(0xFF6B7280),
+              fontWeight: FontWeight.w600,
+            ),
+          ),
           const SizedBox(height: 10),
           Wrap(
             spacing: 10,
             children: [
-              TextButton(onPressed: onCourses, child: Text(l10n.t(AppText.favoritesExploreCourses))),
-              TextButton(onPressed: onJobs, child: Text(l10n.t(AppText.favoritesBrowseJobs))),
-              TextButton(onPressed: onInternships, child: Text(l10n.t(AppText.favoritesBrowseInternships))),
+              TextButton(
+                onPressed: onCourses,
+                child: Text(l10n.t(AppText.favoritesExploreCourses)),
+              ),
+              TextButton(
+                onPressed: onJobs,
+                child: Text(l10n.t(AppText.favoritesBrowseJobs)),
+              ),
+              TextButton(
+                onPressed: onInternships,
+                child: Text(l10n.t(AppText.favoritesBrowseInternships)),
+              ),
             ],
           ),
         ],
@@ -719,11 +829,20 @@ class _GuestView extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.lock_outline, size: 46, color: Color(0xFF6B7280)),
+              const Icon(
+                Icons.lock_outline,
+                size: 46,
+                color: Color(0xFF6B7280),
+              ),
               const SizedBox(height: 10),
-              Text(title,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF374151))),
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w800,
+                  color: Color(0xFF374151),
+                ),
+              ),
             ],
           ),
         ),
@@ -733,11 +852,7 @@ class _GuestView extends StatelessWidget {
 }
 
 class _TabItem {
-  const _TabItem({
-    required this.id,
-    required this.label,
-    required this.count,
-  });
+  const _TabItem({required this.id, required this.label, required this.count});
 
   final String id;
   final String label;
@@ -765,7 +880,9 @@ class _FavoriteItem {
 
   String get title => (details['title'] as String?) ?? 'İçerik';
   String? get company =>
-      (details['company'] as String?) ?? (details['company_name'] as String?) ?? (details['companyName'] as String?);
+      (details['company'] as String?) ??
+      (details['company_name'] as String?) ??
+      (details['companyName'] as String?);
   String? get location => details['location'] as String?;
   String? get instructor => details['instructor'] as String?;
   String? get duration => details['duration'] as String?;
@@ -775,11 +892,16 @@ class _FavoriteItem {
   String? get detailPath {
     if (type == 'course' && courseId != null) return '/courses/$courseId';
     if (type == 'job' && jobId != null) return '/jobs/$jobId';
-    if (type == 'internship' && internshipId != null) return '/internships/$internshipId';
+    if (type == 'internship' && internshipId != null) {
+      return '/internships/$internshipId';
+    }
     return null;
   }
 
-  factory _FavoriteItem.fromMap(Map<String, dynamic> map, Map<String, dynamic> details) {
+  factory _FavoriteItem.fromMap(
+    Map<String, dynamic> map,
+    Map<String, dynamic> details,
+  ) {
     return _FavoriteItem(
       id: map['id']?.toString() ?? '',
       type: (map['type'] ?? '').toString(),

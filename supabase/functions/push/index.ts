@@ -2,12 +2,12 @@
 // Sends an FCM push for a focus check.
 //
 // Required secrets:
-// - SERVICE_ROLE_KEY (or BASE_SERVICE_ROLE_KEY / SUPABASE_SERVICE_ROLE_KEY)
+// - SUPABASE_SERVICE_ROLE_KEY (or SERVICE_ROLE_KEY)
 // - FIREBASE_SERVICE_ACCOUNT_JSON  (the full JSON string of a Firebase service account)
 //
 // Note: In hosted Supabase Edge Functions, SUPABASE_URL and SUPABASE_ANON_KEY are
 // typically provided automatically by the platform. If you're running locally,
-// you can provide SUPABASE_URL/SUPABASE_ANON_KEY (or BASE_URL/BASE_ANON_KEY).
+// you can provide SUPABASE_URL/SUPABASE_ANON_KEY.
 //
 // Call:
 //   POST /functions/v1/push { "focus_check_id": "<uuid>" }
@@ -135,9 +135,9 @@ Deno.serve(async (req) => {
   const focusCheckId = (payload["focus_check_id"] ?? "").toString().trim();
   if (!focusCheckId) return jsonResponse({ error: "focus_check_id required" }, 400);
 
-  const supabaseUrl = envAny(["SUPABASE_URL", "BASE_URL"]);
-  const anonKey = envJwtAny(["BASE_ANON_KEY", "SUPABASE_ANON_KEY"]);
-  const serviceKey = envJwtAny(["SERVICE_ROLE_KEY", "BASE_SERVICE_ROLE_KEY", "SUPABASE_SERVICE_ROLE_KEY"]);
+  const supabaseUrl = envAny(["SUPABASE_URL"]);
+  const anonKey = envJwtAny(["SUPABASE_ANON_KEY"]);
+  const serviceKey = envJwtAny(["SUPABASE_SERVICE_ROLE_KEY", "SERVICE_ROLE_KEY"]);
 
   // 1) Use caller auth (RLS enforced) to validate access to that focus_check
   const userClient = createClient(supabaseUrl, anonKey, {

@@ -11,10 +11,12 @@ class CompanyExcuseRequestsScreen extends ConsumerStatefulWidget {
   const CompanyExcuseRequestsScreen({super.key});
 
   @override
-  ConsumerState<CompanyExcuseRequestsScreen> createState() => _CompanyExcuseRequestsScreenState();
+  ConsumerState<CompanyExcuseRequestsScreen> createState() =>
+      _CompanyExcuseRequestsScreenState();
 }
 
-class _CompanyExcuseRequestsScreenState extends ConsumerState<CompanyExcuseRequestsScreen> {
+class _CompanyExcuseRequestsScreenState
+    extends ConsumerState<CompanyExcuseRequestsScreen> {
   bool _loading = true;
   String _filter = 'pending'; // pending | all
 
@@ -37,12 +39,17 @@ class _CompanyExcuseRequestsScreenState extends ConsumerState<CompanyExcuseReque
     try {
       final repo = const ExcuseRepository();
       final status = _filter == 'pending' ? 'pending' : null;
-      final items = await repo.listCompanyRequests(companyId: companyId, status: status);
+      final items = await repo.listCompanyRequests(
+        companyId: companyId,
+        status: status,
+      );
       if (!mounted) return;
       setState(() => _items = items);
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed: $e')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Failed: $e')));
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -54,7 +61,9 @@ class _CompanyExcuseRequestsScreenState extends ConsumerState<CompanyExcuseReque
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text(status == 'approved' ? 'Approve request?' : 'Reject request?'),
+          title: Text(
+            status == 'approved' ? 'Approve request?' : 'Reject request?',
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -72,11 +81,16 @@ class _CompanyExcuseRequestsScreenState extends ConsumerState<CompanyExcuseReque
             ],
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel'),
+            ),
             ElevatedButton(
               onPressed: () => Navigator.pop(context, true),
               style: ElevatedButton.styleFrom(
-                backgroundColor: status == 'approved' ? const Color(0xFF16A34A) : const Color(0xFFDC2626),
+                backgroundColor: status == 'approved'
+                    ? const Color(0xFF16A34A)
+                    : const Color(0xFFDC2626),
                 foregroundColor: Colors.white,
               ),
               child: Text(status == 'approved' ? 'Approve' : 'Reject'),
@@ -94,14 +108,20 @@ class _CompanyExcuseRequestsScreenState extends ConsumerState<CompanyExcuseReque
       await repo.reviewRequest(
         requestId: r.id,
         newStatus: status,
-        reviewerNote: noteCtrl.text.trim().isEmpty ? null : noteCtrl.text.trim(),
+        reviewerNote: noteCtrl.text.trim().isEmpty
+            ? null
+            : noteCtrl.text.trim(),
       );
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Updated.')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Updated.')));
       await _load();
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed: $e')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Failed: $e')));
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -117,7 +137,12 @@ class _CompanyExcuseRequestsScreenState extends ConsumerState<CompanyExcuseReque
     }
 
     if (_loading) {
-      return const Center(child: Padding(padding: EdgeInsets.all(24), child: CircularProgressIndicator()));
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(24),
+          child: CircularProgressIndicator(),
+        ),
+      );
     }
 
     return Container(
@@ -135,7 +160,10 @@ class _CompanyExcuseRequestsScreenState extends ConsumerState<CompanyExcuseReque
                     const Expanded(
                       child: Text(
                         'Excuse Requests',
-                        style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900),
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.w900,
+                        ),
                       ),
                     ),
                     IconButton(
@@ -176,16 +204,24 @@ class _CompanyExcuseRequestsScreenState extends ConsumerState<CompanyExcuseReque
                       ? const Center(
                           child: Text(
                             'No requests.',
-                            style: TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w800),
+                            style: TextStyle(
+                              color: Color(0xFF6B7280),
+                              fontWeight: FontWeight.w800,
+                            ),
                           ),
                         )
                       : ListView.separated(
                           itemCount: _items.length,
-                          separatorBuilder: (context, index) => const SizedBox(height: 10),
+                          separatorBuilder: (context, index) =>
+                              const SizedBox(height: 10),
                           itemBuilder: (_, i) => _RequestCard(
                             item: _items[i],
-                            onApprove: _items[i].status == 'pending' ? () => _review(_items[i], 'approved') : null,
-                            onReject: _items[i].status == 'pending' ? () => _review(_items[i], 'rejected') : null,
+                            onApprove: _items[i].status == 'pending'
+                                ? () => _review(_items[i], 'approved')
+                                : null,
+                            onReject: _items[i].status == 'pending'
+                                ? () => _review(_items[i], 'rejected')
+                                : null,
                           ),
                         ),
                 ),
@@ -199,7 +235,11 @@ class _CompanyExcuseRequestsScreenState extends ConsumerState<CompanyExcuseReque
 }
 
 class _RequestCard extends StatelessWidget {
-  const _RequestCard({required this.item, required this.onApprove, required this.onReject});
+  const _RequestCard({
+    required this.item,
+    required this.onApprove,
+    required this.onReject,
+  });
   final CompanyExcuseRequest item;
   final VoidCallback? onApprove;
   final VoidCallback? onReject;
@@ -212,7 +252,13 @@ class _RequestCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: const [BoxShadow(color: Color(0x07000000), blurRadius: 14, offset: Offset(0, 8))],
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x07000000),
+            blurRadius: 14,
+            offset: Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -221,8 +267,13 @@ class _RequestCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  item.studentName.isEmpty ? item.studentEmail : item.studentName,
-                  style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+                  item.studentName.isEmpty
+                      ? item.studentEmail
+                      : item.studentName,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 16,
+                  ),
                 ),
               ),
               _StatusPill(status: item.status),
@@ -231,7 +282,10 @@ class _RequestCard extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             item.internshipTitle,
-            style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
+            style: const TextStyle(
+              color: Color(0xFF6B7280),
+              fontWeight: FontWeight.w700,
+            ),
           ),
           const SizedBox(height: 10),
           Wrap(
@@ -244,7 +298,13 @@ class _RequestCard extends StatelessWidget {
           ),
           if (item.details != null && item.details!.isNotEmpty) ...[
             const SizedBox(height: 10),
-            Text(item.details!, style: const TextStyle(color: Color(0xFF374151), fontWeight: FontWeight.w600)),
+            Text(
+              item.details!,
+              style: const TextStyle(
+                color: Color(0xFF374151),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ],
           if (item.reviewerNote != null && item.reviewerNote!.isNotEmpty) ...[
             const SizedBox(height: 10),
@@ -255,8 +315,13 @@ class _RequestCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(color: const Color(0xFFE5E7EB)),
               ),
-              child: Text('Note: ${item.reviewerNote!}',
-                  style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700)),
+              child: Text(
+                'Note: ${item.reviewerNote!}',
+                style: const TextStyle(
+                  color: Color(0xFF6B7280),
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
             ),
           ],
           if (onApprove != null || onReject != null) ...[
@@ -269,9 +334,14 @@ class _RequestCard extends StatelessWidget {
                     style: OutlinedButton.styleFrom(
                       foregroundColor: const Color(0xFFDC2626),
                       side: const BorderSide(color: Color(0xFFFCA5A5)),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
                     ),
-                    child: const Text('Reject', style: TextStyle(fontWeight: FontWeight.w900)),
+                    child: const Text(
+                      'Reject',
+                      style: TextStyle(fontWeight: FontWeight.w900),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -281,10 +351,15 @@ class _RequestCard extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF16A34A),
                       foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
                       elevation: 0,
                     ),
-                    child: const Text('Approve', style: TextStyle(fontWeight: FontWeight.w900)),
+                    child: const Text(
+                      'Approve',
+                      style: TextStyle(fontWeight: FontWeight.w900),
+                    ),
                   ),
                 ),
               ],
@@ -304,8 +379,18 @@ class _Tag extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(color: const Color(0xFFF3F4F6), borderRadius: BorderRadius.circular(999)),
-      child: Text(text, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12, color: Color(0xFF374151))),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF3F4F6),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        text,
+        style: const TextStyle(
+          fontWeight: FontWeight.w800,
+          fontSize: 12,
+          color: Color(0xFF374151),
+        ),
+      ),
     );
   }
 }
@@ -345,8 +430,14 @@ class _StatusPill extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(999)),
-      child: Text(label, style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: fg)),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: fg),
+      ),
     );
   }
 }

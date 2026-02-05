@@ -1,10 +1,7 @@
 enum UserType { guest, student, company, admin }
 
 class CompanyMembership {
-  const CompanyMembership({
-    required this.companyId,
-    required this.role,
-  });
+  const CompanyMembership({required this.companyId, required this.role});
 
   final String companyId;
   final String role;

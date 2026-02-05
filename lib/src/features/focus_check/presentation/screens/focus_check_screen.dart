@@ -90,10 +90,18 @@ class _FocusCheckScreenState extends ConsumerState<FocusCheckScreen> {
                   children: [
                     const Icon(Icons.timer_outlined, color: Color(0xFF6D28D9)),
                     const SizedBox(width: 10),
-                    const Text('Instant Focus Check', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900)),
+                    const Text(
+                      'Instant Focus Check',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
                     const Spacer(),
                     IconButton(
-                      onPressed: () => ref.read(acceptedInternshipsProvider.notifier).refresh(),
+                      onPressed: () => ref
+                          .read(acceptedInternshipsProvider.notifier)
+                          .refresh(),
                       icon: const Icon(Icons.refresh),
                     ),
                   ],
@@ -116,7 +124,8 @@ class _FocusCheckScreenState extends ConsumerState<FocusCheckScreen> {
                         return const _Banner(
                           color: Color(0xFFB45309),
                           bg: Color(0xFFFFF7ED),
-                          text: 'No accepted internship found. Focus checks are available after you are accepted.',
+                          text:
+                              'No accepted internship found. Focus checks are available after you are accepted.',
                         );
                       }
                       _selected ??= items.first;
@@ -142,7 +151,8 @@ class _FocusCheckScreenState extends ConsumerState<FocusCheckScreen> {
                   const _Banner(
                     color: Color(0xFF2563EB),
                     bg: Color(0xFFDBEAFE),
-                    text: 'You have a new Focus Check. Answer before time runs out.',
+                    text:
+                        'You have a new Focus Check. Answer before time runs out.',
                   ),
 
                 const SizedBox(height: 14),
@@ -152,13 +162,17 @@ class _FocusCheckScreenState extends ConsumerState<FocusCheckScreen> {
                     height: 48,
                     width: double.infinity,
                     child: ElevatedButton.icon(
-                      onPressed: (isPush || _starting || _selected == null) ? null : _start,
+                      onPressed: (isPush || _starting || _selected == null)
+                          ? null
+                          : _start,
                       icon: const Icon(Icons.play_arrow),
                       label: Text(_starting ? 'Starting...' : 'Start (30s)'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF6D28D9),
                         foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
                         elevation: 0,
                       ),
                     ),
@@ -186,14 +200,16 @@ class _FocusCheckScreenState extends ConsumerState<FocusCheckScreen> {
     if (internship == null) return;
     setState(() => _starting = true);
     try {
-      final session = await ref.read(focusActionProvider).start(
-            internshipApplicationId: internship.applicationId,
-          );
+      final session = await ref
+          .read(focusActionProvider)
+          .start(internshipApplicationId: internship.applicationId);
       if (!mounted) return;
       _startTimer(session);
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to start: $e')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Failed to start: $e')));
     } finally {
       if (mounted) setState(() => _starting = false);
     }
@@ -219,22 +235,27 @@ class _FocusCheckScreenState extends ConsumerState<FocusCheckScreen> {
     final session = ref.read(focusSessionProvider);
     if (session == null) return;
     if (_secondsLeft <= 0) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Time is up.')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Time is up.')));
       return;
     }
     setState(() => _submitting = true);
     try {
-      await ref.read(focusActionProvider).submit(
-            focusCheckId: session.id,
-            answer: _answerCtrl.text.trim(),
-          );
+      await ref
+          .read(focusActionProvider)
+          .submit(focusCheckId: session.id, answer: _answerCtrl.text.trim());
       _answerCtrl.clear();
       _timer?.cancel();
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Submitted.')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Submitted.')));
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Submit failed: $e')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Submit failed: $e')));
     } finally {
       if (mounted) setState(() => _submitting = false);
     }
@@ -310,7 +331,13 @@ class _SessionCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 18, offset: Offset(0, 8))],
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0A000000),
+            blurRadius: 18,
+            offset: Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -318,7 +345,10 @@ class _SessionCard extends StatelessWidget {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: color.withValues(alpha: 0.10),
                   borderRadius: BorderRadius.circular(999),
@@ -330,11 +360,17 @@ class _SessionCard extends StatelessWidget {
                 ),
               ),
               const Spacer(),
-              const Text('Answer before time runs out.', style: TextStyle(color: Color(0xFF6B7280))),
+              const Text(
+                'Answer before time runs out.',
+                style: TextStyle(color: Color(0xFF6B7280)),
+              ),
             ],
           ),
           const SizedBox(height: 14),
-          Text(session.question, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
+          Text(
+            session.question,
+            style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+          ),
           const SizedBox(height: 12),
           TextField(
             controller: controller,
@@ -356,7 +392,9 @@ class _SessionCard extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF6D28D9),
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
                 elevation: 0,
               ),
             ),
@@ -383,7 +421,10 @@ class _Banner extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: color.withValues(alpha: 0.25)),
       ),
-      child: Text(text, style: TextStyle(color: color, fontWeight: FontWeight.w700)),
+      child: Text(
+        text,
+        style: TextStyle(color: color, fontWeight: FontWeight.w700),
+      ),
     );
   }
 }

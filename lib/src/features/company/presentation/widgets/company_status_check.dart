@@ -35,7 +35,9 @@ class _CompanyStatusCheckState extends ConsumerState<CompanyStatusCheck> {
   Future<void> _load() async {
     final auth = ref.read(authViewStateProvider).value;
     final companyId = auth?.companyId;
-    if (auth == null || auth.userType != UserType.company || companyId == null) {
+    if (auth == null ||
+        auth.userType != UserType.company ||
+        companyId == null) {
       setState(() {
         _loading = false;
         _error = _errCompanyAccountMissing;
@@ -78,10 +80,7 @@ class _CompanyStatusCheckState extends ConsumerState<CompanyStatusCheck> {
             ? l10n.t(AppText.companyStatusCompanyAccountMissing)
             : _error!,
         actions: [
-          ElevatedButton(
-            onPressed: _load,
-            child: Text(l10n.t(AppText.retry)),
-          ),
+          ElevatedButton(onPressed: _load, child: Text(l10n.t(AppText.retry))),
         ],
       );
     }
@@ -106,7 +105,7 @@ class _CompanyStatusCheckState extends ConsumerState<CompanyStatusCheck> {
     if (status.isBanned || status.approvalStatus == 'banned') {
       return _CenteredCard(
         icon: Icons.block,
-        iconBg: const Color(0xFF111827),
+        iconBg: const Color(0xFF7F1D1D),
         iconFg: Colors.white,
         title: l10n.t(AppText.companyStatusBannedTitle),
         subtitle: l10n.t(AppText.companyStatusBannedSubtitle),
@@ -115,7 +114,9 @@ class _CompanyStatusCheckState extends ConsumerState<CompanyStatusCheck> {
             onPressed: _launchMail,
             icon: const Icon(Icons.mail_outline),
             label: Text(l10n.t(AppText.companyStatusSupportTeam)),
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF111827)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF7F1D1D),
+            ),
           ),
         ],
       );
@@ -166,7 +167,9 @@ class _CompanyStatusCheckState extends ConsumerState<CompanyStatusCheck> {
             onPressed: _launchMail,
             icon: const Icon(Icons.mail_outline),
             label: Text(l10n.t(AppText.companyStatusContactSupport)),
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF111827)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF7F1D1D),
+            ),
           ),
         ],
       );
@@ -191,7 +194,9 @@ class _CompanyStatusCheckState extends ConsumerState<CompanyStatusCheck> {
             onPressed: () => context.go(Routes.companyPricing),
             icon: const Icon(Icons.credit_card),
             label: Text(l10n.t(AppText.companyStatusViewPlans)),
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6D28D9)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF6D28D9),
+            ),
           ),
         ],
       );
@@ -231,7 +236,13 @@ class _CenteredCard extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(18),
-              boxShadow: const [BoxShadow(color: Color(0x14000000), blurRadius: 18, offset: Offset(0, 10))],
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x14000000),
+                  blurRadius: 18,
+                  offset: Offset(0, 10),
+                ),
+              ],
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -239,13 +250,26 @@ class _CenteredCard extends StatelessWidget {
                 Container(
                   width: 80,
                   height: 80,
-                  decoration: BoxDecoration(color: iconBg, shape: BoxShape.circle),
+                  decoration: BoxDecoration(
+                    color: iconBg,
+                    shape: BoxShape.circle,
+                  ),
                   child: Icon(icon, size: 40, color: iconFg),
                 ),
                 const SizedBox(height: 16),
-                Text(title, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900)),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
                 const SizedBox(height: 8),
-                Text(subtitle, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFF6B7280))),
+                Text(
+                  subtitle,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Color(0xFF6B7280)),
+                ),
                 const SizedBox(height: 16),
                 for (final item in actions) item,
               ],
@@ -282,7 +306,10 @@ class _InfoBox extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: TextStyle(fontWeight: FontWeight.w800, color: accentText)),
+          Text(
+            title,
+            style: TextStyle(fontWeight: FontWeight.w800, color: accentText),
+          ),
           const SizedBox(height: 6),
           for (final item in items)
             Text('• $item', style: TextStyle(color: accentText)),

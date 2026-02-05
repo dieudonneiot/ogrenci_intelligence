@@ -30,7 +30,8 @@ class AuthViewState {
   bool get isEmailVerified => user?.emailConfirmedAt != null;
 
   // AUTHENTICATED = signed in + verified
-  bool get isAuthenticated => user != null && session != null && isEmailVerified;
+  bool get isAuthenticated =>
+      user != null && session != null && isEmailVerified;
 }
 
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
@@ -92,13 +93,16 @@ final authViewStateProvider = StreamProvider<AuthViewState>((ref) {
       ),
     );
   }
+
   // initial
-  controller.add(const AuthViewState(
-    user: null,
-    session: null,
-    loading: true,
-    userType: UserType.guest,
-  ));
+  controller.add(
+    const AuthViewState(
+      user: null,
+      session: null,
+      loading: true,
+      userType: UserType.guest,
+    ),
+  );
 
   unawaited(() async {
     await emit(repo.currentSession, loading: false);
@@ -110,12 +114,14 @@ final authViewStateProvider = StreamProvider<AuthViewState>((ref) {
       await emit(evt.session, loading: false);
     } catch (_) {
       // last-resort: still emit minimal state
-      controller.add(AuthViewState(
-        user: evt.session?.user,
-        session: evt.session,
-        loading: false,
-        userType: UserType.guest,
-      ));
+      controller.add(
+        AuthViewState(
+          user: evt.session?.user,
+          session: evt.session,
+          loading: false,
+          userType: UserType.guest,
+        ),
+      );
     }
   });
 
@@ -129,8 +135,8 @@ final authViewStateProvider = StreamProvider<AuthViewState>((ref) {
 
 final authActionLoadingProvider =
     StateNotifierProvider<AuthActionController, bool>((ref) {
-  return AuthActionController(ref.watch(authRepositoryProvider));
-});
+      return AuthActionController(ref.watch(authRepositoryProvider));
+    });
 
 class AuthActionController extends StateNotifier<bool> {
   AuthActionController(this._repo) : super(false);

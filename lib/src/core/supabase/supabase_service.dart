@@ -7,7 +7,7 @@ class SupabaseService {
   }) async {
     if (supabaseUrl.isEmpty || supabaseAnonKey.isEmpty) {
       throw Exception(
-        'Missing Supabase config in .env (SUPABASE_URL/SUPABASE_ANON_KEY or BASE_URL/BASE_ANON_KEY)',
+        'Missing Supabase config in .env (SUPABASE_URL and SUPABASE_ANON_KEY)',
       );
     }
 

@@ -1035,18 +1035,59 @@ class AppLocalizations {
   static const delegate = _AppLocalizationsDelegate();
 
   static const languages = <AppLanguage>[
-    AppLanguage(code: 'tr', locale: Locale('tr'), nativeName: 'Türkçe', englishName: 'Turkish'),
-    AppLanguage(code: 'en', locale: Locale('en'), nativeName: 'English', englishName: 'English'),
-    AppLanguage(code: 'ru', locale: Locale('ru'), nativeName: 'Русский', englishName: 'Russian'),
-    AppLanguage(code: 'fr', locale: Locale('fr'), nativeName: 'Français', englishName: 'French'),
-    AppLanguage(code: 'ky', locale: Locale('ky'), nativeName: 'Кыргызча', englishName: 'Kyrgyz'),
-    AppLanguage(code: 'kk', locale: Locale('kk'), nativeName: 'Қазақша', englishName: 'Kazakh'),
-    AppLanguage(code: 'ja', locale: Locale('ja'), nativeName: '日本語', englishName: 'Japanese'),
-    AppLanguage(code: 'zh', locale: Locale('zh', 'CN'), nativeName: '中文', englishName: 'Chinese'),
+    AppLanguage(
+      code: 'tr',
+      locale: Locale('tr'),
+      nativeName: 'Türkçe',
+      englishName: 'Turkish',
+    ),
+    AppLanguage(
+      code: 'en',
+      locale: Locale('en'),
+      nativeName: 'English',
+      englishName: 'English',
+    ),
+    AppLanguage(
+      code: 'ru',
+      locale: Locale('ru'),
+      nativeName: 'Русский',
+      englishName: 'Russian',
+    ),
+    AppLanguage(
+      code: 'fr',
+      locale: Locale('fr'),
+      nativeName: 'Français',
+      englishName: 'French',
+    ),
+    AppLanguage(
+      code: 'ky',
+      locale: Locale('ky'),
+      nativeName: 'Кыргызча',
+      englishName: 'Kyrgyz',
+    ),
+    AppLanguage(
+      code: 'kk',
+      locale: Locale('kk'),
+      nativeName: 'Қазақша',
+      englishName: 'Kazakh',
+    ),
+    AppLanguage(
+      code: 'ja',
+      locale: Locale('ja'),
+      nativeName: '日本語',
+      englishName: 'Japanese',
+    ),
+    AppLanguage(
+      code: 'zh',
+      locale: Locale('zh', 'CN'),
+      nativeName: '中文',
+      englishName: 'Chinese',
+    ),
   ];
 
-  static final supportedLocales =
-      languages.map((language) => language.locale).toList(growable: false);
+  static final supportedLocales = languages
+      .map((language) => language.locale)
+      .toList(growable: false);
 
   static AppLocalizations of(BuildContext context) {
     final loc = Localizations.of<AppLocalizations>(context, AppLocalizations);
@@ -1061,7 +1102,9 @@ class AppLocalizations {
   }
 
   String t(AppText key) {
-    final lang = _values.containsKey(locale.languageCode) ? locale.languageCode : 'tr';
+    final lang = _values.containsKey(locale.languageCode)
+        ? locale.languageCode
+        : 'tr';
     final current = _values[lang];
     if (current != null && current.containsKey(key)) {
       return current[key]!;
@@ -1077,15 +1120,24 @@ class AppLocalizations {
     return text;
   }
 
-  String signOutFailed(String error) => _format(AppText.signOutFailed, {'error': error});
-  String favoriteUpdateFailed(String error) => _format(AppText.favoriteUpdateFailed, {'error': error});
-  String commonUpdateFailed(String error) => _format(AppText.commonUpdateFailed, {'error': error});
-  String commonActionFailed(String error) => _format(AppText.commonActionFailed, {'error': error});
-  String deadlineLabel(String date) => _format(AppText.deadline, {'date': date});
-  String legalLastUpdated(String date) => _format(AppText.legalLastUpdated, {'date': date});
-  String footerCopyright(String year) => _format(AppText.footerCopyright, {'year': year});
-  String linkComingSoon(String name) => _format(AppText.linkComingSoon, {'name': name});
-  String pointsSystemLoadFailed(String error) => _format(AppText.pointsSystemLoadFailed, {'error': error});
+  String signOutFailed(String error) =>
+      _format(AppText.signOutFailed, {'error': error});
+  String favoriteUpdateFailed(String error) =>
+      _format(AppText.favoriteUpdateFailed, {'error': error});
+  String commonUpdateFailed(String error) =>
+      _format(AppText.commonUpdateFailed, {'error': error});
+  String commonActionFailed(String error) =>
+      _format(AppText.commonActionFailed, {'error': error});
+  String deadlineLabel(String date) =>
+      _format(AppText.deadline, {'date': date});
+  String legalLastUpdated(String date) =>
+      _format(AppText.legalLastUpdated, {'date': date});
+  String footerCopyright(String year) =>
+      _format(AppText.footerCopyright, {'year': year});
+  String linkComingSoon(String name) =>
+      _format(AppText.linkComingSoon, {'name': name});
+  String pointsSystemLoadFailed(String error) =>
+      _format(AppText.pointsSystemLoadFailed, {'error': error});
   String pointsSystemHistoryLoadFailed(String error) =>
       _format(AppText.pointsSystemHistoryLoadFailed, {'error': error});
   String pointsSystemRewardsLoadFailed(String error) =>
@@ -1093,35 +1145,57 @@ class AppLocalizations {
   String pointsSystemBadgesLoadFailed(String error) =>
       _format(AppText.pointsSystemBadgesLoadFailed, {'error': error});
   String pointsSystemNextReward({required String title, required int points}) =>
-      _format(AppText.pointsSystemNextReward, {'title': title, 'points': '$points'});
-  String applicationsLoadFailed(String error) => _format(AppText.applicationsLoadFailed, {'error': error});
-  String leaderboardDepartmentLabel(String dept) => _format(AppText.leaderboardDepartmentLabel, {'dept': dept});
-  String dbDebugProfileFound(String dept) => _format(AppText.dbDebugProfileFound, {'dept': dept});
-  String dbDebugTableTitle(String name) => _format(AppText.dbDebugTableTitle, {'name': name});
-  String dbDebugTotalRecords(int count) => _format(AppText.dbDebugTotalRecords, {'count': '$count'});
-  String dbDebugDepartmentRecords(int count) => _format(AppText.dbDebugDepartmentRecords, {'count': '$count'});
-  String dbDebugPartTimeRecords(int count) => _format(AppText.dbDebugPartTimeRecords, {'count': '$count'});
-  String dbDebugError(String error) => _format(AppText.dbDebugError, {'error': error});
-  String adminLogoutFailed(String error) => _format(AppText.adminLogoutFailed, {'error': error});
+      _format(AppText.pointsSystemNextReward, {
+        'title': title,
+        'points': '$points',
+      });
+  String applicationsLoadFailed(String error) =>
+      _format(AppText.applicationsLoadFailed, {'error': error});
+  String leaderboardDepartmentLabel(String dept) =>
+      _format(AppText.leaderboardDepartmentLabel, {'dept': dept});
+  String dbDebugProfileFound(String dept) =>
+      _format(AppText.dbDebugProfileFound, {'dept': dept});
+  String dbDebugTableTitle(String name) =>
+      _format(AppText.dbDebugTableTitle, {'name': name});
+  String dbDebugTotalRecords(int count) =>
+      _format(AppText.dbDebugTotalRecords, {'count': '$count'});
+  String dbDebugDepartmentRecords(int count) =>
+      _format(AppText.dbDebugDepartmentRecords, {'count': '$count'});
+  String dbDebugPartTimeRecords(int count) =>
+      _format(AppText.dbDebugPartTimeRecords, {'count': '$count'});
+  String dbDebugError(String error) =>
+      _format(AppText.dbDebugError, {'error': error});
+  String adminLogoutFailed(String error) =>
+      _format(AppText.adminLogoutFailed, {'error': error});
   String adminDashboardSubtitleWithName(String name) =>
       _format(AppText.adminDashboardSubtitle, {'name': name});
   String adminStatTotalUsersSubtitleToday(int count) =>
       _format(AppText.adminStatTotalUsersSubtitleToday, {'count': '$count'});
   String adminStatCompaniesSubtitlePending(int count) =>
       _format(AppText.adminStatCompaniesSubtitlePending, {'count': '$count'});
-  String adminStatActiveListingsSubtitle({required int jobs, required int internships}) =>
-      _format(AppText.adminStatActiveListingsSubtitle, {'jobs': '$jobs', 'internships': '$internships'});
+  String adminStatActiveListingsSubtitle({
+    required int jobs,
+    required int internships,
+  }) => _format(AppText.adminStatActiveListingsSubtitle, {
+    'jobs': '$jobs',
+    'internships': '$internships',
+  });
   String adminStatMonthlyRevenueSubtitle(int count) =>
       _format(AppText.adminStatMonthlyRevenueSubtitle, {'count': '$count'});
   String adminUsersTotalCountWithCount(int count) =>
       _format(AppText.adminUsersTotalCount, {'count': '$count'});
   String adminCompaniesTotalCountWithCount(int count) =>
       _format(AppText.adminCompaniesTotalCount, {'count': '$count'});
-  String adminBanUserFailed(String error) => _format(AppText.adminBanUserFailed, {'error': error});
-  String adminUnbanUserFailed(String error) => _format(AppText.adminUnbanUserFailed, {'error': error});
-  String adminTimeAgoMinutes(int count) => _format(AppText.adminTimeAgoMinutes, {'count': '$count'});
-  String adminTimeAgoHours(int count) => _format(AppText.adminTimeAgoHours, {'count': '$count'});
-  String adminTimeAgoDays(int count) => _format(AppText.adminTimeAgoDays, {'count': '$count'});
+  String adminBanUserFailed(String error) =>
+      _format(AppText.adminBanUserFailed, {'error': error});
+  String adminUnbanUserFailed(String error) =>
+      _format(AppText.adminUnbanUserFailed, {'error': error});
+  String adminTimeAgoMinutes(int count) =>
+      _format(AppText.adminTimeAgoMinutes, {'count': '$count'});
+  String adminTimeAgoHours(int count) =>
+      _format(AppText.adminTimeAgoHours, {'count': '$count'});
+  String adminTimeAgoDays(int count) =>
+      _format(AppText.adminTimeAgoDays, {'count': '$count'});
   String commonResendCountdown(int seconds) =>
       _format(AppText.commonResendCountdown, {'seconds': '$seconds'});
   String authRequestAgainIn(int seconds) =>
@@ -1157,10 +1231,11 @@ class AppLocalizations {
   String internshipDetailApplyHint(int minChars) =>
       _format(AppText.internshipDetailApplyHint, {'min': '$minChars'});
 
-  String companyReportsActiveListingsValue(int jobs, int internships) => _format(
-        AppText.companyReportsActiveListingsValue,
-        {'jobs': '$jobs', 'internships': '$internships'},
-      );
+  String companyReportsActiveListingsValue(int jobs, int internships) =>
+      _format(AppText.companyReportsActiveListingsValue, {
+        'jobs': '$jobs',
+        'internships': '$internships',
+      });
 
   String companyApplicationsYearOfStudy(int year) =>
       _format(AppText.companyApplicationsYearOfStudy, {'year': '$year'});
@@ -1169,7 +1244,9 @@ class AppLocalizations {
       _format(AppText.companyJobApplicationsTitleWithJob, {'title': title});
 
   String companyInternshipApplicationsTitleWithInternship(String title) =>
-      _format(AppText.companyInternshipApplicationsTitleWithInternship, {'title': title});
+      _format(AppText.companyInternshipApplicationsTitleWithInternship, {
+        'title': title,
+      });
 
   String companyJobFormDeadlineSelected(String date) =>
       _format(AppText.companyJobFormDeadlineSelected, {'date': date});
@@ -1177,20 +1254,26 @@ class AppLocalizations {
   String companyDashboardWelcome(String name) =>
       _format(AppText.companyDashboardWelcome, {'name': name});
 
-  String companyDashboardStatusRejectedWithReason(String reason) =>
-      _format(AppText.companyDashboardStatusRejectedWithReason, {'reason': reason});
+  String companyDashboardStatusRejectedWithReason(String reason) => _format(
+    AppText.companyDashboardStatusRejectedWithReason,
+    {'reason': reason},
+  );
 
   String companyDashboardStatusOther(String status) =>
       _format(AppText.companyDashboardStatusOther, {'status': status});
 
-  String companyProfileStatusRejectedWithReason(String reason) =>
-      _format(AppText.companyProfileStatusRejectedWithReason, {'reason': reason});
+  String companyProfileStatusRejectedWithReason(String reason) => _format(
+    AppText.companyProfileStatusRejectedWithReason,
+    {'reason': reason},
+  );
 
   String companyProfileStatusOther(String status) =>
       _format(AppText.companyProfileStatusOther, {'status': status});
 
-  String pointsDelta(int points) => _format(AppText.commonPointsDelta, {'points': '$points'});
-  String pointsValue(int points) => _format(AppText.commonPointsValue, {'points': '$points'});
+  String pointsDelta(int points) =>
+      _format(AppText.commonPointsDelta, {'points': '$points'});
+  String pointsValue(int points) =>
+      _format(AppText.commonPointsValue, {'points': '$points'});
 
   String howItWorksRewardFromPoints(int points) =>
       _format(AppText.howItWorksRewardFromPoints, {'points': '$points'});
@@ -1202,17 +1285,22 @@ class AppLocalizations {
   String settingsDeleteAccountFailed(String error) =>
       _format(AppText.settingsDeleteAccountFailed, {'error': error});
 
-  String dashboardWelcome(String name) => _format(AppText.dashboardWelcome, {'name': name});
+  String dashboardWelcome(String name) =>
+      _format(AppText.dashboardWelcome, {'name': name});
   String dashboardDepartmentRank(int rank) =>
       _format(AppText.dashboardDepartmentRank, {'rank': '$rank'});
   String dashboardCourseProgress(int percent) =>
       _format(AppText.dashboardCourseProgress, {'percent': '$percent'});
 
-  String favoritesLoadFailed(String error) => _format(AppText.favoritesLoadFailed, {'error': error});
+  String favoritesLoadFailed(String error) =>
+      _format(AppText.favoritesLoadFailed, {'error': error});
 
-  String profileLoadFailed(String error) => _format(AppText.profileLoadFailed, {'error': error});
-  String profileCompletedCoursesTitleWithCount(int count) =>
-      _format(AppText.profileCompletedCoursesTitleWithCount, {'count': '$count'});
+  String profileLoadFailed(String error) =>
+      _format(AppText.profileLoadFailed, {'error': error});
+  String profileCompletedCoursesTitleWithCount(int count) => _format(
+    AppText.profileCompletedCoursesTitleWithCount,
+    {'count': '$count'},
+  );
   String profileCompletionAwarded(int points) =>
       _format(AppText.profileCompletionAwarded, {'points': '$points'});
 
@@ -1229,10 +1317,12 @@ class AppLocalizations {
       _format(AppText.notificationsLoadFailed, {'error': error});
   String notificationsDeleteFailed(String error) =>
       _format(AppText.notificationsDeleteFailed, {'error': error});
-  String notificationsTabAll(int count) => _format(AppText.notificationsTabAll, {'count': '$count'});
+  String notificationsTabAll(int count) =>
+      _format(AppText.notificationsTabAll, {'count': '$count'});
   String notificationsTabUnread(int count) =>
       _format(AppText.notificationsTabUnread, {'count': '$count'});
-  String notificationsTabRead(int count) => _format(AppText.notificationsTabRead, {'count': '$count'});
+  String notificationsTabRead(int count) =>
+      _format(AppText.notificationsTabRead, {'count': '$count'});
   String chatGreeting(String nameOrEmpty) {
     final raw = nameOrEmpty.trim();
     final name = raw.isEmpty ? t(AppText.chatFriend) : raw;
@@ -1240,23 +1330,26 @@ class AppLocalizations {
   }
 
   List<String> chatDefaultSuggestions() => [
-        t(AppText.chatDefaultSuggestion1),
-        t(AppText.chatDefaultSuggestion2),
-        t(AppText.chatDefaultSuggestion3),
-        t(AppText.chatDefaultSuggestion4),
-      ];
+    t(AppText.chatDefaultSuggestion1),
+    t(AppText.chatDefaultSuggestion2),
+    t(AppText.chatDefaultSuggestion3),
+    t(AppText.chatDefaultSuggestion4),
+  ];
 
   String chatHistoryLoadFailed(String error) =>
       _format(AppText.chatHistoryLoadFailed, {'error': error});
-  String chatReplyFailed(String error) => _format(AppText.chatReplyFailed, {'error': error});
+  String chatReplyFailed(String error) =>
+      _format(AppText.chatReplyFailed, {'error': error});
 }
 
-class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
+class _AppLocalizationsDelegate
+    extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();
 
   @override
-  bool isSupported(Locale locale) =>
-      AppLocalizations.languages.any((language) => language.code == locale.languageCode);
+  bool isSupported(Locale locale) => AppLocalizations.languages.any(
+    (language) => language.code == locale.languageCode,
+  );
 
   @override
   Future<AppLocalizations> load(Locale locale) =>
@@ -1297,12 +1390,16 @@ const _values = <String, Map<AppText, String>>{
     AppText.close: 'Kapat',
     AppText.menu: 'Menü',
     AppText.pointsSystem: 'Puan Sistemi',
-    AppText.pointsSystemGuestSubtitle: 'Kurslara kayıt ol, ilerleme kaydet, rozet kazan ve ödülleri aç.',
+    AppText.pointsSystemGuestSubtitle:
+        'Kurslara kayıt ol, ilerleme kaydet, rozet kazan ve ödülleri aç.',
     AppText.pointsSystemGuestBullet1: 'Kurs kaydı → puan kazan',
     AppText.pointsSystemGuestBullet2: 'Kurs tamamla → ekstra puan + rozet',
-    AppText.pointsSystemGuestBullet3: 'Toplanan puanlarla ödüllerin kilidini aç',
-    AppText.pointsSystemGuestSignInHint: 'Giriş yaptıktan sonra puan geçmişini ve ödüllerini burada göreceksin.',
-    AppText.pointsSystemAuthedSubtitle: 'Puanlarını takip et, ödülleri hedefle.',
+    AppText.pointsSystemGuestBullet3:
+        'Toplanan puanlarla ödüllerin kilidini aç',
+    AppText.pointsSystemGuestSignInHint:
+        'Giriş yaptıktan sonra puan geçmişini ve ödüllerini burada göreceksin.',
+    AppText.pointsSystemAuthedSubtitle:
+        'Puanlarını takip et, ödülleri hedefle.',
     AppText.pointsSystemTabHistory: 'Geçmiş',
     AppText.pointsSystemTabRewards: 'Ödüller',
     AppText.pointsSystemTabBadges: 'Rozetler',
@@ -1312,11 +1409,13 @@ const _values = <String, Map<AppText, String>>{
     AppText.pointsSystemBadgesLoadFailed: 'Rozetler yüklenemedi: {error}',
     AppText.pointsSystemHistoryEmpty: 'Henüz puan hareketi yok.',
     AppText.pointsSystemRewardsEmpty: 'Ödül bulunamadı.',
-    AppText.pointsSystemBadgesEmpty: 'Henüz rozet yok. Kurs tamamlayınca rozetler gelir.',
+    AppText.pointsSystemBadgesEmpty:
+        'Henüz rozet yok. Kurs tamamlayınca rozetler gelir.',
     AppText.pointsSystemNextReward: 'Sonraki ödül: {title} ({points} puan)',
     AppText.pointsSystemAllRewardsUnlocked: 'Tüm ödüller açılmış olabilir.',
     AppText.leaderboardLoadFailedTitle: 'Leaderboard yüklenemedi',
-    AppText.leaderboardSubtitle: 'En aktif öğrenciler arasında yerini al. Puan kazan, yüksel, ödüllere yaklaş.',
+    AppText.leaderboardSubtitle:
+        'En aktif öğrenciler arasında yerini al. Puan kazan, yüksel, ödüllere yaklaş.',
     AppText.leaderboardTabOverall: 'Genel',
     AppText.leaderboardTabDepartment: 'Bölüm',
     AppText.leaderboardEmpty: 'Henüz sıralama verisi yok.',
@@ -1334,10 +1433,12 @@ const _values = <String, Map<AppText, String>>{
         '• Kurs tamamla: +50 puan\n• Kursa kayıt ol: +10 puan\n• Günlük giriş: +2 puan\n• 7 gün seri: +15 puan',
     AppText.leaderboardViewPointsSystem: 'Puan Sistemini Gör',
     AppText.commonYou: 'Sen',
-    AppText.applicationsLoginRequired: 'Başvuruları görmek için giriş yapmalısın.',
+    AppText.applicationsLoginRequired:
+        'Başvuruları görmek için giriş yapmalısın.',
     AppText.applicationsSearchHint: 'Başvuru ara...',
     AppText.applicationsLoadFailed: 'Başvurular yüklenemedi: {error}',
-    AppText.applicationsSubtitle: 'Tüm başvuru ve kayıtlarınızı buradan takip edebilirsiniz.',
+    AppText.applicationsSubtitle:
+        'Tüm başvuru ve kayıtlarınızı buradan takip edebilirsiniz.',
     AppText.applicationsEmpty: 'Henüz başvurunuz bulunmuyor.',
     AppText.applicationsKindJob: 'İş',
     AppText.applicationsKindInternship: 'Staj',
@@ -1350,7 +1451,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.retry: 'Tekrar dene',
     AppText.commonPleaseSignIn: 'Lütfen giriş yapın.',
     AppText.jobsTitle: 'İş İlanları',
-    AppText.jobsSubtitle: 'Arama yap, filtrele, favorile ve başvur. React ile aynı akış.',
+    AppText.jobsSubtitle:
+        'Arama yap, filtrele, favorile ve başvur. React ile aynı akış.',
     AppText.jobsSearchHint: 'Başlık, şirket, bölüm, konum...',
 
     // Job Detail
@@ -1388,11 +1490,13 @@ const _values = <String, Map<AppText, String>>{
     AppText.footerQuickLinks: 'Hızlı Linkler',
     AppText.footerMore: 'Daha Fazla',
     AppText.footerNewsletter: 'Bülten',
-    AppText.footerNewsletterDesc: 'Yeni fırsatlardan haberdar olmak için e-posta listemize katılın.',
+    AppText.footerNewsletterDesc:
+        'Yeni fırsatlardan haberdar olmak için e-posta listemize katılın.',
     AppText.footerEmailHint: 'E-posta adresiniz',
     AppText.footerSubscribeSuccess: 'Bültene başarıyla kayıt oldunuz.',
     AppText.footerSubscribeInvalid: 'Lütfen geçerli bir e-posta girin.',
-    AppText.footerCopyright: '© {year} Öğrenci Platformu. Tüm hakları saklıdır.',
+    AppText.footerCopyright:
+        '© {year} Öğrenci Platformu. Tüm hakları saklıdır.',
     AppText.linkInternshipListings: 'Staj İlanları',
     AppText.linkLeaderboard: 'Liderlik Tablosu',
     AppText.linkHowItWorks: 'Nasıl Çalışır?',
@@ -1401,16 +1505,19 @@ const _values = <String, Map<AppText, String>>{
     AppText.linkPrivacy: 'Gizlilik Politikası',
     AppText.linkTerms: 'Kullanım Şartları',
     AppText.linkComingSoon: '{name} bağlantısı yakında.',
-    AppText.homeHeroTitle: 'Üniversite Hayatını Güçlendir,\nKariyerine Hızla Yön Ver!',
+    AppText.homeHeroTitle:
+        'Üniversite Hayatını Güçlendir,\nKariyerine Hızla Yön Ver!',
     AppText.homeHeroSubtitle:
         'Alanına özel kurslar, stajlar ve iş ilanları ile geleceğine sağlam adımlarla ilerle.',
     AppText.homeCard1Title: 'Alanına Özel İçerikler',
     AppText.homeCard1Desc:
         'Bölümüne uygun kurslar, stajlar ve iş ilanlarıyla odaklanmış öğrenme.',
     AppText.homeCard2Title: 'Kariyerine Yön Ver',
-    AppText.homeCard2Desc: 'Kişiselleştirilmiş kariyer rehberliği ve fırsatlarla desteklen.',
+    AppText.homeCard2Desc:
+        'Kişiselleştirilmiş kariyer rehberliği ve fırsatlarla desteklen.',
     AppText.homeCard3Title: 'Kolay ve Hızlı Kullanım',
-    AppText.homeCard3Desc: 'Modern tasarım ve kullanıcı dostu arayüz ile zamandan tasarruf et.',
+    AppText.homeCard3Desc:
+        'Modern tasarım ve kullanıcı dostu arayüz ile zamandan tasarruf et.',
     AppText.homeStudentBenefitsTitle: 'Öğrenciler İçin Faydalar',
     AppText.homeStudentCard1Title: 'Hedef Odaklı İçerik',
     AppText.homeStudentCard1Desc:
@@ -1419,15 +1526,18 @@ const _values = <String, Map<AppText, String>>{
     AppText.homeStudentCard2Desc:
         'Özgeçmişini güçlendirecek fırsatlara herkesten önce ulaş.',
     AppText.homeStudentCard3Title: 'Gelişim Takibi',
-    AppText.homeStudentCard3Desc: 'İlerleyişini takip et, eksiklerini zamanında fark et.',
+    AppText.homeStudentCard3Desc:
+        'İlerleyişini takip et, eksiklerini zamanında fark et.',
     AppText.homeCompanyBenefitsTitle: 'İşletmeler İçin Faydalar',
     AppText.homeCompanyCard1Title: 'Genç Yeteneklere Erişim',
-    AppText.homeCompanyCard1Desc: 'Motivasyonu yüksek, alanına ilgili öğrencilere ulaşın.',
+    AppText.homeCompanyCard1Desc:
+        'Motivasyonu yüksek, alanına ilgili öğrencilere ulaşın.',
     AppText.homeCompanyCard2Title: 'İşbirliği Olanakları',
     AppText.homeCompanyCard2Desc:
         'Projelerinizde üniversite öğrencileriyle birlikte çalışın.',
     AppText.homeCompanyCard3Title: 'Veriye Dayalı Seçim',
-    AppText.homeCompanyCard3Desc: 'Profil verileriyle doğru kişiyi kolayca belirleyin.',
+    AppText.homeCompanyCard3Desc:
+        'Profil verileriyle doğru kişiyi kolayca belirleyin.',
     AppText.howItWorksTitle: 'Nasıl Çalışır?',
     AppText.howItWorksSubtitle:
         'Platformumuz dört temel aşamadan oluşur. Her adımda yanındayız!',
@@ -1456,7 +1566,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.howItWorksStep5Title: 'Ödül Kazan',
     AppText.howItWorksStep5Desc: 'Puanlarını harika ödüllerle değiştir.',
     AppText.howItWorksPageStepByStepTitle: 'Adım Adım',
-    AppText.howItWorksPageStepByStepSubtitle: 'Beş basit adımla kariyer yolculuğunu başlat.',
+    AppText.howItWorksPageStepByStepSubtitle:
+        'Beş basit adımla kariyer yolculuğunu başlat.',
     AppText.howItWorksDetailedStepsTitle: 'Detaylı Adımlar',
     AppText.howItWorksDetail1Title: 'Üyelik ve Profil',
     AppText.howItWorksDetail1Desc:
@@ -1492,7 +1603,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.howItWorksRewardInternshipGuarantee: 'Staj Garantisi',
     AppText.howItWorksRewardFromPoints: '{points} puandan başlayan ödüller',
     AppText.howItWorksCtaTitle: 'Kariyer yolculuğuna bugün başla',
-    AppText.howItWorksCtaSubtitle: 'Ücretsiz kayıt ol, ilanlara başvur ve puan kazan.',
+    AppText.howItWorksCtaSubtitle:
+        'Ücretsiz kayıt ol, ilanlara başvur ve puan kazan.',
     AppText.howItWorksCtaPrimary: 'Kayıt Ol',
     AppText.howItWorksCtaSecondary: 'İş İlanlarını Gör',
 
@@ -1551,9 +1663,11 @@ const _values = <String, Map<AppText, String>>{
     AppText.contactEmailTitle: 'E-posta',
     AppText.contactPhoneTitle: 'Telefon',
     AppText.contactAddressTitle: 'Adres',
-    AppText.contactAddressBody: 'Teknokent, İnovasyon Cad. No:1234\nBeşiktaş, İstanbul',
+    AppText.contactAddressBody:
+        'Teknokent, İnovasyon Cad. No:1234\nBeşiktaş, İstanbul',
     AppText.contactHoursTitle: 'Çalışma Saatleri',
-    AppText.contactHoursBody: 'Pazartesi - Cuma: 09:00 - 18:00\nCumartesi: 10:00 - 14:00',
+    AppText.contactHoursBody:
+        'Pazartesi - Cuma: 09:00 - 18:00\nCumartesi: 10:00 - 14:00',
     AppText.contactFormTitle: 'Bize Yazın',
     AppText.contactNameLabelRequired: 'Adınız Soyadınız *',
     AppText.contactNameHint: 'İsim Soyisim',
@@ -1568,20 +1682,24 @@ const _values = <String, Map<AppText, String>>{
     AppText.contactSubjectPartnership: 'İş Ortaklığı',
     AppText.contactSubjectFeedback: 'Öneri ve Şikayet',
     AppText.contactSubjectOther: 'Diğer',
-    AppText.contactSendSuccess: 'Mesajınız başarıyla gönderildi! En kısa sürede dönüş yapacağız.',
+    AppText.contactSendSuccess:
+        'Mesajınız başarıyla gönderildi! En kısa sürede dönüş yapacağız.',
     AppText.contactFillRequired: 'Lütfen tüm zorunlu alanları doldurun.',
     AppText.contactFaqTitle: 'Sıkça Sorulan Sorular',
     AppText.contactFaqQ1: 'Platform kullanımı ücretli mi?',
-    AppText.contactFaqA1: 'Hayır, platformumuz öğrenciler için tamamen ücretsizdir.',
+    AppText.contactFaqA1:
+        'Hayır, platformumuz öğrenciler için tamamen ücretsizdir.',
     AppText.contactFaqQ2: 'Hangi üniversite öğrencileri katılabilir?',
-    AppText.contactFaqA2: 'Türkiye\'deki tüm üniversitelerin öğrencileri platformumuza üye olabilir.',
+    AppText.contactFaqA2:
+        'Türkiye\'deki tüm üniversitelerin öğrencileri platformumuza üye olabilir.',
     AppText.contactFaqQ3: 'İşveren olarak nasıl ilan verebilirim?',
     AppText.contactFaqA3:
         'İş ortaklığı için bizimle iletişime geçebilir veya kurumsal üyelik başvurusu yapabilirsiniz.',
     AppText.contactMapPlaceholder: 'Harita Alanı',
 
     // Company - General
-    AppText.companyPanelLoginRequired: 'Şirket panelini görmek için giriş yapmalısınız.',
+    AppText.companyPanelLoginRequired:
+        'Şirket panelini görmek için giriş yapmalısınız.',
 
     // Company - Jobs
     AppText.companyJobsTitle: 'İş İlanlarım',
@@ -1599,11 +1717,13 @@ const _values = <String, Map<AppText, String>>{
 
     // Company - Internship Applications
     AppText.companyInternshipApplicationsTitle: 'Başvurular',
-    AppText.companyInternshipApplicationsTitleWithInternship: 'Başvurular • {title}',
+    AppText.companyInternshipApplicationsTitleWithInternship:
+        'Başvurular • {title}',
 
     // Company - Reports
     AppText.companyReportsTitle: 'Raporlar',
-    AppText.companyReportsLoginRequired: 'Şirket raporlarını görmek için giriş yapmalısınız.',
+    AppText.companyReportsLoginRequired:
+        'Şirket raporlarını görmek için giriş yapmalısınız.',
     AppText.companyReportsCsvDownloaded: 'CSV indirildi.',
     AppText.companyReportsExportCsv: 'CSV İndir',
     AppText.companyReportsRangeToday: 'Bugün',
@@ -1629,11 +1749,13 @@ const _values = <String, Map<AppText, String>>{
 
     // Company - Applications
     AppText.companyApplicationsTitle: 'Tüm Başvurular',
-    AppText.companyApplicationsLoginRequired: 'Şirket başvurularını görmek için giriş yapmalısınız.',
+    AppText.companyApplicationsLoginRequired:
+        'Şirket başvurularını görmek için giriş yapmalısınız.',
     AppText.companyApplicationsCsvDownloaded: 'CSV indirildi.',
     AppText.companyApplicationsOpenCv: 'CV Aç',
     AppText.companyApplicationsCvInvalid: 'CV bağlantısı geçersiz.',
-    AppText.companyApplicationsCvOpenFailedCopied: 'Bağlantı açılamadı. CV linki kopyalandı.',
+    AppText.companyApplicationsCvOpenFailedCopied:
+        'Bağlantı açılamadı. CV linki kopyalandı.',
     AppText.companyApplicationsCoverLetterTitle: 'Ön Yazı',
     AppText.companyApplicationsMotivationLetterTitle: 'Motivasyon Mektubu',
     AppText.companyApplicationsSearchHint: 'Ad, e-posta veya ilan ara...',
@@ -1641,7 +1763,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.companyApplicationsFilterAllTypes: 'Tüm Tipler',
     AppText.companyApplicationsEmpty: 'Henüz başvuru yok.',
     AppText.companyApplicationsYearOfStudy: '{year}. sınıf',
-    AppText.companyApplicationsCsvHeader: 'Ad Soyad,E-posta,Telefon,Tip,İlan,Departman,Durum,Başvuru Tarihi',
+    AppText.companyApplicationsCsvHeader:
+        'Ad Soyad,E-posta,Telefon,Tip,İlan,Departman,Durum,Başvuru Tarihi',
     AppText.companyApplicationsCsvTypeJob: 'İş',
     AppText.companyApplicationsCsvTypeInternship: 'Staj',
 
@@ -1662,7 +1785,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.companyJobFormDeadlineNotSelected: 'Son başvuru tarihi seçilmedi',
     AppText.companyJobFormDeadlineSelected: 'Son başvuru: {date}',
     AppText.companyJobFormPickDate: 'Tarih Seç',
-    AppText.companyJobFormValidationTitleDesc: 'Lütfen başlık ve açıklama girin.',
+    AppText.companyJobFormValidationTitleDesc:
+        'Lütfen başlık ve açıklama girin.',
     AppText.companyJobFormValidationDepartment: 'Departman seçimi zorunludur.',
     AppText.companyJobFormValidationLocation: 'Lokasyon zorunludur.',
     AppText.companyJobFormValidationDeadline: 'Son başvuru tarihi seçin.',
@@ -1686,18 +1810,26 @@ const _values = <String, Map<AppText, String>>{
     AppText.companyInternshipFormMonthlyStipendLabel: 'Aylık Ücret *',
     AppText.companyInternshipFormBenefitsLabel: 'Yan Haklar',
     AppText.companyInternshipFormCertificateLabel: 'Staj Sertifikası Verilir',
-    AppText.companyInternshipFormEmploymentPossibilityLabel: 'İş İmkanı Sunulur',
+    AppText.companyInternshipFormEmploymentPossibilityLabel:
+        'İş İmkanı Sunulur',
     AppText.companyInternshipFormActiveLabel: 'İlan Aktif',
-    AppText.companyInternshipFormValidationTitleDesc: 'Başlık ve açıklama zorunludur.',
-    AppText.companyInternshipFormValidationRequirements: 'Gereksinimler zorunludur.',
-    AppText.companyInternshipFormValidationDepartment: 'Departman seçimi zorunludur.',
+    AppText.companyInternshipFormValidationTitleDesc:
+        'Başlık ve açıklama zorunludur.',
+    AppText.companyInternshipFormValidationRequirements:
+        'Gereksinimler zorunludur.',
+    AppText.companyInternshipFormValidationDepartment:
+        'Departman seçimi zorunludur.',
     AppText.companyInternshipFormValidationLocation: 'Lokasyon zorunludur.',
     AppText.companyInternshipFormValidationDuration: 'Süre seçimi zorunludur.',
     AppText.companyInternshipFormValidationStartDate: 'Başlangıç tarihi seçin.',
-    AppText.companyInternshipFormValidationDeadline: 'Son başvuru tarihi seçin.',
-    AppText.companyInternshipFormValidationQuotaRequired: 'Kontenjan zorunludur.',
-    AppText.companyInternshipFormValidationQuotaValid: 'Geçerli bir kontenjan girin.',
-    AppText.companyInternshipFormValidationPaidStipend: 'Ücretli staj için aylık ücret girin.',
+    AppText.companyInternshipFormValidationDeadline:
+        'Son başvuru tarihi seçin.',
+    AppText.companyInternshipFormValidationQuotaRequired:
+        'Kontenjan zorunludur.',
+    AppText.companyInternshipFormValidationQuotaValid:
+        'Geçerli bir kontenjan girin.',
+    AppText.companyInternshipFormValidationPaidStipend:
+        'Ücretli staj için aylık ücret girin.',
     AppText.companyInternshipFormCreated: 'Staj ilanı oluşturuldu.',
     AppText.companyInternshipFormUpdated: 'Staj ilanı güncellendi.',
 
@@ -1732,14 +1864,19 @@ const _values = <String, Map<AppText, String>>{
     AppText.companyDashboardPendingApplications: 'Bekleyen Başvuru',
     AppText.companyDashboardTotalApplications: 'Toplam Başvuru',
     AppText.companyDashboardWelcome: 'Hoş geldiniz, {name}',
-    AppText.companyDashboardStatusBanned: 'Hesabınız devre dışı bırakıldı. Destek ile iletişime geçin.',
-    AppText.companyDashboardStatusPending: 'Hesabınız onay bekliyor. Onay sonrası ilanlarınız yayınlanacaktır.',
-    AppText.companyDashboardStatusRejected: 'Şirket başvurunuz reddedildi. Lütfen profilinizi güncelleyin.',
-    AppText.companyDashboardStatusRejectedWithReason: 'Reddetme nedeni: {reason}',
+    AppText.companyDashboardStatusBanned:
+        'Hesabınız devre dışı bırakıldı. Destek ile iletişime geçin.',
+    AppText.companyDashboardStatusPending:
+        'Hesabınız onay bekliyor. Onay sonrası ilanlarınız yayınlanacaktır.',
+    AppText.companyDashboardStatusRejected:
+        'Şirket başvurunuz reddedildi. Lütfen profilinizi güncelleyin.',
+    AppText.companyDashboardStatusRejectedWithReason:
+        'Reddetme nedeni: {reason}',
     AppText.companyDashboardStatusOther: 'Şirket durumunuz: {status}',
     AppText.companyDashboardQuickActionsTitle: 'Hızlı İşlemler',
     AppText.companyDashboardQuickActionNewJob: 'Yeni İş İlanı',
-    AppText.companyDashboardPerformanceSummaryTitle: 'Performans Özeti (Son 30 Gün)',
+    AppText.companyDashboardPerformanceSummaryTitle:
+        'Performans Özeti (Son 30 Gün)',
 
     // Company - Pricing
     AppText.companyPricingTitle: 'Paketler ve Fiyatlar',
@@ -1768,44 +1905,52 @@ const _values = <String, Map<AppText, String>>{
     AppText.companyPricingEnterpriseFeature3: '7/24 destek',
     AppText.companyPricingEnterpriseFeature4: 'Sınırsız CV görüntüleme',
     AppText.companyPricingEnterpriseFeature5: 'API erişimi',
-    AppText.companyPricingSalesContacted: 'Satış ekibi sizinle iletişime geçecek.',
+    AppText.companyPricingSalesContacted:
+        'Satış ekibi sizinle iletişime geçecek.',
     AppText.companyPricingSelectPackage: 'Paketi Seç',
 
     // Company - Status Check
     AppText.companyStatusCompanyAccountMissing: 'Şirket hesabı bulunamadı.',
     AppText.companyStatusNoRegistrationTitle: 'Şirket kaydı bulunamadı',
-    AppText.companyStatusNoRegistrationSubtitle: 'Şirket hesabınızı tamamlamak için kaydınızı oluşturun.',
+    AppText.companyStatusNoRegistrationSubtitle:
+        'Şirket hesabınızı tamamlamak için kaydınızı oluşturun.',
     AppText.companyStatusRegisterCta: 'Şirket Kaydı',
     AppText.companyStatusBannedTitle: 'Hesap askıya alındı',
     AppText.companyStatusBannedSubtitle:
         'Şirket hesabınız platform kurallarının ihlali nedeniyle askıya alınmıştır. Destek ekibiyle iletişime geçin.',
     AppText.companyStatusSupportTeam: 'Destek Ekibi',
     AppText.companyStatusPendingTitle: 'Onay bekleniyor',
-    AppText.companyStatusPendingSubtitle: 'Şirket hesabınız onay sürecinde. En kısa sürede size dönüş yapacağız.',
+    AppText.companyStatusPendingSubtitle:
+        'Şirket hesabınız onay sürecinde. En kısa sürede size dönüş yapacağız.',
     AppText.companyStatusPendingWhatYouCanDoTitle: 'Ne yapabilirsiniz?',
     AppText.companyStatusPendingTip1: 'Şirket profilinizi tamamlayın',
     AppText.companyStatusPendingTip2: 'Logo ve kapak görseli ekleyin',
     AppText.companyStatusPendingTip3: 'İletişim bilgilerinizi güncelleyin',
     AppText.companyStatusEditProfile: 'Profili Düzenle',
     AppText.companyStatusRejectedTitle: 'Başvuru reddedildi',
-    AppText.companyStatusRejectedSubtitle: 'Üzgünüz, şirket başvurunuz kabul edilmedi.',
+    AppText.companyStatusRejectedSubtitle:
+        'Üzgünüz, şirket başvurunuz kabul edilmedi.',
     AppText.companyStatusRejectedReasonTitle: 'Red Nedeni',
     AppText.companyStatusContactSupport: 'Destek ile İletişim',
     AppText.companyStatusSubscriptionRequiredTitle: 'Abonelik gerekli',
-    AppText.companyStatusSubscriptionRequiredSubtitle: 'İlan yayınlayabilmek için bir abonelik paketi seçmelisiniz.',
+    AppText.companyStatusSubscriptionRequiredSubtitle:
+        'İlan yayınlayabilmek için bir abonelik paketi seçmelisiniz.',
     AppText.companyStatusSubscriptionApprovedTitle: 'Hesabınız onaylandı',
-    AppText.companyStatusSubscriptionApprovedTip: 'Şimdi size uygun bir paket seçerek başlayabilirsiniz.',
+    AppText.companyStatusSubscriptionApprovedTip:
+        'Şimdi size uygun bir paket seçerek başlayabilirsiniz.',
     AppText.companyStatusViewPlans: 'Paketleri İncele',
 
     // Company - Registration
-    AppText.companyRegisterLoginRequired: 'Şirket kaydı için giriş yapmalısınız.',
+    AppText.companyRegisterLoginRequired:
+        'Şirket kaydı için giriş yapmalısınız.',
     AppText.companyRegisterTitle: 'Şirket Kaydı',
     AppText.companyRegisterCompanyNameLabel: 'Şirket Adı',
     AppText.companyRegisterSectorLabel: 'Sektör',
     AppText.companyRegisterTaxNumberLabel: 'Vergi Numarası',
     AppText.companyRegisterPhoneLabel: 'Telefon',
     AppText.companyRegisterCityLabel: 'Şehir',
-    AppText.companyRegisterDuplicateTaxNumber: 'Bu vergi numarası ile kayıtlı bir şirket zaten var.',
+    AppText.companyRegisterDuplicateTaxNumber:
+        'Bu vergi numarası ile kayıtlı bir şirket zaten var.',
     AppText.companyRegisterSuccess: 'Şirket kaydı başarılı!',
     AppText.companyRegisterSubmit: 'Kaydı Tamamla',
 
@@ -1833,7 +1978,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.deptOther: 'Diğer',
 
     // Legal
-    AppText.legalTurkishOnlyNote: 'Bu sayfanın hukuki metni şu an sadece Türkçe olarak sunulmaktadır.',
+    AppText.legalTurkishOnlyNote:
+        'Bu sayfanın hukuki metni şu an sadece Türkçe olarak sunulmaktadır.',
     AppText.legalLastUpdated: 'Son güncellenme: {date}',
     AppText.commonUserId: 'Kullanıcı ID',
     AppText.commonEmail: 'E-posta',
@@ -1878,56 +2024,74 @@ const _values = <String, Map<AppText, String>>{
     AppText.authAlreadyHaveAccount: 'Zaten hesabın var mı?',
     AppText.authAcceptTermsPrefix: 'Kabul ediyorum ',
     AppText.authAcceptTermsAnd: ' ve ',
-    AppText.authAcceptTermsError: 'Kullanım Şartları ve Gizlilik Politikası\'nı kabul etmelisin.',
+    AppText.authAcceptTermsError:
+        'Kullanım Şartları ve Gizlilik Politikası\'nı kabul etmelisin.',
     AppText.authSelectDepartment: 'Lütfen bölümünü seç.',
     AppText.authSelectYear: 'Lütfen sınıfını seç.',
     AppText.authYearPlus: '5+ (ve üzeri)',
     AppText.authForgotTitle: 'Şifremi Unuttum',
-    AppText.authForgotSubtitle: 'E-postana bir sıfırlama bağlantısı göndereceğiz.',
+    AppText.authForgotSubtitle:
+        'E-postana bir sıfırlama bağlantısı göndereceğiz.',
     AppText.authEmailSentTitle: 'E-posta gönderildi!',
-    AppText.authResetLinkSentTo: 'Şifre sıfırlama bağlantısı gönderildi:\n{email}',
+    AppText.authResetLinkSentTo:
+        'Şifre sıfırlama bağlantısı gönderildi:\n{email}',
     AppText.authCheckSpam: 'Görmüyorsan spam/istenmeyen klasörünü kontrol et.',
-    AppText.authRequestAgainIn: 'Yeni bir e-postayı {seconds} saniye sonra isteyebilirsin.',
+    AppText.authRequestAgainIn:
+        'Yeni bir e-postayı {seconds} saniye sonra isteyebilirsin.',
     AppText.authSendResetLink: 'Sıfırlama bağlantısı gönder',
-    AppText.authTooManyRequests: 'Çok fazla istek. Lütfen bir dakika bekleyip tekrar deneyin.',
+    AppText.authTooManyRequests:
+        'Çok fazla istek. Lütfen bir dakika bekleyip tekrar deneyin.',
     AppText.authEmailRequired: 'E-posta gerekli.',
-    AppText.authWaitSeconds: 'Lütfen tekrar istemeden önce {seconds} saniye bekleyin.',
+    AppText.authWaitSeconds:
+        'Lütfen tekrar istemeden önce {seconds} saniye bekleyin.',
     AppText.authResetTitle: 'Şifre Sıfırlama',
-    AppText.authPasteResetLink: 'Sıfırlama bağlantısını yapıştır (otomatik yönlendirilmediyse)',
+    AppText.authPasteResetLink:
+        'Sıfırlama bağlantısını yapıştır (otomatik yönlendirilmediyse)',
     AppText.authUseResetLink: 'Bağlantıyı kullan',
     AppText.authLinkApplied: 'Bağlantı uygulandı',
-    AppText.authLinkRequired: 'E-postadaki sıfırlama bağlantısının tamamını yapıştırın.',
+    AppText.authLinkRequired:
+        'E-postadaki sıfırlama bağlantısının tamamını yapıştırın.',
     AppText.authLinkInvalid: 'Geçersiz bağlantı formatı.',
-    AppText.authLinkAccepted: 'Bağlantı kabul edildi. Şimdi yeni şifre belirleyebilirsin.',
+    AppText.authLinkAccepted:
+        'Bağlantı kabul edildi. Şimdi yeni şifre belirleyebilirsin.',
     AppText.authLinkExpired: 'Geçersiz veya süresi dolmuş bağlantı.',
     AppText.authNewPasswordLabel: 'Yeni şifre',
-    AppText.authOpenResetLinkFirst: 'Önce sıfırlama bağlantısını açın (veya yukarıya yapıştırın).',
+    AppText.authOpenResetLinkFirst:
+        'Önce sıfırlama bağlantısını açın (veya yukarıya yapıştırın).',
     AppText.authPasswordUpdated: 'Şifre güncellendi',
     AppText.authEmailVerificationTitle: 'E-posta Doğrulama',
     AppText.authEmailVerificationPending: 'E-posta doğrulama bekleniyor',
-    AppText.authEmailVerificationSubtitle: 'Hesabınızı etkinleştirmek için e-posta adresinizi doğrulayın.',
+    AppText.authEmailVerificationSubtitle:
+        'Hesabınızı etkinleştirmek için e-posta adresinizi doğrulayın.',
     AppText.authVerificationSentTo: 'Doğrulama bağlantısı gönderildi: {email}',
     AppText.authStepCheckInboxTitle: 'Gelen kutunu kontrol et',
-    AppText.authStepCheckInboxSubtitle: 'Doğrulama e-postası birkaç dakika içinde gelmelidir.',
+    AppText.authStepCheckInboxSubtitle:
+        'Doğrulama e-postası birkaç dakika içinde gelmelidir.',
     AppText.authStepClickLinkTitle: 'Doğrulama bağlantısına tıkla',
     AppText.authStepClickLinkSubtitle: 'E-postayı aç ve hesabını doğrula.',
     AppText.authStepReturnTitle: 'Uygulamaya dön',
-    AppText.authStepReturnSubtitle: 'Doğruladıktan sonra tüm özelliklere erişebilirsin.',
+    AppText.authStepReturnSubtitle:
+        'Doğruladıktan sonra tüm özelliklere erişebilirsin.',
     AppText.authIHaveVerified: 'E-postamı doğruladım',
     AppText.authResendEmail: 'E-postayı yeniden gönder',
-    AppText.authDidNotReceive: 'E-posta gelmedi mi? Spam/istenmeyen klasörü kontrol et veya tekrar gönder.',
+    AppText.authDidNotReceive:
+        'E-posta gelmedi mi? Spam/istenmeyen klasörü kontrol et veya tekrar gönder.',
     AppText.authLoginDifferent: 'Farklı bir hesapla giriş yap',
     AppText.authEmailNotFound: 'E-posta bulunamadı. Lütfen tekrar giriş yap.',
-    AppText.authVerificationEmailSentAgain: 'Doğrulama e-postası tekrar gönderildi.',
+    AppText.authVerificationEmailSentAgain:
+        'Doğrulama e-postası tekrar gönderildi.',
     AppText.authResendFailed: 'E-posta yeniden gönderilemedi: {error}',
-    AppText.authPleaseLoginAfterVerify: 'E-postanı doğruladıktan sonra tekrar giriş yap.',
+    AppText.authPleaseLoginAfterVerify:
+        'E-postanı doğruladıktan sonra tekrar giriş yap.',
     AppText.authEmailVerifiedSuccess: 'E-posta başarıyla doğrulandı!',
     AppText.authEmailNotVerifiedYet: 'E-posta henüz doğrulanmadı.',
-    AppText.authVerificationCheckFailed: 'Doğrulama kontrolü başarısız oldu: {error}',
+    AppText.authVerificationCheckFailed:
+        'Doğrulama kontrolü başarısız oldu: {error}',
     AppText.statusPending: 'Beklemede',
     AppText.resetFilters: 'Sıfırla',
     AppText.internshipsTitle: 'Stajlar',
-    AppText.internshipsSubtitle: 'Sektörün önde gelen şirketlerinde staj yaparak deneyim kazanın.',
+    AppText.internshipsSubtitle:
+        'Sektörün önde gelen şirketlerinde staj yaparak deneyim kazanın.',
     AppText.internshipsLoadFailed: 'Stajlar yüklenemedi',
     AppText.internshipsSearchHint: 'Ara: başlık, şirket, açıklama...',
     AppText.internshipsLocationAll: 'Tüm Lokasyonlar',
@@ -1943,7 +2107,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.internshipsPointsEarn: 'Kazanılacak Puan',
     AppText.internshipsNoDepartmentInfo:
         'Profilinde bölüm bilgisi yok. Staj ilanları bölüm bazlı gösteriliyor. Lütfen profilinden bölümünü ekle.',
-    AppText.internshipsNoResults: 'Aradığınız kriterlere uygun staj ilanı bulunamadı.',
+    AppText.internshipsNoResults:
+        'Aradığınız kriterlere uygun staj ilanı bulunamadı.',
     AppText.internshipsFavorite: 'Favori',
     AppText.internshipsNotSpecified: 'Belirtilmemiş',
 
@@ -1954,10 +2119,12 @@ const _values = <String, Map<AppText, String>>{
     AppText.internshipDetailApplyFailed: 'Başvuru gönderilemedi: {error}',
     AppText.internshipDetailApplyTitle: 'Başvuru',
     AppText.internshipDetailAlreadyApplied: 'Bu staja zaten başvurdunuz.',
-    AppText.internshipDetailApplyHint: 'Devam etmek için en az {min} karakter yazın.',
+    AppText.internshipDetailApplyHint:
+        'Devam etmek için en az {min} karakter yazın.',
     AppText.internshipDetailApplyButton: 'Başvur',
     AppText.internshipDetailMotivationTitle: 'Motivasyon Yazısı',
-    AppText.internshipDetailMotivationHint: 'Bu stajı neden istediğinizi anlatın...',
+    AppText.internshipDetailMotivationHint:
+        'Bu stajı neden istediğinizi anlatın...',
     AppText.internshipDetailCertificate: 'Sertifika',
     AppText.internshipDetailEmploymentChance: 'İşe Alım Şansı',
     AppText.internshipDetailAbout: 'Hakkında',
@@ -1996,7 +2163,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.chatDefaultSuggestion4: 'Bölüm seçimi için öneriler',
     AppText.chatHistoryLoadFailed: 'Geçmiş yüklenemedi: {error}',
     AppText.chatReplyFailed: 'Yanıt alınamadı: {error}',
-    AppText.chatBotUnavailable: 'Üzgünüm, şu an yanıt veremiyorum. Lütfen tekrar deneyin.',
+    AppText.chatBotUnavailable:
+        'Üzgünüm, şu an yanıt veremiyorum. Lütfen tekrar deneyin.',
 
     // Common
     AppText.commonCancel: 'İptal',
@@ -2047,28 +2215,35 @@ const _values = <String, Map<AppText, String>>{
     AppText.settingsPrefEmailTitle: 'E-posta Bildirimleri',
     AppText.settingsPrefEmailSubtitle: 'Önemli güncellemeler için e-posta al',
     AppText.settingsPrefNewCoursesTitle: 'Yeni Kurs Bildirimleri',
-    AppText.settingsPrefNewCoursesSubtitle: 'Yeni kurslar eklendiğinde haberdar ol',
+    AppText.settingsPrefNewCoursesSubtitle:
+        'Yeni kurslar eklendiğinde haberdar ol',
     AppText.settingsPrefJobAlertsTitle: 'İş İlanı Uyarıları',
-    AppText.settingsPrefJobAlertsSubtitle: 'Profiline uygun iş ilanları için bildirim al',
+    AppText.settingsPrefJobAlertsSubtitle:
+        'Profiline uygun iş ilanları için bildirim al',
     AppText.settingsPrefNewsletterTitle: 'Haftalık Bülten',
     AppText.settingsPrefNewsletterSubtitle: 'Haftalık özet ve öneriler al',
     AppText.settingsPrivacySecurityTitle: 'Gizlilik ve Güvenlik',
     AppText.settingsTwoFactorTitle: 'İki Faktörlü Doğrulama',
-    AppText.settingsTwoFactorSubtitle: 'Hesabınızı ekstra güvenlik katmanı ile koruyun',
+    AppText.settingsTwoFactorSubtitle:
+        'Hesabınızı ekstra güvenlik katmanı ile koruyun',
     AppText.settingsEnableArrow: 'Etkinleştir →',
     AppText.settingsDangerZoneTitle: 'Tehlike Bölgesi',
     AppText.settingsFreezeAccountTitle: 'Hesabı Geçici Olarak Dondur',
-    AppText.settingsFreezeAccountSubtitle: 'Hesabınız geçici olarak erişime kapatılır',
+    AppText.settingsFreezeAccountSubtitle:
+        'Hesabınız geçici olarak erişime kapatılır',
     AppText.settingsFreezeAccountButton: 'Dondur',
     AppText.settingsDeleteAccountTitle: 'Hesabı Kalıcı Olarak Sil',
     AppText.settingsDeleteAccountSubtitle: 'Bu işlem geri alınamaz!',
-    AppText.settingsDeleteAccountWarning: 'Bu işlem geri alınamaz! Hesabınızı silerseniz:',
+    AppText.settingsDeleteAccountWarning:
+        'Bu işlem geri alınamaz! Hesabınızı silerseniz:',
     AppText.settingsDeleteAccountConsequences:
         '• Tüm kişisel bilgileriniz silinecek\n• Kurs kayıtlarınız iptal olacak\n• Başvurularınız silinecek\n• Kazandığınız puanlar kaybolacak\n• Bu e-posta ile tekrar kayıt olamayacaksınız',
     AppText.settingsDeleteAccountConfirmPhrase: 'HESABIMI SIL',
-    AppText.settingsDeleteAccountTypeToConfirm: 'Onaylamak için {phrase} yazın:',
+    AppText.settingsDeleteAccountTypeToConfirm:
+        'Onaylamak için {phrase} yazın:',
     AppText.settingsDeleteAccountButton: 'Hesabı Sil',
-    AppText.settingsDeleteAccountFailed: 'Hesap silinirken hata oluştu: {error}',
+    AppText.settingsDeleteAccountFailed:
+        'Hesap silinirken hata oluştu: {error}',
     AppText.settingsProfileVisibilityTitle: 'Profil Görünürlüğü',
     AppText.settingsVisibilityPublic: 'Herkese açık',
     AppText.settingsVisibilityRegistered: 'Sadece kayıtlı kullanıcılar',
@@ -2076,7 +2251,8 @@ const _values = <String, Map<AppText, String>>{
 
     // Favorites
     AppText.favoritesLoginRequired: 'Favorileri görmek için giriş yapmalısın.',
-    AppText.favoritesSubtitle: 'Beğendiğiniz içerikleri buradan takip edebilirsiniz.',
+    AppText.favoritesSubtitle:
+        'Beğendiğiniz içerikleri buradan takip edebilirsiniz.',
     AppText.favoritesLoadFailed: 'Favoriler yüklenirken hata oluştu: {error}',
     AppText.favoritesRemoved: 'Favorilerden kaldırıldı',
     AppText.favoritesEmptyTitle: 'Henüz favoriniz bulunmuyor.',
@@ -2095,9 +2271,11 @@ const _values = <String, Map<AppText, String>>{
     AppText.profileBadgesTitle: 'Rozetlerim',
     AppText.profileNoBadges: 'Henüz rozetin yok.',
     AppText.profileCompletedCoursesTitle: 'Tamamlanan Kurslar',
-    AppText.profileCompletedCoursesTitleWithCount: 'Tamamlanan Kurslar ({count})',
+    AppText.profileCompletedCoursesTitleWithCount:
+        'Tamamlanan Kurslar ({count})',
     AppText.profileNoCompletedCoursesTitle: 'Henüz tamamladığın kurs yok.',
-    AppText.profileNoCompletedCoursesSubtitle: 'Kursları tamamladıkça burada görünecek!',
+    AppText.profileNoCompletedCoursesSubtitle:
+        'Kursları tamamladıkça burada görünecek!',
     AppText.profileCourseCompleted: 'Tamamlandı',
     AppText.profileCourseInfoNotFound: 'Kurs bilgisi bulunamadı.',
     AppText.profileCompletionDescription: 'Profilinizi tamamladınız!',
@@ -2111,7 +2289,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.coursesEmptySubtitle: 'Filtreleri temizleyip tekrar deneyin.',
     AppText.coursesMyLoadFailedTitle: 'Kayıtlı kurslar yüklenemedi',
     AppText.coursesMyEmptyTitle: 'Henüz kayıtlı kurs yok',
-    AppText.coursesMyEmptySubtitle: '“Tümü” sekmesinden bir kursa kayıt olabilirsin.',
+    AppText.coursesMyEmptySubtitle:
+        '“Tümü” sekmesinden bir kursa kayıt olabilirsin.',
     AppText.coursesExploreAction: 'Kursları Keşfet',
     AppText.coursesSearchHint: 'Kurs ara (örn: SQL, Flutter, Veri...)',
     AppText.coursesDepartmentAll: 'Bölüm: Hepsi',
@@ -2129,12 +2308,15 @@ const _values = <String, Map<AppText, String>>{
     AppText.courseDetailLoadFailedTitle: 'Kurs yüklenemedi',
 
     // Notifications
-    AppText.notificationsLoginRequired: 'Bildirimleri görmek için giriş yapmalısın.',
+    AppText.notificationsLoginRequired:
+        'Bildirimleri görmek için giriş yapmalısın.',
     AppText.notificationsMarkAllRead: 'Tümünü Okundu İşaretle',
     AppText.notificationsUnreadCount: '{count} okunmamış bildirim',
     AppText.notificationsNewSnack: 'Yeni bildirim!',
-    AppText.notificationsLoadFailed: 'Bildirimler yüklenirken hata oluştu: {error}',
-    AppText.notificationsAllMarkedRead: 'Tüm bildirimler okundu olarak işaretlendi',
+    AppText.notificationsLoadFailed:
+        'Bildirimler yüklenirken hata oluştu: {error}',
+    AppText.notificationsAllMarkedRead:
+        'Tüm bildirimler okundu olarak işaretlendi',
     AppText.notificationsDeleted: 'Bildirim silindi',
     AppText.notificationsDeleteFailed: 'Silme işlemi başarısız: {error}',
     AppText.notificationsTabAll: 'Tümü ({count})',
@@ -2149,7 +2331,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.dashboardWeeklyStreakBonus: '7 günlük seri tamamlandı! +15 puan',
     AppText.dashboardLoadFailed: 'Dashboard yüklenemedi',
     AppText.dashboardWelcome: 'Hoş Geldin, {name}! 👋',
-    AppText.dashboardWelcomeSubtitle: 'Bugün kariyerine yön verecek yeni fırsatlar seni bekliyor.',
+    AppText.dashboardWelcomeSubtitle:
+        'Bugün kariyerine yön verecek yeni fırsatlar seni bekliyor.',
     AppText.dashboardTotalPoints: 'Toplam Puan',
     AppText.dashboardCompletedCourses: 'Tamamlanan Kurs',
     AppText.dashboardActiveApplications: 'Aktif Başvuru',
@@ -2163,7 +2346,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.dashboardMetricCoursesCompleted: 'Kurs Tamamlama',
     AppText.dashboardMetricNextTarget: 'Sonraki Hedef',
     AppText.dashboardAssistantTitle: 'Kariyer Asistanı',
-    AppText.dashboardAssistantSubtitle: 'CV, staj ve mülakat sorularında hızlı destek al.',
+    AppText.dashboardAssistantSubtitle:
+        'CV, staj ve mülakat sorularında hızlı destek al.',
     AppText.dashboardAssistantChipCv: 'CV özelleştirme',
     AppText.dashboardAssistantChipInternships: 'Staj başvuruları',
     AppText.dashboardAssistantChipInterview: 'Mülakat hazırlığı',
@@ -2222,7 +2406,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.adminUsersTotalCount: 'Toplam: {count} kullanıcı',
     AppText.adminUserDetailsTitle: 'Kullanıcı Detayları',
     AppText.adminBanUserTitle: 'Kullanıcıyı Engelle',
-    AppText.adminBanUserConfirm: 'Bu kullanıcıyı engellemek istediğinizden emin misiniz?',
+    AppText.adminBanUserConfirm:
+        'Bu kullanıcıyı engellemek istediğinizden emin misiniz?',
     AppText.adminBanUserSuccess: 'Kullanıcı engellendi',
     AppText.adminBanUserFailed: 'Kullanıcı engellenemedi: {error}',
     AppText.adminUnbanUserSuccess: 'Engel kaldırıldı',
@@ -2239,7 +2424,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.adminCompanyDetailsTitle: 'Şirket Detayları',
     AppText.adminCompanyDescriptionLabel: 'Açıklama',
     AppText.adminCompanyRejectReasonTitle: 'Red Nedeni',
-    AppText.adminCompanyRejectReasonRequired: 'Red nedeni (reddetmek için zorunlu)',
+    AppText.adminCompanyRejectReasonRequired:
+        'Red nedeni (reddetmek için zorunlu)',
     AppText.adminCompanyRejectReasonLabel: 'Red nedeni',
     AppText.adminCompanyRejectReasonHint: 'Örn: Eksik belge / yanlış bilgi',
     AppText.adminCompanyApprove: 'Onayla',
@@ -2247,7 +2433,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.adminCompanyBan: 'Şirketi Engelle',
     AppText.adminCompanyUnban: 'Engeli Kaldır',
     AppText.adminCompanyBanTitle: 'Şirketi Engelle',
-    AppText.adminCompanyBanConfirm: 'Bu şirketi engellemek istediğinizden emin misiniz?',
+    AppText.adminCompanyBanConfirm:
+        'Bu şirketi engellemek istediğinizden emin misiniz?',
     AppText.adminCompanyBanAction: 'Engelle',
     AppText.adminTableCompany: 'Şirket',
     AppText.adminTableContact: 'İletişim',
@@ -2273,7 +2460,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.adminLoginButtonLoading: 'Giriş yapılıyor...',
     AppText.adminLoginSuccess: 'Admin girişi başarılı!',
     AppText.adminLoginErrorRequired: 'Email ve şifre zorunludur.',
-    AppText.adminLoginErrorInvalidEmail: 'Lütfen geçerli bir email adresi girin.',
+    AppText.adminLoginErrorInvalidEmail:
+        'Lütfen geçerli bir email adresi girin.',
     AppText.adminLoginErrorVerifyEmail: 'Lütfen email adresinizi doğrulayın.',
     AppText.adminLoginErrorNotAdmin: 'Bu bir admin hesabı değil',
     AppText.adminSetupTitle: 'Admin Kurulumu',
@@ -2308,11 +2496,16 @@ const _values = <String, Map<AppText, String>>{
     AppText.dbDebugSampleRecordsTitle: 'Örnek Kayıtlar',
     AppText.dbDebugError: 'Hata: {error}',
     AppText.dbDebugTipsTitle: 'Kontrol Edilecekler',
-    AppText.dbDebugTipProfileDepartment: 'Profil tablosunda department alanı dolu mu?',
-    AppText.dbDebugTipTablesHaveDepartment: 'courses, internships ve jobs tablolarında department kolonları var mı?',
-    AppText.dbDebugTipTablesHaveData: 'Tablolarda kayıt var mı? Yoksa örnek veri eklenmeli.',
-    AppText.dbDebugTipRlsEnabled: 'RLS (Row Level Security) politikaları aktif mi?',
-    AppText.dbDebugTipDepartmentHasMatches: 'Kullanıcının bölümüne uygun kayıtlar var mı?',
+    AppText.dbDebugTipProfileDepartment:
+        'Profil tablosunda department alanı dolu mu?',
+    AppText.dbDebugTipTablesHaveDepartment:
+        'courses, internships ve jobs tablolarında department kolonları var mı?',
+    AppText.dbDebugTipTablesHaveData:
+        'Tablolarda kayıt var mı? Yoksa örnek veri eklenmeli.',
+    AppText.dbDebugTipRlsEnabled:
+        'RLS (Row Level Security) politikaları aktif mi?',
+    AppText.dbDebugTipDepartmentHasMatches:
+        'Kullanıcının bölümüne uygun kayıtlar var mı?',
     AppText.commonComingSoonTitle: 'Yakında',
     AppText.commonComingSoonSubtitle: 'Bu sayfa yakında aktif olacak',
   },
@@ -2349,10 +2542,13 @@ const _values = <String, Map<AppText, String>>{
     AppText.pointsSystemGuestSubtitle:
         'Enroll in courses, make progress, earn badges, and unlock rewards.',
     AppText.pointsSystemGuestBullet1: 'Course enrollment → earn points',
-    AppText.pointsSystemGuestBullet2: 'Complete a course → extra points + badge',
+    AppText.pointsSystemGuestBullet2:
+        'Complete a course → extra points + badge',
     AppText.pointsSystemGuestBullet3: 'Use your points to unlock rewards',
-    AppText.pointsSystemGuestSignInHint: 'After signing in, you’ll see your points history and rewards here.',
-    AppText.pointsSystemAuthedSubtitle: 'Track your points and aim for rewards.',
+    AppText.pointsSystemGuestSignInHint:
+        'After signing in, you’ll see your points history and rewards here.',
+    AppText.pointsSystemAuthedSubtitle:
+        'Track your points and aim for rewards.',
     AppText.pointsSystemTabHistory: 'History',
     AppText.pointsSystemTabRewards: 'Rewards',
     AppText.pointsSystemTabBadges: 'Badges',
@@ -2362,9 +2558,11 @@ const _values = <String, Map<AppText, String>>{
     AppText.pointsSystemBadgesLoadFailed: 'Failed to load badges: {error}',
     AppText.pointsSystemHistoryEmpty: 'No point activity yet.',
     AppText.pointsSystemRewardsEmpty: 'No rewards found.',
-    AppText.pointsSystemBadgesEmpty: 'No badges yet. Complete courses to earn badges.',
+    AppText.pointsSystemBadgesEmpty:
+        'No badges yet. Complete courses to earn badges.',
     AppText.pointsSystemNextReward: 'Next reward: {title} ({points} points)',
-    AppText.pointsSystemAllRewardsUnlocked: 'All rewards may already be unlocked.',
+    AppText.pointsSystemAllRewardsUnlocked:
+        'All rewards may already be unlocked.',
     AppText.leaderboardLoadFailedTitle: 'Failed to load leaderboard',
     AppText.leaderboardSubtitle:
         'Join the most active students. Earn points, climb the ranks, and get closer to rewards.',
@@ -2373,7 +2571,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.leaderboardEmpty: 'No leaderboard data yet.',
     AppText.leaderboardDepartmentLabel: 'Department: {dept}',
     AppText.leaderboardNoDepartment: 'Your profile has no department set.',
-    AppText.leaderboardNoDepartmentData: 'No leaderboard data for this department.',
+    AppText.leaderboardNoDepartmentData:
+        'No leaderboard data for this department.',
     AppText.leaderboardHeroMyPoints: 'Your Total Points',
     AppText.leaderboardHeroOverallRank: 'Overall Rank',
     AppText.leaderboardHeroDepartmentRank: 'Department Rank',
@@ -2385,10 +2584,12 @@ const _values = <String, Map<AppText, String>>{
         '• Complete a course: +50 points\n• Enroll in a course: +10 points\n• Daily login: +2 points\n• 7-day streak: +15 points',
     AppText.leaderboardViewPointsSystem: 'View Points System',
     AppText.commonYou: 'You',
-    AppText.applicationsLoginRequired: 'You must sign in to view your applications.',
+    AppText.applicationsLoginRequired:
+        'You must sign in to view your applications.',
     AppText.applicationsSearchHint: 'Search applications...',
     AppText.applicationsLoadFailed: 'Failed to load applications: {error}',
-    AppText.applicationsSubtitle: 'Track all your applications and enrollments here.',
+    AppText.applicationsSubtitle:
+        'Track all your applications and enrollments here.',
     AppText.applicationsEmpty: 'You don’t have any applications yet.',
     AppText.applicationsKindJob: 'Job',
     AppText.applicationsKindInternship: 'Internship',
@@ -2401,7 +2602,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.retry: 'Try again',
     AppText.commonPleaseSignIn: 'Please sign in.',
     AppText.jobsTitle: 'Job Listings',
-    AppText.jobsSubtitle: 'Search, filter, favorite, and apply. Same flow as React.',
+    AppText.jobsSubtitle:
+        'Search, filter, favorite, and apply. Same flow as React.',
     AppText.jobsSearchHint: 'Title, company, department, location...',
 
     // Job Detail
@@ -2439,9 +2641,11 @@ const _values = <String, Map<AppText, String>>{
     AppText.footerQuickLinks: 'Quick Links',
     AppText.footerMore: 'More',
     AppText.footerNewsletter: 'Newsletter',
-    AppText.footerNewsletterDesc: 'Join our email list to hear about new opportunities.',
+    AppText.footerNewsletterDesc:
+        'Join our email list to hear about new opportunities.',
     AppText.footerEmailHint: 'Your email address',
-    AppText.footerSubscribeSuccess: 'You have successfully subscribed to the newsletter.',
+    AppText.footerSubscribeSuccess:
+        'You have successfully subscribed to the newsletter.',
     AppText.footerSubscribeInvalid: 'Please enter a valid email.',
     AppText.footerCopyright: '© {year} Student Platform. All rights reserved.',
     AppText.linkInternshipListings: 'Internship Listings',
@@ -2452,32 +2656,40 @@ const _values = <String, Map<AppText, String>>{
     AppText.linkPrivacy: 'Privacy Policy',
     AppText.linkTerms: 'Terms of Service',
     AppText.linkComingSoon: '{name} link coming soon.',
-    AppText.homeHeroTitle: 'Boost your university life,\nsteer your career fast!',
+    AppText.homeHeroTitle:
+        'Boost your university life,\nsteer your career fast!',
     AppText.homeHeroSubtitle:
         'Move forward with solid steps with field-specific courses, internships, and job listings.',
     AppText.homeCard1Title: 'Field-Specific Content',
     AppText.homeCard1Desc:
         'Focused learning with courses, internships, and job listings tailored to your department.',
     AppText.homeCard2Title: 'Guide Your Career',
-    AppText.homeCard2Desc: 'Get support with personalized career guidance and opportunities.',
+    AppText.homeCard2Desc:
+        'Get support with personalized career guidance and opportunities.',
     AppText.homeCard3Title: 'Easy and Fast',
     AppText.homeCard3Desc: 'Save time with a modern, user-friendly interface.',
     AppText.homeStudentBenefitsTitle: 'Benefits for Students',
     AppText.homeStudentCard1Title: 'Goal-Oriented Content',
-    AppText.homeStudentCard1Desc: 'Reach your goal faster with opportunities tailored to your field.',
+    AppText.homeStudentCard1Desc:
+        'Reach your goal faster with opportunities tailored to your field.',
     AppText.homeStudentCard2Title: 'Competitive Advantage',
-    AppText.homeStudentCard2Desc: 'Access opportunities that strengthen your resume before others.',
+    AppText.homeStudentCard2Desc:
+        'Access opportunities that strengthen your resume before others.',
     AppText.homeStudentCard3Title: 'Progress Tracking',
     AppText.homeStudentCard3Desc: 'Track your progress and spot gaps on time.',
     AppText.homeCompanyBenefitsTitle: 'Benefits for Companies',
     AppText.homeCompanyCard1Title: 'Access to Young Talent',
-    AppText.homeCompanyCard1Desc: 'Reach motivated students who are interested in your field.',
+    AppText.homeCompanyCard1Desc:
+        'Reach motivated students who are interested in your field.',
     AppText.homeCompanyCard2Title: 'Collaboration Opportunities',
-    AppText.homeCompanyCard2Desc: 'Work together with university students on your projects.',
+    AppText.homeCompanyCard2Desc:
+        'Work together with university students on your projects.',
     AppText.homeCompanyCard3Title: 'Data-Driven Selection',
-    AppText.homeCompanyCard3Desc: 'Easily identify the right person with profile data.',
+    AppText.homeCompanyCard3Desc:
+        'Easily identify the right person with profile data.',
     AppText.howItWorksTitle: 'How It Works?',
-    AppText.howItWorksSubtitle: 'Our platform has four core stages. We are with you at every step!',
+    AppText.howItWorksSubtitle:
+        'Our platform has four core stages. We are with you at every step!',
     AppText.howItWorksStep1Title: 'Learning Module',
     AppText.howItWorksStep1Desc:
         'Start strong with field-specific basics, video lessons, and mini quizzes.',
@@ -2503,7 +2715,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.howItWorksStep5Title: 'Get Rewards',
     AppText.howItWorksStep5Desc: 'Redeem your points for great rewards.',
     AppText.howItWorksPageStepByStepTitle: 'Step by Step',
-    AppText.howItWorksPageStepByStepSubtitle: 'Start your career journey in five simple steps.',
+    AppText.howItWorksPageStepByStepSubtitle:
+        'Start your career journey in five simple steps.',
     AppText.howItWorksDetailedStepsTitle: 'Detailed Steps',
     AppText.howItWorksDetail1Title: 'Sign Up & Profile',
     AppText.howItWorksDetail1Desc:
@@ -2539,7 +2752,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.howItWorksRewardInternshipGuarantee: 'Internship Guarantee',
     AppText.howItWorksRewardFromPoints: 'Rewards starting from {points} points',
     AppText.howItWorksCtaTitle: 'Start your career journey today',
-    AppText.howItWorksCtaSubtitle: 'Sign up for free, apply to listings, and earn points.',
+    AppText.howItWorksCtaSubtitle:
+        'Sign up for free, apply to listings, and earn points.',
     AppText.howItWorksCtaPrimary: 'Sign Up',
     AppText.howItWorksCtaSecondary: 'View Jobs',
 
@@ -2582,7 +2796,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.aboutWhyNetworkDesc:
         'A powerful career network with 500+ partner companies and thousands of active students.',
     AppText.aboutWhyRewardsTitle: 'Reward System',
-    AppText.aboutWhyRewardsDesc: 'Earn points for your activities and redeem them for real rewards.',
+    AppText.aboutWhyRewardsDesc:
+        'Earn points for your activities and redeem them for real rewards.',
     AppText.aboutWhyCareerTitle: 'Career Growth',
     AppText.aboutWhyCareerDesc:
         'We support your development with online courses, mentoring programs, and career events.',
@@ -2592,11 +2807,13 @@ const _values = <String, Map<AppText, String>>{
 
     // Static - Contact
     AppText.contactHeroTitle: 'Contact',
-    AppText.contactHeroSubtitle: 'Reach out for questions, suggestions, or partnership offers.',
+    AppText.contactHeroSubtitle:
+        'Reach out for questions, suggestions, or partnership offers.',
     AppText.contactEmailTitle: 'Email',
     AppText.contactPhoneTitle: 'Phone',
     AppText.contactAddressTitle: 'Address',
-    AppText.contactAddressBody: 'Teknokent, Innovation St. No:1234\nBeşiktaş, Istanbul',
+    AppText.contactAddressBody:
+        'Teknokent, Innovation St. No:1234\nBeşiktaş, Istanbul',
     AppText.contactHoursTitle: 'Working Hours',
     AppText.contactHoursBody: 'Mon - Fri: 09:00 - 18:00\nSat: 10:00 - 14:00',
     AppText.contactFormTitle: 'Write to Us',
@@ -2613,19 +2830,23 @@ const _values = <String, Map<AppText, String>>{
     AppText.contactSubjectPartnership: 'Partnership',
     AppText.contactSubjectFeedback: 'Feedback / Complaint',
     AppText.contactSubjectOther: 'Other',
-    AppText.contactSendSuccess: 'Your message was sent successfully! We will get back to you soon.',
+    AppText.contactSendSuccess:
+        'Your message was sent successfully! We will get back to you soon.',
     AppText.contactFillRequired: 'Please fill in all required fields.',
     AppText.contactFaqTitle: 'Frequently Asked Questions',
     AppText.contactFaqQ1: 'Is the platform paid?',
     AppText.contactFaqA1: 'No, our platform is completely free for students.',
     AppText.contactFaqQ2: 'Which university students can join?',
-    AppText.contactFaqA2: 'Students from all universities in Turkey can join our platform.',
+    AppText.contactFaqA2:
+        'Students from all universities in Turkey can join our platform.',
     AppText.contactFaqQ3: 'How can I post as an employer?',
-    AppText.contactFaqA3: 'You can contact us for partnership or apply for a corporate membership.',
+    AppText.contactFaqA3:
+        'You can contact us for partnership or apply for a corporate membership.',
     AppText.contactMapPlaceholder: 'Map Area',
 
     // Company - General
-    AppText.companyPanelLoginRequired: 'You must sign in to view the company panel.',
+    AppText.companyPanelLoginRequired:
+        'You must sign in to view the company panel.',
 
     // Company - Jobs
     AppText.companyJobsTitle: 'My Job Listings',
@@ -2643,11 +2864,13 @@ const _values = <String, Map<AppText, String>>{
 
     // Company - Internship Applications
     AppText.companyInternshipApplicationsTitle: 'Applications',
-    AppText.companyInternshipApplicationsTitleWithInternship: 'Applications • {title}',
+    AppText.companyInternshipApplicationsTitleWithInternship:
+        'Applications • {title}',
 
     // Company - Reports
     AppText.companyReportsTitle: 'Reports',
-    AppText.companyReportsLoginRequired: 'You must sign in to view company reports.',
+    AppText.companyReportsLoginRequired:
+        'You must sign in to view company reports.',
     AppText.companyReportsCsvDownloaded: 'CSV downloaded.',
     AppText.companyReportsExportCsv: 'Download CSV',
     AppText.companyReportsRangeToday: 'Today',
@@ -2667,17 +2890,20 @@ const _values = <String, Map<AppText, String>>{
     AppText.companyReportsMetricAccepted: 'Accepted',
     AppText.companyReportsMetricRejected: 'Rejected',
     AppText.companyReportsMetricActiveListings: 'Active Listings',
-    AppText.companyReportsActiveListingsValue: '{jobs} jobs • {internships} internships',
+    AppText.companyReportsActiveListingsValue:
+        '{jobs} jobs • {internships} internships',
     AppText.companyReportsChartViewsTrend: 'Views Trend',
     AppText.companyReportsChartApplicationsTrend: 'Applications Trend',
 
     // Company - Applications
     AppText.companyApplicationsTitle: 'All Applications',
-    AppText.companyApplicationsLoginRequired: 'You must sign in to view company applications.',
+    AppText.companyApplicationsLoginRequired:
+        'You must sign in to view company applications.',
     AppText.companyApplicationsCsvDownloaded: 'CSV downloaded.',
     AppText.companyApplicationsOpenCv: 'Open CV',
     AppText.companyApplicationsCvInvalid: 'Invalid CV link.',
-    AppText.companyApplicationsCvOpenFailedCopied: 'Could not open link. CV link copied.',
+    AppText.companyApplicationsCvOpenFailedCopied:
+        'Could not open link. CV link copied.',
     AppText.companyApplicationsCoverLetterTitle: 'Cover Letter',
     AppText.companyApplicationsMotivationLetterTitle: 'Motivation Letter',
     AppText.companyApplicationsSearchHint: 'Search name, email, or listing...',
@@ -2685,7 +2911,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.companyApplicationsFilterAllTypes: 'All types',
     AppText.companyApplicationsEmpty: 'No applications yet.',
     AppText.companyApplicationsYearOfStudy: 'Year {year}',
-    AppText.companyApplicationsCsvHeader: 'Name,Email,Phone,Type,Listing,Department,Status,Applied At',
+    AppText.companyApplicationsCsvHeader:
+        'Name,Email,Phone,Type,Listing,Department,Status,Applied At',
     AppText.companyApplicationsCsvTypeJob: 'Job',
     AppText.companyApplicationsCsvTypeInternship: 'Internship',
 
@@ -2706,7 +2933,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.companyJobFormDeadlineNotSelected: 'Deadline not selected',
     AppText.companyJobFormDeadlineSelected: 'Deadline: {date}',
     AppText.companyJobFormPickDate: 'Pick date',
-    AppText.companyJobFormValidationTitleDesc: 'Please enter a title and description.',
+    AppText.companyJobFormValidationTitleDesc:
+        'Please enter a title and description.',
     AppText.companyJobFormValidationDepartment: 'Department is required.',
     AppText.companyJobFormValidationLocation: 'Location is required.',
     AppText.companyJobFormValidationDeadline: 'Please select a deadline.',
@@ -2730,18 +2958,26 @@ const _values = <String, Map<AppText, String>>{
     AppText.companyInternshipFormMonthlyStipendLabel: 'Monthly stipend *',
     AppText.companyInternshipFormBenefitsLabel: 'Benefits',
     AppText.companyInternshipFormCertificateLabel: 'Certificate provided',
-    AppText.companyInternshipFormEmploymentPossibilityLabel: 'Employment opportunity',
+    AppText.companyInternshipFormEmploymentPossibilityLabel:
+        'Employment opportunity',
     AppText.companyInternshipFormActiveLabel: 'Listing active',
-    AppText.companyInternshipFormValidationTitleDesc: 'Title and description are required.',
-    AppText.companyInternshipFormValidationRequirements: 'Requirements are required.',
-    AppText.companyInternshipFormValidationDepartment: 'Department is required.',
+    AppText.companyInternshipFormValidationTitleDesc:
+        'Title and description are required.',
+    AppText.companyInternshipFormValidationRequirements:
+        'Requirements are required.',
+    AppText.companyInternshipFormValidationDepartment:
+        'Department is required.',
     AppText.companyInternshipFormValidationLocation: 'Location is required.',
     AppText.companyInternshipFormValidationDuration: 'Duration is required.',
-    AppText.companyInternshipFormValidationStartDate: 'Please select a start date.',
-    AppText.companyInternshipFormValidationDeadline: 'Please select a deadline.',
+    AppText.companyInternshipFormValidationStartDate:
+        'Please select a start date.',
+    AppText.companyInternshipFormValidationDeadline:
+        'Please select a deadline.',
     AppText.companyInternshipFormValidationQuotaRequired: 'Quota is required.',
-    AppText.companyInternshipFormValidationQuotaValid: 'Please enter a valid quota.',
-    AppText.companyInternshipFormValidationPaidStipend: 'Please enter a monthly stipend for a paid internship.',
+    AppText.companyInternshipFormValidationQuotaValid:
+        'Please enter a valid quota.',
+    AppText.companyInternshipFormValidationPaidStipend:
+        'Please enter a monthly stipend for a paid internship.',
     AppText.companyInternshipFormCreated: 'Internship listing created.',
     AppText.companyInternshipFormUpdated: 'Internship listing updated.',
 
@@ -2767,7 +3003,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.companyProfileUpdated: 'Company profile updated.',
     AppText.companyProfileStatusPending: 'Your profile is pending approval.',
     AppText.companyProfileStatusRejected: 'Your profile was rejected.',
-    AppText.companyProfileStatusRejectedWithReason: 'Rejection reason: {reason}',
+    AppText.companyProfileStatusRejectedWithReason:
+        'Rejection reason: {reason}',
     AppText.companyProfileStatusOther: 'Status: {status}',
 
     // Company - Dashboard
@@ -2776,19 +3013,24 @@ const _values = <String, Map<AppText, String>>{
     AppText.companyDashboardPendingApplications: 'Pending applications',
     AppText.companyDashboardTotalApplications: 'Total applications',
     AppText.companyDashboardWelcome: 'Welcome, {name}',
-    AppText.companyDashboardStatusBanned: 'Your account has been disabled. Please contact support.',
+    AppText.companyDashboardStatusBanned:
+        'Your account has been disabled. Please contact support.',
     AppText.companyDashboardStatusPending:
         'Your account is pending approval. Your listings will be published after approval.',
-    AppText.companyDashboardStatusRejected: 'Your company application was rejected. Please update your profile.',
-    AppText.companyDashboardStatusRejectedWithReason: 'Rejection reason: {reason}',
+    AppText.companyDashboardStatusRejected:
+        'Your company application was rejected. Please update your profile.',
+    AppText.companyDashboardStatusRejectedWithReason:
+        'Rejection reason: {reason}',
     AppText.companyDashboardStatusOther: 'Company status: {status}',
     AppText.companyDashboardQuickActionsTitle: 'Quick Actions',
     AppText.companyDashboardQuickActionNewJob: 'New job listing',
-    AppText.companyDashboardPerformanceSummaryTitle: 'Performance Summary (Last 30 Days)',
+    AppText.companyDashboardPerformanceSummaryTitle:
+        'Performance Summary (Last 30 Days)',
 
     // Company - Pricing
     AppText.companyPricingTitle: 'Plans & Pricing',
-    AppText.companyPricingSubtitle: 'Choose the plan that fits your company. Contact us for new plans.',
+    AppText.companyPricingSubtitle:
+        'Choose the plan that fits your company. Contact us for new plans.',
     AppText.companyPricingStarterName: 'Starter',
     AppText.companyPricingStarterPrice: '₺1999 / month',
     AppText.companyPricingStarterDesc: 'Ideal for small businesses',
@@ -2818,38 +3060,45 @@ const _values = <String, Map<AppText, String>>{
     // Company - Status Check
     AppText.companyStatusCompanyAccountMissing: 'Company account not found.',
     AppText.companyStatusNoRegistrationTitle: 'Company registration not found',
-    AppText.companyStatusNoRegistrationSubtitle: 'Create your company registration to continue.',
+    AppText.companyStatusNoRegistrationSubtitle:
+        'Create your company registration to continue.',
     AppText.companyStatusRegisterCta: 'Register company',
     AppText.companyStatusBannedTitle: 'Account suspended',
     AppText.companyStatusBannedSubtitle:
         'Your company account has been suspended for violating platform rules. Please contact support.',
     AppText.companyStatusSupportTeam: 'Support team',
     AppText.companyStatusPendingTitle: 'Approval pending',
-    AppText.companyStatusPendingSubtitle: 'Your company account is under review. We will get back to you soon.',
+    AppText.companyStatusPendingSubtitle:
+        'Your company account is under review. We will get back to you soon.',
     AppText.companyStatusPendingWhatYouCanDoTitle: 'What you can do',
     AppText.companyStatusPendingTip1: 'Complete your company profile',
     AppText.companyStatusPendingTip2: 'Add a logo and cover image',
     AppText.companyStatusPendingTip3: 'Update your contact information',
     AppText.companyStatusEditProfile: 'Edit profile',
     AppText.companyStatusRejectedTitle: 'Application rejected',
-    AppText.companyStatusRejectedSubtitle: 'Sorry, your company application was not approved.',
+    AppText.companyStatusRejectedSubtitle:
+        'Sorry, your company application was not approved.',
     AppText.companyStatusRejectedReasonTitle: 'Rejection reason',
     AppText.companyStatusContactSupport: 'Contact support',
     AppText.companyStatusSubscriptionRequiredTitle: 'Subscription required',
-    AppText.companyStatusSubscriptionRequiredSubtitle: 'Choose a subscription plan to publish listings.',
+    AppText.companyStatusSubscriptionRequiredSubtitle:
+        'Choose a subscription plan to publish listings.',
     AppText.companyStatusSubscriptionApprovedTitle: 'Your account is approved',
-    AppText.companyStatusSubscriptionApprovedTip: 'You can get started by choosing a plan.',
+    AppText.companyStatusSubscriptionApprovedTip:
+        'You can get started by choosing a plan.',
     AppText.companyStatusViewPlans: 'View plans',
 
     // Company - Registration
-    AppText.companyRegisterLoginRequired: 'You must sign in to register a company.',
+    AppText.companyRegisterLoginRequired:
+        'You must sign in to register a company.',
     AppText.companyRegisterTitle: 'Company Registration',
     AppText.companyRegisterCompanyNameLabel: 'Company name',
     AppText.companyRegisterSectorLabel: 'Sector',
     AppText.companyRegisterTaxNumberLabel: 'Tax number',
     AppText.companyRegisterPhoneLabel: 'Phone',
     AppText.companyRegisterCityLabel: 'City',
-    AppText.companyRegisterDuplicateTaxNumber: 'A company with this tax number already exists.',
+    AppText.companyRegisterDuplicateTaxNumber:
+        'A company with this tax number already exists.',
     AppText.companyRegisterSuccess: 'Company registration successful!',
     AppText.companyRegisterSubmit: 'Complete registration',
 
@@ -2877,7 +3126,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.deptOther: 'Other',
 
     // Legal
-    AppText.legalTurkishOnlyNote: 'The full legal text is currently available only in Turkish.',
+    AppText.legalTurkishOnlyNote:
+        'The full legal text is currently available only in Turkish.',
     AppText.legalLastUpdated: 'Last updated: {date}',
     AppText.commonUserId: 'User ID',
     AppText.commonEmail: 'Email',
@@ -2931,13 +3181,17 @@ const _values = <String, Map<AppText, String>>{
     AppText.authEmailSentTitle: 'Email sent!',
     AppText.authResetLinkSentTo: 'A password reset link was sent to:\n{email}',
     AppText.authCheckSpam: 'If you don’t see it, check your spam/junk folder.',
-    AppText.authRequestAgainIn: 'You can request another email in {seconds} seconds.',
+    AppText.authRequestAgainIn:
+        'You can request another email in {seconds} seconds.',
     AppText.authSendResetLink: 'Send reset link',
-    AppText.authTooManyRequests: 'Too many requests. Please wait a minute and try again.',
+    AppText.authTooManyRequests:
+        'Too many requests. Please wait a minute and try again.',
     AppText.authEmailRequired: 'Email is required.',
-    AppText.authWaitSeconds: 'Please wait {seconds} seconds before requesting again.',
+    AppText.authWaitSeconds:
+        'Please wait {seconds} seconds before requesting again.',
     AppText.authResetTitle: 'Reset Password',
-    AppText.authPasteResetLink: 'Paste reset link (if not redirected automatically)',
+    AppText.authPasteResetLink:
+        'Paste reset link (if not redirected automatically)',
     AppText.authUseResetLink: 'Use reset link',
     AppText.authLinkApplied: 'Link applied',
     AppText.authLinkRequired: 'Paste the full reset link from your email.',
@@ -2945,7 +3199,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.authLinkAccepted: 'Link accepted. You can set a new password now.',
     AppText.authLinkExpired: 'Invalid or expired link.',
     AppText.authNewPasswordLabel: 'New password',
-    AppText.authOpenResetLinkFirst: 'Open the reset link first (or paste it above).',
+    AppText.authOpenResetLinkFirst:
+        'Open the reset link first (or paste it above).',
     AppText.authPasswordUpdated: 'Password updated',
     AppText.authEmailVerificationTitle: 'Email Verification',
     AppText.authEmailVerificationPending: 'Email verification pending',
@@ -2953,26 +3208,32 @@ const _values = <String, Map<AppText, String>>{
         'To activate your account, please verify your email address.',
     AppText.authVerificationSentTo: 'Verification link sent to: {email}',
     AppText.authStepCheckInboxTitle: 'Check your inbox',
-    AppText.authStepCheckInboxSubtitle: 'The verification email should arrive in a few minutes.',
+    AppText.authStepCheckInboxSubtitle:
+        'The verification email should arrive in a few minutes.',
     AppText.authStepClickLinkTitle: 'Click the verification link',
-    AppText.authStepClickLinkSubtitle: 'Open the email and confirm your account.',
+    AppText.authStepClickLinkSubtitle:
+        'Open the email and confirm your account.',
     AppText.authStepReturnTitle: 'Return to the app',
-    AppText.authStepReturnSubtitle: 'After verification, you can access all features.',
+    AppText.authStepReturnSubtitle:
+        'After verification, you can access all features.',
     AppText.authIHaveVerified: 'I verified my email',
     AppText.authResendEmail: 'Resend email',
-    AppText.authDidNotReceive: 'Didn’t receive the email? Check spam/junk, or try resending.',
+    AppText.authDidNotReceive:
+        'Didn’t receive the email? Check spam/junk, or try resending.',
     AppText.authLoginDifferent: 'Login with a different account',
     AppText.authEmailNotFound: 'Email not found. Please login again.',
     AppText.authVerificationEmailSentAgain: 'Verification email sent again.',
     AppText.authResendFailed: 'Failed to resend email: {error}',
-    AppText.authPleaseLoginAfterVerify: 'Please login again after verifying your email.',
+    AppText.authPleaseLoginAfterVerify:
+        'Please login again after verifying your email.',
     AppText.authEmailVerifiedSuccess: 'Email verified successfully!',
     AppText.authEmailNotVerifiedYet: 'Email not verified yet.',
     AppText.authVerificationCheckFailed: 'Verification check failed: {error}',
     AppText.statusPending: 'Pending',
     AppText.resetFilters: 'Reset',
     AppText.internshipsTitle: 'Internships',
-    AppText.internshipsSubtitle: 'Gain experience by interning at leading companies.',
+    AppText.internshipsSubtitle:
+        'Gain experience by interning at leading companies.',
     AppText.internshipsLoadFailed: 'Internships could not be loaded',
     AppText.internshipsSearchHint: 'Search: title, company, description...',
     AppText.internshipsLocationAll: 'All Locations',
@@ -2988,21 +3249,26 @@ const _values = <String, Map<AppText, String>>{
     AppText.internshipsPointsEarn: 'Points Earned',
     AppText.internshipsNoDepartmentInfo:
         'Your profile is missing department info. Internship listings are filtered by department. Please add your department in your profile.',
-    AppText.internshipsNoResults: 'No internships found that match your criteria.',
+    AppText.internshipsNoResults:
+        'No internships found that match your criteria.',
     AppText.internshipsFavorite: 'Favorite',
     AppText.internshipsNotSpecified: 'Not specified',
 
     // Internship Detail
     AppText.internshipDetailTitle: 'Internship Details',
-    AppText.internshipDetailLoadFailed: 'Failed to load internship details: {error}',
+    AppText.internshipDetailLoadFailed:
+        'Failed to load internship details: {error}',
     AppText.internshipDetailApplySuccess: 'Application sent.',
     AppText.internshipDetailApplyFailed: 'Application failed: {error}',
     AppText.internshipDetailApplyTitle: 'Apply',
-    AppText.internshipDetailAlreadyApplied: 'You have already applied to this internship.',
-    AppText.internshipDetailApplyHint: 'Write at least {min} characters to continue.',
+    AppText.internshipDetailAlreadyApplied:
+        'You have already applied to this internship.',
+    AppText.internshipDetailApplyHint:
+        'Write at least {min} characters to continue.',
     AppText.internshipDetailApplyButton: 'Apply',
     AppText.internshipDetailMotivationTitle: 'Motivation Letter',
-    AppText.internshipDetailMotivationHint: 'Tell us why you want this internship...',
+    AppText.internshipDetailMotivationHint:
+        'Tell us why you want this internship...',
     AppText.internshipDetailCertificate: 'Certificate',
     AppText.internshipDetailEmploymentChance: 'Employment chance',
     AppText.internshipDetailAbout: 'About',
@@ -3028,7 +3294,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.chatUserNotFoundTitle: 'User not found',
     AppText.chatUserNotFoundSubtitle: 'Please try logging in again.',
     AppText.chatHeaderTitle: 'Career Assistant',
-    AppText.chatHeaderSubtitle: 'Fast help for internships, resumes, and interviews',
+    AppText.chatHeaderSubtitle:
+        'Fast help for internships, resumes, and interviews',
     AppText.chatNewChat: 'New Chat',
     AppText.chatTyping: 'Typing',
     AppText.chatInputHint: 'Type a message...',
@@ -3041,7 +3308,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.chatDefaultSuggestion4: 'Suggestions for choosing a department',
     AppText.chatHistoryLoadFailed: 'Could not load history: {error}',
     AppText.chatReplyFailed: 'Could not get a reply: {error}',
-    AppText.chatBotUnavailable: 'Sorry, I can’t respond right now. Please try again.',
+    AppText.chatBotUnavailable:
+        'Sorry, I can’t respond right now. Please try again.',
 
     // Common
     AppText.commonCancel: 'Cancel',
@@ -3092,28 +3360,35 @@ const _values = <String, Map<AppText, String>>{
     AppText.settingsPrefEmailTitle: 'Email Notifications',
     AppText.settingsPrefEmailSubtitle: 'Get important updates via email',
     AppText.settingsPrefNewCoursesTitle: 'New Course Notifications',
-    AppText.settingsPrefNewCoursesSubtitle: 'Be notified when new courses are added',
+    AppText.settingsPrefNewCoursesSubtitle:
+        'Be notified when new courses are added',
     AppText.settingsPrefJobAlertsTitle: 'Job Alerts',
-    AppText.settingsPrefJobAlertsSubtitle: 'Get notified about jobs that match your profile',
+    AppText.settingsPrefJobAlertsSubtitle:
+        'Get notified about jobs that match your profile',
     AppText.settingsPrefNewsletterTitle: 'Weekly Newsletter',
-    AppText.settingsPrefNewsletterSubtitle: 'Get a weekly digest and recommendations',
+    AppText.settingsPrefNewsletterSubtitle:
+        'Get a weekly digest and recommendations',
     AppText.settingsPrivacySecurityTitle: 'Privacy & Security',
     AppText.settingsTwoFactorTitle: 'Two-Factor Authentication',
-    AppText.settingsTwoFactorSubtitle: 'Protect your account with an extra security layer',
+    AppText.settingsTwoFactorSubtitle:
+        'Protect your account with an extra security layer',
     AppText.settingsEnableArrow: 'Enable →',
     AppText.settingsDangerZoneTitle: 'Danger Zone',
     AppText.settingsFreezeAccountTitle: 'Freeze Account Temporarily',
-    AppText.settingsFreezeAccountSubtitle: 'Your account will be temporarily inaccessible',
+    AppText.settingsFreezeAccountSubtitle:
+        'Your account will be temporarily inaccessible',
     AppText.settingsFreezeAccountButton: 'Freeze',
     AppText.settingsDeleteAccountTitle: 'Delete Account Permanently',
     AppText.settingsDeleteAccountSubtitle: 'This action cannot be undone!',
-    AppText.settingsDeleteAccountWarning: 'This action cannot be undone. If you delete your account:',
+    AppText.settingsDeleteAccountWarning:
+        'This action cannot be undone. If you delete your account:',
     AppText.settingsDeleteAccountConsequences:
         '• All your personal data will be deleted\n• Your course enrollments will be canceled\n• Your applications will be deleted\n• Your earned points will be lost\n• You won’t be able to sign up again with this email',
     AppText.settingsDeleteAccountConfirmPhrase: 'DELETE MY ACCOUNT',
     AppText.settingsDeleteAccountTypeToConfirm: 'To confirm, type {phrase}:',
     AppText.settingsDeleteAccountButton: 'Delete Account',
-    AppText.settingsDeleteAccountFailed: 'Error while deleting account: {error}',
+    AppText.settingsDeleteAccountFailed:
+        'Error while deleting account: {error}',
     AppText.settingsProfileVisibilityTitle: 'Profile Visibility',
     AppText.settingsVisibilityPublic: 'Public',
     AppText.settingsVisibilityRegistered: 'Registered users only',
@@ -3140,9 +3415,12 @@ const _values = <String, Map<AppText, String>>{
     AppText.profileBadgesTitle: 'My Badges',
     AppText.profileNoBadges: 'You don’t have any badges yet.',
     AppText.profileCompletedCoursesTitle: 'Completed Courses',
-    AppText.profileCompletedCoursesTitleWithCount: 'Completed Courses ({count})',
-    AppText.profileNoCompletedCoursesTitle: 'You haven’t completed any courses yet.',
-    AppText.profileNoCompletedCoursesSubtitle: 'They’ll appear here as you complete courses!',
+    AppText.profileCompletedCoursesTitleWithCount:
+        'Completed Courses ({count})',
+    AppText.profileNoCompletedCoursesTitle:
+        'You haven’t completed any courses yet.',
+    AppText.profileNoCompletedCoursesSubtitle:
+        'They’ll appear here as you complete courses!',
     AppText.profileCourseCompleted: 'Completed',
     AppText.profileCourseInfoNotFound: 'Course information not found.',
     AppText.profileCompletionDescription: 'You completed your profile!',
@@ -3194,7 +3472,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.dashboardWeeklyStreakBonus: '7-day streak completed! +15 points',
     AppText.dashboardLoadFailed: 'Could not load dashboard',
     AppText.dashboardWelcome: 'Welcome, {name}! 👋',
-    AppText.dashboardWelcomeSubtitle: 'New opportunities to shape your career are waiting for you today.',
+    AppText.dashboardWelcomeSubtitle:
+        'New opportunities to shape your career are waiting for you today.',
     AppText.dashboardTotalPoints: 'Total Points',
     AppText.dashboardCompletedCourses: 'Courses Completed',
     AppText.dashboardActiveApplications: 'Active Applications',
@@ -3208,7 +3487,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.dashboardMetricCoursesCompleted: 'Course Completion',
     AppText.dashboardMetricNextTarget: 'Next Target',
     AppText.dashboardAssistantTitle: 'Career Assistant',
-    AppText.dashboardAssistantSubtitle: 'Quick help for resumes, internships, and interview questions.',
+    AppText.dashboardAssistantSubtitle:
+        'Quick help for resumes, internships, and interview questions.',
     AppText.dashboardAssistantChipCv: 'Resume improvement',
     AppText.dashboardAssistantChipInternships: 'Internship applications',
     AppText.dashboardAssistantChipInterview: 'Interview prep',
@@ -3244,7 +3524,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.adminStatCompaniesTitle: 'Companies',
     AppText.adminStatCompaniesSubtitlePending: '{count} pending',
     AppText.adminStatActiveListingsTitle: 'Active Listings',
-    AppText.adminStatActiveListingsSubtitle: '{jobs} jobs, {internships} internships',
+    AppText.adminStatActiveListingsSubtitle:
+        '{jobs} jobs, {internships} internships',
     AppText.adminStatMonthlyRevenueTitle: 'Monthly Revenue',
     AppText.adminStatMonthlyRevenueSubtitle: '{count} active subscriptions',
     AppText.adminCompanyApprovalsTitle: 'Pending Approvals',
@@ -3284,15 +3565,18 @@ const _values = <String, Map<AppText, String>>{
     AppText.adminCompanyDetailsTitle: 'Company Details',
     AppText.adminCompanyDescriptionLabel: 'Description',
     AppText.adminCompanyRejectReasonTitle: 'Rejection Reason',
-    AppText.adminCompanyRejectReasonRequired: 'Rejection reason (required to reject)',
+    AppText.adminCompanyRejectReasonRequired:
+        'Rejection reason (required to reject)',
     AppText.adminCompanyRejectReasonLabel: 'Rejection reason',
-    AppText.adminCompanyRejectReasonHint: 'e.g. Missing documents / incorrect info',
+    AppText.adminCompanyRejectReasonHint:
+        'e.g. Missing documents / incorrect info',
     AppText.adminCompanyApprove: 'Approve',
     AppText.adminCompanyReject: 'Reject',
     AppText.adminCompanyBan: 'Ban Company',
     AppText.adminCompanyUnban: 'Unban',
     AppText.adminCompanyBanTitle: 'Ban Company',
-    AppText.adminCompanyBanConfirm: 'Are you sure you want to ban this company?',
+    AppText.adminCompanyBanConfirm:
+        'Are you sure you want to ban this company?',
     AppText.adminCompanyBanAction: 'Ban',
     AppText.adminTableCompany: 'Company',
     AppText.adminTableContact: 'Contact',
@@ -3353,11 +3637,16 @@ const _values = <String, Map<AppText, String>>{
     AppText.dbDebugSampleRecordsTitle: 'Sample Records',
     AppText.dbDebugError: 'Error: {error}',
     AppText.dbDebugTipsTitle: 'Things to Check',
-    AppText.dbDebugTipProfileDepartment: 'Is the department field filled in the profiles table?',
-    AppText.dbDebugTipTablesHaveDepartment: 'Do the courses, internships, and jobs tables have department columns?',
-    AppText.dbDebugTipTablesHaveData: 'Do the tables have data? If not, add sample data.',
-    AppText.dbDebugTipRlsEnabled: 'Are RLS (Row Level Security) policies enabled?',
-    AppText.dbDebugTipDepartmentHasMatches: 'Are there records that match the user’s department?',
+    AppText.dbDebugTipProfileDepartment:
+        'Is the department field filled in the profiles table?',
+    AppText.dbDebugTipTablesHaveDepartment:
+        'Do the courses, internships, and jobs tables have department columns?',
+    AppText.dbDebugTipTablesHaveData:
+        'Do the tables have data? If not, add sample data.',
+    AppText.dbDebugTipRlsEnabled:
+        'Are RLS (Row Level Security) policies enabled?',
+    AppText.dbDebugTipDepartmentHasMatches:
+        'Are there records that match the user’s department?',
     AppText.commonComingSoonTitle: 'Coming soon',
     AppText.commonComingSoonSubtitle: 'This page will be available soon',
   },
@@ -3396,20 +3685,28 @@ const _values = <String, Map<AppText, String>>{
     AppText.pointsSystemGuestBullet1: 'Запись на курс → баллы',
     AppText.pointsSystemGuestBullet2: 'Завершить курс → доп. баллы + значок',
     AppText.pointsSystemGuestBullet3: 'Открывайте награды за баллы',
-    AppText.pointsSystemGuestSignInHint: 'После входа здесь будут история баллов и награды.',
-    AppText.pointsSystemAuthedSubtitle: 'Отслеживайте баллы и стремитесь к наградам.',
+    AppText.pointsSystemGuestSignInHint:
+        'После входа здесь будут история баллов и награды.',
+    AppText.pointsSystemAuthedSubtitle:
+        'Отслеживайте баллы и стремитесь к наградам.',
     AppText.pointsSystemTabHistory: 'История',
     AppText.pointsSystemTabRewards: 'Награды',
     AppText.pointsSystemTabBadges: 'Значки',
     AppText.pointsSystemLoadFailed: 'Не удалось загрузить баллы: {error}',
-    AppText.pointsSystemHistoryLoadFailed: 'Не удалось загрузить историю: {error}',
-    AppText.pointsSystemRewardsLoadFailed: 'Не удалось загрузить награды: {error}',
-    AppText.pointsSystemBadgesLoadFailed: 'Не удалось загрузить значки: {error}',
+    AppText.pointsSystemHistoryLoadFailed:
+        'Не удалось загрузить историю: {error}',
+    AppText.pointsSystemRewardsLoadFailed:
+        'Не удалось загрузить награды: {error}',
+    AppText.pointsSystemBadgesLoadFailed:
+        'Не удалось загрузить значки: {error}',
     AppText.pointsSystemHistoryEmpty: 'Пока нет активности баллов.',
     AppText.pointsSystemRewardsEmpty: 'Награды не найдены.',
-    AppText.pointsSystemBadgesEmpty: 'Пока нет значков. Завершайте курсы, чтобы получать значки.',
-    AppText.pointsSystemNextReward: 'Следующая награда: {title} ({points} баллов)',
-    AppText.pointsSystemAllRewardsUnlocked: 'Возможно, все награды уже открыты.',
+    AppText.pointsSystemBadgesEmpty:
+        'Пока нет значков. Завершайте курсы, чтобы получать значки.',
+    AppText.pointsSystemNextReward:
+        'Следующая награда: {title} ({points} баллов)',
+    AppText.pointsSystemAllRewardsUnlocked:
+        'Возможно, все награды уже открыты.',
     AppText.leaderboardLoadFailedTitle: 'Не удалось загрузить рейтинг',
     AppText.leaderboardSubtitle:
         'Попади в число самых активных студентов. Зарабатывай баллы, поднимайся в рейтинге и приближайся к наградам.',
@@ -3418,7 +3715,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.leaderboardEmpty: 'Данных рейтинга пока нет.',
     AppText.leaderboardDepartmentLabel: 'Факультет: {dept}',
     AppText.leaderboardNoDepartment: 'В вашем профиле не указан факультет.',
-    AppText.leaderboardNoDepartmentData: 'Нет данных рейтинга для этого факультета.',
+    AppText.leaderboardNoDepartmentData:
+        'Нет данных рейтинга для этого факультета.',
     AppText.leaderboardHeroMyPoints: 'Ваши баллы',
     AppText.leaderboardHeroOverallRank: 'Общий рейтинг',
     AppText.leaderboardHeroDepartmentRank: 'Рейтинг факультета',
@@ -3430,10 +3728,12 @@ const _values = <String, Map<AppText, String>>{
         '• Завершите курс: +50 баллов\n• Запишитесь на курс: +10 баллов\n• Ежедневный вход: +2 балла\n• Серия 7 дней: +15 баллов',
     AppText.leaderboardViewPointsSystem: 'Открыть систему баллов',
     AppText.commonYou: 'Вы',
-    AppText.applicationsLoginRequired: 'Войдите, чтобы просматривать ваши заявки.',
+    AppText.applicationsLoginRequired:
+        'Войдите, чтобы просматривать ваши заявки.',
     AppText.applicationsSearchHint: 'Поиск заявок...',
     AppText.applicationsLoadFailed: 'Не удалось загрузить заявки: {error}',
-    AppText.applicationsSubtitle: 'Здесь можно отслеживать все заявки и записи.',
+    AppText.applicationsSubtitle:
+        'Здесь можно отслеживать все заявки и записи.',
     AppText.applicationsEmpty: 'У вас пока нет заявок.',
     AppText.applicationsKindJob: 'Вакансия',
     AppText.applicationsKindInternship: 'Стажировка',
@@ -3446,7 +3746,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.retry: 'Повторить',
     AppText.commonPleaseSignIn: 'Пожалуйста, войдите.',
     AppText.jobsTitle: 'Вакансии',
-    AppText.jobsSubtitle: 'Ищите, фильтруйте, добавляйте в избранное и откликайтесь. Тот же поток, что и в React.',
+    AppText.jobsSubtitle:
+        'Ищите, фильтруйте, добавляйте в избранное и откликайтесь. Тот же поток, что и в React.',
     AppText.jobsSearchHint: 'Должность, компания, отдел, локация...',
 
     // Job Detail
@@ -3457,7 +3758,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.jobDetailApply: 'Откликнуться',
     AppText.jobDetailAppliedStatus: 'Статус заявки: {status}',
     AppText.jobDetailApplySheetTitle: 'Отклик на вакансию',
-    AppText.jobDetailApplySheetSubtitle: 'Добавьте короткое сообщение (необязательно).',
+    AppText.jobDetailApplySheetSubtitle:
+        'Добавьте короткое сообщение (необязательно).',
     AppText.jobDetailApplySheetHint: 'Напишите сообщение компании...',
     AppText.jobDetailApplySuccess: 'Заявка отправлена.',
     AppText.jobDetailApplyFailed: 'Не удалось отправить заявку: {error}',
@@ -3484,11 +3786,13 @@ const _values = <String, Map<AppText, String>>{
     AppText.footerQuickLinks: 'Быстрые ссылки',
     AppText.footerMore: 'Больше',
     AppText.footerNewsletter: 'Рассылка',
-    AppText.footerNewsletterDesc: 'Подпишитесь на рассылку, чтобы узнавать о новых возможностях.',
+    AppText.footerNewsletterDesc:
+        'Подпишитесь на рассылку, чтобы узнавать о новых возможностях.',
     AppText.footerEmailHint: 'Ваш адрес электронной почты',
     AppText.footerSubscribeSuccess: 'Вы успешно подписались на рассылку.',
     AppText.footerSubscribeInvalid: 'Пожалуйста, введите корректный email.',
-    AppText.footerCopyright: '© {year} Студенческая платформа. Все права защищены.',
+    AppText.footerCopyright:
+        '© {year} Студенческая платформа. Все права защищены.',
     AppText.linkInternshipListings: 'Стажировки',
     AppText.linkLeaderboard: 'Таблица лидеров',
     AppText.linkHowItWorks: 'Как это работает?',
@@ -3497,32 +3801,41 @@ const _values = <String, Map<AppText, String>>{
     AppText.linkPrivacy: 'Политика конфиденциальности',
     AppText.linkTerms: 'Условия использования',
     AppText.linkComingSoon: 'Ссылка {name} скоро будет доступна.',
-    AppText.homeHeroTitle: 'Укрепи студенческую жизнь,\nбыстро направь карьеру!',
+    AppText.homeHeroTitle:
+        'Укрепи студенческую жизнь,\nбыстро направь карьеру!',
     AppText.homeHeroSubtitle:
         'Двигайся к будущему уверенно с курсами, стажировками и вакансиями по твоей области.',
     AppText.homeCard1Title: 'Контент по твоей области',
     AppText.homeCard1Desc:
         'Сфокусированное обучение: курсы, стажировки и вакансии для твоего направления.',
     AppText.homeCard2Title: 'Направь карьеру',
-    AppText.homeCard2Desc: 'Персональные рекомендации и возможности для поддержки карьеры.',
+    AppText.homeCard2Desc:
+        'Персональные рекомендации и возможности для поддержки карьеры.',
     AppText.homeCard3Title: 'Легко и быстро',
     AppText.homeCard3Desc: 'Экономь время с современным и удобным интерфейсом.',
     AppText.homeStudentBenefitsTitle: 'Преимущества для студентов',
     AppText.homeStudentCard1Title: 'Целевой контент',
-    AppText.homeStudentCard1Desc: 'Достигай целей быстрее с возможностями по твоему направлению.',
+    AppText.homeStudentCard1Desc:
+        'Достигай целей быстрее с возможностями по твоему направлению.',
     AppText.homeStudentCard2Title: 'Конкурентное преимущество',
-    AppText.homeStudentCard2Desc: 'Получай возможности для усиления резюме раньше других.',
+    AppText.homeStudentCard2Desc:
+        'Получай возможности для усиления резюме раньше других.',
     AppText.homeStudentCard3Title: 'Отслеживание прогресса',
-    AppText.homeStudentCard3Desc: 'Следи за прогрессом и вовремя замечай пробелы.',
+    AppText.homeStudentCard3Desc:
+        'Следи за прогрессом и вовремя замечай пробелы.',
     AppText.homeCompanyBenefitsTitle: 'Преимущества для компаний',
     AppText.homeCompanyCard1Title: 'Доступ к молодым талантам',
-    AppText.homeCompanyCard1Desc: 'Находите мотивированных студентов, заинтересованных в вашей сфере.',
+    AppText.homeCompanyCard1Desc:
+        'Находите мотивированных студентов, заинтересованных в вашей сфере.',
     AppText.homeCompanyCard2Title: 'Возможности сотрудничества',
-    AppText.homeCompanyCard2Desc: 'Работайте вместе со студентами над вашими проектами.',
+    AppText.homeCompanyCard2Desc:
+        'Работайте вместе со студентами над вашими проектами.',
     AppText.homeCompanyCard3Title: 'Выбор на основе данных',
-    AppText.homeCompanyCard3Desc: 'Легко находите подходящего кандидата по данным профиля.',
+    AppText.homeCompanyCard3Desc:
+        'Легко находите подходящего кандидата по данным профиля.',
     AppText.howItWorksTitle: 'Как это работает?',
-    AppText.howItWorksSubtitle: 'Наша платформа состоит из четырех этапов. Мы с вами на каждом шаге!',
+    AppText.howItWorksSubtitle:
+        'Наша платформа состоит из четырех этапов. Мы с вами на каждом шаге!',
     AppText.howItWorksStep1Title: 'Модуль обучения',
     AppText.howItWorksStep1Desc:
         'Сильный старт с базовыми знаниями, видеоуроками и мини-тестами.',
@@ -3548,7 +3861,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.howItWorksStep5Title: 'Получайте награды',
     AppText.howItWorksStep5Desc: 'Обменивайте баллы на отличные награды.',
     AppText.howItWorksPageStepByStepTitle: 'Шаг за шагом',
-    AppText.howItWorksPageStepByStepSubtitle: 'Начните карьерный путь за пять простых шагов.',
+    AppText.howItWorksPageStepByStepSubtitle:
+        'Начните карьерный путь за пять простых шагов.',
     AppText.howItWorksDetailedStepsTitle: 'Подробные шаги',
     AppText.howItWorksDetail1Title: 'Регистрация и профиль',
     AppText.howItWorksDetail1Desc:
@@ -3567,7 +3881,8 @@ const _values = <String, Map<AppText, String>>{
         'Подавайте заявки на предложения компаний. Получайте дополнительные баллы при одобрении.',
     AppText.howItWorksDetail3Bullet1: 'Предложения по вашему направлению',
     AppText.howItWorksDetail3Bullet2: 'Удалённо и в офисе',
-    AppText.howItWorksDetail3Bullet3: 'Дополнительные баллы по результатам оценки',
+    AppText.howItWorksDetail3Bullet3:
+        'Дополнительные баллы по результатам оценки',
     AppText.howItWorksDetail4Title: 'Система баллов',
     AppText.howItWorksDetail4Desc:
         'Заходите каждый день, выполняйте активности и зарабатывайте баллы. Поднимайтесь в рейтингах.',
@@ -3584,7 +3899,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.howItWorksRewardInternshipGuarantee: 'Гарантия стажировки',
     AppText.howItWorksRewardFromPoints: 'Награды от {points} баллов',
     AppText.howItWorksCtaTitle: 'Начните карьерный путь уже сегодня',
-    AppText.howItWorksCtaSubtitle: 'Зарегистрируйтесь бесплатно, подавайте заявки и зарабатывайте баллы.',
+    AppText.howItWorksCtaSubtitle:
+        'Зарегистрируйтесь бесплатно, подавайте заявки и зарабатывайте баллы.',
     AppText.howItWorksCtaPrimary: 'Регистрация',
     AppText.howItWorksCtaSecondary: 'Смотреть вакансии',
 
@@ -3638,11 +3954,13 @@ const _values = <String, Map<AppText, String>>{
 
     // Static - Contact
     AppText.contactHeroTitle: 'Контакты',
-    AppText.contactHeroSubtitle: 'Свяжитесь с нами по вопросам, предложениям или партнёрству.',
+    AppText.contactHeroSubtitle:
+        'Свяжитесь с нами по вопросам, предложениям или партнёрству.',
     AppText.contactEmailTitle: 'Эл. почта',
     AppText.contactPhoneTitle: 'Телефон',
     AppText.contactAddressTitle: 'Адрес',
-    AppText.contactAddressBody: 'Teknokent, Innovation St. No:1234\nBeşiktaş, Istanbul',
+    AppText.contactAddressBody:
+        'Teknokent, Innovation St. No:1234\nBeşiktaş, Istanbul',
     AppText.contactHoursTitle: 'Часы работы',
     AppText.contactHoursBody: 'Пн–Пт: 09:00 - 18:00\nСб: 10:00 - 14:00',
     AppText.contactFormTitle: 'Напишите нам',
@@ -3659,19 +3977,23 @@ const _values = <String, Map<AppText, String>>{
     AppText.contactSubjectPartnership: 'Партнёрство',
     AppText.contactSubjectFeedback: 'Отзыв / жалоба',
     AppText.contactSubjectOther: 'Другое',
-    AppText.contactSendSuccess: 'Сообщение отправлено! Мы свяжемся с вами в ближайшее время.',
+    AppText.contactSendSuccess:
+        'Сообщение отправлено! Мы свяжемся с вами в ближайшее время.',
     AppText.contactFillRequired: 'Пожалуйста, заполните все обязательные поля.',
     AppText.contactFaqTitle: 'Часто задаваемые вопросы',
     AppText.contactFaqQ1: 'Платформа платная?',
     AppText.contactFaqA1: 'Нет, платформа полностью бесплатна для студентов.',
     AppText.contactFaqQ2: 'Какие студенты могут присоединиться?',
-    AppText.contactFaqA2: 'Студенты всех университетов Турции могут присоединиться к платформе.',
+    AppText.contactFaqA2:
+        'Студенты всех университетов Турции могут присоединиться к платформе.',
     AppText.contactFaqQ3: 'Как разместить вакансию как работодатель?',
-    AppText.contactFaqA3: 'Свяжитесь с нами для партнёрства или подайте заявку на корпоративный аккаунт.',
+    AppText.contactFaqA3:
+        'Свяжитесь с нами для партнёрства или подайте заявку на корпоративный аккаунт.',
     AppText.contactMapPlaceholder: 'Карта',
 
     // Company - General
-    AppText.companyPanelLoginRequired: 'Войдите, чтобы открыть панель компании.',
+    AppText.companyPanelLoginRequired:
+        'Войдите, чтобы открыть панель компании.',
 
     // Company - Jobs
     AppText.companyJobsTitle: 'Мои вакансии',
@@ -3681,7 +4003,8 @@ const _values = <String, Map<AppText, String>>{
     // Company - Internships
     AppText.companyInternshipsTitle: 'Мои стажировки',
     AppText.companyInternshipsSearchHint: 'Поиск стажировок...',
-    AppText.companyInternshipsEmptyNoListings: 'Пока нет объявлений о стажировках.',
+    AppText.companyInternshipsEmptyNoListings:
+        'Пока нет объявлений о стажировках.',
 
     // Company - Job Applications
     AppText.companyJobApplicationsTitle: 'Заявки',
@@ -3689,11 +4012,13 @@ const _values = <String, Map<AppText, String>>{
 
     // Company - Internship Applications
     AppText.companyInternshipApplicationsTitle: 'Заявки',
-    AppText.companyInternshipApplicationsTitleWithInternship: 'Заявки • {title}',
+    AppText.companyInternshipApplicationsTitleWithInternship:
+        'Заявки • {title}',
 
     // Company - Reports
     AppText.companyReportsTitle: 'Отчёты',
-    AppText.companyReportsLoginRequired: 'Войдите, чтобы просматривать отчёты компании.',
+    AppText.companyReportsLoginRequired:
+        'Войдите, чтобы просматривать отчёты компании.',
     AppText.companyReportsCsvDownloaded: 'CSV скачан.',
     AppText.companyReportsExportCsv: 'Скачать CSV',
     AppText.companyReportsRangeToday: 'Сегодня',
@@ -3713,25 +4038,30 @@ const _values = <String, Map<AppText, String>>{
     AppText.companyReportsMetricAccepted: 'Принято',
     AppText.companyReportsMetricRejected: 'Отклонено',
     AppText.companyReportsMetricActiveListings: 'Активные объявления',
-    AppText.companyReportsActiveListingsValue: '{jobs} вакансий • {internships} стажировок',
+    AppText.companyReportsActiveListingsValue:
+        '{jobs} вакансий • {internships} стажировок',
     AppText.companyReportsChartViewsTrend: 'Тренд просмотров',
     AppText.companyReportsChartApplicationsTrend: 'Тренд заявок',
 
     // Company - Applications
     AppText.companyApplicationsTitle: 'Все заявки',
-    AppText.companyApplicationsLoginRequired: 'Войдите, чтобы просматривать заявки компании.',
+    AppText.companyApplicationsLoginRequired:
+        'Войдите, чтобы просматривать заявки компании.',
     AppText.companyApplicationsCsvDownloaded: 'CSV скачан.',
     AppText.companyApplicationsOpenCv: 'Открыть CV',
     AppText.companyApplicationsCvInvalid: 'Неверная ссылка на CV.',
-    AppText.companyApplicationsCvOpenFailedCopied: 'Не удалось открыть ссылку. Ссылка на CV скопирована.',
+    AppText.companyApplicationsCvOpenFailedCopied:
+        'Не удалось открыть ссылку. Ссылка на CV скопирована.',
     AppText.companyApplicationsCoverLetterTitle: 'Сопроводительное письмо',
     AppText.companyApplicationsMotivationLetterTitle: 'Мотивационное письмо',
-    AppText.companyApplicationsSearchHint: 'Поиск по имени, email или объявлению...',
+    AppText.companyApplicationsSearchHint:
+        'Поиск по имени, email или объявлению...',
     AppText.companyApplicationsFilterAllStatuses: 'Все статусы',
     AppText.companyApplicationsFilterAllTypes: 'Все типы',
     AppText.companyApplicationsEmpty: 'Заявок пока нет.',
     AppText.companyApplicationsYearOfStudy: '{year} курс',
-    AppText.companyApplicationsCsvHeader: 'Имя,Email,Телефон,Тип,Объявление,Отдел,Статус,Дата подачи',
+    AppText.companyApplicationsCsvHeader:
+        'Имя,Email,Телефон,Тип,Объявление,Отдел,Статус,Дата подачи',
     AppText.companyApplicationsCsvTypeJob: 'Вакансия',
     AppText.companyApplicationsCsvTypeInternship: 'Стажировка',
 
@@ -3776,17 +4106,22 @@ const _values = <String, Map<AppText, String>>{
     AppText.companyInternshipFormMonthlyStipendLabel: 'Ежемесячная выплата *',
     AppText.companyInternshipFormBenefitsLabel: 'Льготы',
     AppText.companyInternshipFormCertificateLabel: 'Сертификат предоставляется',
-    AppText.companyInternshipFormEmploymentPossibilityLabel: 'Возможность трудоустройства',
+    AppText.companyInternshipFormEmploymentPossibilityLabel:
+        'Возможность трудоустройства',
     AppText.companyInternshipFormActiveLabel: 'Объявление активно',
-    AppText.companyInternshipFormValidationTitleDesc: 'Название и описание обязательны.',
-    AppText.companyInternshipFormValidationRequirements: 'Требования обязательны.',
+    AppText.companyInternshipFormValidationTitleDesc:
+        'Название и описание обязательны.',
+    AppText.companyInternshipFormValidationRequirements:
+        'Требования обязательны.',
     AppText.companyInternshipFormValidationDepartment: 'Отдел обязателен.',
     AppText.companyInternshipFormValidationLocation: 'Локация обязательна.',
-    AppText.companyInternshipFormValidationDuration: 'Длительность обязательна.',
+    AppText.companyInternshipFormValidationDuration:
+        'Длительность обязательна.',
     AppText.companyInternshipFormValidationStartDate: 'Выберите дату начала.',
     AppText.companyInternshipFormValidationDeadline: 'Выберите дедлайн.',
     AppText.companyInternshipFormValidationQuotaRequired: 'Квота обязательна.',
-    AppText.companyInternshipFormValidationQuotaValid: 'Введите корректную квоту.',
+    AppText.companyInternshipFormValidationQuotaValid:
+        'Введите корректную квоту.',
     AppText.companyInternshipFormValidationPaidStipend:
         'Укажите ежемесячную выплату для оплачиваемой стажировки.',
     AppText.companyInternshipFormCreated: 'Стажировка создана.',
@@ -3807,7 +4142,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.companyProfileFieldAbout: 'О компании',
     AppText.companyProfileFieldFoundedYear: 'Год основания',
     AppText.companyProfileFieldCompanySize: 'Размер компании',
-    AppText.companyProfileValidationNameRequired: 'Название компании обязательно.',
+    AppText.companyProfileValidationNameRequired:
+        'Название компании обязательно.',
     AppText.companyProfileValidationSectorRequired: 'Сфера обязательна.',
     AppText.companyProfileValidationPhoneRequired: 'Телефон обязателен.',
     AppText.companyProfileValidationCityRequired: 'Город обязателен.',
@@ -3823,18 +4159,24 @@ const _values = <String, Map<AppText, String>>{
     AppText.companyDashboardPendingApplications: 'Заявки в ожидании',
     AppText.companyDashboardTotalApplications: 'Всего заявок',
     AppText.companyDashboardWelcome: 'Добро пожаловать, {name}',
-    AppText.companyDashboardStatusBanned: 'Ваш аккаунт отключён. Свяжитесь со службой поддержки.',
-    AppText.companyDashboardStatusPending: 'Аккаунт на проверке. Объявления будут опубликованы после одобрения.',
-    AppText.companyDashboardStatusRejected: 'Заявка компании отклонена. Обновите профиль.',
-    AppText.companyDashboardStatusRejectedWithReason: 'Причина отказа: {reason}',
+    AppText.companyDashboardStatusBanned:
+        'Ваш аккаунт отключён. Свяжитесь со службой поддержки.',
+    AppText.companyDashboardStatusPending:
+        'Аккаунт на проверке. Объявления будут опубликованы после одобрения.',
+    AppText.companyDashboardStatusRejected:
+        'Заявка компании отклонена. Обновите профиль.',
+    AppText.companyDashboardStatusRejectedWithReason:
+        'Причина отказа: {reason}',
     AppText.companyDashboardStatusOther: 'Статус компании: {status}',
     AppText.companyDashboardQuickActionsTitle: 'Быстрые действия',
     AppText.companyDashboardQuickActionNewJob: 'Новая вакансия',
-    AppText.companyDashboardPerformanceSummaryTitle: 'Сводка эффективности (последние 30 дней)',
+    AppText.companyDashboardPerformanceSummaryTitle:
+        'Сводка эффективности (последние 30 дней)',
 
     // Company - Pricing
     AppText.companyPricingTitle: 'Тарифы',
-    AppText.companyPricingSubtitle: 'Выберите подходящий тариф. Для новых тарифов свяжитесь с нами.',
+    AppText.companyPricingSubtitle:
+        'Выберите подходящий тариф. Для новых тарифов свяжитесь с нами.',
     AppText.companyPricingStarterName: 'Старт',
     AppText.companyPricingStarterPrice: '₺1999 / мес.',
     AppText.companyPricingStarterDesc: 'Идеально для малого бизнеса',
@@ -3864,38 +4206,45 @@ const _values = <String, Map<AppText, String>>{
     // Company - Status Check
     AppText.companyStatusCompanyAccountMissing: 'Аккаунт компании не найден.',
     AppText.companyStatusNoRegistrationTitle: 'Регистрация компании не найдена',
-    AppText.companyStatusNoRegistrationSubtitle: 'Создайте регистрацию компании, чтобы продолжить.',
+    AppText.companyStatusNoRegistrationSubtitle:
+        'Создайте регистрацию компании, чтобы продолжить.',
     AppText.companyStatusRegisterCta: 'Зарегистрировать компанию',
     AppText.companyStatusBannedTitle: 'Аккаунт приостановлен',
     AppText.companyStatusBannedSubtitle:
         'Аккаунт компании приостановлен за нарушение правил. Свяжитесь с поддержкой.',
     AppText.companyStatusSupportTeam: 'Поддержка',
     AppText.companyStatusPendingTitle: 'Ожидает одобрения',
-    AppText.companyStatusPendingSubtitle: 'Аккаунт на проверке. Мы свяжемся с вами в ближайшее время.',
+    AppText.companyStatusPendingSubtitle:
+        'Аккаунт на проверке. Мы свяжемся с вами в ближайшее время.',
     AppText.companyStatusPendingWhatYouCanDoTitle: 'Что можно сделать',
     AppText.companyStatusPendingTip1: 'Заполните профиль компании',
     AppText.companyStatusPendingTip2: 'Добавьте логотип и обложку',
     AppText.companyStatusPendingTip3: 'Обновите контактные данные',
     AppText.companyStatusEditProfile: 'Редактировать профиль',
     AppText.companyStatusRejectedTitle: 'Заявка отклонена',
-    AppText.companyStatusRejectedSubtitle: 'К сожалению, заявка компании не одобрена.',
+    AppText.companyStatusRejectedSubtitle:
+        'К сожалению, заявка компании не одобрена.',
     AppText.companyStatusRejectedReasonTitle: 'Причина отказа',
     AppText.companyStatusContactSupport: 'Связаться с поддержкой',
     AppText.companyStatusSubscriptionRequiredTitle: 'Нужна подписка',
-    AppText.companyStatusSubscriptionRequiredSubtitle: 'Выберите тариф, чтобы публиковать объявления.',
+    AppText.companyStatusSubscriptionRequiredSubtitle:
+        'Выберите тариф, чтобы публиковать объявления.',
     AppText.companyStatusSubscriptionApprovedTitle: 'Аккаунт одобрен',
-    AppText.companyStatusSubscriptionApprovedTip: 'Выберите тариф, чтобы начать.',
+    AppText.companyStatusSubscriptionApprovedTip:
+        'Выберите тариф, чтобы начать.',
     AppText.companyStatusViewPlans: 'Посмотреть тарифы',
 
     // Company - Registration
-    AppText.companyRegisterLoginRequired: 'Войдите, чтобы зарегистрировать компанию.',
+    AppText.companyRegisterLoginRequired:
+        'Войдите, чтобы зарегистрировать компанию.',
     AppText.companyRegisterTitle: 'Регистрация компании',
     AppText.companyRegisterCompanyNameLabel: 'Название компании',
     AppText.companyRegisterSectorLabel: 'Сфера',
     AppText.companyRegisterTaxNumberLabel: 'Налоговый номер',
     AppText.companyRegisterPhoneLabel: 'Телефон',
     AppText.companyRegisterCityLabel: 'Город',
-    AppText.companyRegisterDuplicateTaxNumber: 'Компания с таким налоговым номером уже существует.',
+    AppText.companyRegisterDuplicateTaxNumber:
+        'Компания с таким налоговым номером уже существует.',
     AppText.companyRegisterSuccess: 'Регистрация компании успешна!',
     AppText.companyRegisterSubmit: 'Завершить регистрацию',
 
@@ -3923,7 +4272,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.deptOther: 'Другое',
 
     // Legal
-    AppText.legalTurkishOnlyNote: 'Полный юридический текст сейчас доступен только на турецком языке.',
+    AppText.legalTurkishOnlyNote:
+        'Полный юридический текст сейчас доступен только на турецком языке.',
     AppText.legalLastUpdated: 'Последнее обновление: {date}',
     AppText.commonUserId: 'ID пользователя',
     AppText.commonEmail: 'Эл. почта',
@@ -3968,7 +4318,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.authAlreadyHaveAccount: 'Уже есть аккаунт?',
     AppText.authAcceptTermsPrefix: 'Я принимаю ',
     AppText.authAcceptTermsAnd: ' и ',
-    AppText.authAcceptTermsError: 'Необходимо принять Условия и Политику конфиденциальности.',
+    AppText.authAcceptTermsError:
+        'Необходимо принять Условия и Политику конфиденциальности.',
     AppText.authSelectDepartment: 'Пожалуйста, выберите факультет.',
     AppText.authSelectYear: 'Пожалуйста, выберите курс.',
     AppText.authYearPlus: '5+ (и выше)',
@@ -3977,47 +4328,62 @@ const _values = <String, Map<AppText, String>>{
     AppText.authEmailSentTitle: 'Письмо отправлено!',
     AppText.authResetLinkSentTo: 'Ссылка для сброса отправлена на:\n{email}',
     AppText.authCheckSpam: 'Если не видите письмо, проверьте спам.',
-    AppText.authRequestAgainIn: 'Вы можете запросить письмо снова через {seconds} секунд.',
+    AppText.authRequestAgainIn:
+        'Вы можете запросить письмо снова через {seconds} секунд.',
     AppText.authSendResetLink: 'Отправить ссылку',
-    AppText.authTooManyRequests: 'Слишком много запросов. Подождите минуту и попробуйте снова.',
+    AppText.authTooManyRequests:
+        'Слишком много запросов. Подождите минуту и попробуйте снова.',
     AppText.authEmailRequired: 'Email обязателен.',
-    AppText.authWaitSeconds: 'Подождите {seconds} секунд перед повторным запросом.',
+    AppText.authWaitSeconds:
+        'Подождите {seconds} секунд перед повторным запросом.',
     AppText.authResetTitle: 'Сброс пароля',
-    AppText.authPasteResetLink: 'Вставьте ссылку для сброса (если не перенаправило автоматически)',
+    AppText.authPasteResetLink:
+        'Вставьте ссылку для сброса (если не перенаправило автоматически)',
     AppText.authUseResetLink: 'Использовать ссылку',
     AppText.authLinkApplied: 'Ссылка применена',
     AppText.authLinkRequired: 'Вставьте полную ссылку из письма.',
     AppText.authLinkInvalid: 'Неверный формат ссылки.',
-    AppText.authLinkAccepted: 'Ссылка принята. Теперь можно задать новый пароль.',
+    AppText.authLinkAccepted:
+        'Ссылка принята. Теперь можно задать новый пароль.',
     AppText.authLinkExpired: 'Ссылка недействительна или истекла.',
     AppText.authNewPasswordLabel: 'Новый пароль',
-    AppText.authOpenResetLinkFirst: 'Сначала откройте ссылку для сброса (или вставьте её выше).',
+    AppText.authOpenResetLinkFirst:
+        'Сначала откройте ссылку для сброса (или вставьте её выше).',
     AppText.authPasswordUpdated: 'Пароль обновлён',
     AppText.authEmailVerificationTitle: 'Подтверждение email',
     AppText.authEmailVerificationPending: 'Ожидается подтверждение email',
-    AppText.authEmailVerificationSubtitle: 'Для активации аккаунта подтвердите адрес электронной почты.',
-    AppText.authVerificationSentTo: 'Ссылка для подтверждения отправлена: {email}',
+    AppText.authEmailVerificationSubtitle:
+        'Для активации аккаунта подтвердите адрес электронной почты.',
+    AppText.authVerificationSentTo:
+        'Ссылка для подтверждения отправлена: {email}',
     AppText.authStepCheckInboxTitle: 'Проверьте почту',
-    AppText.authStepCheckInboxSubtitle: 'Письмо с подтверждением придет через несколько минут.',
+    AppText.authStepCheckInboxSubtitle:
+        'Письмо с подтверждением придет через несколько минут.',
     AppText.authStepClickLinkTitle: 'Нажмите ссылку подтверждения',
     AppText.authStepClickLinkSubtitle: 'Откройте письмо и подтвердите аккаунт.',
     AppText.authStepReturnTitle: 'Вернитесь в приложение',
-    AppText.authStepReturnSubtitle: 'После подтверждения вы получите доступ ко всем функциям.',
+    AppText.authStepReturnSubtitle:
+        'После подтверждения вы получите доступ ко всем функциям.',
     AppText.authIHaveVerified: 'Я подтвердил email',
     AppText.authResendEmail: 'Отправить письмо снова',
-    AppText.authDidNotReceive: 'Не получили письмо? Проверьте спам или отправьте снова.',
+    AppText.authDidNotReceive:
+        'Не получили письмо? Проверьте спам или отправьте снова.',
     AppText.authLoginDifferent: 'Войти с другим аккаунтом',
     AppText.authEmailNotFound: 'Email не найден. Пожалуйста, войдите снова.',
-    AppText.authVerificationEmailSentAgain: 'Письмо с подтверждением отправлено снова.',
+    AppText.authVerificationEmailSentAgain:
+        'Письмо с подтверждением отправлено снова.',
     AppText.authResendFailed: 'Не удалось отправить письмо снова: {error}',
-    AppText.authPleaseLoginAfterVerify: 'Пожалуйста, войдите снова после подтверждения email.',
+    AppText.authPleaseLoginAfterVerify:
+        'Пожалуйста, войдите снова после подтверждения email.',
     AppText.authEmailVerifiedSuccess: 'Email успешно подтвержден!',
     AppText.authEmailNotVerifiedYet: 'Email еще не подтвержден.',
-    AppText.authVerificationCheckFailed: 'Проверка подтверждения не удалась: {error}',
+    AppText.authVerificationCheckFailed:
+        'Проверка подтверждения не удалась: {error}',
     AppText.statusPending: 'В ожидании',
     AppText.resetFilters: 'Сбросить',
     AppText.internshipsTitle: 'Стажировки',
-    AppText.internshipsSubtitle: 'Получайте опыт стажировки в ведущих компаниях.',
+    AppText.internshipsSubtitle:
+        'Получайте опыт стажировки в ведущих компаниях.',
     AppText.internshipsLoadFailed: 'Не удалось загрузить стажировки',
     AppText.internshipsSearchHint: 'Поиск: должность, компания, описание...',
     AppText.internshipsLocationAll: 'Все локации',
@@ -4033,21 +4399,26 @@ const _values = <String, Map<AppText, String>>{
     AppText.internshipsPointsEarn: 'Будущие баллы',
     AppText.internshipsNoDepartmentInfo:
         'В профиле нет данных о факультете. Стажировки показываются по факультету. Укажите факультет в профиле.',
-    AppText.internshipsNoResults: 'Стажировки по заданным критериям не найдены.',
+    AppText.internshipsNoResults:
+        'Стажировки по заданным критериям не найдены.',
     AppText.internshipsFavorite: 'Избранное',
     AppText.internshipsNotSpecified: 'Не указано',
 
     // Internship Detail
     AppText.internshipDetailTitle: 'Детали стажировки',
-    AppText.internshipDetailLoadFailed: 'Не удалось загрузить детали стажировки: {error}',
+    AppText.internshipDetailLoadFailed:
+        'Не удалось загрузить детали стажировки: {error}',
     AppText.internshipDetailApplySuccess: 'Заявка отправлена.',
     AppText.internshipDetailApplyFailed: 'Не удалось отправить заявку: {error}',
     AppText.internshipDetailApplyTitle: 'Откликнуться',
-    AppText.internshipDetailAlreadyApplied: 'Вы уже откликнулись на эту стажировку.',
-    AppText.internshipDetailApplyHint: 'Чтобы продолжить, напишите минимум {min} символов.',
+    AppText.internshipDetailAlreadyApplied:
+        'Вы уже откликнулись на эту стажировку.',
+    AppText.internshipDetailApplyHint:
+        'Чтобы продолжить, напишите минимум {min} символов.',
     AppText.internshipDetailApplyButton: 'Откликнуться',
     AppText.internshipDetailMotivationTitle: 'Мотивационное письмо',
-    AppText.internshipDetailMotivationHint: 'Расскажите, почему вы хотите эту стажировку...',
+    AppText.internshipDetailMotivationHint:
+        'Расскажите, почему вы хотите эту стажировку...',
     AppText.internshipDetailCertificate: 'Сертификат',
     AppText.internshipDetailEmploymentChance: 'Шанс трудоустройства',
     AppText.internshipDetailAbout: 'О стажировке',
@@ -4073,7 +4444,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.chatUserNotFoundTitle: 'Пользователь не найден',
     AppText.chatUserNotFoundSubtitle: 'Попробуйте войти снова.',
     AppText.chatHeaderTitle: 'Карьерный ассистент',
-    AppText.chatHeaderSubtitle: 'Быстрая помощь по стажировкам, резюме и интервью',
+    AppText.chatHeaderSubtitle:
+        'Быстрая помощь по стажировкам, резюме и интервью',
     AppText.chatNewChat: 'Новый чат',
     AppText.chatTyping: 'Печатает',
     AppText.chatInputHint: 'Введите сообщение...',
@@ -4086,7 +4458,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.chatDefaultSuggestion4: 'Советы по выбору направления',
     AppText.chatHistoryLoadFailed: 'Не удалось загрузить историю: {error}',
     AppText.chatReplyFailed: 'Не удалось получить ответ: {error}',
-    AppText.chatBotUnavailable: 'Извините, сейчас не могу ответить. Попробуйте позже.',
+    AppText.chatBotUnavailable:
+        'Извините, сейчас не могу ответить. Попробуйте позже.',
 
     // Common
     AppText.commonCancel: 'Отмена',
@@ -4120,7 +4493,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.commonNoData: 'Нет данных',
 
     // Settings
-    AppText.settingsLoginRequired: 'Чтобы открыть настройки, войдите в аккаунт.',
+    AppText.settingsLoginRequired:
+        'Чтобы открыть настройки, войдите в аккаунт.',
     AppText.settingsProfileUpdated: 'Данные профиля обновлены!',
     AppText.settingsPasswordUpdated: 'Пароль обновлён!',
     AppText.settingsPasswordUpdateFailed: 'Не удалось обновить пароль: {error}',
@@ -4139,12 +4513,15 @@ const _values = <String, Map<AppText, String>>{
     AppText.settingsPrefNewCoursesTitle: 'Новые курсы',
     AppText.settingsPrefNewCoursesSubtitle: 'Узнавать о новых курсах',
     AppText.settingsPrefJobAlertsTitle: 'Уведомления о вакансиях',
-    AppText.settingsPrefJobAlertsSubtitle: 'Получать вакансии, подходящие вашему профилю',
+    AppText.settingsPrefJobAlertsSubtitle:
+        'Получать вакансии, подходящие вашему профилю',
     AppText.settingsPrefNewsletterTitle: 'Еженедельная рассылка',
-    AppText.settingsPrefNewsletterSubtitle: 'Получать еженедельный дайджест и рекомендации',
+    AppText.settingsPrefNewsletterSubtitle:
+        'Получать еженедельный дайджест и рекомендации',
     AppText.settingsPrivacySecurityTitle: 'Конфиденциальность и безопасность',
     AppText.settingsTwoFactorTitle: 'Двухфакторная аутентификация',
-    AppText.settingsTwoFactorSubtitle: 'Защитите аккаунт дополнительным уровнем безопасности',
+    AppText.settingsTwoFactorSubtitle:
+        'Защитите аккаунт дополнительным уровнем безопасности',
     AppText.settingsEnableArrow: 'Включить →',
     AppText.settingsDangerZoneTitle: 'Опасная зона',
     AppText.settingsFreezeAccountTitle: 'Временно заморозить аккаунт',
@@ -4152,21 +4529,27 @@ const _values = <String, Map<AppText, String>>{
     AppText.settingsFreezeAccountButton: 'Заморозить',
     AppText.settingsDeleteAccountTitle: 'Удалить аккаунт навсегда',
     AppText.settingsDeleteAccountSubtitle: 'Это действие нельзя отменить!',
-    AppText.settingsDeleteAccountWarning: 'Это действие нельзя отменить! При удалении аккаунта:',
+    AppText.settingsDeleteAccountWarning:
+        'Это действие нельзя отменить! При удалении аккаунта:',
     AppText.settingsDeleteAccountConsequences:
         '• Все ваши персональные данные будут удалены\n• Записи на курсы будут отменены\n• Ваши заявки будут удалены\n• Накопленные баллы будут потеряны\n• Вы не сможете снова зарегистрироваться с этим email',
     AppText.settingsDeleteAccountConfirmPhrase: 'УДАЛИТЬ АККАУНТ',
-    AppText.settingsDeleteAccountTypeToConfirm: 'Для подтверждения введите {phrase}:',
+    AppText.settingsDeleteAccountTypeToConfirm:
+        'Для подтверждения введите {phrase}:',
     AppText.settingsDeleteAccountButton: 'Удалить аккаунт',
-    AppText.settingsDeleteAccountFailed: 'Ошибка при удалении аккаунта: {error}',
+    AppText.settingsDeleteAccountFailed:
+        'Ошибка при удалении аккаунта: {error}',
     AppText.settingsProfileVisibilityTitle: 'Видимость профиля',
     AppText.settingsVisibilityPublic: 'Публично',
-    AppText.settingsVisibilityRegistered: 'Только зарегистрированные пользователи',
+    AppText.settingsVisibilityRegistered:
+        'Только зарегистрированные пользователи',
     AppText.settingsVisibilityHidden: 'Скрыто',
 
     // Favorites
-    AppText.favoritesLoginRequired: 'Чтобы открыть избранное, войдите в аккаунт.',
-    AppText.favoritesSubtitle: 'Здесь вы можете отслеживать понравившийся контент.',
+    AppText.favoritesLoginRequired:
+        'Чтобы открыть избранное, войдите в аккаунт.',
+    AppText.favoritesSubtitle:
+        'Здесь вы можете отслеживать понравившийся контент.',
     AppText.favoritesLoadFailed: 'Не удалось загрузить избранное: {error}',
     AppText.favoritesRemoved: 'Удалено из избранного',
     AppText.favoritesEmptyTitle: 'Пока нет избранного.',
@@ -4185,16 +4568,20 @@ const _values = <String, Map<AppText, String>>{
     AppText.profileBadgesTitle: 'Мои значки',
     AppText.profileNoBadges: 'Пока нет значков.',
     AppText.profileCompletedCoursesTitle: 'Завершённые курсы',
-    AppText.profileCompletedCoursesTitleWithCount: 'Завершённые курсы ({count})',
-    AppText.profileNoCompletedCoursesTitle: 'Вы пока не завершили ни одного курса.',
-    AppText.profileNoCompletedCoursesSubtitle: 'Они появятся здесь по мере прохождения!',
+    AppText.profileCompletedCoursesTitleWithCount:
+        'Завершённые курсы ({count})',
+    AppText.profileNoCompletedCoursesTitle:
+        'Вы пока не завершили ни одного курса.',
+    AppText.profileNoCompletedCoursesSubtitle:
+        'Они появятся здесь по мере прохождения!',
     AppText.profileCourseCompleted: 'Завершено',
     AppText.profileCourseInfoNotFound: 'Информация о курсе не найдена.',
     AppText.profileCompletionDescription: 'Вы заполнили профиль!',
     AppText.profileCompletionAwarded: 'Профиль заполнен! +{points} баллов',
 
     // Courses
-    AppText.coursesSubtitle: 'Просматривайте курсы, записывайтесь и получайте баллы.',
+    AppText.coursesSubtitle:
+        'Просматривайте курсы, записывайтесь и получайте баллы.',
     AppText.coursesMyEnrolledTab: 'Мои курсы',
     AppText.coursesLoadFailedTitle: 'Не удалось загрузить курсы',
     AppText.coursesEmptyTitle: 'Курсы не найдены',
@@ -4219,12 +4606,15 @@ const _values = <String, Map<AppText, String>>{
     AppText.courseDetailLoadFailedTitle: 'Не удалось загрузить курс',
 
     // Notifications
-    AppText.notificationsLoginRequired: 'Чтобы открыть уведомления, войдите в аккаунт.',
+    AppText.notificationsLoginRequired:
+        'Чтобы открыть уведомления, войдите в аккаунт.',
     AppText.notificationsMarkAllRead: 'Отметить все как прочитанные',
     AppText.notificationsUnreadCount: '{count} непрочитанных',
     AppText.notificationsNewSnack: 'Новое уведомление!',
-    AppText.notificationsLoadFailed: 'Не удалось загрузить уведомления: {error}',
-    AppText.notificationsAllMarkedRead: 'Все уведомления отмечены как прочитанные',
+    AppText.notificationsLoadFailed:
+        'Не удалось загрузить уведомления: {error}',
+    AppText.notificationsAllMarkedRead:
+        'Все уведомления отмечены как прочитанные',
     AppText.notificationsDeleted: 'Уведомление удалено',
     AppText.notificationsDeleteFailed: 'Не удалось удалить: {error}',
     AppText.notificationsTabAll: 'Все ({count})',
@@ -4239,7 +4629,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.dashboardWeeklyStreakBonus: 'Серия 7 дней завершена! +15 баллов',
     AppText.dashboardLoadFailed: 'Не удалось загрузить панель',
     AppText.dashboardWelcome: 'Добро пожаловать, {name}! 👋',
-    AppText.dashboardWelcomeSubtitle: 'Сегодня вас ждут новые возможности для карьеры.',
+    AppText.dashboardWelcomeSubtitle:
+        'Сегодня вас ждут новые возможности для карьеры.',
     AppText.dashboardTotalPoints: 'Всего баллов',
     AppText.dashboardCompletedCourses: 'Курсов пройдено',
     AppText.dashboardActiveApplications: 'Активные заявки',
@@ -4253,7 +4644,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.dashboardMetricCoursesCompleted: 'Завершение курсов',
     AppText.dashboardMetricNextTarget: 'Следующая цель',
     AppText.dashboardAssistantTitle: 'Карьерный ассистент',
-    AppText.dashboardAssistantSubtitle: 'Быстрая помощь по резюме, стажировкам и интервью.',
+    AppText.dashboardAssistantSubtitle:
+        'Быстрая помощь по резюме, стажировкам и интервью.',
     AppText.dashboardAssistantChipCv: 'Настройка резюме',
     AppText.dashboardAssistantChipInternships: 'Заявки на стажировку',
     AppText.dashboardAssistantChipInterview: 'Подготовка к интервью',
@@ -4289,7 +4681,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.adminStatCompaniesTitle: 'Компании',
     AppText.adminStatCompaniesSubtitlePending: '{count} ожидают',
     AppText.adminStatActiveListingsTitle: 'Активные объявления',
-    AppText.adminStatActiveListingsSubtitle: '{jobs} вакансий, {internships} стажировок',
+    AppText.adminStatActiveListingsSubtitle:
+        '{jobs} вакансий, {internships} стажировок',
     AppText.adminStatMonthlyRevenueTitle: 'Ежемесячный доход',
     AppText.adminStatMonthlyRevenueSubtitle: '{count} активных подписок',
     AppText.adminCompanyApprovalsTitle: 'Ожидают одобрения',
@@ -4312,9 +4705,11 @@ const _values = <String, Map<AppText, String>>{
     AppText.adminUsersTotalCount: 'Всего: {count} пользователей',
     AppText.adminUserDetailsTitle: 'Данные пользователя',
     AppText.adminBanUserTitle: 'Заблокировать пользователя',
-    AppText.adminBanUserConfirm: 'Вы уверены, что хотите заблокировать этого пользователя?',
+    AppText.adminBanUserConfirm:
+        'Вы уверены, что хотите заблокировать этого пользователя?',
     AppText.adminBanUserSuccess: 'Пользователь заблокирован',
-    AppText.adminBanUserFailed: 'Не удалось заблокировать пользователя: {error}',
+    AppText.adminBanUserFailed:
+        'Не удалось заблокировать пользователя: {error}',
     AppText.adminUnbanUserSuccess: 'Блокировка снята',
     AppText.adminUnbanUserFailed: 'Не удалось снять блокировку: {error}',
     AppText.adminCompaniesTitle: 'Управление компаниями',
@@ -4329,15 +4724,18 @@ const _values = <String, Map<AppText, String>>{
     AppText.adminCompanyDetailsTitle: 'Данные компании',
     AppText.adminCompanyDescriptionLabel: 'Описание',
     AppText.adminCompanyRejectReasonTitle: 'Причина отказа',
-    AppText.adminCompanyRejectReasonRequired: 'Причина отказа (обязательно для отклонения)',
+    AppText.adminCompanyRejectReasonRequired:
+        'Причина отказа (обязательно для отклонения)',
     AppText.adminCompanyRejectReasonLabel: 'Причина отказа',
-    AppText.adminCompanyRejectReasonHint: 'например: Нет документов / неверная информация',
+    AppText.adminCompanyRejectReasonHint:
+        'например: Нет документов / неверная информация',
     AppText.adminCompanyApprove: 'Одобрить',
     AppText.adminCompanyReject: 'Отклонить',
     AppText.adminCompanyBan: 'Заблокировать компанию',
     AppText.adminCompanyUnban: 'Разблокировать',
     AppText.adminCompanyBanTitle: 'Заблокировать компанию',
-    AppText.adminCompanyBanConfirm: 'Вы уверены, что хотите заблокировать эту компанию?',
+    AppText.adminCompanyBanConfirm:
+        'Вы уверены, что хотите заблокировать эту компанию?',
     AppText.adminCompanyBanAction: 'Заблокировать',
     AppText.adminTableCompany: 'Компания',
     AppText.adminTableContact: 'Контакты',
@@ -4398,11 +4796,16 @@ const _values = <String, Map<AppText, String>>{
     AppText.dbDebugSampleRecordsTitle: 'Примеры записей',
     AppText.dbDebugError: 'Ошибка: {error}',
     AppText.dbDebugTipsTitle: 'Что проверить',
-    AppText.dbDebugTipProfileDepartment: 'Заполнено ли поле department в таблице profiles?',
-    AppText.dbDebugTipTablesHaveDepartment: 'Есть ли столбец department в таблицах courses, internships и jobs?',
-    AppText.dbDebugTipTablesHaveData: 'Есть ли записи в таблицах? Если нет — добавьте пример данных.',
-    AppText.dbDebugTipRlsEnabled: 'Включены ли политики RLS (Row Level Security)?',
-    AppText.dbDebugTipDepartmentHasMatches: 'Есть ли записи, соответствующие факультету пользователя?',
+    AppText.dbDebugTipProfileDepartment:
+        'Заполнено ли поле department в таблице profiles?',
+    AppText.dbDebugTipTablesHaveDepartment:
+        'Есть ли столбец department в таблицах courses, internships и jobs?',
+    AppText.dbDebugTipTablesHaveData:
+        'Есть ли записи в таблицах? Если нет — добавьте пример данных.',
+    AppText.dbDebugTipRlsEnabled:
+        'Включены ли политики RLS (Row Level Security)?',
+    AppText.dbDebugTipDepartmentHasMatches:
+        'Есть ли записи, соответствующие факультету пользователя?',
     AppText.commonComingSoonTitle: 'Скоро',
     AppText.commonComingSoonSubtitle: 'Эта страница скоро будет доступна',
   },
@@ -4438,25 +4841,36 @@ const _values = <String, Map<AppText, String>>{
     AppText.pointsSystem: 'Système de points',
     AppText.pointsSystemGuestSubtitle:
         'Inscrivez-vous aux cours, progressez, gagnez des badges et débloquez des récompenses.',
-    AppText.pointsSystemGuestBullet1: 'Inscription au cours → gagner des points',
-    AppText.pointsSystemGuestBullet2: 'Terminer un cours → points bonus + badge',
-    AppText.pointsSystemGuestBullet3: 'Utilisez vos points pour débloquer des récompenses',
+    AppText.pointsSystemGuestBullet1:
+        'Inscription au cours → gagner des points',
+    AppText.pointsSystemGuestBullet2:
+        'Terminer un cours → points bonus + badge',
+    AppText.pointsSystemGuestBullet3:
+        'Utilisez vos points pour débloquer des récompenses',
     AppText.pointsSystemGuestSignInHint:
         'Après connexion, vous verrez ici l’historique de points et vos récompenses.',
-    AppText.pointsSystemAuthedSubtitle: 'Suivez vos points et visez des récompenses.',
+    AppText.pointsSystemAuthedSubtitle:
+        'Suivez vos points et visez des récompenses.',
     AppText.pointsSystemTabHistory: 'Historique',
     AppText.pointsSystemTabRewards: 'Récompenses',
     AppText.pointsSystemTabBadges: 'Badges',
-    AppText.pointsSystemLoadFailed: 'Impossible de charger les points : {error}',
-    AppText.pointsSystemHistoryLoadFailed: 'Impossible de charger l’historique : {error}',
-    AppText.pointsSystemRewardsLoadFailed: 'Impossible de charger les récompenses : {error}',
-    AppText.pointsSystemBadgesLoadFailed: 'Impossible de charger les badges : {error}',
-    AppText.pointsSystemHistoryEmpty: 'Aucune activité de points pour le moment.',
+    AppText.pointsSystemLoadFailed:
+        'Impossible de charger les points : {error}',
+    AppText.pointsSystemHistoryLoadFailed:
+        'Impossible de charger l’historique : {error}',
+    AppText.pointsSystemRewardsLoadFailed:
+        'Impossible de charger les récompenses : {error}',
+    AppText.pointsSystemBadgesLoadFailed:
+        'Impossible de charger les badges : {error}',
+    AppText.pointsSystemHistoryEmpty:
+        'Aucune activité de points pour le moment.',
     AppText.pointsSystemRewardsEmpty: 'Aucune récompense trouvée.',
     AppText.pointsSystemBadgesEmpty:
         'Aucun badge pour le moment. Terminez des cours pour gagner des badges.',
-    AppText.pointsSystemNextReward: 'Prochaine récompense : {title} ({points} points)',
-    AppText.pointsSystemAllRewardsUnlocked: 'Toutes les récompenses sont peut-être déjà débloquées.',
+    AppText.pointsSystemNextReward:
+        'Prochaine récompense : {title} ({points} points)',
+    AppText.pointsSystemAllRewardsUnlocked:
+        'Toutes les récompenses sont peut-être déjà débloquées.',
     AppText.leaderboardLoadFailedTitle: 'Impossible de charger le classement',
     AppText.leaderboardSubtitle:
         'Faites partie des étudiants les plus actifs. Gagnez des points, grimpez et rapprochez-vous des récompenses.',
@@ -4464,8 +4878,10 @@ const _values = <String, Map<AppText, String>>{
     AppText.leaderboardTabDepartment: 'Département',
     AppText.leaderboardEmpty: 'Aucune donnée de classement pour le moment.',
     AppText.leaderboardDepartmentLabel: 'Département : {dept}',
-    AppText.leaderboardNoDepartment: 'Aucun département n’est renseigné dans votre profil.',
-    AppText.leaderboardNoDepartmentData: 'Aucune donnée de classement pour ce département.',
+    AppText.leaderboardNoDepartment:
+        'Aucun département n’est renseigné dans votre profil.',
+    AppText.leaderboardNoDepartmentData:
+        'Aucune donnée de classement pour ce département.',
     AppText.leaderboardHeroMyPoints: 'Vos points',
     AppText.leaderboardHeroOverallRank: 'Classement général',
     AppText.leaderboardHeroDepartmentRank: 'Classement du département',
@@ -4477,10 +4893,13 @@ const _values = <String, Map<AppText, String>>{
         '• Terminer un cours : +50 points\n• S’inscrire à un cours : +10 points\n• Connexion quotidienne : +2 points\n• Série de 7 jours : +15 points',
     AppText.leaderboardViewPointsSystem: 'Voir le système de points',
     AppText.commonYou: 'Vous',
-    AppText.applicationsLoginRequired: 'Connectez-vous pour voir vos candidatures.',
+    AppText.applicationsLoginRequired:
+        'Connectez-vous pour voir vos candidatures.',
     AppText.applicationsSearchHint: 'Rechercher des candidatures...',
-    AppText.applicationsLoadFailed: 'Impossible de charger les candidatures : {error}',
-    AppText.applicationsSubtitle: 'Suivez ici toutes vos candidatures et inscriptions.',
+    AppText.applicationsLoadFailed:
+        'Impossible de charger les candidatures : {error}',
+    AppText.applicationsSubtitle:
+        'Suivez ici toutes vos candidatures et inscriptions.',
     AppText.applicationsEmpty: 'Vous n’avez pas encore de candidatures.',
     AppText.applicationsKindJob: 'Emploi',
     AppText.applicationsKindInternship: 'Stage',
@@ -4493,7 +4912,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.retry: 'Réessayer',
     AppText.commonPleaseSignIn: 'Veuillez vous connecter.',
     AppText.jobsTitle: 'Offres d\'emploi',
-    AppText.jobsSubtitle: 'Recherchez, filtrez, mettez en favori et postulez. Même flux que React.',
+    AppText.jobsSubtitle:
+        'Recherchez, filtrez, mettez en favori et postulez. Même flux que React.',
     AppText.jobsSearchHint: 'Intitulé, entreprise, département, lieu...',
 
     // Job Detail
@@ -4504,7 +4924,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.jobDetailApply: 'Postuler',
     AppText.jobDetailAppliedStatus: 'Statut de candidature : {status}',
     AppText.jobDetailApplySheetTitle: 'Postuler à cette offre',
-    AppText.jobDetailApplySheetSubtitle: 'Ajoutez un court message (facultatif).',
+    AppText.jobDetailApplySheetSubtitle:
+        'Ajoutez un court message (facultatif).',
     AppText.jobDetailApplySheetHint: 'Écrivez un message à l’entreprise...',
     AppText.jobDetailApplySuccess: 'Candidature envoyée.',
     AppText.jobDetailApplyFailed: 'Échec de la candidature : {error}',
@@ -4518,7 +4939,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.deadline: 'Date limite : {date}',
     AppText.favoriteRemove: 'Retirer des favoris',
     AppText.favoriteAdd: 'Ajouter aux favoris',
-    AppText.favoriteUpdateFailed: 'Impossible de mettre à jour les favoris : {error}',
+    AppText.favoriteUpdateFailed:
+        'Impossible de mettre à jour les favoris : {error}',
     AppText.statusAccepted: 'Accepté',
     AppText.statusRejected: 'Refusé',
     AppText.statusCompleted: 'Terminé',
@@ -4536,7 +4958,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.footerEmailHint: 'Votre adresse e-mail',
     AppText.footerSubscribeSuccess: 'Inscription à la newsletter réussie.',
     AppText.footerSubscribeInvalid: 'Veuillez saisir un e-mail valide.',
-    AppText.footerCopyright: '© {year} Plateforme étudiante. Tous droits réservés.',
+    AppText.footerCopyright:
+        '© {year} Plateforme étudiante. Tous droits réservés.',
     AppText.linkInternshipListings: 'Offres de stage',
     AppText.linkLeaderboard: 'Classement',
     AppText.linkHowItWorks: 'Comment ça marche ?',
@@ -4545,16 +4968,19 @@ const _values = <String, Map<AppText, String>>{
     AppText.linkPrivacy: 'Politique de confidentialité',
     AppText.linkTerms: 'Conditions d\'utilisation',
     AppText.linkComingSoon: 'Le lien {name} arrive bientôt.',
-    AppText.homeHeroTitle: 'Renforce ta vie universitaire,\noriente ta carrière rapidement !',
+    AppText.homeHeroTitle:
+        'Renforce ta vie universitaire,\noriente ta carrière rapidement !',
     AppText.homeHeroSubtitle:
         'Avance avec assurance grâce à des cours, stages et offres d\'emploi adaptés à ton domaine.',
     AppText.homeCard1Title: 'Contenus adaptés à ton domaine',
     AppText.homeCard1Desc:
         'Apprentissage ciblé avec des cours, stages et offres d\'emploi pour ton département.',
     AppText.homeCard2Title: 'Guide ta carrière',
-    AppText.homeCard2Desc: 'Bénéficie d\'un accompagnement personnalisé et d\'opportunités.',
+    AppText.homeCard2Desc:
+        'Bénéficie d\'un accompagnement personnalisé et d\'opportunités.',
     AppText.homeCard3Title: 'Simple et rapide',
-    AppText.homeCard3Desc: 'Gagne du temps avec une interface moderne et conviviale.',
+    AppText.homeCard3Desc:
+        'Gagne du temps avec une interface moderne et conviviale.',
     AppText.homeStudentBenefitsTitle: 'Avantages pour les étudiants',
     AppText.homeStudentCard1Title: 'Contenu orienté objectifs',
     AppText.homeStudentCard1Desc:
@@ -4563,7 +4989,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.homeStudentCard2Desc:
         'Accède aux opportunités qui renforcent ton CV avant les autres.',
     AppText.homeStudentCard3Title: 'Suivi de progression',
-    AppText.homeStudentCard3Desc: 'Suis ta progression et repère les lacunes à temps.',
+    AppText.homeStudentCard3Desc:
+        'Suis ta progression et repère les lacunes à temps.',
     AppText.homeCompanyBenefitsTitle: 'Avantages pour les entreprises',
     AppText.homeCompanyCard1Title: 'Accès aux jeunes talents',
     AppText.homeCompanyCard1Desc:
@@ -4596,13 +5023,16 @@ const _values = <String, Map<AppText, String>>{
     AppText.howItWorksHeroSecondary: 'Voir les cours',
     AppText.howItWorksHeroSidebarTitle: 'Sur cette page',
     AppText.howItWorksHeroBullet1: 'Un résumé des étapes de la plateforme',
-    AppText.howItWorksHeroBullet2: 'Le fonctionnement des points et récompenses',
+    AppText.howItWorksHeroBullet2:
+        'Le fonctionnement des points et récompenses',
     AppText.howItWorksHeroBullet3: 'Le processus de candidature',
     AppText.howItWorksHeroBullet4: 'Des conseils pour bien démarrer',
     AppText.howItWorksStep5Title: 'Gagner des récompenses',
-    AppText.howItWorksStep5Desc: 'Échange tes points contre de super récompenses.',
+    AppText.howItWorksStep5Desc:
+        'Échange tes points contre de super récompenses.',
     AppText.howItWorksPageStepByStepTitle: 'Pas à pas',
-    AppText.howItWorksPageStepByStepSubtitle: 'Lance ton parcours carrière en cinq étapes simples.',
+    AppText.howItWorksPageStepByStepSubtitle:
+        'Lance ton parcours carrière en cinq étapes simples.',
     AppText.howItWorksDetailedStepsTitle: 'Étapes détaillées',
     AppText.howItWorksDetail1Title: 'Inscription et profil',
     AppText.howItWorksDetail1Desc:
@@ -4621,7 +5051,8 @@ const _values = <String, Map<AppText, String>>{
         'Postule aux offres des entreprises. Gagne des points supplémentaires en cas d’acceptation.',
     AppText.howItWorksDetail3Bullet1: 'Offres adaptées à ton profil',
     AppText.howItWorksDetail3Bullet2: 'Options à distance et sur site',
-    AppText.howItWorksDetail3Bullet3: 'Points supplémentaires selon l’évaluation',
+    AppText.howItWorksDetail3Bullet3:
+        'Points supplémentaires selon l’évaluation',
     AppText.howItWorksDetail4Title: 'Système de points',
     AppText.howItWorksDetail4Desc:
         'Connecte-toi chaque jour, complète des activités et gagne des points. Monte dans les classements.',
@@ -4636,9 +5067,11 @@ const _values = <String, Map<AppText, String>>{
     AppText.howItWorksRewardTechProducts: 'Produits tech',
     AppText.howItWorksRewardAbroadTrips: 'Voyages à l’étranger',
     AppText.howItWorksRewardInternshipGuarantee: 'Garantie de stage',
-    AppText.howItWorksRewardFromPoints: 'Récompenses à partir de {points} points',
+    AppText.howItWorksRewardFromPoints:
+        'Récompenses à partir de {points} points',
     AppText.howItWorksCtaTitle: 'Commence ton parcours carrière aujourd’hui',
-    AppText.howItWorksCtaSubtitle: 'Inscris-toi gratuitement, postule et gagne des points.',
+    AppText.howItWorksCtaSubtitle:
+        'Inscris-toi gratuitement, postule et gagne des points.',
     AppText.howItWorksCtaPrimary: 'S’inscrire',
     AppText.howItWorksCtaSecondary: 'Voir les offres',
 
@@ -4681,7 +5114,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.aboutWhyNetworkDesc:
         'Un réseau puissant avec 500+ entreprises partenaires et des milliers d’étudiants actifs.',
     AppText.aboutWhyRewardsTitle: 'Système de récompenses',
-    AppText.aboutWhyRewardsDesc: 'Gagne des points et échange-les contre de vraies récompenses.',
+    AppText.aboutWhyRewardsDesc:
+        'Gagne des points et échange-les contre de vraies récompenses.',
     AppText.aboutWhyCareerTitle: 'Évolution de carrière',
     AppText.aboutWhyCareerDesc:
         'Nous soutenons ta progression avec des cours en ligne, du mentorat et des événements carrière.',
@@ -4691,11 +5125,13 @@ const _values = <String, Map<AppText, String>>{
 
     // Static - Contact
     AppText.contactHeroTitle: 'Contact',
-    AppText.contactHeroSubtitle: 'Contacte-nous pour toute question, suggestion ou partenariat.',
+    AppText.contactHeroSubtitle:
+        'Contacte-nous pour toute question, suggestion ou partenariat.',
     AppText.contactEmailTitle: 'E-mail',
     AppText.contactPhoneTitle: 'Téléphone',
     AppText.contactAddressTitle: 'Adresse',
-    AppText.contactAddressBody: 'Teknokent, Innovation St. No:1234\nBeşiktaş, Istanbul',
+    AppText.contactAddressBody:
+        'Teknokent, Innovation St. No:1234\nBeşiktaş, Istanbul',
     AppText.contactHoursTitle: 'Horaires',
     AppText.contactHoursBody: 'Lun - Ven : 09:00 - 18:00\nSam : 10:00 - 14:00',
     AppText.contactFormTitle: 'Nous écrire',
@@ -4712,19 +5148,25 @@ const _values = <String, Map<AppText, String>>{
     AppText.contactSubjectPartnership: 'Partenariat',
     AppText.contactSubjectFeedback: 'Suggestion / plainte',
     AppText.contactSubjectOther: 'Autre',
-    AppText.contactSendSuccess: 'Message envoyé ! Nous te répondrons au plus vite.',
-    AppText.contactFillRequired: 'Merci de remplir tous les champs obligatoires.',
+    AppText.contactSendSuccess:
+        'Message envoyé ! Nous te répondrons au plus vite.',
+    AppText.contactFillRequired:
+        'Merci de remplir tous les champs obligatoires.',
     AppText.contactFaqTitle: 'Questions fréquentes',
     AppText.contactFaqQ1: 'La plateforme est-elle payante ?',
-    AppText.contactFaqA1: 'Non, la plateforme est totalement gratuite pour les étudiants.',
+    AppText.contactFaqA1:
+        'Non, la plateforme est totalement gratuite pour les étudiants.',
     AppText.contactFaqQ2: 'Quels étudiants peuvent rejoindre ?',
-    AppText.contactFaqA2: 'Les étudiants de toutes les universités de Turquie peuvent s’inscrire.',
+    AppText.contactFaqA2:
+        'Les étudiants de toutes les universités de Turquie peuvent s’inscrire.',
     AppText.contactFaqQ3: 'Comment publier une offre en tant qu’employeur ?',
-    AppText.contactFaqA3: 'Contacte-nous pour un partenariat ou fais une demande de compte entreprise.',
+    AppText.contactFaqA3:
+        'Contacte-nous pour un partenariat ou fais une demande de compte entreprise.',
     AppText.contactMapPlaceholder: 'Zone de carte',
 
     // Company - General
-    AppText.companyPanelLoginRequired: 'Connectez-vous pour accéder au panneau entreprise.',
+    AppText.companyPanelLoginRequired:
+        'Connectez-vous pour accéder au panneau entreprise.',
 
     // Company - Jobs
     AppText.companyJobsTitle: 'Mes offres d’emploi',
@@ -4742,11 +5184,13 @@ const _values = <String, Map<AppText, String>>{
 
     // Company - Internship Applications
     AppText.companyInternshipApplicationsTitle: 'Candidatures',
-    AppText.companyInternshipApplicationsTitleWithInternship: 'Candidatures • {title}',
+    AppText.companyInternshipApplicationsTitleWithInternship:
+        'Candidatures • {title}',
 
     // Company - Reports
     AppText.companyReportsTitle: 'Rapports',
-    AppText.companyReportsLoginRequired: 'Connectez-vous pour voir les rapports de l’entreprise.',
+    AppText.companyReportsLoginRequired:
+        'Connectez-vous pour voir les rapports de l’entreprise.',
     AppText.companyReportsCsvDownloaded: 'CSV téléchargé.',
     AppText.companyReportsExportCsv: 'Télécharger CSV',
     AppText.companyReportsRangeToday: 'Aujourd’hui',
@@ -4766,20 +5210,24 @@ const _values = <String, Map<AppText, String>>{
     AppText.companyReportsMetricAccepted: 'Acceptées',
     AppText.companyReportsMetricRejected: 'Rejetées',
     AppText.companyReportsMetricActiveListings: 'Offres actives',
-    AppText.companyReportsActiveListingsValue: '{jobs} offres • {internships} stages',
+    AppText.companyReportsActiveListingsValue:
+        '{jobs} offres • {internships} stages',
     AppText.companyReportsChartViewsTrend: 'Tendance des vues',
     AppText.companyReportsChartApplicationsTrend: 'Tendance des candidatures',
 
     // Company - Applications
     AppText.companyApplicationsTitle: 'Toutes les candidatures',
-    AppText.companyApplicationsLoginRequired: 'Connectez-vous pour voir les candidatures de l’entreprise.',
+    AppText.companyApplicationsLoginRequired:
+        'Connectez-vous pour voir les candidatures de l’entreprise.',
     AppText.companyApplicationsCsvDownloaded: 'CSV téléchargé.',
     AppText.companyApplicationsOpenCv: 'Ouvrir le CV',
     AppText.companyApplicationsCvInvalid: 'Lien de CV invalide.',
-    AppText.companyApplicationsCvOpenFailedCopied: 'Impossible d’ouvrir le lien. Le lien du CV a été copié.',
+    AppText.companyApplicationsCvOpenFailedCopied:
+        'Impossible d’ouvrir le lien. Le lien du CV a été copié.',
     AppText.companyApplicationsCoverLetterTitle: 'Lettre de motivation',
     AppText.companyApplicationsMotivationLetterTitle: 'Lettre de motivation',
-    AppText.companyApplicationsSearchHint: 'Rechercher par nom, e-mail ou offre...',
+    AppText.companyApplicationsSearchHint:
+        'Rechercher par nom, e-mail ou offre...',
     AppText.companyApplicationsFilterAllStatuses: 'Tous les statuts',
     AppText.companyApplicationsFilterAllTypes: 'Tous les types',
     AppText.companyApplicationsEmpty: 'Aucune candidature pour le moment.',
@@ -4806,10 +5254,13 @@ const _values = <String, Map<AppText, String>>{
     AppText.companyJobFormDeadlineNotSelected: 'Date limite non sélectionnée',
     AppText.companyJobFormDeadlineSelected: 'Date limite : {date}',
     AppText.companyJobFormPickDate: 'Choisir une date',
-    AppText.companyJobFormValidationTitleDesc: 'Veuillez saisir un titre et une description.',
-    AppText.companyJobFormValidationDepartment: 'Le département est obligatoire.',
+    AppText.companyJobFormValidationTitleDesc:
+        'Veuillez saisir un titre et une description.',
+    AppText.companyJobFormValidationDepartment:
+        'Le département est obligatoire.',
     AppText.companyJobFormValidationLocation: 'Le lieu est obligatoire.',
-    AppText.companyJobFormValidationDeadline: 'Veuillez sélectionner une date limite.',
+    AppText.companyJobFormValidationDeadline:
+        'Veuillez sélectionner une date limite.',
     AppText.companyJobFormCreated: 'Offre créée.',
     AppText.companyJobFormUpdated: 'Offre mise à jour.',
 
@@ -4830,17 +5281,26 @@ const _values = <String, Map<AppText, String>>{
     AppText.companyInternshipFormMonthlyStipendLabel: 'Indemnité mensuelle *',
     AppText.companyInternshipFormBenefitsLabel: 'Avantages',
     AppText.companyInternshipFormCertificateLabel: 'Certificat fourni',
-    AppText.companyInternshipFormEmploymentPossibilityLabel: 'Possibilité d’embauche',
+    AppText.companyInternshipFormEmploymentPossibilityLabel:
+        'Possibilité d’embauche',
     AppText.companyInternshipFormActiveLabel: 'Offre active',
-    AppText.companyInternshipFormValidationTitleDesc: 'Le titre et la description sont obligatoires.',
-    AppText.companyInternshipFormValidationRequirements: 'Les exigences sont obligatoires.',
-    AppText.companyInternshipFormValidationDepartment: 'Le département est obligatoire.',
+    AppText.companyInternshipFormValidationTitleDesc:
+        'Le titre et la description sont obligatoires.',
+    AppText.companyInternshipFormValidationRequirements:
+        'Les exigences sont obligatoires.',
+    AppText.companyInternshipFormValidationDepartment:
+        'Le département est obligatoire.',
     AppText.companyInternshipFormValidationLocation: 'Le lieu est obligatoire.',
-    AppText.companyInternshipFormValidationDuration: 'La durée est obligatoire.',
-    AppText.companyInternshipFormValidationStartDate: 'Veuillez sélectionner une date de début.',
-    AppText.companyInternshipFormValidationDeadline: 'Veuillez sélectionner une date limite.',
-    AppText.companyInternshipFormValidationQuotaRequired: 'Le quota est obligatoire.',
-    AppText.companyInternshipFormValidationQuotaValid: 'Veuillez saisir un quota valide.',
+    AppText.companyInternshipFormValidationDuration:
+        'La durée est obligatoire.',
+    AppText.companyInternshipFormValidationStartDate:
+        'Veuillez sélectionner une date de début.',
+    AppText.companyInternshipFormValidationDeadline:
+        'Veuillez sélectionner une date limite.',
+    AppText.companyInternshipFormValidationQuotaRequired:
+        'Le quota est obligatoire.',
+    AppText.companyInternshipFormValidationQuotaValid:
+        'Veuillez saisir un quota valide.',
     AppText.companyInternshipFormValidationPaidStipend:
         'Veuillez saisir une indemnité pour un stage rémunéré.',
     AppText.companyInternshipFormCreated: 'Offre de stage créée.',
@@ -4861,12 +5321,16 @@ const _values = <String, Map<AppText, String>>{
     AppText.companyProfileFieldAbout: 'À propos',
     AppText.companyProfileFieldFoundedYear: 'Année de création',
     AppText.companyProfileFieldCompanySize: 'Taille de l’entreprise',
-    AppText.companyProfileValidationNameRequired: 'Le nom de l’entreprise est obligatoire.',
-    AppText.companyProfileValidationSectorRequired: 'Le secteur est obligatoire.',
-    AppText.companyProfileValidationPhoneRequired: 'Le téléphone est obligatoire.',
+    AppText.companyProfileValidationNameRequired:
+        'Le nom de l’entreprise est obligatoire.',
+    AppText.companyProfileValidationSectorRequired:
+        'Le secteur est obligatoire.',
+    AppText.companyProfileValidationPhoneRequired:
+        'Le téléphone est obligatoire.',
     AppText.companyProfileValidationCityRequired: 'La ville est obligatoire.',
     AppText.companyProfileUpdated: 'Profil de l’entreprise mis à jour.',
-    AppText.companyProfileStatusPending: 'Votre profil est en attente de validation.',
+    AppText.companyProfileStatusPending:
+        'Votre profil est en attente de validation.',
     AppText.companyProfileStatusRejected: 'Votre profil a été rejeté.',
     AppText.companyProfileStatusRejectedWithReason: 'Motif du rejet : {reason}',
     AppText.companyProfileStatusOther: 'Statut : {status}',
@@ -4877,16 +5341,19 @@ const _values = <String, Map<AppText, String>>{
     AppText.companyDashboardPendingApplications: 'Candidatures en attente',
     AppText.companyDashboardTotalApplications: 'Total des candidatures',
     AppText.companyDashboardWelcome: 'Bienvenue, {name}',
-    AppText.companyDashboardStatusBanned: 'Votre compte a été désactivé. Contactez le support.',
+    AppText.companyDashboardStatusBanned:
+        'Votre compte a été désactivé. Contactez le support.',
     AppText.companyDashboardStatusPending:
         'Compte en attente de validation. Les offres seront publiées après validation.',
     AppText.companyDashboardStatusRejected:
         'La demande entreprise a été rejetée. Veuillez mettre à jour votre profil.',
-    AppText.companyDashboardStatusRejectedWithReason: 'Motif du rejet : {reason}',
+    AppText.companyDashboardStatusRejectedWithReason:
+        'Motif du rejet : {reason}',
     AppText.companyDashboardStatusOther: 'Statut de l’entreprise : {status}',
     AppText.companyDashboardQuickActionsTitle: 'Accès rapide',
     AppText.companyDashboardQuickActionNewJob: 'Nouvelle offre d’emploi',
-    AppText.companyDashboardPerformanceSummaryTitle: 'Résumé des performances (30 derniers jours)',
+    AppText.companyDashboardPerformanceSummaryTitle:
+        'Résumé des performances (30 derniers jours)',
 
     // Company - Pricing
     AppText.companyPricingTitle: 'Offres et tarifs',
@@ -4915,13 +5382,17 @@ const _values = <String, Map<AppText, String>>{
     AppText.companyPricingEnterpriseFeature3: 'Support 24/7',
     AppText.companyPricingEnterpriseFeature4: 'Consultations de CV illimitées',
     AppText.companyPricingEnterpriseFeature5: 'Accès API',
-    AppText.companyPricingSalesContacted: 'L’équipe commerciale vous contactera.',
+    AppText.companyPricingSalesContacted:
+        'L’équipe commerciale vous contactera.',
     AppText.companyPricingSelectPackage: 'Choisir l’offre',
 
     // Company - Status Check
-    AppText.companyStatusCompanyAccountMissing: 'Compte entreprise introuvable.',
-    AppText.companyStatusNoRegistrationTitle: 'Inscription entreprise introuvable',
-    AppText.companyStatusNoRegistrationSubtitle: 'Créez votre inscription entreprise pour continuer.',
+    AppText.companyStatusCompanyAccountMissing:
+        'Compte entreprise introuvable.',
+    AppText.companyStatusNoRegistrationTitle:
+        'Inscription entreprise introuvable',
+    AppText.companyStatusNoRegistrationSubtitle:
+        'Créez votre inscription entreprise pour continuer.',
     AppText.companyStatusRegisterCta: 'Inscrire l’entreprise',
     AppText.companyStatusBannedTitle: 'Compte suspendu',
     AppText.companyStatusBannedSubtitle:
@@ -4932,28 +5403,34 @@ const _values = <String, Map<AppText, String>>{
         'Votre compte est en cours de vérification. Nous reviendrons vers vous rapidement.',
     AppText.companyStatusPendingWhatYouCanDoTitle: 'Ce que vous pouvez faire',
     AppText.companyStatusPendingTip1: 'Complétez votre profil entreprise',
-    AppText.companyStatusPendingTip2: 'Ajoutez un logo et une image de couverture',
+    AppText.companyStatusPendingTip2:
+        'Ajoutez un logo et une image de couverture',
     AppText.companyStatusPendingTip3: 'Mettez à jour vos coordonnées',
     AppText.companyStatusEditProfile: 'Modifier le profil',
     AppText.companyStatusRejectedTitle: 'Demande rejetée',
-    AppText.companyStatusRejectedSubtitle: 'Désolé, votre demande entreprise n’a pas été approuvée.',
+    AppText.companyStatusRejectedSubtitle:
+        'Désolé, votre demande entreprise n’a pas été approuvée.',
     AppText.companyStatusRejectedReasonTitle: 'Motif du rejet',
     AppText.companyStatusContactSupport: 'Contacter le support',
     AppText.companyStatusSubscriptionRequiredTitle: 'Abonnement requis',
-    AppText.companyStatusSubscriptionRequiredSubtitle: 'Choisissez un forfait pour publier des offres.',
+    AppText.companyStatusSubscriptionRequiredSubtitle:
+        'Choisissez un forfait pour publier des offres.',
     AppText.companyStatusSubscriptionApprovedTitle: 'Compte approuvé',
-    AppText.companyStatusSubscriptionApprovedTip: 'Vous pouvez commencer en choisissant un forfait.',
+    AppText.companyStatusSubscriptionApprovedTip:
+        'Vous pouvez commencer en choisissant un forfait.',
     AppText.companyStatusViewPlans: 'Voir les forfaits',
 
     // Company - Registration
-    AppText.companyRegisterLoginRequired: 'Connectez-vous pour inscrire une entreprise.',
+    AppText.companyRegisterLoginRequired:
+        'Connectez-vous pour inscrire une entreprise.',
     AppText.companyRegisterTitle: 'Inscription entreprise',
     AppText.companyRegisterCompanyNameLabel: 'Nom de l’entreprise',
     AppText.companyRegisterSectorLabel: 'Secteur',
     AppText.companyRegisterTaxNumberLabel: 'Numéro fiscal',
     AppText.companyRegisterPhoneLabel: 'Téléphone',
     AppText.companyRegisterCityLabel: 'Ville',
-    AppText.companyRegisterDuplicateTaxNumber: 'Une entreprise avec ce numéro fiscal existe déjà.',
+    AppText.companyRegisterDuplicateTaxNumber:
+        'Une entreprise avec ce numéro fiscal existe déjà.',
     AppText.companyRegisterSuccess: 'Inscription entreprise réussie !',
     AppText.companyRegisterSubmit: 'Finaliser l’inscription',
 
@@ -4981,7 +5458,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.deptOther: 'Autre',
 
     // Legal
-    AppText.legalTurkishOnlyNote: 'Le texte juridique complet est actuellement disponible uniquement en turc.',
+    AppText.legalTurkishOnlyNote:
+        'Le texte juridique complet est actuellement disponible uniquement en turc.',
     AppText.legalLastUpdated: 'Dernière mise à jour : {date}',
     AppText.commonUserId: 'ID utilisateur',
     AppText.commonEmail: 'E-mail',
@@ -5010,7 +5488,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.commonSomethingWentWrong: 'Une erreur s’est produite.',
     AppText.commonInvalidEmail: 'Veuillez saisir un e-mail valide.',
     AppText.commonFillAllFields: 'Veuillez remplir tous les champs.',
-    AppText.commonPasswordMin: 'Le mot de passe doit comporter au moins 6 caractères.',
+    AppText.commonPasswordMin:
+        'Le mot de passe doit comporter au moins 6 caractères.',
     AppText.commonPasswordsNoMatch: 'Les mots de passe ne correspondent pas.',
     AppText.commonUnnamedCandidate: 'Candidat sans nom',
     AppText.authLoginTitle: 'Connexion',
@@ -5032,17 +5511,21 @@ const _values = <String, Map<AppText, String>>{
     AppText.authSelectYear: 'Veuillez sélectionner votre année.',
     AppText.authYearPlus: '5+ (et plus)',
     AppText.authForgotTitle: 'Mot de passe oublié',
-    AppText.authForgotSubtitle: 'Nous enverrons un lien de réinitialisation à votre e-mail.',
+    AppText.authForgotSubtitle:
+        'Nous enverrons un lien de réinitialisation à votre e-mail.',
     AppText.authEmailSentTitle: 'E-mail envoyé !',
-    AppText.authResetLinkSentTo: 'Un lien de réinitialisation a été envoyé à :\n{email}',
-    AppText.authCheckSpam: 'Si vous ne le voyez pas, vérifiez le dossier spam/indésirables.',
+    AppText.authResetLinkSentTo:
+        'Un lien de réinitialisation a été envoyé à :\n{email}',
+    AppText.authCheckSpam:
+        'Si vous ne le voyez pas, vérifiez le dossier spam/indésirables.',
     AppText.authRequestAgainIn:
         'Vous pourrez demander un autre e-mail dans {seconds} secondes.',
     AppText.authSendResetLink: 'Envoyer le lien',
     AppText.authTooManyRequests:
         'Trop de demandes. Veuillez patienter une minute puis réessayer.',
     AppText.authEmailRequired: 'L\'e-mail est requis.',
-    AppText.authWaitSeconds: 'Veuillez attendre {seconds} secondes avant de redemander.',
+    AppText.authWaitSeconds:
+        'Veuillez attendre {seconds} secondes avant de redemander.',
     AppText.authResetTitle: 'Réinitialiser le mot de passe',
     AppText.authPasteResetLink:
         'Collez le lien de réinitialisation (si non redirigé automatiquement)',
@@ -5050,14 +5533,16 @@ const _values = <String, Map<AppText, String>>{
     AppText.authLinkApplied: 'Lien appliqué',
     AppText.authLinkRequired: 'Collez le lien complet de l\'e-mail.',
     AppText.authLinkInvalid: 'Format de lien invalide.',
-    AppText.authLinkAccepted: 'Lien accepté. Vous pouvez définir un nouveau mot de passe.',
+    AppText.authLinkAccepted:
+        'Lien accepté. Vous pouvez définir un nouveau mot de passe.',
     AppText.authLinkExpired: 'Lien invalide ou expiré.',
     AppText.authNewPasswordLabel: 'Nouveau mot de passe',
     AppText.authOpenResetLinkFirst:
         'Ouvrez d\'abord le lien de réinitialisation (ou collez-le ci-dessus).',
     AppText.authPasswordUpdated: 'Mot de passe mis à jour',
     AppText.authEmailVerificationTitle: 'Vérification de l\'e-mail',
-    AppText.authEmailVerificationPending: 'Vérification de l\'e-mail en attente',
+    AppText.authEmailVerificationPending:
+        'Vérification de l\'e-mail en attente',
     AppText.authEmailVerificationSubtitle:
         'Pour activer votre compte, veuillez vérifier votre adresse e-mail.',
     AppText.authVerificationSentTo: 'Lien de vérification envoyé à : {email}',
@@ -5065,7 +5550,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.authStepCheckInboxSubtitle:
         'L\'e-mail de vérification devrait arriver dans quelques minutes.',
     AppText.authStepClickLinkTitle: 'Cliquez sur le lien de vérification',
-    AppText.authStepClickLinkSubtitle: 'Ouvrez l\'e-mail et confirmez votre compte.',
+    AppText.authStepClickLinkSubtitle:
+        'Ouvrez l\'e-mail et confirmez votre compte.',
     AppText.authStepReturnTitle: 'Revenez dans l\'application',
     AppText.authStepReturnSubtitle:
         'Après vérification, vous pourrez accéder à toutes les fonctionnalités.',
@@ -5077,7 +5563,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.authEmailNotFound: 'E-mail introuvable. Veuillez vous reconnecter.',
     AppText.authVerificationEmailSentAgain: 'E-mail de vérification renvoyé.',
     AppText.authResendFailed: 'Échec de l\'envoi : {error}',
-    AppText.authPleaseLoginAfterVerify: 'Veuillez vous reconnecter après vérification.',
+    AppText.authPleaseLoginAfterVerify:
+        'Veuillez vous reconnecter après vérification.',
     AppText.authEmailVerifiedSuccess: 'E-mail vérifié avec succès !',
     AppText.authEmailNotVerifiedYet: 'E-mail pas encore vérifié.',
     AppText.authVerificationCheckFailed: 'La vérification a échoué : {error}',
@@ -5087,7 +5574,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.internshipsSubtitle:
         'Acquérez de l\'expérience en effectuant un stage dans des entreprises de premier plan.',
     AppText.internshipsLoadFailed: 'Impossible de charger les stages',
-    AppText.internshipsSearchHint: 'Rechercher : poste, entreprise, description...',
+    AppText.internshipsSearchHint:
+        'Rechercher : poste, entreprise, description...',
     AppText.internshipsLocationAll: 'Tous les lieux',
     AppText.internshipsDurationAll: 'Toutes les durées',
     AppText.internshipsDuration1_3: '1-3 mois',
@@ -5107,15 +5595,19 @@ const _values = <String, Map<AppText, String>>{
 
     // Internship Detail
     AppText.internshipDetailTitle: 'Détails du stage',
-    AppText.internshipDetailLoadFailed: 'Impossible de charger les détails du stage : {error}',
+    AppText.internshipDetailLoadFailed:
+        'Impossible de charger les détails du stage : {error}',
     AppText.internshipDetailApplySuccess: 'Candidature envoyée.',
     AppText.internshipDetailApplyFailed: 'Échec de la candidature : {error}',
     AppText.internshipDetailApplyTitle: 'Postuler',
-    AppText.internshipDetailAlreadyApplied: 'Vous avez déjà postulé à ce stage.',
-    AppText.internshipDetailApplyHint: 'Écrivez au moins {min} caractères pour continuer.',
+    AppText.internshipDetailAlreadyApplied:
+        'Vous avez déjà postulé à ce stage.',
+    AppText.internshipDetailApplyHint:
+        'Écrivez au moins {min} caractères pour continuer.',
     AppText.internshipDetailApplyButton: 'Postuler',
     AppText.internshipDetailMotivationTitle: 'Lettre de motivation',
-    AppText.internshipDetailMotivationHint: 'Expliquez pourquoi vous voulez ce stage...',
+    AppText.internshipDetailMotivationHint:
+        'Expliquez pourquoi vous voulez ce stage...',
     AppText.internshipDetailCertificate: 'Certificat',
     AppText.internshipDetailEmploymentChance: 'Chance d’embauche',
     AppText.internshipDetailAbout: 'À propos',
@@ -5152,9 +5644,11 @@ const _values = <String, Map<AppText, String>>{
     AppText.chatDefaultSuggestion2: 'Conseils pour le CV',
     AppText.chatDefaultSuggestion3: 'Questions et réponses d\'entretien',
     AppText.chatDefaultSuggestion4: 'Conseils pour choisir un département',
-    AppText.chatHistoryLoadFailed: 'Impossible de charger l\'historique : {error}',
+    AppText.chatHistoryLoadFailed:
+        'Impossible de charger l\'historique : {error}',
     AppText.chatReplyFailed: 'Impossible d\'obtenir une réponse : {error}',
-    AppText.chatBotUnavailable: 'Désolé, je ne peux pas répondre pour le moment. Réessayez.',
+    AppText.chatBotUnavailable:
+        'Désolé, je ne peux pas répondre pour le moment. Réessayez.',
 
     // Common
     AppText.commonCancel: 'Annuler',
@@ -5187,11 +5681,14 @@ const _values = <String, Map<AppText, String>>{
     AppText.commonNoData: 'Aucune donnée',
 
     // Settings
-    AppText.settingsLoginRequired: 'Connectez-vous pour accéder aux paramètres.',
+    AppText.settingsLoginRequired:
+        'Connectez-vous pour accéder aux paramètres.',
     AppText.settingsProfileUpdated: 'Profil mis à jour !',
     AppText.settingsPasswordUpdated: 'Mot de passe mis à jour !',
-    AppText.settingsPasswordUpdateFailed: 'Impossible de mettre à jour le mot de passe : {error}',
-    AppText.settingsPreferencesUpdated: 'Préférences de notification mises à jour !',
+    AppText.settingsPasswordUpdateFailed:
+        'Impossible de mettre à jour le mot de passe : {error}',
+    AppText.settingsPreferencesUpdated:
+        'Préférences de notification mises à jour !',
     AppText.settingsPrivacy: 'Confidentialité',
     AppText.settingsProfileInfoTitle: 'Informations du profil',
     AppText.settingsSaveChanges: 'Enregistrer les modifications',
@@ -5202,30 +5699,39 @@ const _values = <String, Map<AppText, String>>{
     AppText.settingsUpdatePassword: 'Mettre à jour le mot de passe',
     AppText.settingsNotificationPreferencesTitle: 'Préférences de notification',
     AppText.settingsPrefEmailTitle: 'Notifications e-mail',
-    AppText.settingsPrefEmailSubtitle: 'Recevoir les mises à jour importantes par e-mail',
+    AppText.settingsPrefEmailSubtitle:
+        'Recevoir les mises à jour importantes par e-mail',
     AppText.settingsPrefNewCoursesTitle: 'Nouveaux cours',
-    AppText.settingsPrefNewCoursesSubtitle: 'Être averti lorsque de nouveaux cours sont ajoutés',
+    AppText.settingsPrefNewCoursesSubtitle:
+        'Être averti lorsque de nouveaux cours sont ajoutés',
     AppText.settingsPrefJobAlertsTitle: 'Alertes d\'offres d\'emploi',
-    AppText.settingsPrefJobAlertsSubtitle: 'Recevoir des alertes correspondant à votre profil',
+    AppText.settingsPrefJobAlertsSubtitle:
+        'Recevoir des alertes correspondant à votre profil',
     AppText.settingsPrefNewsletterTitle: 'Newsletter hebdomadaire',
-    AppText.settingsPrefNewsletterSubtitle: 'Recevoir un récapitulatif et des recommandations chaque semaine',
+    AppText.settingsPrefNewsletterSubtitle:
+        'Recevoir un récapitulatif et des recommandations chaque semaine',
     AppText.settingsPrivacySecurityTitle: 'Confidentialité et sécurité',
     AppText.settingsTwoFactorTitle: 'Authentification à deux facteurs',
-    AppText.settingsTwoFactorSubtitle: 'Protégez votre compte avec une couche de sécurité supplémentaire',
+    AppText.settingsTwoFactorSubtitle:
+        'Protégez votre compte avec une couche de sécurité supplémentaire',
     AppText.settingsEnableArrow: 'Activer →',
     AppText.settingsDangerZoneTitle: 'Zone à risque',
     AppText.settingsFreezeAccountTitle: 'Geler le compte temporairement',
-    AppText.settingsFreezeAccountSubtitle: 'Le compte sera temporairement inaccessible',
+    AppText.settingsFreezeAccountSubtitle:
+        'Le compte sera temporairement inaccessible',
     AppText.settingsFreezeAccountButton: 'Geler',
     AppText.settingsDeleteAccountTitle: 'Supprimer le compte définitivement',
     AppText.settingsDeleteAccountSubtitle: 'Cette action est irréversible !',
-    AppText.settingsDeleteAccountWarning: 'Cette action est irréversible. Si vous supprimez votre compte :',
+    AppText.settingsDeleteAccountWarning:
+        'Cette action est irréversible. Si vous supprimez votre compte :',
     AppText.settingsDeleteAccountConsequences:
         '• Toutes vos données personnelles seront supprimées\n• Vos inscriptions aux cours seront annulées\n• Vos candidatures seront supprimées\n• Vos points gagnés seront perdus\n• Vous ne pourrez plus vous inscrire avec cet e-mail',
     AppText.settingsDeleteAccountConfirmPhrase: 'SUPPRIMER MON COMPTE',
-    AppText.settingsDeleteAccountTypeToConfirm: 'Pour confirmer, tapez {phrase} :',
+    AppText.settingsDeleteAccountTypeToConfirm:
+        'Pour confirmer, tapez {phrase} :',
     AppText.settingsDeleteAccountButton: 'Supprimer le compte',
-    AppText.settingsDeleteAccountFailed: 'Erreur lors de la suppression du compte : {error}',
+    AppText.settingsDeleteAccountFailed:
+        'Erreur lors de la suppression du compte : {error}',
     AppText.settingsProfileVisibilityTitle: 'Visibilité du profil',
     AppText.settingsVisibilityPublic: 'Public',
     AppText.settingsVisibilityRegistered: 'Utilisateurs inscrits uniquement',
@@ -5233,7 +5739,8 @@ const _values = <String, Map<AppText, String>>{
 
     // Favorites
     AppText.favoritesLoginRequired: 'Connectez-vous pour voir vos favoris.',
-    AppText.favoritesSubtitle: 'Vous pouvez suivre ici le contenu que vous avez aimé.',
+    AppText.favoritesSubtitle:
+        'Vous pouvez suivre ici le contenu que vous avez aimé.',
     AppText.favoritesLoadFailed: 'Impossible de charger les favoris : {error}',
     AppText.favoritesRemoved: 'Retiré des favoris',
     AppText.favoritesEmptyTitle: 'Vous n’avez pas encore de favoris.',
@@ -5253,31 +5760,37 @@ const _values = <String, Map<AppText, String>>{
     AppText.profileNoBadges: 'Vous n’avez pas encore de badge.',
     AppText.profileCompletedCoursesTitle: 'Cours terminés',
     AppText.profileCompletedCoursesTitleWithCount: 'Cours terminés ({count})',
-    AppText.profileNoCompletedCoursesTitle: 'Vous n’avez pas encore terminé de cours.',
-    AppText.profileNoCompletedCoursesSubtitle: 'Ils apparaîtront ici au fur et à mesure !',
+    AppText.profileNoCompletedCoursesTitle:
+        'Vous n’avez pas encore terminé de cours.',
+    AppText.profileNoCompletedCoursesSubtitle:
+        'Ils apparaîtront ici au fur et à mesure !',
     AppText.profileCourseCompleted: 'Terminé',
     AppText.profileCourseInfoNotFound: 'Informations du cours introuvables.',
     AppText.profileCompletionDescription: 'Vous avez complété votre profil !',
     AppText.profileCompletionAwarded: 'Profil complété ! +{points} points',
 
     // Courses
-    AppText.coursesSubtitle: 'Parcourez les cours, inscrivez-vous et gagnez des points.',
+    AppText.coursesSubtitle:
+        'Parcourez les cours, inscrivez-vous et gagnez des points.',
     AppText.coursesMyEnrolledTab: 'Mes inscriptions',
     AppText.coursesLoadFailedTitle: 'Impossible de charger les cours',
     AppText.coursesEmptyTitle: 'Aucun cours trouvé',
     AppText.coursesEmptySubtitle: 'Effacez les filtres et réessayez.',
     AppText.coursesMyLoadFailedTitle: 'Impossible de charger vos cours',
     AppText.coursesMyEmptyTitle: 'Aucun cours inscrit pour le moment',
-    AppText.coursesMyEmptySubtitle: 'Vous pouvez vous inscrire depuis l’onglet « Tout ».',
+    AppText.coursesMyEmptySubtitle:
+        'Vous pouvez vous inscrire depuis l’onglet « Tout ».',
     AppText.coursesExploreAction: 'Explorer les cours',
-    AppText.coursesSearchHint: 'Rechercher un cours (ex : SQL, Flutter, Data...)',
+    AppText.coursesSearchHint:
+        'Rechercher un cours (ex : SQL, Flutter, Data...)',
     AppText.coursesDepartmentAll: 'Département : Tous',
     AppText.coursesDepartmentSelected: 'Département : {department}',
     AppText.coursesLevelAll: 'Niveau : Tous',
     AppText.coursesLevelSelected: 'Niveau : {level}',
     AppText.coursesQuickFilterLabel: 'Filtre rapide :',
     AppText.coursesEnrolledPill: 'Inscrit',
-    AppText.coursesEnrollmentLoadFailed: 'Impossible de charger l\'inscription : {error}',
+    AppText.coursesEnrollmentLoadFailed:
+        'Impossible de charger l\'inscription : {error}',
     AppText.courseDetailTitle: 'Détails du cours',
     AppText.courseDetailVideoUrl: 'URL de la vidéo',
     AppText.courseDetailEnroll: 'S\'inscrire',
@@ -5286,12 +5799,15 @@ const _values = <String, Map<AppText, String>>{
     AppText.courseDetailLoadFailedTitle: 'Impossible de charger le cours',
 
     // Notifications
-    AppText.notificationsLoginRequired: 'Connectez-vous pour voir les notifications.',
+    AppText.notificationsLoginRequired:
+        'Connectez-vous pour voir les notifications.',
     AppText.notificationsMarkAllRead: 'Tout marquer comme lu',
     AppText.notificationsUnreadCount: '{count} notifications non lues',
     AppText.notificationsNewSnack: 'Nouvelle notification !',
-    AppText.notificationsLoadFailed: 'Impossible de charger les notifications : {error}',
-    AppText.notificationsAllMarkedRead: 'Toutes les notifications ont été marquées comme lues',
+    AppText.notificationsLoadFailed:
+        'Impossible de charger les notifications : {error}',
+    AppText.notificationsAllMarkedRead:
+        'Toutes les notifications ont été marquées comme lues',
     AppText.notificationsDeleted: 'Notification supprimée',
     AppText.notificationsDeleteFailed: 'Échec de la suppression : {error}',
     AppText.notificationsTabAll: 'Tout ({count})',
@@ -5302,11 +5818,14 @@ const _values = <String, Map<AppText, String>>{
     AppText.notificationsEmptyRead: 'Aucune notification lue.',
 
     // Student Dashboard
-    AppText.dashboardDailyLoginBonus: 'Bonus de connexion quotidien ! +2 points',
-    AppText.dashboardWeeklyStreakBonus: 'Série de 7 jours terminée ! +15 points',
+    AppText.dashboardDailyLoginBonus:
+        'Bonus de connexion quotidien ! +2 points',
+    AppText.dashboardWeeklyStreakBonus:
+        'Série de 7 jours terminée ! +15 points',
     AppText.dashboardLoadFailed: 'Impossible de charger le tableau de bord',
     AppText.dashboardWelcome: 'Bienvenue, {name} ! 👋',
-    AppText.dashboardWelcomeSubtitle: 'De nouvelles opportunités de carrière vous attendent aujourd\'hui.',
+    AppText.dashboardWelcomeSubtitle:
+        'De nouvelles opportunités de carrière vous attendent aujourd\'hui.',
     AppText.dashboardTotalPoints: 'Points totaux',
     AppText.dashboardCompletedCourses: 'Cours terminés',
     AppText.dashboardActiveApplications: 'Candidatures actives',
@@ -5320,13 +5839,15 @@ const _values = <String, Map<AppText, String>>{
     AppText.dashboardMetricCoursesCompleted: 'Cours terminés',
     AppText.dashboardMetricNextTarget: 'Prochain objectif',
     AppText.dashboardAssistantTitle: 'Assistant carrière',
-    AppText.dashboardAssistantSubtitle: 'Aide rapide pour CV, stages et entretiens.',
+    AppText.dashboardAssistantSubtitle:
+        'Aide rapide pour CV, stages et entretiens.',
     AppText.dashboardAssistantChipCv: 'Personnaliser le CV',
     AppText.dashboardAssistantChipInternships: 'Candidatures de stage',
     AppText.dashboardAssistantChipInterview: 'Préparation d\'entretien',
     AppText.dashboardStartChat: 'Démarrer le chat',
     AppText.dashboardOngoingCoursesTitle: 'Mes cours en cours',
-    AppText.dashboardNoCourses: 'Vous n\'êtes inscrit à aucun cours pour le moment.',
+    AppText.dashboardNoCourses:
+        'Vous n\'êtes inscrit à aucun cours pour le moment.',
     AppText.dashboardExploreCoursesArrow: 'Explorer les cours →',
     AppText.dashboardCourseProgress: '{percent}% terminé',
     AppText.dashboardRecentActivitiesTitle: 'Activités récentes',
@@ -5350,13 +5871,15 @@ const _values = <String, Map<AppText, String>>{
     AppText.adminDashboardSubtitle: 'Bienvenue, {name}',
     AppText.adminRoleSuper: 'Super admin',
     AppText.adminRoleAdmin: 'Admin',
-    AppText.adminDashboardLoadFailedTitle: 'Impossible de charger le tableau de bord',
+    AppText.adminDashboardLoadFailedTitle:
+        'Impossible de charger le tableau de bord',
     AppText.adminStatTotalUsersTitle: 'Utilisateurs au total',
     AppText.adminStatTotalUsersSubtitleToday: '+{count} aujourd\'hui',
     AppText.adminStatCompaniesTitle: 'Entreprises',
     AppText.adminStatCompaniesSubtitlePending: '{count} en attente',
     AppText.adminStatActiveListingsTitle: 'Offres actives',
-    AppText.adminStatActiveListingsSubtitle: '{jobs} emplois, {internships} stages',
+    AppText.adminStatActiveListingsSubtitle:
+        '{jobs} emplois, {internships} stages',
     AppText.adminStatMonthlyRevenueTitle: 'Revenu mensuel',
     AppText.adminStatMonthlyRevenueSubtitle: '{count} abonnements actifs',
     AppText.adminCompanyApprovalsTitle: 'En attente de validation',
@@ -5379,11 +5902,13 @@ const _values = <String, Map<AppText, String>>{
     AppText.adminUsersTotalCount: 'Total : {count} utilisateurs',
     AppText.adminUserDetailsTitle: 'Détails de l\'utilisateur',
     AppText.adminBanUserTitle: 'Bannir l\'utilisateur',
-    AppText.adminBanUserConfirm: 'Voulez-vous vraiment bannir cet utilisateur ?',
+    AppText.adminBanUserConfirm:
+        'Voulez-vous vraiment bannir cet utilisateur ?',
     AppText.adminBanUserSuccess: 'Utilisateur banni',
     AppText.adminBanUserFailed: 'Impossible de bannir l\'utilisateur : {error}',
     AppText.adminUnbanUserSuccess: 'Bannissement levé',
-    AppText.adminUnbanUserFailed: 'Impossible de lever le bannissement : {error}',
+    AppText.adminUnbanUserFailed:
+        'Impossible de lever le bannissement : {error}',
     AppText.adminCompaniesTitle: 'Gestion des entreprises',
     AppText.adminCompaniesSubtitle: 'Voir et approuver les entreprises',
     AppText.adminCompaniesTotalCount: 'Total : {count}',
@@ -5396,15 +5921,18 @@ const _values = <String, Map<AppText, String>>{
     AppText.adminCompanyDetailsTitle: 'Détails de l\'entreprise',
     AppText.adminCompanyDescriptionLabel: 'Description',
     AppText.adminCompanyRejectReasonTitle: 'Motif de refus',
-    AppText.adminCompanyRejectReasonRequired: 'Motif de refus (obligatoire pour refuser)',
+    AppText.adminCompanyRejectReasonRequired:
+        'Motif de refus (obligatoire pour refuser)',
     AppText.adminCompanyRejectReasonLabel: 'Motif de refus',
-    AppText.adminCompanyRejectReasonHint: 'ex : documents manquants / info incorrecte',
+    AppText.adminCompanyRejectReasonHint:
+        'ex : documents manquants / info incorrecte',
     AppText.adminCompanyApprove: 'Approuver',
     AppText.adminCompanyReject: 'Refuser',
     AppText.adminCompanyBan: 'Bannir l\'entreprise',
     AppText.adminCompanyUnban: 'Débannir',
     AppText.adminCompanyBanTitle: 'Bannir l\'entreprise',
-    AppText.adminCompanyBanConfirm: 'Voulez-vous vraiment bannir cette entreprise ?',
+    AppText.adminCompanyBanConfirm:
+        'Voulez-vous vraiment bannir cette entreprise ?',
     AppText.adminCompanyBanAction: 'Bannir',
     AppText.adminTableCompany: 'Entreprise',
     AppText.adminTableContact: 'Contact',
@@ -5431,7 +5959,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.adminLoginSuccess: 'Connexion admin réussie !',
     AppText.adminLoginErrorRequired: 'Email et mot de passe requis.',
     AppText.adminLoginErrorInvalidEmail: 'Veuillez saisir un email valide.',
-    AppText.adminLoginErrorVerifyEmail: 'Veuillez vérifier votre adresse email.',
+    AppText.adminLoginErrorVerifyEmail:
+        'Veuillez vérifier votre adresse email.',
     AppText.adminLoginErrorNotAdmin: 'Ce n\'est pas un compte admin',
     AppText.adminSetupTitle: 'Configuration admin',
     AppText.adminSetupSubtitle: 'Créer le premier compte admin',
@@ -5440,12 +5969,14 @@ const _values = <String, Map<AppText, String>>{
         'Cette page est affichée uniquement s’il n’y a aucun administrateur dans le système.\nLe compte créé aura les permissions super admin.',
     AppText.adminSetupKeyLabel: 'Clé de configuration',
     AppText.adminSetupKeyHint: 'Saisissez la clé de configuration',
-    AppText.adminSetupKeyHelp: 'Obtenez cette clé auprès de l’administrateur système',
+    AppText.adminSetupKeyHelp:
+        'Obtenez cette clé auprès de l’administrateur système',
     AppText.adminSetupNameLabel: 'Nom complet',
     AppText.adminSetupEmailLabel: 'Email',
     AppText.adminSetupPasswordLabel: 'Mot de passe',
     AppText.adminSetupPasswordHint: 'Au moins 8 caractères',
-    AppText.adminSetupPasswordMin: 'Le mot de passe doit contenir au moins 8 caractères.',
+    AppText.adminSetupPasswordMin:
+        'Le mot de passe doit contenir au moins 8 caractères.',
     AppText.adminSetupCreateButton: 'Créer admin',
     AppText.adminSetupCreateButtonLoading: 'Création...',
     AppText.adminSetupSuccess: 'Admin créé !',
@@ -5459,17 +5990,23 @@ const _values = <String, Map<AppText, String>>{
     AppText.dbDebugProfileNotFound: 'Profil introuvable',
     AppText.dbDebugTableTitle: 'Table {name}',
     AppText.dbDebugTotalRecords: 'Enregistrements totaux : {count}',
-    AppText.dbDebugDepartmentRecords: 'Enregistrements du département : {count}',
+    AppText.dbDebugDepartmentRecords:
+        'Enregistrements du département : {count}',
     AppText.dbDebugPartTimeRecords: 'Temps partiel : {count}',
     AppText.dbDebugTableColumnsTitle: 'Colonnes de la table',
     AppText.dbDebugSampleRecordsTitle: 'Exemples d’enregistrements',
     AppText.dbDebugError: 'Erreur : {error}',
     AppText.dbDebugTipsTitle: 'À vérifier',
-    AppText.dbDebugTipProfileDepartment: 'Le champ department est-il rempli dans la table profiles ?',
-    AppText.dbDebugTipTablesHaveDepartment: 'Les tables courses, internships et jobs ont-elles une colonne department ?',
-    AppText.dbDebugTipTablesHaveData: 'Les tables contiennent-elles des données ? Sinon, ajoutez des exemples.',
-    AppText.dbDebugTipRlsEnabled: 'Les politiques RLS (Row Level Security) sont-elles activées ?',
-    AppText.dbDebugTipDepartmentHasMatches: 'Y a-t-il des enregistrements correspondant au département de l’utilisateur ?',
+    AppText.dbDebugTipProfileDepartment:
+        'Le champ department est-il rempli dans la table profiles ?',
+    AppText.dbDebugTipTablesHaveDepartment:
+        'Les tables courses, internships et jobs ont-elles une colonne department ?',
+    AppText.dbDebugTipTablesHaveData:
+        'Les tables contiennent-elles des données ? Sinon, ajoutez des exemples.',
+    AppText.dbDebugTipRlsEnabled:
+        'Les politiques RLS (Row Level Security) sont-elles activées ?',
+    AppText.dbDebugTipDepartmentHasMatches:
+        'Y a-t-il des enregistrements correspondant au département de l’utilisateur ?',
     AppText.commonComingSoonTitle: 'Bientôt',
     AppText.commonComingSoonSubtitle: 'Cette page sera disponible bientôt',
   },
@@ -5503,12 +6040,16 @@ const _values = <String, Map<AppText, String>>{
     AppText.close: 'Жабуу',
     AppText.menu: 'Меню',
     AppText.pointsSystem: 'Упай системасы',
-    AppText.pointsSystemGuestSubtitle: 'Курстарга катталып, прогресс кылып, төшбелги алып, сыйлыктарды ачыңыз.',
+    AppText.pointsSystemGuestSubtitle:
+        'Курстарга катталып, прогресс кылып, төшбелги алып, сыйлыктарды ачыңыз.',
     AppText.pointsSystemGuestBullet1: 'Курска катталуу → упай',
-    AppText.pointsSystemGuestBullet2: 'Курсту бүтүрүү → кошумча упай + төшбелги',
+    AppText.pointsSystemGuestBullet2:
+        'Курсту бүтүрүү → кошумча упай + төшбелги',
     AppText.pointsSystemGuestBullet3: 'Упай менен сыйлык ачуу',
-    AppText.pointsSystemGuestSignInHint: 'Киргенден кийин упай тарыхын жана сыйлыктарды бул жерден көрөсүз.',
-    AppText.pointsSystemAuthedSubtitle: 'Упайларыңызды көзөмөлдөп, сыйлыктарды максат кылыңыз.',
+    AppText.pointsSystemGuestSignInHint:
+        'Киргенден кийин упай тарыхын жана сыйлыктарды бул жерден көрөсүз.',
+    AppText.pointsSystemAuthedSubtitle:
+        'Упайларыңызды көзөмөлдөп, сыйлыктарды максат кылыңыз.',
     AppText.pointsSystemTabHistory: 'Тарых',
     AppText.pointsSystemTabRewards: 'Сыйлыктар',
     AppText.pointsSystemTabBadges: 'Төшбелгилер',
@@ -5518,17 +6059,21 @@ const _values = <String, Map<AppText, String>>{
     AppText.pointsSystemBadgesLoadFailed: 'Төшбелгилер жүктөлбөдү: {error}',
     AppText.pointsSystemHistoryEmpty: 'Азырынча упай кыймылы жок.',
     AppText.pointsSystemRewardsEmpty: 'Сыйлык табылган жок.',
-    AppText.pointsSystemBadgesEmpty: 'Азырынча төшбелги жок. Курсту бүтүрсөңүз, төшбелги келет.',
+    AppText.pointsSystemBadgesEmpty:
+        'Азырынча төшбелги жок. Курсту бүтүрсөңүз, төшбелги келет.',
     AppText.pointsSystemNextReward: 'Кийинки сыйлык: {title} ({points} упай)',
-    AppText.pointsSystemAllRewardsUnlocked: 'Бардык сыйлыктар ачылган болушу мүмкүн.',
+    AppText.pointsSystemAllRewardsUnlocked:
+        'Бардык сыйлыктар ачылган болушу мүмкүн.',
     AppText.leaderboardLoadFailedTitle: 'Рейтинг жүктөлбөдү',
-    AppText.leaderboardSubtitle: 'Эң активдүү студенттердин катарына кошул. Упай топто, рейтингде көтөрүлүп, сыйлыктарга жакында.',
+    AppText.leaderboardSubtitle:
+        'Эң активдүү студенттердин катарына кошул. Упай топто, рейтингде көтөрүлүп, сыйлыктарга жакында.',
     AppText.leaderboardTabOverall: 'Жалпы',
     AppText.leaderboardTabDepartment: 'Бөлүм',
     AppText.leaderboardEmpty: 'Азырынча рейтинг маалыматтары жок.',
     AppText.leaderboardDepartmentLabel: 'Бөлүм: {dept}',
     AppText.leaderboardNoDepartment: 'Профилиңизде бөлүм маалыматы жок.',
-    AppText.leaderboardNoDepartmentData: 'Бул бөлүм үчүн рейтинг маалыматы жок.',
+    AppText.leaderboardNoDepartmentData:
+        'Бул бөлүм үчүн рейтинг маалыматы жок.',
     AppText.leaderboardHeroMyPoints: 'Сиздин упайларыңыз',
     AppText.leaderboardHeroOverallRank: 'Жалпы рейтинг',
     AppText.leaderboardHeroDepartmentRank: 'Бөлүм рейтинги',
@@ -5540,10 +6085,12 @@ const _values = <String, Map<AppText, String>>{
         '• Курсту бүтүрүү: +50 упай\n• Курска катталуу: +10 упай\n• Күн сайын кирүү: +2 упай\n• 7 күн серия: +15 упай',
     AppText.leaderboardViewPointsSystem: 'Упай системасын көрүү',
     AppText.commonYou: 'Сиз',
-    AppText.applicationsLoginRequired: 'Арыздарыңызды көрүү үчүн киришиңиз керек.',
+    AppText.applicationsLoginRequired:
+        'Арыздарыңызды көрүү үчүн киришиңиз керек.',
     AppText.applicationsSearchHint: 'Арыз издөө...',
     AppText.applicationsLoadFailed: 'Арыздар жүктөлбөдү: {error}',
-    AppText.applicationsSubtitle: 'Бул жерден бардык арыздарыңызды жана каттоолоруңузду көзөмөлдөй аласыз.',
+    AppText.applicationsSubtitle:
+        'Бул жерден бардык арыздарыңызды жана каттоолоруңузду көзөмөлдөй аласыз.',
     AppText.applicationsEmpty: 'Азырынча арыздарыңыз жок.',
     AppText.applicationsKindJob: 'Жумуш',
     AppText.applicationsKindInternship: 'Стажировка',
@@ -5556,7 +6103,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.retry: 'Кайра аракет кылуу',
     AppText.commonPleaseSignIn: 'Сураныч, кириңиз.',
     AppText.jobsTitle: 'Жумуш жарыялары',
-    AppText.jobsSubtitle: 'Изде, чыпкала, сүйүктүүлөргө кош жана арыз бер. React менен бирдей агым.',
+    AppText.jobsSubtitle:
+        'Изде, чыпкала, сүйүктүүлөргө кош жана арыз бер. React менен бирдей агым.',
     AppText.jobsSearchHint: 'Аталыш, компания, бөлүм, жайгашкан жер...',
 
     // Job Detail
@@ -5567,7 +6115,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.jobDetailApply: 'Өтүнмө берүү',
     AppText.jobDetailAppliedStatus: 'Өтүнмөнүн абалы: {status}',
     AppText.jobDetailApplySheetTitle: 'Өтүнмө',
-    AppText.jobDetailApplySheetSubtitle: 'Кыскача билдирүү кошуңуз (кааласаңыз).',
+    AppText.jobDetailApplySheetSubtitle:
+        'Кыскача билдирүү кошуңуз (кааласаңыз).',
     AppText.jobDetailApplySheetHint: 'Компанияга билдирүү жазыңыз...',
     AppText.jobDetailApplySuccess: 'Өтүнмө жөнөтүлдү.',
     AppText.jobDetailApplyFailed: 'Өтүнмө жөнөтүлгөн жок: {error}',
@@ -5599,7 +6148,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.footerEmailHint: 'Электрондук почтаңыз',
     AppText.footerSubscribeSuccess: 'Бюллетеньге ийгиликтүү катталдыңыз.',
     AppText.footerSubscribeInvalid: 'Туура e-mail киргизиңиз.',
-    AppText.footerCopyright: '© {year} Студенттик платформа. Бардык укуктар корголгон.',
+    AppText.footerCopyright:
+        '© {year} Студенттик платформа. Бардык укуктар корголгон.',
     AppText.linkInternshipListings: 'Стажировка жарыялары',
     AppText.linkLeaderboard: 'Лидер тактасы',
     AppText.linkHowItWorks: 'Кантип иштейт?',
@@ -5608,31 +6158,39 @@ const _values = <String, Map<AppText, String>>{
     AppText.linkPrivacy: 'Купуялуулук саясаты',
     AppText.linkTerms: 'Колдонуу шарттары',
     AppText.linkComingSoon: '{name} шилтемеси жакында.',
-    AppText.homeHeroTitle: 'Университет жашоосун күчтөндүр,\nкарьераңа тез багыт бер!',
+    AppText.homeHeroTitle:
+        'Университет жашоосун күчтөндүр,\nкарьераңа тез багыт бер!',
     AppText.homeHeroSubtitle:
         'Тармагына ылайык курстар, стажировкалар жана жумуш жарыялары менен келечекке ишенимдүү кадам ташта.',
     AppText.homeCard1Title: 'Тармакка ылайык контент',
     AppText.homeCard1Desc:
         'Бөлүмүңө ылайык курстар, стажировкалар жана жумуш жарыялары менен багытталган окуу.',
     AppText.homeCard2Title: 'Карьераңа багыт бер',
-    AppText.homeCard2Desc: 'Жекелештирилген кеңештер жана мүмкүнчүлүктөр менен колдоо ал.',
+    AppText.homeCard2Desc:
+        'Жекелештирилген кеңештер жана мүмкүнчүлүктөр менен колдоо ал.',
     AppText.homeCard3Title: 'Жөнөкөй жана тез',
-    AppText.homeCard3Desc: 'Заманбап жана ыңгайлуу интерфейс менен убакытты үнөмдө.',
+    AppText.homeCard3Desc:
+        'Заманбап жана ыңгайлуу интерфейс менен убакытты үнөмдө.',
     AppText.homeStudentBenefitsTitle: 'Студенттер үчүн пайдасы',
     AppText.homeStudentCard1Title: 'Максатка багытталган контент',
-    AppText.homeStudentCard1Desc: 'Тармагына ылайык мүмкүнчүлүктөр менен максатка тез жет.',
+    AppText.homeStudentCard1Desc:
+        'Тармагына ылайык мүмкүнчүлүктөр менен максатка тез жет.',
     AppText.homeStudentCard2Title: 'Атаандаштык артыкчылык',
     AppText.homeStudentCard2Desc:
         'Резюмеңди күчтөндүрө турган мүмкүнчүлүктөргө башкалардан мурда жет.',
     AppText.homeStudentCard3Title: 'Өнүгүүнү көзөмөлдөө',
-    AppText.homeStudentCard3Desc: 'Өнүгүүңдү көзөмөлдөп, кемчиликтерди убагында байка.',
+    AppText.homeStudentCard3Desc:
+        'Өнүгүүңдү көзөмөлдөп, кемчиликтерди убагында байка.',
     AppText.homeCompanyBenefitsTitle: 'Ишканалар үчүн пайдасы',
     AppText.homeCompanyCard1Title: 'Жаш таланттарга жетүү',
-    AppText.homeCompanyCard1Desc: 'Мотивациясы жогору, тармагына кызыккан студенттерге жеткиле.',
+    AppText.homeCompanyCard1Desc:
+        'Мотивациясы жогору, тармагына кызыккан студенттерге жеткиле.',
     AppText.homeCompanyCard2Title: 'Кызматташуу мүмкүнчүлүктөрү',
-    AppText.homeCompanyCard2Desc: 'Долбоорлоруңузда университет студенттери менен бирге иштеңиз.',
+    AppText.homeCompanyCard2Desc:
+        'Долбоорлоруңузда университет студенттери менен бирге иштеңиз.',
     AppText.homeCompanyCard3Title: 'Маалыматка негизделген тандоо',
-    AppText.homeCompanyCard3Desc: 'Профиль маалыматтары менен туура адамды оңой тандаңыз.',
+    AppText.homeCompanyCard3Desc:
+        'Профиль маалыматтары менен туура адамды оңой тандаңыз.',
     AppText.howItWorksTitle: 'Кантип иштейт?',
     AppText.howItWorksSubtitle:
         'Платформабыз төрт негизги баскычтан турат. Ар бир кадамда жанындабыз!',
@@ -5654,14 +6212,16 @@ const _values = <String, Map<AppText, String>>{
     AppText.howItWorksHeroPrimary: 'Акысыз катталуу',
     AppText.howItWorksHeroSecondary: 'Курстарды көрүү',
     AppText.howItWorksHeroSidebarTitle: 'Бул бетте',
-    AppText.howItWorksHeroBullet1: 'Платформанын кадамдарынын кыскача түшүндүрмөсү',
+    AppText.howItWorksHeroBullet1:
+        'Платформанын кадамдарынын кыскача түшүндүрмөсү',
     AppText.howItWorksHeroBullet2: 'Упай жана сыйлык логикасы',
     AppText.howItWorksHeroBullet3: 'Өтүнмө берүү процесси',
     AppText.howItWorksHeroBullet4: 'Тез баштоо боюнча кеңештер',
     AppText.howItWorksStep5Title: 'Сыйлык ал',
     AppText.howItWorksStep5Desc: 'Упайларыңды сонун сыйлыктарга алмаштыр.',
     AppText.howItWorksPageStepByStepTitle: 'Кадам-кадам',
-    AppText.howItWorksPageStepByStepSubtitle: 'Карьерa жолуңду 5 жөнөкөй кадам менен башта.',
+    AppText.howItWorksPageStepByStepSubtitle:
+        'Карьерa жолуңду 5 жөнөкөй кадам менен башта.',
     AppText.howItWorksDetailedStepsTitle: 'Толук кадамдар',
     AppText.howItWorksDetail1Title: 'Катталуу жана профиль',
     AppText.howItWorksDetail1Desc:
@@ -5737,21 +6297,27 @@ const _values = <String, Map<AppText, String>>{
     AppText.aboutRoleTechnology: 'Технология',
     AppText.aboutWhyTitle: 'Эмне үчүн биз?',
     AppText.aboutWhyNetworkTitle: 'Кең тармак',
-    AppText.aboutWhyNetworkDesc: '500+ өнөктөш компания жана миңдеген активдүү студенттер менен күчтүү тармак.',
+    AppText.aboutWhyNetworkDesc:
+        '500+ өнөктөш компания жана миңдеген активдүү студенттер менен күчтүү тармак.',
     AppText.aboutWhyRewardsTitle: 'Сыйлык системасы',
-    AppText.aboutWhyRewardsDesc: 'Активдүүлүгүң үчүн упай алып, аны чыныгы сыйлыктарга алмаштыр.',
+    AppText.aboutWhyRewardsDesc:
+        'Активдүүлүгүң үчүн упай алып, аны чыныгы сыйлыктарга алмаштыр.',
     AppText.aboutWhyCareerTitle: 'Карьерa өнүгүүсү',
-    AppText.aboutWhyCareerDesc: 'Онлайн курстар, ментордук программалар жана иш-чаралар менен колдойбуз.',
+    AppText.aboutWhyCareerDesc:
+        'Онлайн курстар, ментордук программалар жана иш-чаралар менен колдойбуз.',
     AppText.aboutWhyStudentFriendlyTitle: 'Студентке ыңгайлуу',
-    AppText.aboutWhyStudentFriendlyDesc: 'Толук акысыз платформа жана студентке ылайык интерфейс/функциялар.',
+    AppText.aboutWhyStudentFriendlyDesc:
+        'Толук акысыз платформа жана студентке ылайык интерфейс/функциялар.',
 
     // Static - Contact
     AppText.contactHeroTitle: 'Байланыш',
-    AppText.contactHeroSubtitle: 'Суроолор, сунуштар же өнөктөштүк үчүн биз менен байланышыңыз.',
+    AppText.contactHeroSubtitle:
+        'Суроолор, сунуштар же өнөктөштүк үчүн биз менен байланышыңыз.',
     AppText.contactEmailTitle: 'Эл. почта',
     AppText.contactPhoneTitle: 'Телефон',
     AppText.contactAddressTitle: 'Дарек',
-    AppText.contactAddressBody: 'Teknokent, Innovation St. No:1234\nBeşiktaş, Istanbul',
+    AppText.contactAddressBody:
+        'Teknokent, Innovation St. No:1234\nBeşiktaş, Istanbul',
     AppText.contactHoursTitle: 'Иштөө убактысы',
     AppText.contactHoursBody: 'Дүй - Жм: 09:00 - 18:00\nИш: 10:00 - 14:00',
     AppText.contactFormTitle: 'Бизге жазыңыз',
@@ -5769,18 +6335,22 @@ const _values = <String, Map<AppText, String>>{
     AppText.contactSubjectFeedback: 'Сунуш / даттануу',
     AppText.contactSubjectOther: 'Башка',
     AppText.contactSendSuccess: 'Билдирүү жөнөтүлдү! Жакын арада жооп беребиз.',
-    AppText.contactFillRequired: 'Сураныч, бардык милдеттүү талааларды толтуруңуз.',
+    AppText.contactFillRequired:
+        'Сураныч, бардык милдеттүү талааларды толтуруңуз.',
     AppText.contactFaqTitle: 'Көп берилген суроолор',
     AppText.contactFaqQ1: 'Платформа акы төлөнөбү?',
     AppText.contactFaqA1: 'Жок, платформа студенттер үчүн толук акысыз.',
     AppText.contactFaqQ2: 'Кайсы университет студенттери катыша алат?',
-    AppText.contactFaqA2: 'Түркиядагы бардык университеттердин студенттери каттала алышат.',
+    AppText.contactFaqA2:
+        'Түркиядагы бардык университеттердин студенттери каттала алышат.',
     AppText.contactFaqQ3: 'Иш берүүчү катары кантип жарыя бере алам?',
-    AppText.contactFaqA3: 'Өнөктөштүк үчүн байланышып же корпоративдик катталууга арыз бере аласыз.',
+    AppText.contactFaqA3:
+        'Өнөктөштүк үчүн байланышып же корпоративдик катталууга арыз бере аласыз.',
     AppText.contactMapPlaceholder: 'Карта',
 
     // Company - General
-    AppText.companyPanelLoginRequired: 'Компания панелин көрүү үчүн киришиңиз керек.',
+    AppText.companyPanelLoginRequired:
+        'Компания панелин көрүү үчүн киришиңиз керек.',
 
     // Company - Jobs
     AppText.companyJobsTitle: 'Менин жумуш жарыяларым',
@@ -5790,7 +6360,8 @@ const _values = <String, Map<AppText, String>>{
     // Company - Internships
     AppText.companyInternshipsTitle: 'Менин стажировка жарыяларым',
     AppText.companyInternshipsSearchHint: 'Стажировкаларды издөө...',
-    AppText.companyInternshipsEmptyNoListings: 'Азырынча стажировка жарыясы жок.',
+    AppText.companyInternshipsEmptyNoListings:
+        'Азырынча стажировка жарыясы жок.',
 
     // Company - Job Applications
     AppText.companyJobApplicationsTitle: 'Өтүнмөлөр',
@@ -5798,11 +6369,13 @@ const _values = <String, Map<AppText, String>>{
 
     // Company - Internship Applications
     AppText.companyInternshipApplicationsTitle: 'Өтүнмөлөр',
-    AppText.companyInternshipApplicationsTitleWithInternship: 'Өтүнмөлөр • {title}',
+    AppText.companyInternshipApplicationsTitleWithInternship:
+        'Өтүнмөлөр • {title}',
 
     // Company - Reports
     AppText.companyReportsTitle: 'Отчеттор',
-    AppText.companyReportsLoginRequired: 'Компания отчетторун көрүү үчүн киришиңиз керек.',
+    AppText.companyReportsLoginRequired:
+        'Компания отчетторун көрүү үчүн киришиңиз керек.',
     AppText.companyReportsCsvDownloaded: 'CSV жүктөлдү.',
     AppText.companyReportsExportCsv: 'CSV жүктөө',
     AppText.companyReportsRangeToday: 'Бүгүн',
@@ -5822,25 +6395,30 @@ const _values = <String, Map<AppText, String>>{
     AppText.companyReportsMetricAccepted: 'Кабыл алынган',
     AppText.companyReportsMetricRejected: 'Четке кагылган',
     AppText.companyReportsMetricActiveListings: 'Активдүү жарыялар',
-    AppText.companyReportsActiveListingsValue: '{jobs} иш • {internships} стажировка',
+    AppText.companyReportsActiveListingsValue:
+        '{jobs} иш • {internships} стажировка',
     AppText.companyReportsChartViewsTrend: 'Көрүү тренди',
     AppText.companyReportsChartApplicationsTrend: 'Өтүнмө тренди',
 
     // Company - Applications
     AppText.companyApplicationsTitle: 'Бардык өтүнмөлөр',
-    AppText.companyApplicationsLoginRequired: 'Компания өтүнмөлөрүн көрүү үчүн киришиңиз керек.',
+    AppText.companyApplicationsLoginRequired:
+        'Компания өтүнмөлөрүн көрүү үчүн киришиңиз керек.',
     AppText.companyApplicationsCsvDownloaded: 'CSV жүктөлдү.',
     AppText.companyApplicationsOpenCv: 'CV ач',
     AppText.companyApplicationsCvInvalid: 'CV шилтемеси жараксыз.',
-    AppText.companyApplicationsCvOpenFailedCopied: 'Шилтеме ачылган жок. CV шилтемеси көчүрүлдү.',
+    AppText.companyApplicationsCvOpenFailedCopied:
+        'Шилтеме ачылган жок. CV шилтемеси көчүрүлдү.',
     AppText.companyApplicationsCoverLetterTitle: 'Коштоочу кат',
     AppText.companyApplicationsMotivationLetterTitle: 'Мотивациялык кат',
-    AppText.companyApplicationsSearchHint: 'Аты, эл. почта же жарыя боюнча издөө...',
+    AppText.companyApplicationsSearchHint:
+        'Аты, эл. почта же жарыя боюнча издөө...',
     AppText.companyApplicationsFilterAllStatuses: 'Бардык абалдар',
     AppText.companyApplicationsFilterAllTypes: 'Бардык типтер',
     AppText.companyApplicationsEmpty: 'Азырынча өтүнмө жок.',
     AppText.companyApplicationsYearOfStudy: '{year}-курс',
-    AppText.companyApplicationsCsvHeader: 'Аты,Email,Телефон,Түрү,Жарыя,Бөлүм,Абалы,Арыз күнү',
+    AppText.companyApplicationsCsvHeader:
+        'Аты,Email,Телефон,Түрү,Жарыя,Бөлүм,Абалы,Арыз күнү',
     AppText.companyApplicationsCsvTypeJob: 'Жумуш',
     AppText.companyApplicationsCsvTypeInternship: 'Стажировка',
 
@@ -5861,7 +6439,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.companyJobFormDeadlineNotSelected: 'Акыркы күн тандалган жок',
     AppText.companyJobFormDeadlineSelected: 'Акыркы күн: {date}',
     AppText.companyJobFormPickDate: 'Күн тандоо',
-    AppText.companyJobFormValidationTitleDesc: 'Аталышын жана сүрөттөмөсүн киргизиңиз.',
+    AppText.companyJobFormValidationTitleDesc:
+        'Аталышын жана сүрөттөмөсүн киргизиңиз.',
     AppText.companyJobFormValidationDepartment: 'Бөлүм милдеттүү.',
     AppText.companyJobFormValidationLocation: 'Жайгашкан жер милдеттүү.',
     AppText.companyJobFormValidationDeadline: 'Акыркы күндү тандаңыз.',
@@ -5885,17 +6464,21 @@ const _values = <String, Map<AppText, String>>{
     AppText.companyInternshipFormMonthlyStipendLabel: 'Айлык төлөм *',
     AppText.companyInternshipFormBenefitsLabel: 'Жөлөкпулдар',
     AppText.companyInternshipFormCertificateLabel: 'Сертификат берилет',
-    AppText.companyInternshipFormEmploymentPossibilityLabel: 'Ишке калуу мүмкүнчүлүгү',
+    AppText.companyInternshipFormEmploymentPossibilityLabel:
+        'Ишке калуу мүмкүнчүлүгү',
     AppText.companyInternshipFormActiveLabel: 'Жарыя активдүү',
-    AppText.companyInternshipFormValidationTitleDesc: 'Аталышы жана сүрөттөмө милдеттүү.',
+    AppText.companyInternshipFormValidationTitleDesc:
+        'Аталышы жана сүрөттөмө милдеттүү.',
     AppText.companyInternshipFormValidationRequirements: 'Талаптар милдеттүү.',
     AppText.companyInternshipFormValidationDepartment: 'Бөлүм милдеттүү.',
     AppText.companyInternshipFormValidationLocation: 'Жайгашкан жер милдеттүү.',
     AppText.companyInternshipFormValidationDuration: 'Узактык милдеттүү.',
-    AppText.companyInternshipFormValidationStartDate: 'Башталыш күнүн тандаңыз.',
+    AppText.companyInternshipFormValidationStartDate:
+        'Башталыш күнүн тандаңыз.',
     AppText.companyInternshipFormValidationDeadline: 'Акыркы күндү тандаңыз.',
     AppText.companyInternshipFormValidationQuotaRequired: 'Квота милдеттүү.',
-    AppText.companyInternshipFormValidationQuotaValid: 'Туура квота киргизиңиз.',
+    AppText.companyInternshipFormValidationQuotaValid:
+        'Туура квота киргизиңиз.',
     AppText.companyInternshipFormValidationPaidStipend:
         'Акы төлөнүүчү стажировка үчүн айлык төлөмдү киргизиңиз.',
     AppText.companyInternshipFormCreated: 'Стажировка жарыясы түзүлдү.',
@@ -5916,14 +6499,16 @@ const _values = <String, Map<AppText, String>>{
     AppText.companyProfileFieldAbout: 'Компания жөнүндө',
     AppText.companyProfileFieldFoundedYear: 'Негизделген жылы',
     AppText.companyProfileFieldCompanySize: 'Кызматкерлер саны',
-    AppText.companyProfileValidationNameRequired: 'Компаниянын аталышы милдеттүү.',
+    AppText.companyProfileValidationNameRequired:
+        'Компаниянын аталышы милдеттүү.',
     AppText.companyProfileValidationSectorRequired: 'Тармак милдеттүү.',
     AppText.companyProfileValidationPhoneRequired: 'Телефон милдеттүү.',
     AppText.companyProfileValidationCityRequired: 'Шаар милдеттүү.',
     AppText.companyProfileUpdated: 'Компания профили жаңыртылды.',
     AppText.companyProfileStatusPending: 'Профилиңиз текшерүүдө.',
     AppText.companyProfileStatusRejected: 'Профилиңиз четке кагылды.',
-    AppText.companyProfileStatusRejectedWithReason: 'Четке кагуу себеби: {reason}',
+    AppText.companyProfileStatusRejectedWithReason:
+        'Четке кагуу себеби: {reason}',
     AppText.companyProfileStatusOther: 'Абалы: {status}',
 
     // Company - Dashboard
@@ -5932,19 +6517,24 @@ const _values = <String, Map<AppText, String>>{
     AppText.companyDashboardPendingApplications: 'Күтүүдөгү өтүнмөлөр',
     AppText.companyDashboardTotalApplications: 'Жалпы өтүнмөлөр',
     AppText.companyDashboardWelcome: 'Кош келиңиз, {name}',
-    AppText.companyDashboardStatusBanned: 'Аккаунтуңуз өчүрүлгөн. Колдоо кызматына кайрылыңыз.',
+    AppText.companyDashboardStatusBanned:
+        'Аккаунтуңуз өчүрүлгөн. Колдоо кызматына кайрылыңыз.',
     AppText.companyDashboardStatusPending:
         'Аккаунтуңуз текшерүүдө. Макул болгондон кийин жарыяларыңыз чыгат.',
-    AppText.companyDashboardStatusRejected: 'Компания арызыңыз четке кагылды. Профилди жаңыртыңыз.',
-    AppText.companyDashboardStatusRejectedWithReason: 'Четке кагуу себеби: {reason}',
+    AppText.companyDashboardStatusRejected:
+        'Компания арызыңыз четке кагылды. Профилди жаңыртыңыз.',
+    AppText.companyDashboardStatusRejectedWithReason:
+        'Четке кагуу себеби: {reason}',
     AppText.companyDashboardStatusOther: 'Компания абалы: {status}',
     AppText.companyDashboardQuickActionsTitle: 'Тез аракеттер',
     AppText.companyDashboardQuickActionNewJob: 'Жаңы жумуш жарыясы',
-    AppText.companyDashboardPerformanceSummaryTitle: 'Көрсөткүчтөр (акыркы 30 күн)',
+    AppText.companyDashboardPerformanceSummaryTitle:
+        'Көрсөткүчтөр (акыркы 30 күн)',
 
     // Company - Pricing
     AppText.companyPricingTitle: 'Пакеттер жана баалар',
-    AppText.companyPricingSubtitle: 'Компанияңызга ылайыктуу пакетти тандаңыз. Жаңы пакеттер үчүн биз менен байланышыңыз.',
+    AppText.companyPricingSubtitle:
+        'Компанияңызга ылайыктуу пакетти тандаңыз. Жаңы пакеттер үчүн биз менен байланышыңыз.',
     AppText.companyPricingStarterName: 'Баштапкы',
     AppText.companyPricingStarterPrice: '₺1999 / ай',
     AppText.companyPricingStarterDesc: 'Кичи бизнес үчүн ылайыктуу',
@@ -5972,39 +6562,48 @@ const _values = <String, Map<AppText, String>>{
     AppText.companyPricingSelectPackage: 'Пакетти танда',
 
     // Company - Status Check
-    AppText.companyStatusCompanyAccountMissing: 'Компания аккаунту табылган жок.',
+    AppText.companyStatusCompanyAccountMissing:
+        'Компания аккаунту табылган жок.',
     AppText.companyStatusNoRegistrationTitle: 'Компания каттоосу табылган жок',
-    AppText.companyStatusNoRegistrationSubtitle: 'Улантуу үчүн компания каттоосун түзүңүз.',
+    AppText.companyStatusNoRegistrationSubtitle:
+        'Улантуу үчүн компания каттоосун түзүңүз.',
     AppText.companyStatusRegisterCta: 'Компанияны каттоо',
     AppText.companyStatusBannedTitle: 'Аккаунт токтотулду',
-    AppText.companyStatusBannedSubtitle: 'Компания аккаунту эрежелерди бузганы үчүн токтотулду. Колдоо кызматына кайрылыңыз.',
+    AppText.companyStatusBannedSubtitle:
+        'Компания аккаунту эрежелерди бузганы үчүн токтотулду. Колдоо кызматына кайрылыңыз.',
     AppText.companyStatusSupportTeam: 'Колдоо',
     AppText.companyStatusPendingTitle: 'Текшерүүдө',
-    AppText.companyStatusPendingSubtitle: 'Компания аккаунту текшерүүдө. Жакын арада жооп беребиз.',
+    AppText.companyStatusPendingSubtitle:
+        'Компания аккаунту текшерүүдө. Жакын арада жооп беребиз.',
     AppText.companyStatusPendingWhatYouCanDoTitle: 'Эмне кылса болот?',
     AppText.companyStatusPendingTip1: 'Компания профилин толтуруңуз',
     AppText.companyStatusPendingTip2: 'Лого жана капкак сүрөт кошуңуз',
     AppText.companyStatusPendingTip3: 'Байланыш маалыматтарын жаңыртыңыз',
     AppText.companyStatusEditProfile: 'Профилди түзөтүү',
     AppText.companyStatusRejectedTitle: 'Арыз четке кагылды',
-    AppText.companyStatusRejectedSubtitle: 'Тилекке каршы, компания арызыңыз кабыл алынган жок.',
+    AppText.companyStatusRejectedSubtitle:
+        'Тилекке каршы, компания арызыңыз кабыл алынган жок.',
     AppText.companyStatusRejectedReasonTitle: 'Четке кагуу себеби',
     AppText.companyStatusContactSupport: 'Колдоо менен байланыш',
     AppText.companyStatusSubscriptionRequiredTitle: 'Абоненттик керек',
-    AppText.companyStatusSubscriptionRequiredSubtitle: 'Жарыя берүү үчүн пакет тандаңыз.',
+    AppText.companyStatusSubscriptionRequiredSubtitle:
+        'Жарыя берүү үчүн пакет тандаңыз.',
     AppText.companyStatusSubscriptionApprovedTitle: 'Аккаунт бекитилди',
-    AppText.companyStatusSubscriptionApprovedTip: 'Пакет тандап баштасаңыз болот.',
+    AppText.companyStatusSubscriptionApprovedTip:
+        'Пакет тандап баштасаңыз болот.',
     AppText.companyStatusViewPlans: 'Пакеттерди көрүү',
 
     // Company - Registration
-    AppText.companyRegisterLoginRequired: 'Компания каттоо үчүн киришиңиз керек.',
+    AppText.companyRegisterLoginRequired:
+        'Компания каттоо үчүн киришиңиз керек.',
     AppText.companyRegisterTitle: 'Компания каттоо',
     AppText.companyRegisterCompanyNameLabel: 'Компаниянын аталышы',
     AppText.companyRegisterSectorLabel: 'Тармак',
     AppText.companyRegisterTaxNumberLabel: 'Салык номери',
     AppText.companyRegisterPhoneLabel: 'Телефон',
     AppText.companyRegisterCityLabel: 'Шаар',
-    AppText.companyRegisterDuplicateTaxNumber: 'Бул салык номери менен компания бар.',
+    AppText.companyRegisterDuplicateTaxNumber:
+        'Бул салык номери менен компания бар.',
     AppText.companyRegisterSuccess: 'Компания каттоо ийгиликтүү!',
     AppText.companyRegisterSubmit: 'Каттоону бүтүр',
 
@@ -6032,7 +6631,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.deptOther: 'Башка',
 
     // Legal
-    AppText.legalTurkishOnlyNote: 'Бул беттин толук укуктук тексти азырынча түрк тилинде гана жеткиликтүү.',
+    AppText.legalTurkishOnlyNote:
+        'Бул беттин толук укуктук тексти азырынча түрк тилинде гана жеткиликтүү.',
     AppText.legalLastUpdated: 'Акыркы жаңыртуу: {date}',
     AppText.commonUserId: 'Колдонуучу ID',
     AppText.commonEmail: 'Эл. почта',
@@ -6077,7 +6677,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.authAlreadyHaveAccount: 'Аккаунтуң барбы?',
     AppText.authAcceptTermsPrefix: 'Мен кабыл алам ',
     AppText.authAcceptTermsAnd: ' жана ',
-    AppText.authAcceptTermsError: 'Шарттарды жана купуялуулук саясатын кабыл алышың керек.',
+    AppText.authAcceptTermsError:
+        'Шарттарды жана купуялуулук саясатын кабыл алышың керек.',
     AppText.authSelectDepartment: 'Бөлүмүңүздү тандаңыз.',
     AppText.authSelectYear: 'Курсуңузду тандаңыз.',
     AppText.authYearPlus: '5+ (жана жогору)',
@@ -6085,11 +6686,14 @@ const _values = <String, Map<AppText, String>>{
     AppText.authForgotSubtitle:
         'Э-почтаңызга калыбына келтирүү шилтемесин жөнөтөбүз.',
     AppText.authEmailSentTitle: 'Э-почта жөнөтүлдү!',
-    AppText.authResetLinkSentTo: 'Калыбына келтирүү шилтемеси жөнөтүлдү:\n{email}',
+    AppText.authResetLinkSentTo:
+        'Калыбына келтирүү шилтемеси жөнөтүлдү:\n{email}',
     AppText.authCheckSpam: 'Эгер көрүнбөсө, спам/керексиз папканы текшериңиз.',
-    AppText.authRequestAgainIn: '{seconds} секунддан кийин кайра сурансаңыз болот.',
+    AppText.authRequestAgainIn:
+        '{seconds} секунддан кийин кайра сурансаңыз болот.',
     AppText.authSendResetLink: 'Калыбына келтирүү шилтемесин жөнөт',
-    AppText.authTooManyRequests: 'Өтө көп сурам. Бир мүнөт күтүп кайра аракет кылыңыз.',
+    AppText.authTooManyRequests:
+        'Өтө көп сурам. Бир мүнөт күтүп кайра аракет кылыңыз.',
     AppText.authEmailRequired: 'Э-почта талап кылынат.',
     AppText.authWaitSeconds: 'Кайра сурануудан мурда {seconds} секунд күтүңүз.',
     AppText.authResetTitle: 'Сырсөздү калыбына келтирүү',
@@ -6111,11 +6715,13 @@ const _values = <String, Map<AppText, String>>{
         'Аккаунтту активдештирүү үчүн э-почтаңызды тастыктаңыз.',
     AppText.authVerificationSentTo: 'Тастыктоо шилтемеси жөнөтүлдү: {email}',
     AppText.authStepCheckInboxTitle: 'Кат кутуңузду текшериңиз',
-    AppText.authStepCheckInboxSubtitle: 'Тастыктоо каты бир нече мүнөттө келет.',
+    AppText.authStepCheckInboxSubtitle:
+        'Тастыктоо каты бир нече мүнөттө келет.',
     AppText.authStepClickLinkTitle: 'Тастыктоо шилтемесин бас',
     AppText.authStepClickLinkSubtitle: 'Катты ачып, аккаунтуңду тастыкта.',
     AppText.authStepReturnTitle: 'Колдонмого кайт',
-    AppText.authStepReturnSubtitle: 'Тастыктагандан кийин бардык функциялар ачылат.',
+    AppText.authStepReturnSubtitle:
+        'Тастыктагандан кийин бардык функциялар ачылат.',
     AppText.authIHaveVerified: 'Э-почтамды тастыктадым',
     AppText.authResendEmail: 'Катты кайра жөнөт',
     AppText.authDidNotReceive:
@@ -6133,7 +6739,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.statusPending: 'Күтүүдө',
     AppText.resetFilters: 'Тазалоо',
     AppText.internshipsTitle: 'Стажировкалар',
-    AppText.internshipsSubtitle: 'Алдыңкы компанияларда стажировка өтүп тажрыйба топтоңуз.',
+    AppText.internshipsSubtitle:
+        'Алдыңкы компанияларда стажировка өтүп тажрыйба топтоңуз.',
     AppText.internshipsLoadFailed: 'Стажировкаларды жүктөө мүмкүн болбоду',
     AppText.internshipsSearchHint: 'Издөө: аталыш, компания, сүрөттөмө...',
     AppText.internshipsLocationAll: 'Бардык жайгашкан жерлер',
@@ -6149,21 +6756,26 @@ const _values = <String, Map<AppText, String>>{
     AppText.internshipsPointsEarn: 'Жыйналуучу упай',
     AppText.internshipsNoDepartmentInfo:
         'Профилиңизде бөлүм маалыматы жок. Стажировкалар бөлүм боюнча көрсөтүлөт. Профилиңизге бөлүмдү кошуңуз.',
-    AppText.internshipsNoResults: 'Көрсөткөн критерийлерге ылайык стажировка табылган жок.',
+    AppText.internshipsNoResults:
+        'Көрсөткөн критерийлерге ылайык стажировка табылган жок.',
     AppText.internshipsFavorite: 'Сүйүктүү',
     AppText.internshipsNotSpecified: 'Көрсөтүлгөн эмес',
 
     // Internship Detail
     AppText.internshipDetailTitle: 'Стажировка тууралуу',
-    AppText.internshipDetailLoadFailed: 'Стажировка маалыматы жүктөлгөн жок: {error}',
+    AppText.internshipDetailLoadFailed:
+        'Стажировка маалыматы жүктөлгөн жок: {error}',
     AppText.internshipDetailApplySuccess: 'Өтүнмө жөнөтүлдү.',
     AppText.internshipDetailApplyFailed: 'Өтүнмө жөнөтүлгөн жок: {error}',
     AppText.internshipDetailApplyTitle: 'Өтүнмө',
-    AppText.internshipDetailAlreadyApplied: 'Бул стажировкага буга чейин өтүнмө бергенсиз.',
-    AppText.internshipDetailApplyHint: 'Улантуу үчүн кеминде {min} белги жазыңыз.',
+    AppText.internshipDetailAlreadyApplied:
+        'Бул стажировкага буга чейин өтүнмө бергенсиз.',
+    AppText.internshipDetailApplyHint:
+        'Улантуу үчүн кеминде {min} белги жазыңыз.',
     AppText.internshipDetailApplyButton: 'Өтүнмө берүү',
     AppText.internshipDetailMotivationTitle: 'Мотивациялык кат',
-    AppText.internshipDetailMotivationHint: 'Эмне үчүн бул стажировканы каалаарыңызды жазыңыз...',
+    AppText.internshipDetailMotivationHint:
+        'Эмне үчүн бул стажировканы каалаарыңызды жазыңыз...',
     AppText.internshipDetailCertificate: 'Сертификат',
     AppText.internshipDetailEmploymentChance: 'Ишке алуу мүмкүнчүлүгү',
     AppText.internshipDetailAbout: 'Тууралуу',
@@ -6189,7 +6801,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.chatUserNotFoundTitle: 'Колдонуучу табылган жок',
     AppText.chatUserNotFoundSubtitle: 'Кайра кирип көрүңүз.',
     AppText.chatHeaderTitle: 'Карьера ассистенти',
-    AppText.chatHeaderSubtitle: 'Стажировка, CV жана маектешүү боюнча тез жардам',
+    AppText.chatHeaderSubtitle:
+        'Стажировка, CV жана маектешүү боюнча тез жардам',
     AppText.chatNewChat: 'Жаңы чат',
     AppText.chatTyping: 'Жазууда',
     AppText.chatInputHint: 'Билдирүү жазыңыз...',
@@ -6202,7 +6815,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.chatDefaultSuggestion4: 'Бөлүм тандоо боюнча сунуштар',
     AppText.chatHistoryLoadFailed: 'Тарых жүктөлгөн жок: {error}',
     AppText.chatReplyFailed: 'Жооп алынган жок: {error}',
-    AppText.chatBotUnavailable: 'Кечиресиз, азыр жооп бере албайм. Кайра аракет кылыңыз.',
+    AppText.chatBotUnavailable:
+        'Кечиресиз, азыр жооп бере албайм. Кайра аракет кылыңыз.',
 
     // Common
     AppText.commonCancel: 'Баш тартуу',
@@ -6250,28 +6864,37 @@ const _values = <String, Map<AppText, String>>{
     AppText.settingsUpdatePassword: 'Сырсөздү жаңыртуу',
     AppText.settingsNotificationPreferencesTitle: 'Билдирүү жөндөөлөрү',
     AppText.settingsPrefEmailTitle: 'E-mail билдирүүлөрү',
-    AppText.settingsPrefEmailSubtitle: 'Маанилүү жаңылыктарды e-mail аркылуу алуу',
+    AppText.settingsPrefEmailSubtitle:
+        'Маанилүү жаңылыктарды e-mail аркылуу алуу',
     AppText.settingsPrefNewCoursesTitle: 'Жаңы курстар',
-    AppText.settingsPrefNewCoursesSubtitle: 'Жаңы курс кошулганда кабардар болуу',
+    AppText.settingsPrefNewCoursesSubtitle:
+        'Жаңы курс кошулганда кабардар болуу',
     AppText.settingsPrefJobAlertsTitle: 'Жумуш жарыялары боюнча билдирүүлөр',
-    AppText.settingsPrefJobAlertsSubtitle: 'Профилиңизге ылайык жумуштар жөнүндө билдирүү алуу',
+    AppText.settingsPrefJobAlertsSubtitle:
+        'Профилиңизге ылайык жумуштар жөнүндө билдирүү алуу',
     AppText.settingsPrefNewsletterTitle: 'Апталык бюллетень',
-    AppText.settingsPrefNewsletterSubtitle: 'Апталык жыйынтык жана сунуштарды алуу',
+    AppText.settingsPrefNewsletterSubtitle:
+        'Апталык жыйынтык жана сунуштарды алуу',
     AppText.settingsPrivacySecurityTitle: 'Купуялык жана коопсуздук',
     AppText.settingsTwoFactorTitle: 'Эки факторлуу текшерүү',
-    AppText.settingsTwoFactorSubtitle: 'Аккаунтуңузду кошумча коопсуздук менен коргоңуз',
+    AppText.settingsTwoFactorSubtitle:
+        'Аккаунтуңузду кошумча коопсуздук менен коргоңуз',
     AppText.settingsEnableArrow: 'Иштетүү →',
     AppText.settingsDangerZoneTitle: 'Кооптуу бөлүк',
     AppText.settingsFreezeAccountTitle: 'Аккаунтту убактылуу тоңдуруу',
-    AppText.settingsFreezeAccountSubtitle: 'Аккаунт убактылуу жеткиликсиз болот',
+    AppText.settingsFreezeAccountSubtitle:
+        'Аккаунт убактылуу жеткиликсиз болот',
     AppText.settingsFreezeAccountButton: 'Тоңдуруу',
     AppText.settingsDeleteAccountTitle: 'Аккаунтту биротоло өчүрүү',
-    AppText.settingsDeleteAccountSubtitle: 'Бул аракетти артка кайтарууга болбойт!',
-    AppText.settingsDeleteAccountWarning: 'Бул аракетти артка кайтарууга болбойт! Аккаунтуңузду өчүрсөңүз:',
+    AppText.settingsDeleteAccountSubtitle:
+        'Бул аракетти артка кайтарууга болбойт!',
+    AppText.settingsDeleteAccountWarning:
+        'Бул аракетти артка кайтарууга болбойт! Аккаунтуңузду өчүрсөңүз:',
     AppText.settingsDeleteAccountConsequences:
         '• Бардык жеке маалыматтарыңыз өчүрүлөт\n• Курстарга жазылууларыңыз жокко чыгарылат\n• Арыздарыңыз өчүрүлөт\n• Топтогон упайларыңыз жоголот\n• Бул e-mail менен кайра каттала албайсыз',
     AppText.settingsDeleteAccountConfirmPhrase: 'АККАУНТТУ ӨЧҮР',
-    AppText.settingsDeleteAccountTypeToConfirm: 'Ырастоо үчүн {phrase} жазыңыз:',
+    AppText.settingsDeleteAccountTypeToConfirm:
+        'Ырастоо үчүн {phrase} жазыңыз:',
     AppText.settingsDeleteAccountButton: 'Аккаунтту өчүр',
     AppText.settingsDeleteAccountFailed: 'Аккаунт өчүрүүдө ката кетти: {error}',
     AppText.settingsProfileVisibilityTitle: 'Профиль көрүнүктүүлүгү',
@@ -6280,8 +6903,10 @@ const _values = <String, Map<AppText, String>>{
     AppText.settingsVisibilityHidden: 'Жашыруун',
 
     // Favorites
-    AppText.favoritesLoginRequired: 'Тандалгандарды көрүү үчүн киришиңиз керек.',
-    AppText.favoritesSubtitle: 'Сизге жаккан мазмунду бул жерден байкай аласыз.',
+    AppText.favoritesLoginRequired:
+        'Тандалгандарды көрүү үчүн киришиңиз керек.',
+    AppText.favoritesSubtitle:
+        'Сизге жаккан мазмунду бул жерден байкай аласыз.',
     AppText.favoritesLoadFailed: 'Тандалгандар жүктөлгөн жок: {error}',
     AppText.favoritesRemoved: 'Тандалгандардан алынды',
     AppText.favoritesEmptyTitle: 'Азырынча тандалганыңыз жок.',
@@ -6300,9 +6925,11 @@ const _values = <String, Map<AppText, String>>{
     AppText.profileBadgesTitle: 'Менин төш белгилерим',
     AppText.profileNoBadges: 'Азырынча төш белгисиңиз жок.',
     AppText.profileCompletedCoursesTitle: 'Аякталган курстар',
-    AppText.profileCompletedCoursesTitleWithCount: 'Аякталган курстар ({count})',
+    AppText.profileCompletedCoursesTitleWithCount:
+        'Аякталган курстар ({count})',
     AppText.profileNoCompletedCoursesTitle: 'Азырынча аяктаган курсуңуз жок.',
-    AppText.profileNoCompletedCoursesSubtitle: 'Курстарды аяктаган сайын бул жерде көрүнөт!',
+    AppText.profileNoCompletedCoursesSubtitle:
+        'Курстарды аяктаган сайын бул жерде көрүнөт!',
     AppText.profileCourseCompleted: 'Аякталды',
     AppText.profileCourseInfoNotFound: 'Курс маалыматы табылган жок.',
     AppText.profileCompletionDescription: 'Профилиңиз толукталды!',
@@ -6334,12 +6961,14 @@ const _values = <String, Map<AppText, String>>{
     AppText.courseDetailLoadFailedTitle: 'Курс жүктөлгөн жок',
 
     // Notifications
-    AppText.notificationsLoginRequired: 'Билдирүүлөрдү көрүү үчүн киришиңиз керек.',
+    AppText.notificationsLoginRequired:
+        'Билдирүүлөрдү көрүү үчүн киришиңиз керек.',
     AppText.notificationsMarkAllRead: 'Баарын окулган деп белгилөө',
     AppText.notificationsUnreadCount: '{count} окулбаган билдирүү',
     AppText.notificationsNewSnack: 'Жаңы билдирүү!',
     AppText.notificationsLoadFailed: 'Билдирүүлөр жүктөлгөн жок: {error}',
-    AppText.notificationsAllMarkedRead: 'Бардык билдирүүлөр окулган деп белгиленди',
+    AppText.notificationsAllMarkedRead:
+        'Бардык билдирүүлөр окулган деп белгиленди',
     AppText.notificationsDeleted: 'Билдирүү өчүрүлдү',
     AppText.notificationsDeleteFailed: 'Өчүрүү ишке ашкан жок: {error}',
     AppText.notificationsTabAll: 'Баары ({count})',
@@ -6354,7 +6983,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.dashboardWeeklyStreakBonus: '7 күндүк серия бүткөрүлдү! +15 упай',
     AppText.dashboardLoadFailed: 'Дашборд жүктөлгөн жок',
     AppText.dashboardWelcome: 'Кош келиңиз, {name}! 👋',
-    AppText.dashboardWelcomeSubtitle: 'Бүгүн карьераңыз үчүн жаңы мүмкүнчүлүктөр күтүп турат.',
+    AppText.dashboardWelcomeSubtitle:
+        'Бүгүн карьераңыз үчүн жаңы мүмкүнчүлүктөр күтүп турат.',
     AppText.dashboardTotalPoints: 'Жалпы упай',
     AppText.dashboardCompletedCourses: 'Бүттүрүлгөн курс',
     AppText.dashboardActiveApplications: 'Активдүү арыздар',
@@ -6368,7 +6998,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.dashboardMetricCoursesCompleted: 'Курс аяктоо',
     AppText.dashboardMetricNextTarget: 'Кийинки максат',
     AppText.dashboardAssistantTitle: 'Карьера жардамчысы',
-    AppText.dashboardAssistantSubtitle: 'CV, стаж жана маектешүү боюнча тез жардам.',
+    AppText.dashboardAssistantSubtitle:
+        'CV, стаж жана маектешүү боюнча тез жардам.',
     AppText.dashboardAssistantChipCv: 'CV ыңгайлаштыруу',
     AppText.dashboardAssistantChipInternships: 'Стажга арыз берүү',
     AppText.dashboardAssistantChipInterview: 'Маекке даярдык',
@@ -6398,7 +7029,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.adminDashboardSubtitle: 'Кош келиңиз, {name}',
     AppText.adminRoleSuper: 'Супер админ',
     AppText.adminRoleAdmin: 'Админ',
-    AppText.adminDashboardLoadFailedTitle: 'Башкаруу тактасын жүктөө мүмкүн болбоду',
+    AppText.adminDashboardLoadFailedTitle:
+        'Башкаруу тактасын жүктөө мүмкүн болбоду',
     AppText.adminStatTotalUsersTitle: 'Жалпы колдонуучу',
     AppText.adminStatTotalUsersSubtitleToday: '+{count} бүгүн',
     AppText.adminStatCompaniesTitle: 'Компаниялар',
@@ -6444,9 +7076,11 @@ const _values = <String, Map<AppText, String>>{
     AppText.adminCompanyDetailsTitle: 'Компания маалыматы',
     AppText.adminCompanyDescriptionLabel: 'Сүрөттөмө',
     AppText.adminCompanyRejectReasonTitle: 'Четке кагуу себеби',
-    AppText.adminCompanyRejectReasonRequired: 'Четке кагуу себеби (четке кагуу үчүн милдеттүү)',
+    AppText.adminCompanyRejectReasonRequired:
+        'Четке кагуу себеби (четке кагуу үчүн милдеттүү)',
     AppText.adminCompanyRejectReasonLabel: 'Четке кагуу себеби',
-    AppText.adminCompanyRejectReasonHint: 'мис: документ жетишпейт / маалымат туура эмес',
+    AppText.adminCompanyRejectReasonHint:
+        'мис: документ жетишпейт / маалымат туура эмес',
     AppText.adminCompanyApprove: 'Бекитүү',
     AppText.adminCompanyReject: 'Четке кагуу',
     AppText.adminCompanyBan: 'Компанияны бөгөттөө',
@@ -6513,11 +7147,16 @@ const _values = <String, Map<AppText, String>>{
     AppText.dbDebugSampleRecordsTitle: 'Мисал жазуулар',
     AppText.dbDebugError: 'Ката: {error}',
     AppText.dbDebugTipsTitle: 'Текшерүү керек',
-    AppText.dbDebugTipProfileDepartment: 'profiles таблицасында department талаасы толтурулганбы?',
-    AppText.dbDebugTipTablesHaveDepartment: 'courses, internships жана jobs таблицаларында department колонкасы барбы?',
-    AppText.dbDebugTipTablesHaveData: 'Таблицаларда жазуулар барбы? Болбосо, мисал маалымат кошуңуз.',
-    AppText.dbDebugTipRlsEnabled: 'RLS (Row Level Security) саясаттары активдүүбү?',
-    AppText.dbDebugTipDepartmentHasMatches: 'Колдонуучунун бөлүмүнө ылайык жазуулар барбы?',
+    AppText.dbDebugTipProfileDepartment:
+        'profiles таблицасында department талаасы толтурулганбы?',
+    AppText.dbDebugTipTablesHaveDepartment:
+        'courses, internships жана jobs таблицаларында department колонкасы барбы?',
+    AppText.dbDebugTipTablesHaveData:
+        'Таблицаларда жазуулар барбы? Болбосо, мисал маалымат кошуңуз.',
+    AppText.dbDebugTipRlsEnabled:
+        'RLS (Row Level Security) саясаттары активдүүбү?',
+    AppText.dbDebugTipDepartmentHasMatches:
+        'Колдонуучунун бөлүмүнө ылайык жазуулар барбы?',
     AppText.commonComingSoonTitle: 'Жакында',
     AppText.commonComingSoonSubtitle: 'Бул баракча жакында жеткиликтүү болот',
   },
@@ -6551,12 +7190,15 @@ const _values = <String, Map<AppText, String>>{
     AppText.close: 'Жабу',
     AppText.menu: 'Мәзір',
     AppText.pointsSystem: 'Ұпай жүйесі',
-    AppText.pointsSystemGuestSubtitle: 'Курстарға жазылып, прогресс жасап, белгілер алып, сыйлықтарды ашыңыз.',
+    AppText.pointsSystemGuestSubtitle:
+        'Курстарға жазылып, прогресс жасап, белгілер алып, сыйлықтарды ашыңыз.',
     AppText.pointsSystemGuestBullet1: 'Курсқа жазылу → ұпай',
     AppText.pointsSystemGuestBullet2: 'Курсты аяқтау → қосымша ұпай + белгі',
     AppText.pointsSystemGuestBullet3: 'Ұпаймен сыйлықтарды ашу',
-    AppText.pointsSystemGuestSignInHint: 'Кіргеннен кейін ұпай тарихын және сыйлықтарды осы жерден көресіз.',
-    AppText.pointsSystemAuthedSubtitle: 'Ұпайларыңызды бақылап, сыйлықтарға ұмтылыңыз.',
+    AppText.pointsSystemGuestSignInHint:
+        'Кіргеннен кейін ұпай тарихын және сыйлықтарды осы жерден көресіз.',
+    AppText.pointsSystemAuthedSubtitle:
+        'Ұпайларыңызды бақылап, сыйлықтарға ұмтылыңыз.',
     AppText.pointsSystemTabHistory: 'Тарих',
     AppText.pointsSystemTabRewards: 'Сыйлықтар',
     AppText.pointsSystemTabBadges: 'Белгілер',
@@ -6566,17 +7208,21 @@ const _values = <String, Map<AppText, String>>{
     AppText.pointsSystemBadgesLoadFailed: 'Белгілер жүктелмеді: {error}',
     AppText.pointsSystemHistoryEmpty: 'Әзірге ұпай қозғалысы жоқ.',
     AppText.pointsSystemRewardsEmpty: 'Сыйлық табылмады.',
-    AppText.pointsSystemBadgesEmpty: 'Әзірге белгі жоқ. Курсты аяқтасаңыз, белгі келеді.',
+    AppText.pointsSystemBadgesEmpty:
+        'Әзірге белгі жоқ. Курсты аяқтасаңыз, белгі келеді.',
     AppText.pointsSystemNextReward: 'Келесі сыйлық: {title} ({points} ұпай)',
-    AppText.pointsSystemAllRewardsUnlocked: 'Барлық сыйлықтар ашылған болуы мүмкін.',
+    AppText.pointsSystemAllRewardsUnlocked:
+        'Барлық сыйлықтар ашылған болуы мүмкін.',
     AppText.leaderboardLoadFailedTitle: 'Рейтинг жүктелмеді',
-    AppText.leaderboardSubtitle: 'Ең белсенді студенттердің қатарына қосыл. Ұпай жина, рейтингте көтеріл, сыйлықтарға жақында.',
+    AppText.leaderboardSubtitle:
+        'Ең белсенді студенттердің қатарына қосыл. Ұпай жина, рейтингте көтеріл, сыйлықтарға жақында.',
     AppText.leaderboardTabOverall: 'Жалпы',
     AppText.leaderboardTabDepartment: 'Бөлім',
     AppText.leaderboardEmpty: 'Әзірге рейтинг деректері жоқ.',
     AppText.leaderboardDepartmentLabel: 'Бөлім: {dept}',
     AppText.leaderboardNoDepartment: 'Профиліңізде бөлім көрсетілмеген.',
-    AppText.leaderboardNoDepartmentData: 'Бұл бөлім үшін рейтинг деректері жоқ.',
+    AppText.leaderboardNoDepartmentData:
+        'Бұл бөлім үшін рейтинг деректері жоқ.',
     AppText.leaderboardHeroMyPoints: 'Сіздің ұпайыңыз',
     AppText.leaderboardHeroOverallRank: 'Жалпы рейтинг',
     AppText.leaderboardHeroDepartmentRank: 'Бөлім рейтингі',
@@ -6591,7 +7237,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.applicationsLoginRequired: 'Өтінімдеріңізді көру үшін кіріңіз.',
     AppText.applicationsSearchHint: 'Өтінім іздеу...',
     AppText.applicationsLoadFailed: 'Өтінімдер жүктелмеді: {error}',
-    AppText.applicationsSubtitle: 'Барлық өтінімдеріңіз бен тіркелімдеріңізді осы жерден қадағалаңыз.',
+    AppText.applicationsSubtitle:
+        'Барлық өтінімдеріңіз бен тіркелімдеріңізді осы жерден қадағалаңыз.',
     AppText.applicationsEmpty: 'Әзірге өтінімдеріңіз жоқ.',
     AppText.applicationsKindJob: 'Жұмыс',
     AppText.applicationsKindInternship: 'Тағылымдама',
@@ -6604,7 +7251,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.retry: 'Қайта көру',
     AppText.commonPleaseSignIn: 'Кіруіңізді өтінеміз.',
     AppText.jobsTitle: 'Вакансиялар',
-    AppText.jobsSubtitle: 'Ізде, сүзгіле, таңдаулыға қос және өтінім бер. React-тағыдай ағым.',
+    AppText.jobsSubtitle:
+        'Ізде, сүзгіле, таңдаулыға қос және өтінім бер. React-тағыдай ағым.',
     AppText.jobsSearchHint: 'Лауазым, компания, бөлім, орын...',
 
     // Job Detail
@@ -6615,7 +7263,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.jobDetailApply: 'Өтініш беру',
     AppText.jobDetailAppliedStatus: 'Өтініш күйі: {status}',
     AppText.jobDetailApplySheetTitle: 'Өтініш',
-    AppText.jobDetailApplySheetSubtitle: 'Қысқа хабарлама қосыңыз (қалауыңызша).',
+    AppText.jobDetailApplySheetSubtitle:
+        'Қысқа хабарлама қосыңыз (қалауыңызша).',
     AppText.jobDetailApplySheetHint: 'Компанияға хабарлама жазыңыз...',
     AppText.jobDetailApplySuccess: 'Өтініш жіберілді.',
     AppText.jobDetailApplyFailed: 'Өтініш жіберілмеді: {error}',
@@ -6647,7 +7296,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.footerEmailHint: 'Электрондық поштаңыз',
     AppText.footerSubscribeSuccess: 'Хабарландыруға сәтті тіркелдіңіз.',
     AppText.footerSubscribeInvalid: 'Дұрыс e-mail енгізіңіз.',
-    AppText.footerCopyright: '© {year} Студенттік платформа. Барлық құқықтар қорғалған.',
+    AppText.footerCopyright:
+        '© {year} Студенттік платформа. Барлық құқықтар қорғалған.',
     AppText.linkInternshipListings: 'Тағылымдама хабарландырулары',
     AppText.linkLeaderboard: 'Лидерлер кестесі',
     AppText.linkHowItWorks: 'Қалай жұмыс істейді?',
@@ -6656,32 +7306,38 @@ const _values = <String, Map<AppText, String>>{
     AppText.linkPrivacy: 'Құпиялылық саясаты',
     AppText.linkTerms: 'Қолдану шарттары',
     AppText.linkComingSoon: '{name} сілтемесі жақында.',
-    AppText.homeHeroTitle: 'Университет өмірін күшейт,\nмансабыңа тез бағыт бер!',
+    AppText.homeHeroTitle:
+        'Университет өмірін күшейт,\nмансабыңа тез бағыт бер!',
     AppText.homeHeroSubtitle:
         'Салаңа сай курстар, тағылымдамалар және вакансиялармен болашағыңа сенімді қадам жаса.',
     AppText.homeCard1Title: 'Салаға сай контент',
     AppText.homeCard1Desc:
         'Бөліміңе сай курстар, тағылымдамалар және вакансиялар арқылы мақсатты оқу.',
     AppText.homeCard2Title: 'Мансабыңды бағытта',
-    AppText.homeCard2Desc: 'Жекелендірілген мансап кеңесі мен мүмкіндіктер арқылы қолдау ал.',
+    AppText.homeCard2Desc:
+        'Жекелендірілген мансап кеңесі мен мүмкіндіктер арқылы қолдау ал.',
     AppText.homeCard3Title: 'Оңай және жылдам',
     AppText.homeCard3Desc: 'Заманауи, ыңғайлы интерфейспен уақыт үнемде.',
     AppText.homeStudentBenefitsTitle: 'Студенттерге арналған артықшылықтар',
     AppText.homeStudentCard1Title: 'Мақсатқа бағытталған контент',
-    AppText.homeStudentCard1Desc: 'Салаңа сай мүмкіндіктермен мақсатқа тез жет.',
+    AppText.homeStudentCard1Desc:
+        'Салаңа сай мүмкіндіктермен мақсатқа тез жет.',
     AppText.homeStudentCard2Title: 'Бәсекелестік артықшылық',
     AppText.homeStudentCard2Desc:
         'Түйіндемеңді күшейтетін мүмкіндіктерге басқалардан бұрын жет.',
     AppText.homeStudentCard3Title: 'Даму бақылауы',
-    AppText.homeStudentCard3Desc: 'Прогресіңді бақылап, олқылықтарды уақытында байқап отыр.',
+    AppText.homeStudentCard3Desc:
+        'Прогресіңді бақылап, олқылықтарды уақытында байқап отыр.',
     AppText.homeCompanyBenefitsTitle: 'Компанияларға арналған артықшылықтар',
     AppText.homeCompanyCard1Title: 'Жас таланттарға қолжетімділік',
     AppText.homeCompanyCard1Desc:
         'Мотивациясы жоғары, салаңа қызығатын студенттерге қол жеткізіңіз.',
     AppText.homeCompanyCard2Title: 'Ынтымақтастық мүмкіндіктері',
-    AppText.homeCompanyCard2Desc: 'Жобаларыңызда университет студенттерімен бірге жұмыс істеңіз.',
+    AppText.homeCompanyCard2Desc:
+        'Жобаларыңызда университет студенттерімен бірге жұмыс істеңіз.',
     AppText.homeCompanyCard3Title: 'Дерекке негізделген таңдау',
-    AppText.homeCompanyCard3Desc: 'Профиль деректері арқылы дұрыс адамды оңай анықтаңыз.',
+    AppText.homeCompanyCard3Desc:
+        'Профиль деректері арқылы дұрыс адамды оңай анықтаңыз.',
     AppText.howItWorksTitle: 'Қалай жұмыс істейді?',
     AppText.howItWorksSubtitle:
         'Платформамыз төрт негізгі кезеңнен тұрады. Әр қадамда жаныңдамыз!',
@@ -6708,9 +7364,11 @@ const _values = <String, Map<AppText, String>>{
     AppText.howItWorksHeroBullet3: 'Өтінім беру процесі',
     AppText.howItWorksHeroBullet4: 'Жылдам бастау кеңестері',
     AppText.howItWorksStep5Title: 'Сыйлық алу',
-    AppText.howItWorksStep5Desc: 'Ұпайларыңызды керемет сыйлықтарға айырбастаңыз.',
+    AppText.howItWorksStep5Desc:
+        'Ұпайларыңызды керемет сыйлықтарға айырбастаңыз.',
     AppText.howItWorksPageStepByStepTitle: 'Қадам-қадам',
-    AppText.howItWorksPageStepByStepSubtitle: 'Мансап жолын 5 қарапайым қадаммен бастаңыз.',
+    AppText.howItWorksPageStepByStepSubtitle:
+        'Мансап жолын 5 қарапайым қадаммен бастаңыз.',
     AppText.howItWorksDetailedStepsTitle: 'Толық қадамдар',
     AppText.howItWorksDetail1Title: 'Тіркелу және профиль',
     AppText.howItWorksDetail1Desc:
@@ -6746,7 +7404,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.howItWorksRewardInternshipGuarantee: 'Тағылымдама кепілдігі',
     AppText.howItWorksRewardFromPoints: '{points} ұпайдан басталатын сыйлықтар',
     AppText.howItWorksCtaTitle: 'Мансап жолыңызды бүгін бастаңыз',
-    AppText.howItWorksCtaSubtitle: 'Тегін тіркеліңіз, өтінім беріңіз, ұпай жинаңыз.',
+    AppText.howItWorksCtaSubtitle:
+        'Тегін тіркеліңіз, өтінім беріңіз, ұпай жинаңыз.',
     AppText.howItWorksCtaPrimary: 'Тіркелу',
     AppText.howItWorksCtaSecondary: 'Жұмыстарды көру',
 
@@ -6786,21 +7445,27 @@ const _values = <String, Map<AppText, String>>{
     AppText.aboutRoleTechnology: 'Технология',
     AppText.aboutWhyTitle: 'Неге біз?',
     AppText.aboutWhyNetworkTitle: 'Кең желі',
-    AppText.aboutWhyNetworkDesc: '500+ серіктес компания және мыңдаған белсенді студенттерден тұратын күшті желі.',
+    AppText.aboutWhyNetworkDesc:
+        '500+ серіктес компания және мыңдаған белсенді студенттерден тұратын күшті желі.',
     AppText.aboutWhyRewardsTitle: 'Сыйлық жүйесі',
-    AppText.aboutWhyRewardsDesc: 'Белсенділігіңіз үшін ұпай жинап, оны нақты сыйлықтарға айырбастаңыз.',
+    AppText.aboutWhyRewardsDesc:
+        'Белсенділігіңіз үшін ұпай жинап, оны нақты сыйлықтарға айырбастаңыз.',
     AppText.aboutWhyCareerTitle: 'Мансап дамуы',
-    AppText.aboutWhyCareerDesc: 'Онлайн курстар, менторлық бағдарламалар және іс-шаралармен қолдаймыз.',
+    AppText.aboutWhyCareerDesc:
+        'Онлайн курстар, менторлық бағдарламалар және іс-шаралармен қолдаймыз.',
     AppText.aboutWhyStudentFriendlyTitle: 'Студентке ыңғайлы',
-    AppText.aboutWhyStudentFriendlyDesc: 'Толық тегін платформа және студент қажеттілігіне сай интерфейс/мүмкіндіктер.',
+    AppText.aboutWhyStudentFriendlyDesc:
+        'Толық тегін платформа және студент қажеттілігіне сай интерфейс/мүмкіндіктер.',
 
     // Static - Contact
     AppText.contactHeroTitle: 'Байланыс',
-    AppText.contactHeroSubtitle: 'Сұрақтар, ұсыныстар немесе әріптестік үшін бізбен байланысыңыз.',
+    AppText.contactHeroSubtitle:
+        'Сұрақтар, ұсыныстар немесе әріптестік үшін бізбен байланысыңыз.',
     AppText.contactEmailTitle: 'Эл. пошта',
     AppText.contactPhoneTitle: 'Телефон',
     AppText.contactAddressTitle: 'Мекенжай',
-    AppText.contactAddressBody: 'Teknokent, Innovation St. No:1234\nBeşiktaş, Istanbul',
+    AppText.contactAddressBody:
+        'Teknokent, Innovation St. No:1234\nBeşiktaş, Istanbul',
     AppText.contactHoursTitle: 'Жұмыс уақыты',
     AppText.contactHoursBody: 'Дс - Жм: 09:00 - 18:00\nСн: 10:00 - 14:00',
     AppText.contactFormTitle: 'Бізге жазыңыз',
@@ -6817,19 +7482,23 @@ const _values = <String, Map<AppText, String>>{
     AppText.contactSubjectPartnership: 'Әріптестік',
     AppText.contactSubjectFeedback: 'Ұсыныс / шағым',
     AppText.contactSubjectOther: 'Басқа',
-    AppText.contactSendSuccess: 'Хабарлама жіберілді! Жақын арада жауап береміз.',
+    AppText.contactSendSuccess:
+        'Хабарлама жіберілді! Жақын арада жауап береміз.',
     AppText.contactFillRequired: 'Барлық міндетті өрістерді толтырыңыз.',
     AppText.contactFaqTitle: 'Жиі қойылатын сұрақтар',
     AppText.contactFaqQ1: 'Платформа ақылы ма?',
     AppText.contactFaqA1: 'Жоқ, платформа студенттер үшін толық тегін.',
     AppText.contactFaqQ2: 'Қай университет студенттері қатыса алады?',
-    AppText.contactFaqA2: 'Түркиядағы барлық университет студенттері тіркеле алады.',
+    AppText.contactFaqA2:
+        'Түркиядағы барлық университет студенттері тіркеле алады.',
     AppText.contactFaqQ3: 'Жұмыс беруші ретінде қалай жариялаймын?',
-    AppText.contactFaqA3: 'Әріптестік үшін хабарласыңыз немесе корпоративтік аккаунтқа өтінім беріңіз.',
+    AppText.contactFaqA3:
+        'Әріптестік үшін хабарласыңыз немесе корпоративтік аккаунтқа өтінім беріңіз.',
     AppText.contactMapPlaceholder: 'Карта',
 
     // Company - General
-    AppText.companyPanelLoginRequired: 'Компания панелін көру үшін жүйеге кіру керек.',
+    AppText.companyPanelLoginRequired:
+        'Компания панелін көру үшін жүйеге кіру керек.',
 
     // Company - Jobs
     AppText.companyJobsTitle: 'Менің жұмыс хабарландыруларым',
@@ -6839,7 +7508,8 @@ const _values = <String, Map<AppText, String>>{
     // Company - Internships
     AppText.companyInternshipsTitle: 'Менің тағылымдамаларым',
     AppText.companyInternshipsSearchHint: 'Тағылымдамаларды іздеу...',
-    AppText.companyInternshipsEmptyNoListings: 'Әзірге тағылымдама хабарландыруы жоқ.',
+    AppText.companyInternshipsEmptyNoListings:
+        'Әзірге тағылымдама хабарландыруы жоқ.',
 
     // Company - Job Applications
     AppText.companyJobApplicationsTitle: 'Өтінімдер',
@@ -6847,11 +7517,13 @@ const _values = <String, Map<AppText, String>>{
 
     // Company - Internship Applications
     AppText.companyInternshipApplicationsTitle: 'Өтінімдер',
-    AppText.companyInternshipApplicationsTitleWithInternship: 'Өтінімдер • {title}',
+    AppText.companyInternshipApplicationsTitleWithInternship:
+        'Өтінімдер • {title}',
 
     // Company - Reports
     AppText.companyReportsTitle: 'Есептер',
-    AppText.companyReportsLoginRequired: 'Компания есептерін көру үшін жүйеге кіру керек.',
+    AppText.companyReportsLoginRequired:
+        'Компания есептерін көру үшін жүйеге кіру керек.',
     AppText.companyReportsCsvDownloaded: 'CSV жүктелді.',
     AppText.companyReportsExportCsv: 'CSV жүктеу',
     AppText.companyReportsRangeToday: 'Бүгін',
@@ -6871,25 +7543,30 @@ const _values = <String, Map<AppText, String>>{
     AppText.companyReportsMetricAccepted: 'Қабылданған',
     AppText.companyReportsMetricRejected: 'Қабылданбаған',
     AppText.companyReportsMetricActiveListings: 'Белсенді хабарландырулар',
-    AppText.companyReportsActiveListingsValue: '{jobs} жұмыс • {internships} тағылымдама',
+    AppText.companyReportsActiveListingsValue:
+        '{jobs} жұмыс • {internships} тағылымдама',
     AppText.companyReportsChartViewsTrend: 'Қаралым тренді',
     AppText.companyReportsChartApplicationsTrend: 'Өтінім тренді',
 
     // Company - Applications
     AppText.companyApplicationsTitle: 'Барлық өтінімдер',
-    AppText.companyApplicationsLoginRequired: 'Компания өтінімдерін көру үшін жүйеге кіру керек.',
+    AppText.companyApplicationsLoginRequired:
+        'Компания өтінімдерін көру үшін жүйеге кіру керек.',
     AppText.companyApplicationsCsvDownloaded: 'CSV жүктелді.',
     AppText.companyApplicationsOpenCv: 'CV ашу',
     AppText.companyApplicationsCvInvalid: 'CV сілтемесі жарамсыз.',
-    AppText.companyApplicationsCvOpenFailedCopied: 'Сілтеме ашылмады. CV сілтемесі көшірілді.',
+    AppText.companyApplicationsCvOpenFailedCopied:
+        'Сілтеме ашылмады. CV сілтемесі көшірілді.',
     AppText.companyApplicationsCoverLetterTitle: 'Ілеспе хат',
     AppText.companyApplicationsMotivationLetterTitle: 'Мотивациялық хат',
-    AppText.companyApplicationsSearchHint: 'Аты, эл. пошта немесе хабарландыру бойынша іздеу...',
+    AppText.companyApplicationsSearchHint:
+        'Аты, эл. пошта немесе хабарландыру бойынша іздеу...',
     AppText.companyApplicationsFilterAllStatuses: 'Барлық күйлер',
     AppText.companyApplicationsFilterAllTypes: 'Барлық түрлер',
     AppText.companyApplicationsEmpty: 'Әзірге өтінім жоқ.',
     AppText.companyApplicationsYearOfStudy: '{year}-курс',
-    AppText.companyApplicationsCsvHeader: 'Аты,Email,Телефон,Түрі,Хабарландыру,Бөлім,Күйі,Өтінім күні',
+    AppText.companyApplicationsCsvHeader:
+        'Аты,Email,Телефон,Түрі,Хабарландыру,Бөлім,Күйі,Өтінім күні',
     AppText.companyApplicationsCsvTypeJob: 'Жұмыс',
     AppText.companyApplicationsCsvTypeInternship: 'Тағылымдама',
 
@@ -6910,7 +7587,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.companyJobFormDeadlineNotSelected: 'Мерзім таңдалмады',
     AppText.companyJobFormDeadlineSelected: 'Мерзім: {date}',
     AppText.companyJobFormPickDate: 'Күнді таңдау',
-    AppText.companyJobFormValidationTitleDesc: 'Атауы мен сипаттамасын енгізіңіз.',
+    AppText.companyJobFormValidationTitleDesc:
+        'Атауы мен сипаттамасын енгізіңіз.',
     AppText.companyJobFormValidationDepartment: 'Бөлім міндетті.',
     AppText.companyJobFormValidationLocation: 'Орналасуы міндетті.',
     AppText.companyJobFormValidationDeadline: 'Мерзімді таңдаңыз.',
@@ -6934,20 +7612,25 @@ const _values = <String, Map<AppText, String>>{
     AppText.companyInternshipFormMonthlyStipendLabel: 'Айлық төлем *',
     AppText.companyInternshipFormBenefitsLabel: 'Жеңілдіктер',
     AppText.companyInternshipFormCertificateLabel: 'Сертификат беріледі',
-    AppText.companyInternshipFormEmploymentPossibilityLabel: 'Жұмысқа алу мүмкіндігі',
+    AppText.companyInternshipFormEmploymentPossibilityLabel:
+        'Жұмысқа алу мүмкіндігі',
     AppText.companyInternshipFormActiveLabel: 'Хабарландыру белсенді',
-    AppText.companyInternshipFormValidationTitleDesc: 'Атауы мен сипаттамасы міндетті.',
+    AppText.companyInternshipFormValidationTitleDesc:
+        'Атауы мен сипаттамасы міндетті.',
     AppText.companyInternshipFormValidationRequirements: 'Талаптар міндетті.',
     AppText.companyInternshipFormValidationDepartment: 'Бөлім міндетті.',
     AppText.companyInternshipFormValidationLocation: 'Орналасуы міндетті.',
     AppText.companyInternshipFormValidationDuration: 'Ұзақтық міндетті.',
     AppText.companyInternshipFormValidationStartDate: 'Басталу күнін таңдаңыз.',
-    AppText.companyInternshipFormValidationDeadline: 'Өтінім мерзімін таңдаңыз.',
+    AppText.companyInternshipFormValidationDeadline:
+        'Өтінім мерзімін таңдаңыз.',
     AppText.companyInternshipFormValidationQuotaRequired: 'Квота міндетті.',
     AppText.companyInternshipFormValidationQuotaValid: 'Дұрыс квота енгізіңіз.',
-    AppText.companyInternshipFormValidationPaidStipend: 'Ақылы тағылымдама үшін айлық төлемді енгізіңіз.',
+    AppText.companyInternshipFormValidationPaidStipend:
+        'Ақылы тағылымдама үшін айлық төлемді енгізіңіз.',
     AppText.companyInternshipFormCreated: 'Тағылымдама хабарландыруы құрылды.',
-    AppText.companyInternshipFormUpdated: 'Тағылымдама хабарландыруы жаңартылды.',
+    AppText.companyInternshipFormUpdated:
+        'Тағылымдама хабарландыруы жаңартылды.',
 
     // Company - Profile
     AppText.companyProfileTitle: 'Компания профилі',
@@ -6971,7 +7654,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.companyProfileUpdated: 'Компания профилі жаңартылды.',
     AppText.companyProfileStatusPending: 'Профиль тексерілуде.',
     AppText.companyProfileStatusRejected: 'Профиль қабылданбады.',
-    AppText.companyProfileStatusRejectedWithReason: 'Қабылдамау себебі: {reason}',
+    AppText.companyProfileStatusRejectedWithReason:
+        'Қабылдамау себебі: {reason}',
     AppText.companyProfileStatusOther: 'Күйі: {status}',
 
     // Company - Dashboard
@@ -6980,18 +7664,24 @@ const _values = <String, Map<AppText, String>>{
     AppText.companyDashboardPendingApplications: 'Күтудегі өтінімдер',
     AppText.companyDashboardTotalApplications: 'Жалпы өтінімдер',
     AppText.companyDashboardWelcome: 'Қош келдіңіз, {name}',
-    AppText.companyDashboardStatusBanned: 'Аккаунт өшірілді. Қолдауға хабарласыңыз.',
-    AppText.companyDashboardStatusPending: 'Аккаунт тексерілуде. Бекітілгеннен кейін жарияланады.',
-    AppText.companyDashboardStatusRejected: 'Компания өтінімі қабылданбады. Профильді жаңартыңыз.',
-    AppText.companyDashboardStatusRejectedWithReason: 'Қабылдамау себебі: {reason}',
+    AppText.companyDashboardStatusBanned:
+        'Аккаунт өшірілді. Қолдауға хабарласыңыз.',
+    AppText.companyDashboardStatusPending:
+        'Аккаунт тексерілуде. Бекітілгеннен кейін жарияланады.',
+    AppText.companyDashboardStatusRejected:
+        'Компания өтінімі қабылданбады. Профильді жаңартыңыз.',
+    AppText.companyDashboardStatusRejectedWithReason:
+        'Қабылдамау себебі: {reason}',
     AppText.companyDashboardStatusOther: 'Компания күйі: {status}',
     AppText.companyDashboardQuickActionsTitle: 'Жылдам әрекеттер',
     AppText.companyDashboardQuickActionNewJob: 'Жаңа жұмыс хабарландыруы',
-    AppText.companyDashboardPerformanceSummaryTitle: 'Өнімділік қорытындысы (соңғы 30 күн)',
+    AppText.companyDashboardPerformanceSummaryTitle:
+        'Өнімділік қорытындысы (соңғы 30 күн)',
 
     // Company - Pricing
     AppText.companyPricingTitle: 'Пакеттер және бағалар',
-    AppText.companyPricingSubtitle: 'Компанияңызға сәйкес пакетті таңдаңыз. Жаңа пакеттер үшін бізге хабарласыңыз.',
+    AppText.companyPricingSubtitle:
+        'Компанияңызға сәйкес пакетті таңдаңыз. Жаңа пакеттер үшін бізге хабарласыңыз.',
     AppText.companyPricingStarterName: 'Бастапқы',
     AppText.companyPricingStarterPrice: '₺1999 / ай',
     AppText.companyPricingStarterDesc: 'Кіші бизнес үшін',
@@ -7021,24 +7711,29 @@ const _values = <String, Map<AppText, String>>{
     // Company - Status Check
     AppText.companyStatusCompanyAccountMissing: 'Компания аккаунты табылмады.',
     AppText.companyStatusNoRegistrationTitle: 'Компания тіркеуі табылмады',
-    AppText.companyStatusNoRegistrationSubtitle: 'Жалғастыру үшін компания тіркеуін жасаңыз.',
+    AppText.companyStatusNoRegistrationSubtitle:
+        'Жалғастыру үшін компания тіркеуін жасаңыз.',
     AppText.companyStatusRegisterCta: 'Компанияны тіркеу',
     AppText.companyStatusBannedTitle: 'Аккаунт тоқтатылды',
-    AppText.companyStatusBannedSubtitle: 'Ережелерді бұзғаны үшін аккаунт тоқтатылды. Қолдауға хабарласыңыз.',
+    AppText.companyStatusBannedSubtitle:
+        'Ережелерді бұзғаны үшін аккаунт тоқтатылды. Қолдауға хабарласыңыз.',
     AppText.companyStatusSupportTeam: 'Қолдау',
     AppText.companyStatusPendingTitle: 'Тексерілуде',
-    AppText.companyStatusPendingSubtitle: 'Компания аккаунты тексерілуде. Жақын арада хабарласамыз.',
+    AppText.companyStatusPendingSubtitle:
+        'Компания аккаунты тексерілуде. Жақын арада хабарласамыз.',
     AppText.companyStatusPendingWhatYouCanDoTitle: 'Не істей аласыз?',
     AppText.companyStatusPendingTip1: 'Компания профилін толықтырыңыз',
     AppText.companyStatusPendingTip2: 'Логотип және мұқаба суретін қосыңыз',
     AppText.companyStatusPendingTip3: 'Байланыс ақпаратын жаңартыңыз',
     AppText.companyStatusEditProfile: 'Профильді өңдеу',
     AppText.companyStatusRejectedTitle: 'Өтінім қабылданбады',
-    AppText.companyStatusRejectedSubtitle: 'Кешіріңіз, компания өтінімі мақұлданбады.',
+    AppText.companyStatusRejectedSubtitle:
+        'Кешіріңіз, компания өтінімі мақұлданбады.',
     AppText.companyStatusRejectedReasonTitle: 'Қабылдамау себебі',
     AppText.companyStatusContactSupport: 'Қолдауға жазу',
     AppText.companyStatusSubscriptionRequiredTitle: 'Жазылым қажет',
-    AppText.companyStatusSubscriptionRequiredSubtitle: 'Хабарландыру жариялау үшін пакет таңдаңыз.',
+    AppText.companyStatusSubscriptionRequiredSubtitle:
+        'Хабарландыру жариялау үшін пакет таңдаңыз.',
     AppText.companyStatusSubscriptionApprovedTitle: 'Аккаунт мақұлданды',
     AppText.companyStatusSubscriptionApprovedTip: 'Пакет таңдап бастай аласыз.',
     AppText.companyStatusViewPlans: 'Пакеттерді қарау',
@@ -7051,7 +7746,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.companyRegisterTaxNumberLabel: 'Салық нөмірі',
     AppText.companyRegisterPhoneLabel: 'Телефон',
     AppText.companyRegisterCityLabel: 'Қала',
-    AppText.companyRegisterDuplicateTaxNumber: 'Бұл салық нөмірімен компания бар.',
+    AppText.companyRegisterDuplicateTaxNumber:
+        'Бұл салық нөмірімен компания бар.',
     AppText.companyRegisterSuccess: 'Компания тіркеу сәтті!',
     AppText.companyRegisterSubmit: 'Тіркеуді аяқтау',
 
@@ -7079,7 +7775,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.deptOther: 'Басқа',
 
     // Legal
-    AppText.legalTurkishOnlyNote: 'Бұл беттің толық құқықтық мәтіні әзірге тек түрік тілінде қолжетімді.',
+    AppText.legalTurkishOnlyNote:
+        'Бұл беттің толық құқықтық мәтіні әзірге тек түрік тілінде қолжетімді.',
     AppText.legalLastUpdated: 'Соңғы жаңарту: {date}',
     AppText.commonUserId: 'Пайдаланушы ID',
     AppText.commonEmail: 'Эл. пошта',
@@ -7124,18 +7821,22 @@ const _values = <String, Map<AppText, String>>{
     AppText.authAlreadyHaveAccount: 'Аккаунтыңыз бар ма?',
     AppText.authAcceptTermsPrefix: 'Мен қабылдаймын ',
     AppText.authAcceptTermsAnd: ' және ',
-    AppText.authAcceptTermsError: 'Шарттар мен Құпиялылық саясатын қабылдауыңыз керек.',
+    AppText.authAcceptTermsError:
+        'Шарттар мен Құпиялылық саясатын қабылдауыңыз керек.',
     AppText.authSelectDepartment: 'Бөліміңізді таңдаңыз.',
     AppText.authSelectYear: 'Курсыңызды таңдаңыз.',
     AppText.authYearPlus: '5+ (жоғары)',
     AppText.authForgotTitle: 'Құпиясөзді ұмыттым',
-    AppText.authForgotSubtitle: 'Э-поштаңызға қалпына келтіру сілтемесін жібереміз.',
+    AppText.authForgotSubtitle:
+        'Э-поштаңызға қалпына келтіру сілтемесін жібереміз.',
     AppText.authEmailSentTitle: 'Хат жіберілді!',
-    AppText.authResetLinkSentTo: 'Қалпына келтіру сілтемесі жіберілді:\n{email}',
+    AppText.authResetLinkSentTo:
+        'Қалпына келтіру сілтемесі жіберілді:\n{email}',
     AppText.authCheckSpam: 'Көрінбесе, спам/қажетсіз қалтаны тексеріңіз.',
     AppText.authRequestAgainIn: '{seconds} секундтан кейін қайта сұрай аласыз.',
     AppText.authSendResetLink: 'Қалпына келтіру сілтемесін жіберу',
-    AppText.authTooManyRequests: 'Тым көп сұрау. Бір минут күтіп, қайта көріңіз.',
+    AppText.authTooManyRequests:
+        'Тым көп сұрау. Бір минут күтіп, қайта көріңіз.',
     AppText.authEmailRequired: 'Э-пошта қажет.',
     AppText.authWaitSeconds: 'Қайта сұрамас бұрын {seconds} секунд күтіңіз.',
     AppText.authResetTitle: 'Құпиясөзді қалпына келтіру',
@@ -7145,7 +7846,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.authLinkApplied: 'Сілтеме қолданылды',
     AppText.authLinkRequired: 'Хаттағы толық сілтемені жапсырыңыз.',
     AppText.authLinkInvalid: 'Сілтеме форматы жарамсыз.',
-    AppText.authLinkAccepted: 'Сілтеме қабылданды. Енді жаңа құпиясөз орната аласыз.',
+    AppText.authLinkAccepted:
+        'Сілтеме қабылданды. Енді жаңа құпиясөз орната аласыз.',
     AppText.authLinkExpired: 'Сілтеме жарамсыз немесе мерзімі өткен.',
     AppText.authNewPasswordLabel: 'Жаңа құпиясөз',
     AppText.authOpenResetLinkFirst:
@@ -7153,14 +7855,16 @@ const _values = <String, Map<AppText, String>>{
     AppText.authPasswordUpdated: 'Құпиясөз жаңартылды',
     AppText.authEmailVerificationTitle: 'Э-поштаны растау',
     AppText.authEmailVerificationPending: 'Э-поштаны растау күтілуде',
-    AppText.authEmailVerificationSubtitle: 'Аккаунтты белсендіру үшін э-поштаңызды растаңыз.',
+    AppText.authEmailVerificationSubtitle:
+        'Аккаунтты белсендіру үшін э-поштаңызды растаңыз.',
     AppText.authVerificationSentTo: 'Растау сілтемесі жіберілді: {email}',
     AppText.authStepCheckInboxTitle: 'Пошта жәшігін тексеріңіз',
     AppText.authStepCheckInboxSubtitle: 'Растау хаты бірнеше минутта келеді.',
     AppText.authStepClickLinkTitle: 'Растау сілтемесін басыңыз',
     AppText.authStepClickLinkSubtitle: 'Хатты ашып, аккаунтыңызды растаңыз.',
     AppText.authStepReturnTitle: 'Қолданбаға оралыңыз',
-    AppText.authStepReturnSubtitle: 'Растағаннан кейін барлық мүмкіндіктер ашылады.',
+    AppText.authStepReturnSubtitle:
+        'Растағаннан кейін барлық мүмкіндіктер ашылады.',
     AppText.authIHaveVerified: 'Э-поштамды растадым',
     AppText.authResendEmail: 'Хатты қайта жіберу',
     AppText.authDidNotReceive:
@@ -7169,7 +7873,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.authEmailNotFound: 'Э-пошта табылмады. Қайта кіріңіз.',
     AppText.authVerificationEmailSentAgain: 'Растау хаты қайта жіберілді.',
     AppText.authResendFailed: 'Қайта жіберу сәтсіз: {error}',
-    AppText.authPleaseLoginAfterVerify: 'Э-поштаны растағаннан кейін қайта кіріңіз.',
+    AppText.authPleaseLoginAfterVerify:
+        'Э-поштаны растағаннан кейін қайта кіріңіз.',
     AppText.authEmailVerifiedSuccess: 'Э-пошта сәтті расталды!',
     AppText.authEmailNotVerifiedYet: 'Э-пошта әлі расталмаған.',
     AppText.authVerificationCheckFailed: 'Растауды тексеру сәтсіз: {error}',
@@ -7193,21 +7898,26 @@ const _values = <String, Map<AppText, String>>{
     AppText.internshipsPointsEarn: 'Жинауға болатын ұпай',
     AppText.internshipsNoDepartmentInfo:
         'Профиліңізде бөлім туралы ақпарат жоқ. Тағылымдамалар бөлім бойынша көрсетіледі. Профильге бөліміңізді қосыңыз.',
-    AppText.internshipsNoResults: 'Іздеу критерийлеріне сай тағылымдама табылмады.',
+    AppText.internshipsNoResults:
+        'Іздеу критерийлеріне сай тағылымдама табылмады.',
     AppText.internshipsFavorite: 'Таңдаулы',
     AppText.internshipsNotSpecified: 'Көрсетілмеген',
 
     // Internship Detail
     AppText.internshipDetailTitle: 'Тағылымдама туралы',
-    AppText.internshipDetailLoadFailed: 'Тағылымдама мәліметі жүктелмеді: {error}',
+    AppText.internshipDetailLoadFailed:
+        'Тағылымдама мәліметі жүктелмеді: {error}',
     AppText.internshipDetailApplySuccess: 'Өтініш жіберілді.',
     AppText.internshipDetailApplyFailed: 'Өтініш жіберілмеді: {error}',
     AppText.internshipDetailApplyTitle: 'Өтініш беру',
-    AppText.internshipDetailAlreadyApplied: 'Сіз бұл тағылымдамаға бұрын өтініш бергенсіз.',
-    AppText.internshipDetailApplyHint: 'Жалғастыру үшін кемінде {min} таңба жазыңыз.',
+    AppText.internshipDetailAlreadyApplied:
+        'Сіз бұл тағылымдамаға бұрын өтініш бергенсіз.',
+    AppText.internshipDetailApplyHint:
+        'Жалғастыру үшін кемінде {min} таңба жазыңыз.',
     AppText.internshipDetailApplyButton: 'Өтініш беру',
     AppText.internshipDetailMotivationTitle: 'Мотивациялық хат',
-    AppText.internshipDetailMotivationHint: 'Неліктен осы тағылымдаманы қалайтыныңызды жазыңыз...',
+    AppText.internshipDetailMotivationHint:
+        'Неліктен осы тағылымдаманы қалайтыныңызды жазыңыз...',
     AppText.internshipDetailCertificate: 'Сертификат',
     AppText.internshipDetailEmploymentChance: 'Жұмысқа алу мүмкіндігі',
     AppText.internshipDetailAbout: 'Туралы',
@@ -7233,7 +7943,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.chatUserNotFoundTitle: 'Пайдаланушы табылмады',
     AppText.chatUserNotFoundSubtitle: 'Қайта кіріп көріңіз.',
     AppText.chatHeaderTitle: 'Мансап көмекшісі',
-    AppText.chatHeaderSubtitle: 'Тағылымдама, түйіндеме және сұхбат бойынша жедел көмек',
+    AppText.chatHeaderSubtitle:
+        'Тағылымдама, түйіндеме және сұхбат бойынша жедел көмек',
     AppText.chatNewChat: 'Жаңа чат',
     AppText.chatTyping: 'Жазып жатыр',
     AppText.chatInputHint: 'Хабарлама жазыңыз...',
@@ -7246,7 +7957,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.chatDefaultSuggestion4: 'Бөлім таңдауға ұсыныстар',
     AppText.chatHistoryLoadFailed: 'Тарихты жүктеу мүмкін болмады: {error}',
     AppText.chatReplyFailed: 'Жауап алу мүмкін болмады: {error}',
-    AppText.chatBotUnavailable: 'Кешіріңіз, қазір жауап бере алмаймын. Қайта көріңіз.',
+    AppText.chatBotUnavailable:
+        'Кешіріңіз, қазір жауап бере алмаймын. Қайта көріңіз.',
 
     // Common
     AppText.commonCancel: 'Болдырмау',
@@ -7282,7 +7994,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.settingsLoginRequired: 'Параметрлерді көру үшін жүйеге кіріңіз.',
     AppText.settingsProfileUpdated: 'Профиль жаңартылды!',
     AppText.settingsPasswordUpdated: 'Құпиясөз жаңартылды!',
-    AppText.settingsPasswordUpdateFailed: 'Құпиясөзді жаңарту мүмкін болмады: {error}',
+    AppText.settingsPasswordUpdateFailed:
+        'Құпиясөзді жаңарту мүмкін болмады: {error}',
     AppText.settingsPreferencesUpdated: 'Хабарлама параметрлері жаңартылды!',
     AppText.settingsPrivacy: 'Құпиялылық',
     AppText.settingsProfileInfoTitle: 'Профиль ақпараты',
@@ -7296,14 +8009,18 @@ const _values = <String, Map<AppText, String>>{
     AppText.settingsPrefEmailTitle: 'Email хабарламалары',
     AppText.settingsPrefEmailSubtitle: 'Маңызды жаңартуларды email арқылы алу',
     AppText.settingsPrefNewCoursesTitle: 'Жаңа курстар',
-    AppText.settingsPrefNewCoursesSubtitle: 'Жаңа курс қосылғанда хабардар болу',
+    AppText.settingsPrefNewCoursesSubtitle:
+        'Жаңа курс қосылғанда хабардар болу',
     AppText.settingsPrefJobAlertsTitle: 'Жұмыс хабарландырулары',
-    AppText.settingsPrefJobAlertsSubtitle: 'Профиліңізге сәйкес жұмыстар туралы хабарлама алу',
+    AppText.settingsPrefJobAlertsSubtitle:
+        'Профиліңізге сәйкес жұмыстар туралы хабарлама алу',
     AppText.settingsPrefNewsletterTitle: 'Апталық бюллетень',
-    AppText.settingsPrefNewsletterSubtitle: 'Апталық қорытынды мен ұсыныстар алу',
+    AppText.settingsPrefNewsletterSubtitle:
+        'Апталық қорытынды мен ұсыныстар алу',
     AppText.settingsPrivacySecurityTitle: 'Құпиялылық және қауіпсіздік',
     AppText.settingsTwoFactorTitle: 'Екі факторлы аутентификация',
-    AppText.settingsTwoFactorSubtitle: 'Аккаунтыңызды қосымша қауіпсіздік деңгейімен қорғаңыз',
+    AppText.settingsTwoFactorSubtitle:
+        'Аккаунтыңызды қосымша қауіпсіздік деңгейімен қорғаңыз',
     AppText.settingsEnableArrow: 'Қосу →',
     AppText.settingsDangerZoneTitle: 'Қауіпті аймақ',
     AppText.settingsFreezeAccountTitle: 'Аккаунтты уақытша тоқтату',
@@ -7311,11 +8028,13 @@ const _values = <String, Map<AppText, String>>{
     AppText.settingsFreezeAccountButton: 'Тоқтату',
     AppText.settingsDeleteAccountTitle: 'Аккаунтты біржола жою',
     AppText.settingsDeleteAccountSubtitle: 'Бұл әрекетті қайтару мүмкін емес!',
-    AppText.settingsDeleteAccountWarning: 'Бұл әрекетті қайтару мүмкін емес! Аккаунтты жойсаңыз:',
+    AppText.settingsDeleteAccountWarning:
+        'Бұл әрекетті қайтару мүмкін емес! Аккаунтты жойсаңыз:',
     AppText.settingsDeleteAccountConsequences:
         '• Барлық жеке деректеріңіз жойылады\n• Курсқа жазылуларыңыз тоқтатылады\n• Өтінімдеріңіз жойылады\n• Жинаған ұпайларыңыз жоғалады\n• Бұл email арқылы қайта тіркеле алмайсыз',
     AppText.settingsDeleteAccountConfirmPhrase: 'АККАУНТТЫ ЖОЮ',
-    AppText.settingsDeleteAccountTypeToConfirm: 'Растау үшін {phrase} енгізіңіз:',
+    AppText.settingsDeleteAccountTypeToConfirm:
+        'Растау үшін {phrase} енгізіңіз:',
     AppText.settingsDeleteAccountButton: 'Аккаунтты жою',
     AppText.settingsDeleteAccountFailed: 'Аккаунтты жою кезінде қате: {error}',
     AppText.settingsProfileVisibilityTitle: 'Профиль көрінуі',
@@ -7344,9 +8063,11 @@ const _values = <String, Map<AppText, String>>{
     AppText.profileBadgesTitle: 'Менің белгілерім',
     AppText.profileNoBadges: 'Әзірге белгіңіз жоқ.',
     AppText.profileCompletedCoursesTitle: 'Аяқталған курстар',
-    AppText.profileCompletedCoursesTitleWithCount: 'Аяқталған курстар ({count})',
+    AppText.profileCompletedCoursesTitleWithCount:
+        'Аяқталған курстар ({count})',
     AppText.profileNoCompletedCoursesTitle: 'Әзірге аяқтаған курсыңыз жоқ.',
-    AppText.profileNoCompletedCoursesSubtitle: 'Курстарды аяқтаған сайын осында көрінеді!',
+    AppText.profileNoCompletedCoursesSubtitle:
+        'Курстарды аяқтаған сайын осында көрінеді!',
     AppText.profileCourseCompleted: 'Аяқталды',
     AppText.profileCourseInfoNotFound: 'Курс ақпараты табылмады.',
     AppText.profileCompletionDescription: 'Профиліңіз толтырылды!',
@@ -7360,7 +8081,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.coursesEmptySubtitle: 'Фильтрлерді тазалап қайта көріңіз.',
     AppText.coursesMyLoadFailedTitle: 'Жазылған курстар жүктелмеді',
     AppText.coursesMyEmptyTitle: 'Әзірге жазылған курс жоқ',
-    AppText.coursesMyEmptySubtitle: '«Барлығы» қойындысынан курсқа жазыла аласыз.',
+    AppText.coursesMyEmptySubtitle:
+        '«Барлығы» қойындысынан курсқа жазыла аласыз.',
     AppText.coursesExploreAction: 'Курстарды зерттеу',
     AppText.coursesSearchHint: 'Курсты іздеу (мыс: SQL, Flutter, Data...)',
     AppText.coursesDepartmentAll: 'Бөлім: Барлығы',
@@ -7369,7 +8091,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.coursesLevelSelected: 'Деңгейі: {level}',
     AppText.coursesQuickFilterLabel: 'Жылдам сүзгі:',
     AppText.coursesEnrolledPill: 'Жазылған',
-    AppText.coursesEnrollmentLoadFailed: 'Жазылымды жүктеу мүмкін болмады: {error}',
+    AppText.coursesEnrollmentLoadFailed:
+        'Жазылымды жүктеу мүмкін болмады: {error}',
     AppText.courseDetailTitle: 'Курс мәліметі',
     AppText.courseDetailVideoUrl: 'Бейне URL',
     AppText.courseDetailEnroll: 'Курсқа жазылу',
@@ -7378,12 +8101,15 @@ const _values = <String, Map<AppText, String>>{
     AppText.courseDetailLoadFailedTitle: 'Курс жүктелмеді',
 
     // Notifications
-    AppText.notificationsLoginRequired: 'Хабарламаларды көру үшін жүйеге кіріңіз.',
+    AppText.notificationsLoginRequired:
+        'Хабарламаларды көру үшін жүйеге кіріңіз.',
     AppText.notificationsMarkAllRead: 'Барлығын оқылды деп белгілеу',
     AppText.notificationsUnreadCount: '{count} оқылмаған хабарлама',
     AppText.notificationsNewSnack: 'Жаңа хабарлама!',
-    AppText.notificationsLoadFailed: 'Хабарламаларды жүктеу мүмкін болмады: {error}',
-    AppText.notificationsAllMarkedRead: 'Барлық хабарламалар оқылды деп белгіленді',
+    AppText.notificationsLoadFailed:
+        'Хабарламаларды жүктеу мүмкін болмады: {error}',
+    AppText.notificationsAllMarkedRead:
+        'Барлық хабарламалар оқылды деп белгіленді',
     AppText.notificationsDeleted: 'Хабарлама өшірілді',
     AppText.notificationsDeleteFailed: 'Өшіру сәтсіз: {error}',
     AppText.notificationsTabAll: 'Барлығы ({count})',
@@ -7398,7 +8124,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.dashboardWeeklyStreakBonus: '7 күндік серия аяқталды! +15 ұпай',
     AppText.dashboardLoadFailed: 'Панельді жүктеу мүмкін болмады',
     AppText.dashboardWelcome: 'Қош келдіңіз, {name}! 👋',
-    AppText.dashboardWelcomeSubtitle: 'Бүгін карьераңызға жаңа мүмкіндіктер күтіп тұр.',
+    AppText.dashboardWelcomeSubtitle:
+        'Бүгін карьераңызға жаңа мүмкіндіктер күтіп тұр.',
     AppText.dashboardTotalPoints: 'Жалпы ұпай',
     AppText.dashboardCompletedCourses: 'Аяқталған курстар',
     AppText.dashboardActiveApplications: 'Белсенді өтінімдер',
@@ -7412,7 +8139,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.dashboardMetricCoursesCompleted: 'Курс аяқтау',
     AppText.dashboardMetricNextTarget: 'Келесі мақсат',
     AppText.dashboardAssistantTitle: 'Карьера ассистенті',
-    AppText.dashboardAssistantSubtitle: 'CV, стажировка және сұхбат бойынша жылдам көмек.',
+    AppText.dashboardAssistantSubtitle:
+        'CV, стажировка және сұхбат бойынша жылдам көмек.',
     AppText.dashboardAssistantChipCv: 'CV жақсарту',
     AppText.dashboardAssistantChipInternships: 'Стажировка өтінімдері',
     AppText.dashboardAssistantChipInterview: 'Сұхбатқа дайындық',
@@ -7448,7 +8176,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.adminStatCompaniesTitle: 'Компаниялар',
     AppText.adminStatCompaniesSubtitlePending: '{count} күтілуде',
     AppText.adminStatActiveListingsTitle: 'Белсенді жарияланымдар',
-    AppText.adminStatActiveListingsSubtitle: '{jobs} жұмыс, {internships} тағылымдама',
+    AppText.adminStatActiveListingsSubtitle:
+        '{jobs} жұмыс, {internships} тағылымдама',
     AppText.adminStatMonthlyRevenueTitle: 'Айлық табыс',
     AppText.adminStatMonthlyRevenueSubtitle: '{count} белсенді жазылым',
     AppText.adminCompanyApprovalsTitle: 'Күтілуде',
@@ -7488,9 +8217,11 @@ const _values = <String, Map<AppText, String>>{
     AppText.adminCompanyDetailsTitle: 'Компания мәліметтері',
     AppText.adminCompanyDescriptionLabel: 'Сипаттама',
     AppText.adminCompanyRejectReasonTitle: 'Қабылдамау себебі',
-    AppText.adminCompanyRejectReasonRequired: 'Қабылдамау себебі (қабылдамау үшін міндетті)',
+    AppText.adminCompanyRejectReasonRequired:
+        'Қабылдамау себебі (қабылдамау үшін міндетті)',
     AppText.adminCompanyRejectReasonLabel: 'Қабылдамау себебі',
-    AppText.adminCompanyRejectReasonHint: 'мыс: құжат жетіспейді / қате ақпарат',
+    AppText.adminCompanyRejectReasonHint:
+        'мыс: құжат жетіспейді / қате ақпарат',
     AppText.adminCompanyApprove: 'Мақұлдау',
     AppText.adminCompanyReject: 'Қабылдамау',
     AppText.adminCompanyBan: 'Компанияны бұғаттау',
@@ -7557,11 +8288,16 @@ const _values = <String, Map<AppText, String>>{
     AppText.dbDebugSampleRecordsTitle: 'Үлгі жазбалар',
     AppText.dbDebugError: 'Қате: {error}',
     AppText.dbDebugTipsTitle: 'Тексерілетіндер',
-    AppText.dbDebugTipProfileDepartment: 'profiles кестесінде department өрісі толтырылған ба?',
-    AppText.dbDebugTipTablesHaveDepartment: 'courses, internships және jobs кестелерінде department бағаны бар ма?',
-    AppText.dbDebugTipTablesHaveData: 'Кестелерде дерек бар ма? Болмаса, үлгі дерек қосыңыз.',
-    AppText.dbDebugTipRlsEnabled: 'RLS (Row Level Security) саясаттары қосылған ба?',
-    AppText.dbDebugTipDepartmentHasMatches: 'Пайдаланушы бөліміне сәйкес жазбалар бар ма?',
+    AppText.dbDebugTipProfileDepartment:
+        'profiles кестесінде department өрісі толтырылған ба?',
+    AppText.dbDebugTipTablesHaveDepartment:
+        'courses, internships және jobs кестелерінде department бағаны бар ма?',
+    AppText.dbDebugTipTablesHaveData:
+        'Кестелерде дерек бар ма? Болмаса, үлгі дерек қосыңыз.',
+    AppText.dbDebugTipRlsEnabled:
+        'RLS (Row Level Security) саясаттары қосылған ба?',
+    AppText.dbDebugTipDepartmentHasMatches:
+        'Пайдаланушы бөліміне сәйкес жазбалар бар ма?',
     AppText.commonComingSoonTitle: 'Жақында',
     AppText.commonComingSoonSubtitle: 'Бұл бет жақында қолжетімді болады',
   },
@@ -7681,8 +8417,7 @@ const _values = <String, Map<AppText, String>>{
     AppText.login: 'ログイン',
     AppText.profile: 'プロフィール',
     AppText.footerPlatformTitle: '学生プラットフォーム',
-    AppText.footerPlatformDesc:
-        'キャリアに方向性を与え、可能性を発見。トルコで最も包括的な学生キャリアプラットフォーム。',
+    AppText.footerPlatformDesc: 'キャリアに方向性を与え、可能性を発見。トルコで最も包括的な学生キャリアプラットフォーム。',
     AppText.footerQuickLinks: 'クイックリンク',
     AppText.footerMore: 'もっと見る',
     AppText.footerNewsletter: 'ニュースレター',
@@ -7700,8 +8435,7 @@ const _values = <String, Map<AppText, String>>{
     AppText.linkTerms: '利用規約',
     AppText.linkComingSoon: '{name} のリンクは近日公開。',
     AppText.homeHeroTitle: '大学生活を強化し、\nキャリアを素早く前進！',
-    AppText.homeHeroSubtitle:
-        '分野別のコース、インターン、求人で将来に向けて確かな一歩を。',
+    AppText.homeHeroSubtitle: '分野別のコース、インターン、求人で将来に向けて確かな一歩を。',
     AppText.homeCard1Title: '分野別コンテンツ',
     AppText.homeCard1Desc: '学科に合ったコース・インターン・求人で集中学習。',
     AppText.homeCard2Title: 'キャリアを導く',
@@ -7727,11 +8461,9 @@ const _values = <String, Map<AppText, String>>{
     AppText.howItWorksStep1Title: '学習モジュール',
     AppText.howItWorksStep1Desc: '分野別の基礎、動画、ミニテストで強いスタート。',
     AppText.howItWorksStep2Title: '現場での実践',
-    AppText.howItWorksStep2Desc:
-        '理論を実践し、実務経験を得て、メンター支援で成長。',
+    AppText.howItWorksStep2Desc: '理論を実践し、実務経験を得て、メンター支援で成長。',
     AppText.howItWorksStep3Title: 'ネットワークを構築',
-    AppText.howItWorksStep3Desc:
-        '専門家や学生と出会い、ネットワークを広げ、新しい機会を発見。',
+    AppText.howItWorksStep3Desc: '専門家や学生と出会い、ネットワークを広げ、新しい機会を発見。',
     AppText.howItWorksStep4Title: '成功をつかむ',
     AppText.howItWorksStep4Desc: '証明書を取得し、推薦を集め、夢のキャリアへ。',
     AppText.howItWorksCtaDashboard: 'ダッシュボードへ',
@@ -7790,8 +8522,7 @@ const _values = <String, Map<AppText, String>>{
         '2023年、大学生がインターンを見つけにくいことや、卒業後の就職活動の不確実さをきっかけにスタートしました。',
     AppText.aboutStoryP2:
         '仕事やインターン探しを簡単にするだけでなく、コース、メンタリング、ポイント制度で継続的な成長を支援します。',
-    AppText.aboutStoryP3:
-        '現在、数千人の学生が私たちのプラットフォームでキャリアを形にしています。成功体験が私たちの原動力です。',
+    AppText.aboutStoryP3: '現在、数千人の学生が私たちのプラットフォームでキャリアを形にしています。成功体験が私たちの原動力です。',
     AppText.aboutValuesSectionTitle: '価値観',
     AppText.aboutValuesSectionSubtitle: '私たちを前に進める原則。',
     AppText.aboutValueMissionTitle: 'ミッション',
@@ -7799,7 +8530,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.aboutValueValuesTitle: '価値観',
     AppText.aboutValueValuesDesc: '平等、機会創出、継続的な学びと成長。すべての学生が成功できると信じています。',
     AppText.aboutValueVisionTitle: 'ビジョン',
-    AppText.aboutValueVisionDesc: 'トルコで最も包括的な学生向けキャリアプラットフォームとなり、毎年多くの学生の夢を後押しします。',
+    AppText.aboutValueVisionDesc:
+        'トルコで最も包括的な学生向けキャリアプラットフォームとなり、毎年多くの学生の夢を後押しします。',
     AppText.aboutStatActiveStudents: 'アクティブ学生',
     AppText.aboutStatPartnerCompanies: '提携企業',
     AppText.aboutStatInternshipOpportunities: 'インターン機会',
@@ -7827,7 +8559,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.contactEmailTitle: 'メール',
     AppText.contactPhoneTitle: '電話',
     AppText.contactAddressTitle: '住所',
-    AppText.contactAddressBody: 'Teknokent, Innovation St. No:1234\nBeşiktaş, Istanbul',
+    AppText.contactAddressBody:
+        'Teknokent, Innovation St. No:1234\nBeşiktaş, Istanbul',
     AppText.contactHoursTitle: '営業時間',
     AppText.contactHoursBody: '月-金: 09:00 - 18:00\n土: 10:00 - 14:00',
     AppText.contactFormTitle: 'お問い合わせフォーム',
@@ -7898,7 +8631,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.companyReportsMetricAccepted: '承認',
     AppText.companyReportsMetricRejected: '却下',
     AppText.companyReportsMetricActiveListings: '掲載中',
-    AppText.companyReportsActiveListingsValue: '{jobs} 件の求人 • {internships} 件のインターン',
+    AppText.companyReportsActiveListingsValue:
+        '{jobs} 件の求人 • {internships} 件のインターン',
     AppText.companyReportsChartViewsTrend: '閲覧トレンド',
     AppText.companyReportsChartApplicationsTrend: '応募トレンド',
 
@@ -7908,7 +8642,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.companyApplicationsCsvDownloaded: 'CSVをダウンロードしました。',
     AppText.companyApplicationsOpenCv: 'CVを開く',
     AppText.companyApplicationsCvInvalid: 'CVリンクが無効です。',
-    AppText.companyApplicationsCvOpenFailedCopied: 'リンクを開けませんでした。CVリンクをコピーしました。',
+    AppText.companyApplicationsCvOpenFailedCopied:
+        'リンクを開けませんでした。CVリンクをコピーしました。',
     AppText.companyApplicationsCoverLetterTitle: 'カバーレター',
     AppText.companyApplicationsMotivationLetterTitle: '志望動機',
     AppText.companyApplicationsSearchHint: '名前、メール、募集で検索...',
@@ -8051,7 +8786,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.companyStatusNoRegistrationSubtitle: '続行するには企業登録を作成してください。',
     AppText.companyStatusRegisterCta: '企業登録',
     AppText.companyStatusBannedTitle: 'アカウント停止',
-    AppText.companyStatusBannedSubtitle: '規約違反により企業アカウントが停止されました。サポートへ連絡してください。',
+    AppText.companyStatusBannedSubtitle:
+        '規約違反により企業アカウントが停止されました。サポートへ連絡してください。',
     AppText.companyStatusSupportTeam: 'サポート',
     AppText.companyStatusPendingTitle: '承認待ち',
     AppText.companyStatusPendingSubtitle: '審査中です。まもなくご連絡します。',
@@ -8251,8 +8987,7 @@ const _values = <String, Map<AppText, String>>{
         '• インターン応募: +100ポイント（例）\n• 承認 / 完了: 追加ポイント（後で連携）',
     AppText.internshipsPointsButton: 'ポイント制度を見る',
     AppText.chatLoginRequiredTitle: 'チャットするにはログインが必要です',
-    AppText.chatLoginRequiredSubtitle:
-        'キャリアアシスタントを使うにはログインしてメール確認を完了してください。',
+    AppText.chatLoginRequiredSubtitle: 'キャリアアシスタントを使うにはログインしてメール確認を完了してください。',
     AppText.chatUserNotFoundTitle: 'ユーザーが見つかりません',
     AppText.chatUserNotFoundSubtitle: 'もう一度ログインしてみてください。',
     AppText.chatHeaderTitle: 'キャリアアシスタント',
@@ -8471,7 +9206,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.adminStatCompaniesTitle: '企業',
     AppText.adminStatCompaniesSubtitlePending: '{count} 社が承認待ち',
     AppText.adminStatActiveListingsTitle: '掲載中',
-    AppText.adminStatActiveListingsSubtitle: '{jobs} 件の求人、{internships} 件のインターン',
+    AppText.adminStatActiveListingsSubtitle:
+        '{jobs} 件の求人、{internships} 件のインターン',
     AppText.adminStatMonthlyRevenueTitle: '月間収益',
     AppText.adminStatMonthlyRevenueSubtitle: '有効な購読 {count}',
     AppText.adminCompanyApprovalsTitle: '承認待ち',
@@ -8580,8 +9316,10 @@ const _values = <String, Map<AppText, String>>{
     AppText.dbDebugSampleRecordsTitle: 'サンプルレコード',
     AppText.dbDebugError: 'エラー: {error}',
     AppText.dbDebugTipsTitle: '確認ポイント',
-    AppText.dbDebugTipProfileDepartment: 'profiles テーブルの department は入力されていますか？',
-    AppText.dbDebugTipTablesHaveDepartment: 'courses / internships / jobs テーブルに department 列はありますか？',
+    AppText.dbDebugTipProfileDepartment:
+        'profiles テーブルの department は入力されていますか？',
+    AppText.dbDebugTipTablesHaveDepartment:
+        'courses / internships / jobs テーブルに department 列はありますか？',
     AppText.dbDebugTipTablesHaveData: 'テーブルにデータはありますか？無ければサンプルデータを追加してください。',
     AppText.dbDebugTipRlsEnabled: 'RLS（Row Level Security）は有効ですか？',
     AppText.dbDebugTipDepartmentHasMatches: 'ユーザーの学科に一致するレコードはありますか？',
@@ -8805,12 +9543,9 @@ const _values = <String, Map<AppText, String>>{
     AppText.aboutHeroTitle: '关于我们',
     AppText.aboutHeroSubtitle: 'Öğrenci Intelligence 连接学生与企业，加速你的职业旅程。',
     AppText.aboutStoryTitle: '我们的故事',
-    AppText.aboutStoryP1:
-        '我们于 2023 年起步，源于对大学生寻找实习困难以及毕业后求职不确定性的观察。',
-    AppText.aboutStoryP2:
-        '我们的目标不仅是让找工作和实习更容易，还通过课程、导师支持与积分体系帮助学生持续成长。',
-    AppText.aboutStoryP3:
-        '如今，已有数千名学生在平台上规划职业发展。每一个成功故事都是我们的动力。',
+    AppText.aboutStoryP1: '我们于 2023 年起步，源于对大学生寻找实习困难以及毕业后求职不确定性的观察。',
+    AppText.aboutStoryP2: '我们的目标不仅是让找工作和实习更容易，还通过课程、导师支持与积分体系帮助学生持续成长。',
+    AppText.aboutStoryP3: '如今，已有数千名学生在平台上规划职业发展。每一个成功故事都是我们的动力。',
     AppText.aboutValuesSectionTitle: '我们的价值观',
     AppText.aboutValuesSectionSubtitle: '推动我们前进的原则。',
     AppText.aboutValueMissionTitle: '使命',
@@ -8846,7 +9581,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.contactEmailTitle: '邮箱',
     AppText.contactPhoneTitle: '电话',
     AppText.contactAddressTitle: '地址',
-    AppText.contactAddressBody: 'Teknokent, Innovation St. No:1234\nBeşiktaş, Istanbul',
+    AppText.contactAddressBody:
+        'Teknokent, Innovation St. No:1234\nBeşiktaş, Istanbul',
     AppText.contactHoursTitle: '工作时间',
     AppText.contactHoursBody: '周一-周五: 09:00 - 18:00\n周六: 10:00 - 14:00',
     AppText.contactFormTitle: '给我们留言',
@@ -9233,8 +9969,7 @@ const _values = <String, Map<AppText, String>>{
     AppText.internshipsApplied: '已申请',
     AppText.internshipsAvgDuration: '平均周期',
     AppText.internshipsPointsEarn: '可获得积分',
-    AppText.internshipsNoDepartmentInfo:
-        '你的资料中缺少院系信息。实习岗位按院系展示，请在资料中补充。',
+    AppText.internshipsNoDepartmentInfo: '你的资料中缺少院系信息。实习岗位按院系展示，请在资料中补充。',
     AppText.internshipsNoResults: '没有找到符合条件的实习。',
     AppText.internshipsFavorite: '收藏',
     AppText.internshipsNotSpecified: '未注明',
@@ -9266,8 +10001,7 @@ const _values = <String, Map<AppText, String>>{
     AppText.internshipsMonthlyStipend: '{amount} TRY/月',
     AppText.internshipsDetails: '详情 →',
     AppText.internshipsPointsTitle: '如何获得积分？',
-    AppText.internshipsPointsDesc:
-        '• 实习申请：+100 积分（示例）\n• 录用 / 完成：额外积分（稍后接入）',
+    AppText.internshipsPointsDesc: '• 实习申请：+100 积分（示例）\n• 录用 / 完成：额外积分（稍后接入）',
     AppText.internshipsPointsButton: '查看积分系统',
     AppText.chatLoginRequiredTitle: '需要登录才能聊天',
     AppText.chatLoginRequiredSubtitle: '登录并完成邮箱验证后即可使用职业助手。',
@@ -9279,8 +10013,7 @@ const _values = <String, Map<AppText, String>>{
     AppText.chatTyping: '正在输入',
     AppText.chatInputHint: '输入消息...',
     AppText.chatFriend: '朋友',
-    AppText.chatGreeting:
-        '你好，{name}！我是你的职业助手。我可以帮助实习、专业选择、简历制作和面试。需要我怎么帮你？',
+    AppText.chatGreeting: '你好，{name}！我是你的职业助手。我可以帮助实习、专业选择、简历制作和面试。需要我怎么帮你？',
     AppText.chatDefaultSuggestion1: '如何申请实习？',
     AppText.chatDefaultSuggestion2: '简历技巧',
     AppText.chatDefaultSuggestion3: '面试问题与答案',
@@ -9598,7 +10331,8 @@ const _values = <String, Map<AppText, String>>{
     AppText.dbDebugError: '错误：{error}',
     AppText.dbDebugTipsTitle: '检查项',
     AppText.dbDebugTipProfileDepartment: 'profiles 表中的 department 字段是否已填写？',
-    AppText.dbDebugTipTablesHaveDepartment: 'courses、internships、jobs 表是否都有 department 字段？',
+    AppText.dbDebugTipTablesHaveDepartment:
+        'courses、internships、jobs 表是否都有 department 字段？',
     AppText.dbDebugTipTablesHaveData: '表里是否有数据？如果没有，请添加示例数据。',
     AppText.dbDebugTipRlsEnabled: '是否启用了 RLS（行级安全）策略？',
     AppText.dbDebugTipDepartmentHasMatches: '是否存在与用户院系匹配的数据记录？',

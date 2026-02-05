@@ -12,7 +12,8 @@ class AdminDashboardScreen extends ConsumerStatefulWidget {
   const AdminDashboardScreen({super.key});
 
   @override
-  ConsumerState<AdminDashboardScreen> createState() => _AdminDashboardScreenState();
+  ConsumerState<AdminDashboardScreen> createState() =>
+      _AdminDashboardScreenState();
 }
 
 class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
@@ -41,8 +42,12 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
         client.from('companies').select('approval_status'),
         client.from('jobs').select('id').eq('is_active', true),
         client.from('internships').select('id').eq('is_active', true),
-        client.from('company_subscriptions').select('plan_type, ends_at, is_active'),
-        client.from('subscription_plans').select('slug, name, price_monthly, price_yearly'),
+        client
+            .from('company_subscriptions')
+            .select('plan_type, ends_at, is_active'),
+        client
+            .from('subscription_plans')
+            .select('slug, name, price_monthly, price_yearly'),
         client
             .from('admin_logs')
             .select('id, action_type, created_at, admins(name)')
@@ -71,10 +76,18 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
         final monthly = _toInt(map['price_monthly']);
         final yearly = _toInt(map['price_yearly']);
         if (slug.isNotEmpty) {
-          planBySlug[slug] = _PlanPrice(monthly: monthly, yearly: yearly, name: name);
+          planBySlug[slug] = _PlanPrice(
+            monthly: monthly,
+            yearly: yearly,
+            name: name,
+          );
         }
         if (name.isNotEmpty && !planBySlug.containsKey(name)) {
-          planBySlug[name] = _PlanPrice(monthly: monthly, yearly: yearly, name: name);
+          planBySlug[name] = _PlanPrice(
+            monthly: monthly,
+            yearly: yearly,
+            name: name,
+          );
         }
       }
 
@@ -140,7 +153,9 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final admin = ref.watch(activeAdminProvider).valueOrNull;
-    final adminName = admin?.name.isNotEmpty == true ? admin!.name : l10n.t(AppText.adminRoleAdmin);
+    final adminName = admin?.name.isNotEmpty == true
+        ? admin!.name
+        : l10n.t(AppText.adminRoleAdmin);
     final isSuper = admin?.isSuperAdmin ?? false;
 
     if (_loading) {
@@ -154,12 +169,22 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.error_outline, size: 48, color: Color(0xFFEF4444)),
+              const Icon(
+                Icons.error_outline,
+                size: 48,
+                color: Color(0xFFEF4444),
+              ),
               const SizedBox(height: 10),
-              Text(l10n.t(AppText.adminDashboardLoadFailedTitle),
-                  style: const TextStyle(fontWeight: FontWeight.w900)),
+              Text(
+                l10n.t(AppText.adminDashboardLoadFailedTitle),
+                style: const TextStyle(fontWeight: FontWeight.w900),
+              ),
               const SizedBox(height: 8),
-              Text(_error!, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFF6B7280))),
+              Text(
+                _error!,
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Color(0xFF6B7280)),
+              ),
               const SizedBox(height: 14),
               ElevatedButton(
                 onPressed: _fetchDashboard,
@@ -183,8 +208,13 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
             borderRadius: BorderRadius.circular(999),
           ),
           child: Text(
-            isSuper ? l10n.t(AppText.adminRoleSuper) : l10n.t(AppText.adminRoleAdmin),
-            style: const TextStyle(color: Color(0xFF6D28D9), fontWeight: FontWeight.w800),
+            isSuper
+                ? l10n.t(AppText.adminRoleSuper)
+                : l10n.t(AppText.adminRoleAdmin),
+            style: const TextStyle(
+              color: Color(0xFF6D28D9),
+              fontWeight: FontWeight.w800,
+            ),
           ),
         ),
       ),
@@ -201,7 +231,8 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                   children: [
                     _PendingCard(
                       pending: _stats.pendingCompanies,
-                      onTap: () => context.go('${Routes.adminCompanies}?status=pending'),
+                      onTap: () =>
+                          context.go('${Routes.adminCompanies}?status=pending'),
                     ),
                     const SizedBox(height: 16),
                     const _QuickLinks(),
@@ -214,7 +245,8 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                   Expanded(
                     child: _PendingCard(
                       pending: _stats.pendingCompanies,
-                      onTap: () => context.go('${Routes.adminCompanies}?status=pending'),
+                      onTap: () =>
+                          context.go('${Routes.adminCompanies}?status=pending'),
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -290,7 +322,9 @@ class _StatsGrid extends StatelessWidget {
       _StatCard(
         title: l10n.t(AppText.adminStatTotalUsersTitle),
         value: stats.totalUsers.toString(),
-        subtitle: l10n.adminStatTotalUsersSubtitleToday(stats.todayRegistrations),
+        subtitle: l10n.adminStatTotalUsersSubtitleToday(
+          stats.todayRegistrations,
+        ),
         subtitleColor: const Color(0xFF16A34A),
         icon: Icons.group_outlined,
         iconColor: const Color(0xFF2563EB),
@@ -298,7 +332,9 @@ class _StatsGrid extends StatelessWidget {
       _StatCard(
         title: l10n.t(AppText.adminStatCompaniesTitle),
         value: stats.totalCompanies.toString(),
-        subtitle: l10n.adminStatCompaniesSubtitlePending(stats.pendingCompanies),
+        subtitle: l10n.adminStatCompaniesSubtitlePending(
+          stats.pendingCompanies,
+        ),
         subtitleColor: const Color(0xFFF97316),
         icon: Icons.apartment_outlined,
         iconColor: const Color(0xFF7C3AED),
@@ -306,7 +342,10 @@ class _StatsGrid extends StatelessWidget {
       _StatCard(
         title: l10n.t(AppText.adminStatActiveListingsTitle),
         value: (stats.totalJobs + stats.totalInternships).toString(),
-        subtitle: l10n.adminStatActiveListingsSubtitle(jobs: stats.totalJobs, internships: stats.totalInternships),
+        subtitle: l10n.adminStatActiveListingsSubtitle(
+          jobs: stats.totalJobs,
+          internships: stats.totalInternships,
+        ),
         subtitleColor: const Color(0xFF6B7280),
         icon: Icons.work_outline,
         iconColor: const Color(0xFF16A34A),
@@ -314,7 +353,9 @@ class _StatsGrid extends StatelessWidget {
       _StatCard(
         title: l10n.t(AppText.adminStatMonthlyRevenueTitle),
         value: '₺${_formatNumber(stats.monthlyRevenue)}',
-        subtitle: l10n.adminStatMonthlyRevenueSubtitle(stats.activeSubscriptions),
+        subtitle: l10n.adminStatMonthlyRevenueSubtitle(
+          stats.activeSubscriptions,
+        ),
         subtitleColor: const Color(0xFF16A34A),
         icon: Icons.credit_card_outlined,
         iconColor: const Color(0xFFF59E0B),
@@ -338,7 +379,10 @@ class _StatsGrid extends StatelessWidget {
           spacing: 14,
           runSpacing: 14,
           children: cards
-              .map((c) => SizedBox(width: (constraints.maxWidth - 14) / 2, child: c))
+              .map(
+                (c) =>
+                    SizedBox(width: (constraints.maxWidth - 14) / 2, child: c),
+              )
               .toList(),
         );
       },
@@ -371,7 +415,13 @@ class _StatCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 16, offset: Offset(0, 8))],
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0A000000),
+            blurRadius: 16,
+            offset: Offset(0, 8),
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -379,11 +429,30 @@ class _StatCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700)),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: Color(0xFF6B7280),
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
                 const SizedBox(height: 6),
-                Text(value, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900)),
+                Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
                 const SizedBox(height: 6),
-                Text(subtitle, style: TextStyle(color: subtitleColor, fontWeight: FontWeight.w700, fontSize: 12)),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    color: subtitleColor,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 12,
+                  ),
+                ),
               ],
             ),
           ),
@@ -416,26 +485,44 @@ class _PendingCard extends StatelessWidget {
             children: [
               const Icon(Icons.error_outline, color: Color(0xFFF97316)),
               const SizedBox(width: 8),
-              Text(l10n.t(AppText.adminCompanyApprovalsTitle),
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
+              Text(
+                l10n.t(AppText.adminCompanyApprovalsTitle),
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 12),
           if (pending > 0) ...[
-            Text('$pending', style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w900, color: Color(0xFFF97316))),
+            Text(
+              '$pending',
+              style: const TextStyle(
+                fontSize: 30,
+                fontWeight: FontWeight.w900,
+                color: Color(0xFFF97316),
+              ),
+            ),
             const SizedBox(height: 6),
-            Text(l10n.t(AppText.adminCompanyApprovalsSubtitle),
-                style: const TextStyle(color: Color(0xFF6B7280))),
+            Text(
+              l10n.t(AppText.adminCompanyApprovalsSubtitle),
+              style: const TextStyle(color: Color(0xFF6B7280)),
+            ),
             const SizedBox(height: 12),
             ElevatedButton.icon(
               onPressed: onTap,
               icon: const Icon(Icons.trending_up, size: 18),
               label: Text(l10n.t(AppText.adminReviewCompanies)),
-              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFF97316)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFF97316),
+              ),
             ),
           ] else
-            Text(l10n.t(AppText.adminCompanyApprovalsEmpty),
-                style: const TextStyle(color: Color(0xFF6B7280))),
+            Text(
+              l10n.t(AppText.adminCompanyApprovalsEmpty),
+              style: const TextStyle(color: Color(0xFF6B7280)),
+            ),
         ],
       ),
     );
@@ -458,8 +545,10 @@ class _QuickLinks extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(l10n.t(AppText.adminQuickAccessTitle),
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
+          Text(
+            l10n.t(AppText.adminQuickAccessTitle),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
+          ),
           const SizedBox(height: 12),
           Wrap(
             spacing: 12,
@@ -533,7 +622,10 @@ class _QuickLinkTile extends StatelessWidget {
                 textAlign: TextAlign.center,
                 overflow: TextOverflow.ellipsis,
                 softWrap: false,
-                style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF374151)),
+                style: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF374151),
+                ),
               ),
             ),
           ],
@@ -565,14 +657,21 @@ class _RecentActivities extends StatelessWidget {
             children: [
               const Icon(Icons.access_time, color: Color(0xFF6B7280)),
               const SizedBox(width: 8),
-              Text(l10n.t(AppText.adminRecentActivitiesTitle),
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
+              Text(
+                l10n.t(AppText.adminRecentActivitiesTitle),
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 12),
           if (activities.isEmpty)
-            Text(l10n.t(AppText.adminRecentActivitiesEmpty),
-                style: const TextStyle(color: Color(0xFF6B7280)))
+            Text(
+              l10n.t(AppText.adminRecentActivitiesEmpty),
+              style: const TextStyle(color: Color(0xFF6B7280)),
+            )
           else
             Column(
               children: activities
@@ -592,12 +691,19 @@ class _RecentActivities extends StatelessWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(_activityText(l10n, a.actionType),
-                                    style: const TextStyle(fontWeight: FontWeight.w700)),
+                                Text(
+                                  _activityText(l10n, a.actionType),
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
                                 const SizedBox(height: 2),
                                 Text(
                                   '${a.adminName} • ${_formatTimeAgo(l10n, ml10n, a.createdAt)}',
-                                  style: const TextStyle(color: Color(0xFF6B7280), fontSize: 12),
+                                  style: const TextStyle(
+                                    color: Color(0xFF6B7280),
+                                    fontSize: 12,
+                                  ),
                                 ),
                               ],
                             ),
@@ -659,7 +765,11 @@ String _activityText(AppLocalizations l10n, String actionType) {
   }
 }
 
-String _formatTimeAgo(AppLocalizations l10n, MaterialLocalizations ml10n, DateTime date) {
+String _formatTimeAgo(
+  AppLocalizations l10n,
+  MaterialLocalizations ml10n,
+  DateTime date,
+) {
   final now = DateTime.now();
   final diff = now.difference(date);
   if (diff.inMinutes < 60) return l10n.adminTimeAgoMinutes(diff.inMinutes);

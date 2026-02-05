@@ -9,7 +9,8 @@ class ResetPasswordScreen extends ConsumerStatefulWidget {
   const ResetPasswordScreen({super.key});
 
   @override
-  ConsumerState<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
+  ConsumerState<ResetPasswordScreen> createState() =>
+      _ResetPasswordScreenState();
 }
 
 class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
@@ -48,9 +49,9 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
         _linkApplied = true;
         _linkError = null;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.t(AppText.authLinkAccepted))),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.t(AppText.authLinkAccepted))));
     } catch (e) {
       setState(() => _linkError = l10n.t(AppText.authLinkExpired));
     }
@@ -90,10 +91,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
             ),
             if (_linkError != null) ...[
               const SizedBox(height: 8),
-              Text(
-                _linkError!,
-                style: const TextStyle(color: Colors.red),
-              ),
+              Text(_linkError!, style: const TextStyle(color: Colors.red)),
             ],
             const SizedBox(height: 16),
             TextField(
@@ -119,11 +117,14 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                       final password = _password.text.trim();
                       final confirm = _confirm.text.trim();
 
-                      final session = SupabaseService.client.auth.currentSession;
+                      final session =
+                          SupabaseService.client.auth.currentSession;
                       if (session == null) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text(l10n.t(AppText.authOpenResetLinkFirst)),
+                            content: Text(
+                              l10n.t(AppText.authOpenResetLinkFirst),
+                            ),
                           ),
                         );
                         return;
@@ -131,14 +132,20 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
 
                       if (password.length < 6) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(l10n.t(AppText.commonPasswordMin))),
+                          SnackBar(
+                            content: Text(l10n.t(AppText.commonPasswordMin)),
+                          ),
                         );
                         return;
                       }
 
                       if (password != confirm) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(l10n.t(AppText.commonPasswordsNoMatch))),
+                          SnackBar(
+                            content: Text(
+                              l10n.t(AppText.commonPasswordsNoMatch),
+                            ),
+                          ),
                         );
                         return;
                       }
@@ -149,7 +156,11 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                       if (!context.mounted) return;
 
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(err ?? l10n.t(AppText.authPasswordUpdated))),
+                        SnackBar(
+                          content: Text(
+                            err ?? l10n.t(AppText.authPasswordUpdated),
+                          ),
+                        ),
                       );
                     },
               child: busy

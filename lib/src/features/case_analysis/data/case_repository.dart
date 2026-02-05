@@ -25,11 +25,7 @@ class CaseRepository {
     final c = choice == CaseChoice.left ? 'left' : 'right';
     await SupabaseService.client.rpc(
       'submit_case_response',
-      params: {
-        'p_scenario_id': scenarioId,
-        'p_choice': c,
-      },
+      params: {'p_scenario_id': scenarioId, 'p_choice': c},
     );
   }
 }
-

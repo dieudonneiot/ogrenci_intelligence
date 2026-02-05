@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -51,7 +51,10 @@ class _CompanyJobApplicationsScreenState
     setState(() => _loading = true);
     try {
       final repo = ref.read(companyRepositoryProvider);
-      final job = await repo.getJobById(jobId: widget.jobId, companyId: companyId);
+      final job = await repo.getJobById(
+        jobId: widget.jobId,
+        companyId: companyId,
+      );
       final list = await repo.listJobApplications(jobId: widget.jobId);
       if (!mounted) return;
       setState(() {
@@ -65,7 +68,10 @@ class _CompanyJobApplicationsScreenState
 
   Future<void> _updateStatus(CompanyApplication app, String status) async {
     final repo = ref.read(companyRepositoryProvider);
-    await repo.updateJobApplicationStatus(applicationId: app.id, status: status);
+    await repo.updateJobApplicationStatus(
+      applicationId: app.id,
+      status: status,
+    );
     if (!mounted) return;
     setState(() {
       _apps = [
@@ -84,8 +90,12 @@ class _CompanyJobApplicationsScreenState
     }
 
     final auth = authAsync.value;
-    if (auth == null || !auth.isAuthenticated || auth.userType != UserType.company) {
-      return Center(child: Text(l10n.t(AppText.companyApplicationsLoginRequired)));
+    if (auth == null ||
+        !auth.isAuthenticated ||
+        auth.userType != UserType.company) {
+      return Center(
+        child: Text(l10n.t(AppText.companyApplicationsLoginRequired)),
+      );
     }
 
     final filtered = _apps.where((a) {
@@ -124,7 +134,9 @@ class _CompanyJobApplicationsScreenState
                         child: Text(
                           _jobTitle.isEmpty
                               ? l10n.t(AppText.companyJobApplicationsTitle)
-                              : l10n.companyJobApplicationsTitleWithJob(_jobTitle),
+                              : l10n.companyJobApplicationsTitleWithJob(
+                                  _jobTitle,
+                                ),
                           style: const TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.w900,
@@ -138,10 +150,22 @@ class _CompanyJobApplicationsScreenState
                     spacing: 12,
                     runSpacing: 12,
                     children: [
-                      _MiniStat(label: l10n.t(AppText.commonTotal), value: total),
-                      _MiniStat(label: l10n.t(AppText.statusPending), value: pending),
-                      _MiniStat(label: l10n.t(AppText.statusAccepted), value: accepted),
-                      _MiniStat(label: l10n.t(AppText.statusRejected), value: rejected),
+                      _MiniStat(
+                        label: l10n.t(AppText.commonTotal),
+                        value: total,
+                      ),
+                      _MiniStat(
+                        label: l10n.t(AppText.statusPending),
+                        value: pending,
+                      ),
+                      _MiniStat(
+                        label: l10n.t(AppText.statusAccepted),
+                        value: accepted,
+                      ),
+                      _MiniStat(
+                        label: l10n.t(AppText.statusRejected),
+                        value: rejected,
+                      ),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -167,7 +191,8 @@ class _CompanyJobApplicationsScreenState
                         for (final app in filtered)
                           _ApplicationCard(
                             app: app,
-                            onUpdateStatus: (status) => _updateStatus(app, status),
+                            onUpdateStatus: (status) =>
+                                _updateStatus(app, status),
                           ),
                       ],
                     ),
@@ -242,7 +267,9 @@ class _FiltersBar extends StatelessWidget {
               decoration: InputDecoration(
                 prefixIcon: const Icon(Icons.search),
                 hintText: l10n.t(AppText.companyApplicationsSearchHint),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 isDense: true,
               ),
             ),
@@ -325,9 +352,18 @@ class _MiniStat extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(value.toString(), style: const TextStyle(fontWeight: FontWeight.w900)),
+          Text(
+            value.toString(),
+            style: const TextStyle(fontWeight: FontWeight.w900),
+          ),
           const SizedBox(width: 8),
-          Text(label, style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600)),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Color(0xFF6B7280),
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ],
       ),
     );
@@ -335,10 +371,7 @@ class _MiniStat extends StatelessWidget {
 }
 
 class _ApplicationCard extends StatelessWidget {
-  const _ApplicationCard({
-    required this.app,
-    required this.onUpdateStatus,
-  });
+  const _ApplicationCard({required this.app, required this.onUpdateStatus});
 
   final CompanyApplication app;
   final ValueChanged<String> onUpdateStatus;
@@ -346,13 +379,17 @@ class _ApplicationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final dateText = MaterialLocalizations.of(context).formatShortDate(app.appliedAt);
+    final dateText = MaterialLocalizations.of(
+      context,
+    ).formatShortDate(app.appliedAt);
 
     final dept = (app.profileDepartment ?? '').trim();
     final year = app.profileYear;
     final deptYear = dept.isEmpty
         ? (year == null ? '' : l10n.companyApplicationsYearOfStudy(year))
-        : (year == null ? dept : '$dept • ${l10n.companyApplicationsYearOfStudy(year)}');
+        : (year == null
+              ? dept
+              : '$dept • ${l10n.companyApplicationsYearOfStudy(year)}');
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -361,7 +398,13 @@ class _ApplicationCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: const [BoxShadow(color: Color(0x08000000), blurRadius: 12, offset: Offset(0, 6))],
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x08000000),
+            blurRadius: 12,
+            offset: Offset(0, 6),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -382,16 +425,23 @@ class _ApplicationCard extends StatelessWidget {
             spacing: 12,
             runSpacing: 6,
             children: [
-              _InfoLine(icon: Icons.mail_outline, text: app.profileEmail ?? l10n.t(AppText.commonNotSpecified)),
+              _InfoLine(
+                icon: Icons.mail_outline,
+                text: app.profileEmail ?? l10n.t(AppText.commonNotSpecified),
+              ),
               if ((app.profilePhone ?? '').isNotEmpty)
                 _InfoLine(icon: Icons.phone, text: app.profilePhone!),
-              if (deptYear.isNotEmpty) _InfoLine(icon: Icons.school_outlined, text: deptYear),
+              if (deptYear.isNotEmpty)
+                _InfoLine(icon: Icons.school_outlined, text: deptYear),
               _InfoLine(icon: Icons.event, text: dateText),
             ],
           ),
           if ((app.coverLetter ?? '').isNotEmpty) ...[
             const SizedBox(height: 10),
-            _ExpandableText(title: l10n.t(AppText.companyApplicationsCoverLetterTitle), text: app.coverLetter!),
+            _ExpandableText(
+              title: l10n.t(AppText.companyApplicationsCoverLetterTitle),
+              text: app.coverLetter!,
+            ),
           ],
           if ((app.cvUrl ?? '').isNotEmpty) ...[
             const SizedBox(height: 10),
@@ -410,7 +460,9 @@ class _ApplicationCard extends StatelessWidget {
                     onPressed: () => onUpdateStatus('accepted'),
                     icon: const Icon(Icons.check_circle_outline),
                     label: Text(l10n.t(AppText.commonAccept)),
-                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF16A34A)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF16A34A),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -419,7 +471,9 @@ class _ApplicationCard extends StatelessWidget {
                     onPressed: () => onUpdateStatus('rejected'),
                     icon: const Icon(Icons.cancel_outlined),
                     label: Text(l10n.t(AppText.commonReject)),
-                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFDC2626)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFDC2626),
+                    ),
                   ),
                 ),
               ],
@@ -444,7 +498,9 @@ class _ApplicationCard extends StatelessWidget {
       await Clipboard.setData(ClipboardData(text: url));
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.t(AppText.companyApplicationsCvOpenFailedCopied))),
+        SnackBar(
+          content: Text(l10n.t(AppText.companyApplicationsCvOpenFailedCopied)),
+        ),
       );
     }
   }
@@ -462,7 +518,10 @@ class _InfoLine extends StatelessWidget {
       children: [
         Icon(icon, size: 14, color: const Color(0xFF6B7280)),
         const SizedBox(width: 4),
-        Text(text, style: const TextStyle(color: Color(0xFF6B7280), fontSize: 12)),
+        Text(
+          text,
+          style: const TextStyle(color: Color(0xFF6B7280), fontSize: 12),
+        ),
       ],
     );
   }
@@ -500,8 +559,14 @@ class _StatusPill extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(999)),
-      child: Text(label, style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: fg)),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: fg),
+      ),
     );
   }
 }
@@ -514,7 +579,10 @@ class _ExpandableText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ExpansionTile(
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13)),
+      title: Text(
+        title,
+        style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
+      ),
       tilePadding: EdgeInsets.zero,
       childrenPadding: const EdgeInsets.only(bottom: 8),
       children: [
@@ -552,7 +620,10 @@ class _EmptyState extends StatelessWidget {
           const SizedBox(height: 10),
           Text(
             l10n.t(AppText.companyApplicationsEmpty),
-            style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF6B7280)),
+            style: const TextStyle(
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF6B7280),
+            ),
           ),
         ],
       ),

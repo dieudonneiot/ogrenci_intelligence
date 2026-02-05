@@ -10,20 +10,26 @@ final internshipsRepositoryProvider = Provider<InternshipsRepository>((ref) {
 });
 
 // Filters (match React)
-final internshipsSearchProvider = StateProvider.autoDispose<String>((ref) => '');
-final internshipsLocationProvider =
-    StateProvider.autoDispose<String>((ref) => 'all'); // all, İstanbul, Ankara, İzmir, Bursa, remote
-final internshipsDurationProvider =
-    StateProvider.autoDispose<String>((ref) => 'all'); // all, 1-3, 3-6, 6-12, 12+, 6+
+final internshipsSearchProvider = StateProvider.autoDispose<String>(
+  (ref) => '',
+);
+final internshipsLocationProvider = StateProvider.autoDispose<String>(
+  (ref) => 'all',
+); // all, İstanbul, Ankara, İzmir, Bursa, remote
+final internshipsDurationProvider = StateProvider.autoDispose<String>(
+  (ref) => 'all',
+); // all, 1-3, 3-6, 6-12, 12+, 6+
 
 String? _uid(Ref ref) => ref.read(authViewStateProvider).value?.user?.id;
 
 final internshipsProvider =
-    AutoDisposeAsyncNotifierProvider<InternshipsController, InternshipsViewModel>(
-  InternshipsController.new,
-);
+    AutoDisposeAsyncNotifierProvider<
+      InternshipsController,
+      InternshipsViewModel
+    >(InternshipsController.new);
 
-class InternshipsController extends AutoDisposeAsyncNotifier<InternshipsViewModel> {
+class InternshipsController
+    extends AutoDisposeAsyncNotifier<InternshipsViewModel> {
   @override
   Future<InternshipsViewModel> build() async {
     final auth = ref.watch(authViewStateProvider).value;
@@ -41,7 +47,10 @@ class InternshipsController extends AutoDisposeAsyncNotifier<InternshipsViewMode
     final dept = await repo.fetchMyDepartment(userId: uid);
     if (dept == null || dept.isEmpty) {
       // React: requires department (profile)
-      return InternshipsViewModel.empty(department: null, departmentMissing: true);
+      return InternshipsViewModel.empty(
+        department: null,
+        departmentMissing: true,
+      );
     }
 
     final futures = await Future.wait([
@@ -54,8 +63,16 @@ class InternshipsController extends AutoDisposeAsyncNotifier<InternshipsViewMode
       ),
       repo.fetchMyFavoriteInternshipIds(userId: uid),
       repo.fetchMyApplicationStatusByInternshipId(userId: uid),
-      (() async => await SupabaseService.client.from('profiles').select('year').eq('id', uid).maybeSingle())(),
-      (() async => await SupabaseService.client.from('oi_scores').select('oi_score').eq('user_id', uid).maybeSingle())(),
+      (() async => await SupabaseService.client
+          .from('profiles')
+          .select('year')
+          .eq('id', uid)
+          .maybeSingle())(),
+      (() async => await SupabaseService.client
+          .from('oi_scores')
+          .select('oi_score')
+          .eq('user_id', uid)
+          .maybeSingle())(),
     ]);
 
     var internships = futures[0] as List<Internship>;
@@ -91,20 +108,21 @@ class InternshipsController extends AutoDisposeAsyncNotifier<InternshipsViewMode
       return score.clamp(0, 100);
     }
 
-    internships = internships
-        .map((i) => i.copyWith(compatibility: compatibilityFor(i)))
-        .toList(growable: false)
-      ..sort((a, b) {
-        final c = b.compatibility.compareTo(a.compatibility);
-        if (c != 0) return c;
-        final ad = a.deadline ?? DateTime(2100);
-        final bd = b.deadline ?? DateTime(2100);
-        final d = ad.compareTo(bd);
-        if (d != 0) return d;
-        final ac = a.createdAt ?? DateTime(1970);
-        final bc = b.createdAt ?? DateTime(1970);
-        return bc.compareTo(ac);
-      });
+    internships =
+        internships
+            .map((i) => i.copyWith(compatibility: compatibilityFor(i)))
+            .toList(growable: false)
+          ..sort((a, b) {
+            final c = b.compatibility.compareTo(a.compatibility);
+            if (c != 0) return c;
+            final ad = a.deadline ?? DateTime(2100);
+            final bd = b.deadline ?? DateTime(2100);
+            final d = ad.compareTo(bd);
+            if (d != 0) return d;
+            final ac = a.createdAt ?? DateTime(1970);
+            final bc = b.createdAt ?? DateTime(1970);
+            return bc.compareTo(ac);
+          });
 
     final items = internships
         .map((i) {
@@ -146,7 +164,9 @@ class InternshipsController extends AutoDisposeAsyncNotifier<InternshipsViewMode
     if (current == null) return;
 
     // optimistic UI
-    final idx = current.items.indexWhere((e) => e.internship.id == internshipId);
+    final idx = current.items.indexWhere(
+      (e) => e.internship.id == internshipId,
+    );
     if (idx < 0) return;
 
     final before = current.items[idx];
@@ -170,7 +190,9 @@ class InternshipsController extends AutoDisposeAsyncNotifier<InternshipsViewMode
     final current = state.valueOrNull;
     if (current == null) return;
 
-    final idx = current.items.indexWhere((e) => e.internship.id == internshipId);
+    final idx = current.items.indexWhere(
+      (e) => e.internship.id == internshipId,
+    );
     if (idx < 0) return;
 
     final before = current.items[idx];
@@ -186,14 +208,18 @@ class InternshipsController extends AutoDisposeAsyncNotifier<InternshipsViewMode
       ),
     );
 
-    state = AsyncData(current.copyWith(items: newItems, appliedCount: current.appliedCount + 1));
+    state = AsyncData(
+      current.copyWith(items: newItems, appliedCount: current.appliedCount + 1),
+    );
   }
 }
 
-final internshipDetailProvider = AutoDisposeAsyncNotifierProviderFamily<
-    InternshipDetailController, InternshipDetailViewModel, String>(
-  InternshipDetailController.new,
-);
+final internshipDetailProvider =
+    AutoDisposeAsyncNotifierProviderFamily<
+      InternshipDetailController,
+      InternshipDetailViewModel,
+      String
+    >(InternshipDetailController.new);
 
 class InternshipDetailController
     extends AutoDisposeFamilyAsyncNotifier<InternshipDetailViewModel, String> {
@@ -219,7 +245,11 @@ class InternshipDetailController
     final myApp = futures[2] as InternshipApplication?;
 
     return InternshipDetailViewModel(
-      item: InternshipCardItem(internship: internship, isFavorite: isFav, myApplication: myApp),
+      item: InternshipCardItem(
+        internship: internship,
+        isFavorite: isFav,
+        myApplication: myApp,
+      ),
     );
   }
 

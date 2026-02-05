@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -228,9 +229,8 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           // Auth screens
           GoRoute(
             path: Routes.login,
-            builder: (context, state) => LoginScreen(
-              from: state.uri.queryParameters['from'],
-            ),
+            builder: (context, state) =>
+                LoginScreen(from: state.uri.queryParameters['from']),
           ),
           GoRoute(
             path: Routes.register,
@@ -387,9 +387,8 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: Routes.companyJobsCreate,
-            builder: (context, _) => const CompanyStatusCheck(
-              child: CompanyJobFormScreen(),
-            ),
+            builder: (context, _) =>
+                const CompanyStatusCheck(child: CompanyJobFormScreen()),
           ),
           GoRoute(
             path: Routes.companyJobsEdit,
@@ -408,14 +407,15 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: Routes.companyInternshipsCreate,
-            builder: (context, _) => const CompanyStatusCheck(
-              child: CompanyInternshipFormScreen(),
-            ),
+            builder: (context, _) =>
+                const CompanyStatusCheck(child: CompanyInternshipFormScreen()),
           ),
           GoRoute(
             path: Routes.companyInternshipsEdit,
             builder: (_, s) => CompanyStatusCheck(
-              child: CompanyInternshipFormScreen(internshipId: s.pathParameters['id']),
+              child: CompanyInternshipFormScreen(
+                internshipId: s.pathParameters['id'],
+              ),
             ),
           ),
           GoRoute(
@@ -493,6 +493,25 @@ class MainShell extends ConsumerStatefulWidget {
 
 class _MainShellState extends ConsumerState<MainShell> {
   bool _showFooter = false;
+  bool _footerUpdateScheduled = false;
+  bool? _pendingShowFooter;
+
+  void _scheduleFooterUpdate(bool showFooter) {
+    _pendingShowFooter = showFooter;
+    if (_footerUpdateScheduled) return;
+    _footerUpdateScheduled = true;
+
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      _footerUpdateScheduled = false;
+      if (!mounted) return;
+
+      final next = _pendingShowFooter;
+      _pendingShowFooter = null;
+      if (next == null || next == _showFooter) return;
+
+      setState(() => _showFooter = next);
+    });
+  }
 
   double _footerHeightForWidth(double width) {
     if (width < 820) return 320;
@@ -504,7 +523,8 @@ class _MainShellState extends ConsumerState<MainShell> {
   Widget build(BuildContext context) {
     final authAsync = ref.watch(authViewStateProvider);
     final auth = authAsync.value;
-    final isStudent = auth?.isAuthenticated == true && auth?.userType == UserType.student;
+    final isStudent =
+        auth?.isAuthenticated == true && auth?.userType == UserType.student;
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -522,17 +542,23 @@ class _MainShellState extends ConsumerState<MainShell> {
                     Expanded(
                       child: NotificationListener<ScrollNotification>(
                         onNotification: (notification) {
-                          if (notification.metrics.axis != Axis.vertical) return false;
-                          final atBottom = notification.metrics.extentAfter <= 24;
+                          if (notification.metrics.axis != Axis.vertical) {
+                            return false;
+                          }
+                          final atBottom =
+                              notification.metrics.extentAfter <= 24;
                           if (atBottom != _showFooter) {
-                            setState(() => _showFooter = atBottom);
+                            // Scroll notifications can fire during layout/paint; avoid setState in-frame.
+                            _scheduleFooterUpdate(atBottom);
                           }
                           return false;
                         },
                         child: AnimatedPadding(
                           duration: const Duration(milliseconds: 180),
                           curve: Curves.easeOut,
-                          padding: EdgeInsets.only(bottom: _showFooter ? footerHeight : 0),
+                          padding: EdgeInsets.only(
+                            bottom: _showFooter ? footerHeight : 0,
+                          ),
                           child: widget.child,
                         ),
                       ),
@@ -557,9 +583,7 @@ class _MainShellState extends ConsumerState<MainShell> {
                 Positioned(
                   right: 18,
                   bottom: chatBottom,
-                  child: _ChatFab(
-                    onTap: () => context.go(Routes.chat),
-                  ),
+                  child: _ChatFab(onTap: () => context.go(Routes.chat)),
                 ),
             ],
           ),
@@ -595,15 +619,22 @@ class _ChatFabState extends State<_ChatFab> {
           child: Container(
             width: 58,
             height: 58,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               shape: BoxShape.circle,
               gradient: LinearGradient(
-                colors: [Color(0xFF7C3AED), Color(0xFF4F46E5)],
+                colors: [
+                  Theme.of(context).colorScheme.primary,
+                  Theme.of(context).colorScheme.secondary,
+                ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               boxShadow: [
-                BoxShadow(color: Color(0x33000000), blurRadius: 16, offset: Offset(0, 8)),
+                BoxShadow(
+                  color: Theme.of(context).colorScheme.primary.withAlpha(40),
+                  blurRadius: 16,
+                  offset: Offset(0, 8),
+                ),
               ],
             ),
             child: const Icon(Icons.chat_bubble_outline, color: Colors.white),
@@ -622,7 +653,7 @@ class AdminShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FAFB),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: AdminLayout(child: child),
     );
   }

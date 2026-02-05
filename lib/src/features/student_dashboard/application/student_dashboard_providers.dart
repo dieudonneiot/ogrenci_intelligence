@@ -5,16 +5,19 @@ import '../../points/application/points_providers.dart';
 import '../data/student_dashboard_repository.dart';
 import '../domain/student_dashboard_models.dart';
 
-final studentDashboardRepositoryProvider = Provider<StudentDashboardRepository>((ref) {
-  return StudentDashboardRepository();
-});
+final studentDashboardRepositoryProvider = Provider<StudentDashboardRepository>(
+  (ref) {
+    return StudentDashboardRepository();
+  },
+);
 
 final studentDashboardProvider =
     AsyncNotifierProvider<StudentDashboardNotifier, StudentDashboardViewModel>(
-  StudentDashboardNotifier.new,
-);
+      StudentDashboardNotifier.new,
+    );
 
-class StudentDashboardNotifier extends AsyncNotifier<StudentDashboardViewModel> {
+class StudentDashboardNotifier
+    extends AsyncNotifier<StudentDashboardViewModel> {
   @override
   Future<StudentDashboardViewModel> build() async {
     return _load();
@@ -37,8 +40,9 @@ class StudentDashboardNotifier extends AsyncNotifier<StudentDashboardViewModel> 
         ? (meta['full_name'] ?? meta['name'])?.toString().trim()
         : null;
     final emailPrefix = (user?.email ?? 'Öğrenci').split('@').first;
-    final fallbackName =
-        (metaName != null && metaName.isNotEmpty) ? metaName : emailPrefix;
+    final fallbackName = (metaName != null && metaName.isNotEmpty)
+        ? metaName
+        : emailPrefix;
 
     if (uid == null || uid.isEmpty) {
       return StudentDashboardViewModel.empty(displayName: fallbackName);
@@ -61,23 +65,25 @@ class DashboardBonusesResult {
 
   bool get anyAwarded => dailyAwarded || weeklyAwarded;
 
-  int get awardedPoints =>
-      (dailyAwarded ? 2 : 0) + (weeklyAwarded ? 15 : 0);
+  int get awardedPoints => (dailyAwarded ? 2 : 0) + (weeklyAwarded ? 15 : 0);
 }
 
 final dashboardBonusesProvider =
     FutureProvider.autoDispose<DashboardBonusesResult>((ref) async {
-  final auth = ref.read(authViewStateProvider).value;
-  final uid = auth?.user?.id;
+      final auth = ref.read(authViewStateProvider).value;
+      final uid = auth?.user?.id;
 
-  if (uid == null || uid.isEmpty) {
-    return const DashboardBonusesResult(dailyAwarded: false, weeklyAwarded: false);
-  }
+      if (uid == null || uid.isEmpty) {
+        return const DashboardBonusesResult(
+          dailyAwarded: false,
+          weeklyAwarded: false,
+        );
+      }
 
-  final repo = ref.read(pointsRepositoryProvider);
+      final repo = ref.read(pointsRepositoryProvider);
 
-  final daily = await repo.checkDailyLoginBonus(userId: uid);
-  final weekly = await repo.checkWeeklyStreakBonus(userId: uid);
+      final daily = await repo.checkDailyLoginBonus(userId: uid);
+      final weekly = await repo.checkWeeklyStreakBonus(userId: uid);
 
-  return DashboardBonusesResult(dailyAwarded: daily, weeklyAwarded: weekly);
-});
+      return DashboardBonusesResult(dailyAwarded: daily, weeklyAwarded: weekly);
+    });

@@ -74,7 +74,8 @@ class HowItWorksScreen extends StatelessWidget {
                     final maxWidth = c.maxWidth;
                     final isWide = maxWidth >= 980;
                     final crossAxis = isWide ? 5 : (maxWidth >= 700 ? 2 : 1);
-                    final itemWidth = (maxWidth - (crossAxis - 1) * 16) / crossAxis;
+                    final itemWidth =
+                        (maxWidth - (crossAxis - 1) * 16) / crossAxis;
 
                     return Wrap(
                       spacing: 16,
@@ -82,7 +83,10 @@ class HowItWorksScreen extends StatelessWidget {
                       alignment: WrapAlignment.center,
                       children: [
                         for (final step in steps)
-                          SizedBox(width: itemWidth, child: _StepCard(step: step)),
+                          SizedBox(
+                            width: itemWidth,
+                            child: _StepCard(step: step),
+                          ),
                       ],
                     );
                   },
@@ -127,10 +131,24 @@ class HowItWorksScreen extends StatelessWidget {
                         title: l10n.t(AppText.howItWorksDetail4Title),
                         description: l10n.t(AppText.howItWorksDetail4Desc),
                         highlights: [
-                          _Highlight(l10n.t(AppText.howItWorksHighlightDailyLogin), l10n.pointsDelta(2)),
-                          _Highlight(l10n.t(AppText.howItWorksHighlightWeeklyStreak), l10n.pointsDelta(15)),
-                          _Highlight(l10n.t(AppText.howItWorksHighlightInternshipCompletion), l10n.pointsDelta(100)),
-                          _Highlight(l10n.t(AppText.howItWorksHighlightTop10), l10n.pointsDelta(50)),
+                          _Highlight(
+                            l10n.t(AppText.howItWorksHighlightDailyLogin),
+                            l10n.pointsDelta(2),
+                          ),
+                          _Highlight(
+                            l10n.t(AppText.howItWorksHighlightWeeklyStreak),
+                            l10n.pointsDelta(15),
+                          ),
+                          _Highlight(
+                            l10n.t(
+                              AppText.howItWorksHighlightInternshipCompletion,
+                            ),
+                            l10n.pointsDelta(100),
+                          ),
+                          _Highlight(
+                            l10n.t(AppText.howItWorksHighlightTop10),
+                            l10n.pointsDelta(50),
+                          ),
                         ],
                       ),
                       _DetailStep(
@@ -138,9 +156,18 @@ class HowItWorksScreen extends StatelessWidget {
                         title: l10n.t(AppText.howItWorksDetail5Title),
                         description: l10n.t(AppText.howItWorksDetail5Desc),
                         rewards: [
-                          _Reward(l10n.t(AppText.howItWorksRewardFreeTraining), l10n.howItWorksRewardFromPoints(1000)),
-                          _Reward(l10n.t(AppText.howItWorksRewardTechProducts), l10n.howItWorksRewardFromPoints(3000)),
-                          _Reward(l10n.t(AppText.howItWorksRewardAbroadTrips), l10n.howItWorksRewardFromPoints(5000)),
+                          _Reward(
+                            l10n.t(AppText.howItWorksRewardFreeTraining),
+                            l10n.howItWorksRewardFromPoints(1000),
+                          ),
+                          _Reward(
+                            l10n.t(AppText.howItWorksRewardTechProducts),
+                            l10n.howItWorksRewardFromPoints(3000),
+                          ),
+                          _Reward(
+                            l10n.t(AppText.howItWorksRewardAbroadTrips),
+                            l10n.howItWorksRewardFromPoints(5000),
+                          ),
                           _Reward(
                             l10n.t(AppText.howItWorksRewardInternshipGuarantee),
                             l10n.howItWorksRewardFromPoints(1500),
@@ -183,7 +210,11 @@ class _Hero extends StatelessWidget {
         ),
         borderRadius: BorderRadius.circular(24),
         boxShadow: const [
-          BoxShadow(color: Color(0x26000000), blurRadius: 20, offset: Offset(0, 10)),
+          BoxShadow(
+            color: Color(0x26000000),
+            blurRadius: 20,
+            offset: Offset(0, 10),
+          ),
         ],
       ),
       child: Stack(
@@ -191,12 +222,18 @@ class _Hero extends StatelessWidget {
           Positioned(
             right: -40,
             top: -40,
-            child: _GlowCircle(color: Colors.white.withValues(alpha: 0.12), size: 140),
+            child: _GlowCircle(
+              color: Colors.white.withValues(alpha: 0.12),
+              size: 140,
+            ),
           ),
           Positioned(
             left: -20,
             bottom: -20,
-            child: _GlowCircle(color: Colors.white.withValues(alpha: 0.10), size: 120),
+            child: _GlowCircle(
+              color: Colors.white.withValues(alpha: 0.10),
+              size: 120,
+            ),
           ),
           LayoutBuilder(
             builder: (context, c) {
@@ -211,25 +248,38 @@ class _Hero extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.white.withValues(alpha: 0.18),
                             borderRadius: BorderRadius.circular(999),
                           ),
                           child: Text(
                             l10n.t(AppText.howItWorksHeroChip),
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 12),
                         Text(
                           l10n.t(AppText.howItWorksTitle),
-                          style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w900, color: Colors.white),
+                          style: const TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.white,
+                          ),
                         ),
                         const SizedBox(height: 10),
                         Text(
                           l10n.t(AppText.howItWorksSubtitle),
-                          style: const TextStyle(color: Color(0xFFE0E7FF), height: 1.4),
+                          style: const TextStyle(
+                            color: Color(0xFFE0E7FF),
+                            height: 1.4,
+                          ),
                         ),
                         const SizedBox(height: 18),
                         Wrap(
@@ -241,22 +291,40 @@ class _Hero extends StatelessWidget {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.white,
                                 foregroundColor: const Color(0xFF4C1D95),
-                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 12,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
                               ),
-                              child: Text(l10n.t(AppText.howItWorksHeroPrimary),
-                                  style: const TextStyle(fontWeight: FontWeight.w800)),
+                              child: Text(
+                                l10n.t(AppText.howItWorksHeroPrimary),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
                             ),
                             OutlinedButton(
                               onPressed: onSecondary,
                               style: OutlinedButton.styleFrom(
                                 side: const BorderSide(color: Colors.white),
                                 foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 12,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
                               ),
-                              child: Text(l10n.t(AppText.howItWorksHeroSecondary),
-                                  style: const TextStyle(fontWeight: FontWeight.w700)),
+                              child: Text(
+                                l10n.t(AppText.howItWorksHeroSecondary),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
                             ),
                           ],
                         ),
@@ -270,18 +338,33 @@ class _Hero extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(18),
-                        border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.2),
+                        ),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(l10n.t(AppText.howItWorksHeroSidebarTitle),
-                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+                          Text(
+                            l10n.t(AppText.howItWorksHeroSidebarTitle),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
                           const SizedBox(height: 10),
-                          _HeroBullet(text: l10n.t(AppText.howItWorksHeroBullet1)),
-                          _HeroBullet(text: l10n.t(AppText.howItWorksHeroBullet2)),
-                          _HeroBullet(text: l10n.t(AppText.howItWorksHeroBullet3)),
-                          _HeroBullet(text: l10n.t(AppText.howItWorksHeroBullet4)),
+                          _HeroBullet(
+                            text: l10n.t(AppText.howItWorksHeroBullet1),
+                          ),
+                          _HeroBullet(
+                            text: l10n.t(AppText.howItWorksHeroBullet2),
+                          ),
+                          _HeroBullet(
+                            text: l10n.t(AppText.howItWorksHeroBullet3),
+                          ),
+                          _HeroBullet(
+                            text: l10n.t(AppText.howItWorksHeroBullet4),
+                          ),
                         ],
                       ),
                     ),
@@ -307,10 +390,7 @@ class _GlowCircle extends StatelessWidget {
     return Container(
       width: size,
       height: size,
-      decoration: BoxDecoration(
-        color: color,
-        shape: BoxShape.circle,
-      ),
+      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
     );
   }
 }
@@ -328,7 +408,9 @@ class _HeroBullet extends StatelessWidget {
         children: [
           const Icon(Icons.check_circle, color: Colors.white, size: 16),
           const SizedBox(width: 6),
-          Expanded(child: Text(text, style: const TextStyle(color: Colors.white70))),
+          Expanded(
+            child: Text(text, style: const TextStyle(color: Colors.white70)),
+          ),
         ],
       ),
     );
@@ -345,7 +427,14 @@ class _SectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(title, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w900, color: Color(0xFF111827))),
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 26,
+            fontWeight: FontWeight.w900,
+            color: Color(0xFF1F2937),
+          ),
+        ),
         const SizedBox(height: 6),
         Text(subtitle, style: const TextStyle(color: Color(0xFF6B7280))),
       ],
@@ -382,7 +471,13 @@ class _StepCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 12, offset: Offset(0, 6))],
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0A000000),
+            blurRadius: 12,
+            offset: Offset(0, 6),
+          ),
+        ],
       ),
       child: Column(
         children: [
@@ -431,12 +526,21 @@ class _SectionCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 16, offset: Offset(0, 8))],
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0A000000),
+            blurRadius: 16,
+            offset: Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
+          Text(
+            title,
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
+          ),
           const SizedBox(height: 16),
           child,
         ],
@@ -477,7 +581,13 @@ class _DetailStep extends StatelessWidget {
               borderRadius: BorderRadius.circular(999),
             ),
             child: Center(
-              child: Text(index, style: const TextStyle(fontWeight: FontWeight.w900, color: Color(0xFF6D28D9))),
+              child: Text(
+                index,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w900,
+                  color: Color(0xFF6D28D9),
+                ),
+              ),
             ),
           ),
           const SizedBox(width: 14),
@@ -485,9 +595,18 @@ class _DetailStep extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
                 const SizedBox(height: 6),
-                Text(description, style: const TextStyle(color: Color(0xFF6B7280), height: 1.4)),
+                Text(
+                  description,
+                  style: const TextStyle(color: Color(0xFF6B7280), height: 1.4),
+                ),
                 if (bullets != null) ...[
                   const SizedBox(height: 8),
                   for (final item in bullets!) _Bullet(text: item),
@@ -498,7 +617,8 @@ class _DetailStep extends StatelessWidget {
                     spacing: 12,
                     runSpacing: 12,
                     children: [
-                      for (final item in highlights!) _HighlightCard(item: item),
+                      for (final item in highlights!)
+                        _HighlightCard(item: item),
                     ],
                   ),
                 ],
@@ -534,7 +654,9 @@ class _Bullet extends StatelessWidget {
         children: [
           const Icon(Icons.check_circle, size: 14, color: Color(0xFF7C3AED)),
           const SizedBox(width: 6),
-          Expanded(child: Text(text, style: const TextStyle(color: Color(0xFF6B7280)))),
+          Expanded(
+            child: Text(text, style: const TextStyle(color: Color(0xFF6B7280))),
+          ),
         ],
       ),
     );
@@ -565,9 +687,18 @@ class _HighlightCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(item.title, style: const TextStyle(color: Color(0xFF6B7280), fontSize: 12)),
+          Text(
+            item.title,
+            style: const TextStyle(color: Color(0xFF6B7280), fontSize: 12),
+          ),
           const SizedBox(height: 4),
-          Text(item.value, style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF6D28D9))),
+          Text(
+            item.value,
+            style: const TextStyle(
+              fontWeight: FontWeight.w800,
+              color: Color(0xFF6D28D9),
+            ),
+          ),
         ],
       ),
     );
@@ -600,7 +731,10 @@ class _RewardCard extends StatelessWidget {
         children: [
           Text(item.title, style: const TextStyle(fontWeight: FontWeight.w700)),
           const SizedBox(height: 4),
-          Text(item.subtitle, style: const TextStyle(color: Color(0xFF6B7280), fontSize: 12)),
+          Text(
+            item.subtitle,
+            style: const TextStyle(color: Color(0xFF6B7280), fontSize: 12),
+          ),
         ],
       ),
     );
@@ -619,14 +753,20 @@ class _CtaCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: [Color(0xFF7C3AED), Color(0xFF4F46E5)]),
+        gradient: const LinearGradient(
+          colors: [Color(0xFF7C3AED), Color(0xFF4F46E5)],
+        ),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
         children: [
           Text(
             l10n.t(AppText.howItWorksCtaTitle),
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Colors.white),
+            style: const TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.w900,
+              color: Colors.white,
+            ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 6),
@@ -646,22 +786,36 @@ class _CtaCard extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
                   foregroundColor: const Color(0xFF4C1D95),
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 12,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
                 ),
-                child: Text(l10n.t(AppText.howItWorksCtaPrimary),
-                    style: const TextStyle(fontWeight: FontWeight.w800)),
+                child: Text(
+                  l10n.t(AppText.howItWorksCtaPrimary),
+                  style: const TextStyle(fontWeight: FontWeight.w800),
+                ),
               ),
               OutlinedButton(
                 onPressed: onSecondary,
                 style: OutlinedButton.styleFrom(
                   side: const BorderSide(color: Colors.white),
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 12,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
                 ),
-                child: Text(l10n.t(AppText.howItWorksCtaSecondary),
-                    style: const TextStyle(fontWeight: FontWeight.w700)),
+                child: Text(
+                  l10n.t(AppText.howItWorksCtaSecondary),
+                  style: const TextStyle(fontWeight: FontWeight.w700),
+                ),
               ),
             ],
           ),

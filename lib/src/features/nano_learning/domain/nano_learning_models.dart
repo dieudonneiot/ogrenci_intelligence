@@ -69,8 +69,9 @@ class NanoQuizSubmitResult {
 
   factory NanoQuizSubmitResult.fromRpc(Map<String, dynamic> map) {
     final isCorrect = map['is_correct'] == true;
-    final points = (map['points_awarded'] is num) ? (map['points_awarded'] as num).toInt() : 0;
+    final points = (map['points_awarded'] is num)
+        ? (map['points_awarded'] as num).toInt()
+        : 0;
     return NanoQuizSubmitResult(isCorrect: isCorrect, pointsAwarded: points);
   }
 }
-

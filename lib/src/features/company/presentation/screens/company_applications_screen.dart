@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -24,10 +24,12 @@ class CompanyApplicationsScreen extends ConsumerStatefulWidget {
   const CompanyApplicationsScreen({super.key});
 
   @override
-  ConsumerState<CompanyApplicationsScreen> createState() => _CompanyApplicationsScreenState();
+  ConsumerState<CompanyApplicationsScreen> createState() =>
+      _CompanyApplicationsScreenState();
 }
 
-class _CompanyApplicationsScreenState extends ConsumerState<CompanyApplicationsScreen> {
+class _CompanyApplicationsScreenState
+    extends ConsumerState<CompanyApplicationsScreen> {
   bool _loading = true;
   List<CompanyApplication> _apps = const [];
   String _search = '';
@@ -67,9 +69,15 @@ class _CompanyApplicationsScreenState extends ConsumerState<CompanyApplicationsS
   Future<void> _updateStatus(CompanyApplication app, String status) async {
     final repo = ref.read(companyRepositoryProvider);
     if (app.type == 'job') {
-      await repo.updateJobApplicationStatus(applicationId: app.id, status: status);
+      await repo.updateJobApplicationStatus(
+        applicationId: app.id,
+        status: status,
+      );
     } else {
-      await repo.updateInternshipApplicationStatus(applicationId: app.id, status: status);
+      await repo.updateInternshipApplicationStatus(
+        applicationId: app.id,
+        status: status,
+      );
     }
     if (!mounted) return;
     setState(() {
@@ -133,13 +141,20 @@ class _CompanyApplicationsScreenState extends ConsumerState<CompanyApplicationsS
       final id = (focusId ?? '').toString();
       if (id.isEmpty) throw Exception('Failed to create focus check');
 
-      await SupabaseService.client.functions.invoke('push', body: {'focus_check_id': id});
+      await SupabaseService.client.functions.invoke(
+        'push',
+        body: {'focus_check_id': id},
+      );
 
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Focus check sent.')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Focus check sent.')));
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed: $e')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Failed: $e')));
     } finally {
       if (mounted) setState(() => _sendingFocus.remove(app.id));
     }
@@ -154,8 +169,12 @@ class _CompanyApplicationsScreenState extends ConsumerState<CompanyApplicationsS
     }
 
     final auth = authAsync.value;
-    if (auth == null || !auth.isAuthenticated || auth.userType != UserType.company) {
-      return Center(child: Text(l10n.t(AppText.companyApplicationsLoginRequired)));
+    if (auth == null ||
+        !auth.isAuthenticated ||
+        auth.userType != UserType.company) {
+      return Center(
+        child: Text(l10n.t(AppText.companyApplicationsLoginRequired)),
+      );
     }
 
     final filtered = _apps.where((a) {
@@ -191,10 +210,19 @@ class _CompanyApplicationsScreenState extends ConsumerState<CompanyApplicationsS
                       final isNarrow = c.maxWidth < 640;
                       final titleRow = Row(
                         children: [
-                          const Icon(Icons.people_outline, color: Color(0xFF6D28D9), size: 28),
+                          const Icon(
+                            Icons.people_outline,
+                            color: Color(0xFF6D28D9),
+                            size: 28,
+                          ),
                           const SizedBox(width: 10),
-                          Text(l10n.t(AppText.companyApplicationsTitle),
-                              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900)),
+                          Text(
+                            l10n.t(AppText.companyApplicationsTitle),
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
                         ],
                       );
                       final actions = Wrap(
@@ -208,8 +236,12 @@ class _CompanyApplicationsScreenState extends ConsumerState<CompanyApplicationsS
                           ElevatedButton.icon(
                             onPressed: () => _exportCsv(filtered),
                             icon: const Icon(Icons.download_outlined),
-                            label: Text(l10n.t(AppText.companyReportsExportCsv)),
-                            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6D28D9)),
+                            label: Text(
+                              l10n.t(AppText.companyReportsExportCsv),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF6D28D9),
+                            ),
                           ),
                         ],
                       );
@@ -225,13 +257,7 @@ class _CompanyApplicationsScreenState extends ConsumerState<CompanyApplicationsS
                         );
                       }
 
-                      return Row(
-                        children: [
-                          titleRow,
-                          const Spacer(),
-                          actions,
-                        ],
-                      );
+                      return Row(children: [titleRow, const Spacer(), actions]);
                     },
                   ),
                   const SizedBox(height: 14),
@@ -239,12 +265,30 @@ class _CompanyApplicationsScreenState extends ConsumerState<CompanyApplicationsS
                     spacing: 12,
                     runSpacing: 12,
                     children: [
-                      _MiniStat(label: l10n.t(AppText.commonTotal), value: total),
-                      _MiniStat(label: l10n.t(AppText.statusPending), value: pending),
-                      _MiniStat(label: l10n.t(AppText.statusAccepted), value: accepted),
-                      _MiniStat(label: l10n.t(AppText.statusRejected), value: rejected),
-                      _MiniStat(label: l10n.t(AppText.jobsTitle), value: jobCount),
-                      _MiniStat(label: l10n.t(AppText.internshipsTitle), value: internshipCount),
+                      _MiniStat(
+                        label: l10n.t(AppText.commonTotal),
+                        value: total,
+                      ),
+                      _MiniStat(
+                        label: l10n.t(AppText.statusPending),
+                        value: pending,
+                      ),
+                      _MiniStat(
+                        label: l10n.t(AppText.statusAccepted),
+                        value: accepted,
+                      ),
+                      _MiniStat(
+                        label: l10n.t(AppText.statusRejected),
+                        value: rejected,
+                      ),
+                      _MiniStat(
+                        label: l10n.t(AppText.jobsTitle),
+                        value: jobCount,
+                      ),
+                      _MiniStat(
+                        label: l10n.t(AppText.internshipsTitle),
+                        value: internshipCount,
+                      ),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -258,7 +302,12 @@ class _CompanyApplicationsScreenState extends ConsumerState<CompanyApplicationsS
                   ),
                   const SizedBox(height: 16),
                   if (_loading)
-                    const Center(child: Padding(padding: EdgeInsets.all(24), child: CircularProgressIndicator()))
+                    const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(24),
+                        child: CircularProgressIndicator(),
+                      ),
+                    )
                   else if (filtered.isEmpty)
                     const _EmptyState()
                   else
@@ -267,8 +316,11 @@ class _CompanyApplicationsScreenState extends ConsumerState<CompanyApplicationsS
                         for (final app in filtered)
                           _ApplicationCard(
                             app: app,
-                            onUpdateStatus: (status) => _updateStatus(app, status),
-                            onSendFocusCheck: _sendingFocus.contains(app.id) ? null : () => _sendFocusCheck(app),
+                            onUpdateStatus: (status) =>
+                                _updateStatus(app, status),
+                            onSendFocusCheck: _sendingFocus.contains(app.id)
+                                ? null
+                                : () => _sendFocusCheck(app),
                           ),
                       ],
                     ),
@@ -362,7 +414,9 @@ class _FiltersBar extends StatelessWidget {
               decoration: InputDecoration(
                 prefixIcon: const Icon(Icons.search),
                 hintText: l10n.t(AppText.companyApplicationsSearchHint),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 isDense: true,
               ),
             ),
@@ -460,9 +514,18 @@ class _MiniStat extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(value.toString(), style: const TextStyle(fontWeight: FontWeight.w900)),
+          Text(
+            value.toString(),
+            style: const TextStyle(fontWeight: FontWeight.w900),
+          ),
           const SizedBox(width: 8),
-          Text(label, style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600)),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Color(0xFF6B7280),
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ],
       ),
     );
@@ -491,7 +554,13 @@ class _ApplicationCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: const [BoxShadow(color: Color(0x08000000), blurRadius: 12, offset: Offset(0, 6))],
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x08000000),
+            blurRadius: 12,
+            offset: Offset(0, 6),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -512,31 +581,44 @@ class _ApplicationCard extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             '${app.title ?? '-'} • ${app.department ?? '-'}',
-            style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
+            style: const TextStyle(
+              color: Color(0xFF6B7280),
+              fontWeight: FontWeight.w600,
+            ),
           ),
           const SizedBox(height: 10),
           Wrap(
             spacing: 12,
             runSpacing: 6,
             children: [
-              _InfoLine(icon: Icons.mail_outline, text: app.profileEmail ?? l10n.t(AppText.commonNotSpecified)),
+              _InfoLine(
+                icon: Icons.mail_outline,
+                text: app.profileEmail ?? l10n.t(AppText.commonNotSpecified),
+              ),
               if ((app.profilePhone ?? '').isNotEmpty)
                 _InfoLine(icon: Icons.phone, text: app.profilePhone!),
               if ((app.profileDepartment ?? '').isNotEmpty)
                 _InfoLine(
                   icon: Icons.school_outlined,
-                  text: '${app.profileDepartment}${app.profileYear != null ? ' • ${l10n.companyApplicationsYearOfStudy(app.profileYear!)}' : ''}',
+                  text:
+                      '${app.profileDepartment}${app.profileYear != null ? ' • ${l10n.companyApplicationsYearOfStudy(app.profileYear!)}' : ''}',
                 ),
               _InfoLine(icon: Icons.event, text: _formatDate(app.appliedAt)),
             ],
           ),
           if ((app.coverLetter ?? '').isNotEmpty) ...[
             const SizedBox(height: 10),
-            _ExpandableText(title: l10n.t(AppText.companyApplicationsCoverLetterTitle), text: app.coverLetter!),
+            _ExpandableText(
+              title: l10n.t(AppText.companyApplicationsCoverLetterTitle),
+              text: app.coverLetter!,
+            ),
           ],
           if ((app.motivationLetter ?? '').isNotEmpty) ...[
             const SizedBox(height: 10),
-            _ExpandableText(title: l10n.t(AppText.companyApplicationsMotivationLetterTitle), text: app.motivationLetter!),
+            _ExpandableText(
+              title: l10n.t(AppText.companyApplicationsMotivationLetterTitle),
+              text: app.motivationLetter!,
+            ),
           ],
           if ((app.cvUrl ?? '').isNotEmpty) ...[
             const SizedBox(height: 10),
@@ -547,41 +629,55 @@ class _ApplicationCard extends StatelessWidget {
             ),
           ],
           const SizedBox(height: 6),
-            Row(
-              children: [
-                TextButton.icon(
-                  onPressed: () {
-                    if (isJob && app.jobId != null) {
-                      context.go('${Routes.companyJobs}/${app.jobId}/applications');
-                    } else if (!isJob && app.internshipId != null) {
-                      context.go('${Routes.companyInternships}/${app.internshipId}/applications');
-                    }
-                  },
-                  icon: const Icon(Icons.visibility_outlined),
-                  label: Text(l10n.t(AppText.commonViewDetails)),
-                ),
-                if (!isJob && app.status == 'accepted' && app.profileId != null && app.profileId!.isNotEmpty) ...[
-                  const SizedBox(width: 8),
-                  OutlinedButton.icon(
-                    onPressed: onSendFocusCheck,
-                    icon: const Icon(Icons.notifications_active_outlined),
-                    label: const Text('Send Focus Check', style: TextStyle(fontWeight: FontWeight.w900)),
+          Row(
+            children: [
+              TextButton.icon(
+                onPressed: () {
+                  if (isJob && app.jobId != null) {
+                    context.go(
+                      '${Routes.companyJobs}/${app.jobId}/applications',
+                    );
+                  } else if (!isJob && app.internshipId != null) {
+                    context.go(
+                      '${Routes.companyInternships}/${app.internshipId}/applications',
+                    );
+                  }
+                },
+                icon: const Icon(Icons.visibility_outlined),
+                label: Text(l10n.t(AppText.commonViewDetails)),
+              ),
+              if (!isJob &&
+                  app.status == 'accepted' &&
+                  app.profileId != null &&
+                  app.profileId!.isNotEmpty) ...[
+                const SizedBox(width: 8),
+                OutlinedButton.icon(
+                  onPressed: onSendFocusCheck,
+                  icon: const Icon(Icons.notifications_active_outlined),
+                  label: const Text(
+                    'Send Focus Check',
+                    style: TextStyle(fontWeight: FontWeight.w900),
                   ),
-                ],
-                const Spacer(),
-                if (app.status == 'pending') ...[
-                  ElevatedButton.icon(
-                    onPressed: () => onUpdateStatus('accepted'),
-                    icon: const Icon(Icons.check_circle_outline),
+                ),
+              ],
+              const Spacer(),
+              if (app.status == 'pending') ...[
+                ElevatedButton.icon(
+                  onPressed: () => onUpdateStatus('accepted'),
+                  icon: const Icon(Icons.check_circle_outline),
                   label: Text(l10n.t(AppText.commonAccept)),
-                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF16A34A)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF16A34A),
+                  ),
                 ),
                 const SizedBox(width: 10),
                 ElevatedButton.icon(
                   onPressed: () => onUpdateStatus('rejected'),
                   icon: const Icon(Icons.cancel_outlined),
                   label: Text(l10n.t(AppText.commonReject)),
-                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFDC2626)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFDC2626),
+                  ),
                 ),
               ],
             ],
@@ -605,7 +701,9 @@ class _ApplicationCard extends StatelessWidget {
       await Clipboard.setData(ClipboardData(text: url));
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.t(AppText.companyApplicationsCvOpenFailedCopied))),
+        SnackBar(
+          content: Text(l10n.t(AppText.companyApplicationsCvOpenFailedCopied)),
+        ),
       );
     }
   }
@@ -623,7 +721,10 @@ class _InfoLine extends StatelessWidget {
       children: [
         Icon(icon, size: 14, color: const Color(0xFF6B7280)),
         const SizedBox(width: 4),
-        Text(text, style: const TextStyle(color: Color(0xFF6B7280), fontSize: 12)),
+        Text(
+          text,
+          style: const TextStyle(color: Color(0xFF6B7280), fontSize: 12),
+        ),
       ],
     );
   }
@@ -661,8 +762,14 @@ class _StatusPill extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(999)),
-      child: Text(label, style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: fg)),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: fg),
+      ),
     );
   }
 }
@@ -701,7 +808,10 @@ class _ExpandableText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ExpansionTile(
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13)),
+      title: Text(
+        title,
+        style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
+      ),
       tilePadding: EdgeInsets.zero,
       childrenPadding: const EdgeInsets.only(bottom: 8),
       children: [
@@ -739,7 +849,10 @@ class _EmptyState extends StatelessWidget {
           const SizedBox(height: 10),
           Text(
             l10n.t(AppText.companyApplicationsEmpty),
-            style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF6B7280)),
+            style: const TextStyle(
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF6B7280),
+            ),
           ),
         ],
       ),

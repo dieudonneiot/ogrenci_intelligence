@@ -121,14 +121,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     try {
       final user = SupabaseService.client.auth.currentUser;
       if (user != null) {
-      await SupabaseService.client.from('profiles').upsert({
-        'id': user.id,
-        'full_name': fullName,
-        'department': _department,
-        'year': _year,
-        'email': email,
-        'updated_at': DateTime.now().toUtc().toIso8601String(),
-      });
+        await SupabaseService.client.from('profiles').upsert({
+          'id': user.id,
+          'full_name': fullName,
+          'department': _department,
+          'year': _year,
+          'email': email,
+          'updated_at': DateTime.now().toUtc().toIso8601String(),
+        });
       }
     } catch (_) {
       // ignore
@@ -169,7 +169,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
-                  boxShadow: const [BoxShadow(color: Color(0x24000000), blurRadius: 24, offset: Offset(0, 14))],
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x24000000),
+                      blurRadius: 24,
+                      offset: Offset(0, 14),
+                    ),
+                  ],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -182,20 +188,30 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           color: const Color(0xFFEDE9FE),
                           borderRadius: BorderRadius.circular(22),
                         ),
-                        child: const Icon(Icons.person_add_alt_1, size: 38, color: Color(0xFF7C3AED)),
+                        child: const Icon(
+                          Icons.person_add_alt_1,
+                          size: 38,
+                          color: Color(0xFF7C3AED),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 14),
                     Text(
                       l10n.t(AppText.authCreateAccount),
                       textAlign: TextAlign.center,
-                      style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900),
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w900,
+                      ),
                     ),
                     const SizedBox(height: 6),
                     Text(
                       l10n.t(AppText.authStudentRegisterSubtitle),
                       textAlign: TextAlign.center,
-                      style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
+                      style: const TextStyle(
+                        color: Color(0xFF6B7280),
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     const SizedBox(height: 18),
 
@@ -204,7 +220,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       decoration: InputDecoration(
                         labelText: l10n.t(AppText.commonFullName),
                         prefixIcon: const Icon(Icons.badge_outlined),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -215,7 +233,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       decoration: InputDecoration(
                         labelText: l10n.t(AppText.commonEmail),
                         prefixIcon: const Icon(Icons.mail_outline),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -223,13 +243,17 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     DropdownButtonFormField<String>(
                       initialValue: _department,
                       items: departments
-                          .map((d) => DropdownMenuItem(value: d, child: Text(d)))
+                          .map(
+                            (d) => DropdownMenuItem(value: d, child: Text(d)),
+                          )
                           .toList(),
                       onChanged: (v) => setState(() => _department = v),
                       decoration: InputDecoration(
                         labelText: l10n.t(AppText.commonDepartment),
                         prefixIcon: const Icon(Icons.school_outlined),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -237,16 +261,22 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     DropdownButtonFormField<int>(
                       initialValue: _year,
                       items: const [1, 2, 3, 4, 5]
-                          .map((y) => DropdownMenuItem(
-                                value: y,
-                                child: Text(y == 5 ? l10n.t(AppText.authYearPlus) : '$y'),
-                              ))
+                          .map(
+                            (y) => DropdownMenuItem(
+                              value: y,
+                              child: Text(
+                                y == 5 ? l10n.t(AppText.authYearPlus) : '$y',
+                              ),
+                            ),
+                          )
                           .toList(),
                       onChanged: (v) => setState(() => _year = v),
                       decoration: InputDecoration(
                         labelText: l10n.t(AppText.commonYear),
                         prefixIcon: const Icon(Icons.calendar_today_outlined),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -257,10 +287,17 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       decoration: InputDecoration(
                         labelText: l10n.t(AppText.commonPassword),
                         prefixIcon: const Icon(Icons.lock_outline),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
                         suffixIcon: IconButton(
-                          onPressed: () => setState(() => _showPassword = !_showPassword),
-                          icon: Icon(_showPassword ? Icons.visibility_off : Icons.visibility),
+                          onPressed: () =>
+                              setState(() => _showPassword = !_showPassword),
+                          icon: Icon(
+                            _showPassword
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                          ),
                         ),
                       ),
                     ),
@@ -272,7 +309,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       decoration: InputDecoration(
                         labelText: l10n.t(AppText.commonConfirmPassword),
                         prefixIcon: const Icon(Icons.lock_outline),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
                       ),
                     ),
 
@@ -283,7 +322,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       children: [
                         Checkbox(
                           value: _acceptTerms,
-                          onChanged: (v) => setState(() => _acceptTerms = v ?? false),
+                          onChanged: (v) =>
+                              setState(() => _acceptTerms = v ?? false),
                         ),
                         Expanded(
                           child: Padding(
@@ -296,7 +336,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                   child: Text(
                                     l10n.t(AppText.linkTerms),
                                     style: TextStyle(
-                                      color: Theme.of(context).colorScheme.primary,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.primary,
                                       fontWeight: FontWeight.w700,
                                     ),
                                   ),
@@ -307,7 +349,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                   child: Text(
                                     l10n.t(AppText.linkPrivacy),
                                     style: TextStyle(
-                                      color: Theme.of(context).colorScheme.primary,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.primary,
                                       fontWeight: FontWeight.w700,
                                     ),
                                   ),
@@ -327,9 +371,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         decoration: BoxDecoration(
                           color: Colors.red.withValues(alpha: 0.10),
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.red.withValues(alpha: 0.25)),
+                          border: Border.all(
+                            color: Colors.red.withValues(alpha: 0.25),
+                          ),
                         ),
-                        child: Text(_error!, style: const TextStyle(color: Colors.red)),
+                        child: Text(
+                          _error!,
+                          style: const TextStyle(color: Colors.red),
+                        ),
                       ),
                     ],
 

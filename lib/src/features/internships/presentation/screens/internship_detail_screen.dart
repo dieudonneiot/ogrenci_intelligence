@@ -30,7 +30,11 @@ class InternshipDetailScreen extends ConsumerWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.error_outline, size: 48, color: Color(0xFFEF4444)),
+                const Icon(
+                  Icons.error_outline,
+                  size: 48,
+                  color: Color(0xFFEF4444),
+                ),
                 const SizedBox(height: 10),
                 Text(
                   l10n.internshipDetailLoadFailed(e.toString()),
@@ -41,7 +45,9 @@ class InternshipDetailScreen extends ConsumerWidget {
                 SizedBox(
                   height: 44,
                   child: ElevatedButton(
-                    onPressed: () => ref.read(internshipDetailProvider(internshipId).notifier).refresh(),
+                    onPressed: () => ref
+                        .read(internshipDetailProvider(internshipId).notifier)
+                        .refresh(),
                     child: Text(l10n.t(AppText.retry)),
                   ),
                 ),
@@ -75,12 +81,21 @@ class _InternshipDetailBody extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: const Color(0xFFF9FAFB),
         elevation: 0,
-        title: Text(l10n.t(AppText.internshipDetailTitle), style: const TextStyle(fontWeight: FontWeight.w900)),
+        title: Text(
+          l10n.t(AppText.internshipDetailTitle),
+          style: const TextStyle(fontWeight: FontWeight.w900),
+        ),
         actions: [
           IconButton(
-            onPressed: () => ref.read(internshipDetailProvider(i.id).notifier).toggleFavorite(),
-            icon: Icon(item.isFavorite ? Icons.favorite : Icons.favorite_border),
-            color: item.isFavorite ? const Color(0xFFEF4444) : const Color(0xFF6B7280),
+            onPressed: () => ref
+                .read(internshipDetailProvider(i.id).notifier)
+                .toggleFavorite(),
+            icon: Icon(
+              item.isFavorite ? Icons.favorite : Icons.favorite_border,
+            ),
+            color: item.isFavorite
+                ? const Color(0xFFEF4444)
+                : const Color(0xFF6B7280),
           ),
         ],
       ),
@@ -106,16 +121,26 @@ class _InternshipDetailBody extends ConsumerWidget {
                   status: app?.status,
                   onApply: (motivation) async {
                     try {
-                      await ref.read(internshipDetailProvider(i.id).notifier).apply(motivation);
+                      await ref
+                          .read(internshipDetailProvider(i.id).notifier)
+                          .apply(motivation);
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(l10n.t(AppText.internshipDetailApplySuccess))),
+                          SnackBar(
+                            content: Text(
+                              l10n.t(AppText.internshipDetailApplySuccess),
+                            ),
+                          ),
                         );
                       }
                     } catch (e) {
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(l10n.internshipDetailApplyFailed(e.toString()))),
+                          SnackBar(
+                            content: Text(
+                              l10n.internshipDetailApplyFailed(e.toString()),
+                            ),
+                          ),
                         );
                       }
                     }
@@ -124,11 +149,7 @@ class _InternshipDetailBody extends ConsumerWidget {
 
                 if (!wide) {
                   return Column(
-                    children: [
-                      left,
-                      const SizedBox(height: 14),
-                      right,
-                    ],
+                    children: [left, const SizedBox(height: 14), right],
                   );
                 }
 
@@ -166,7 +187,9 @@ class _MainDetail extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final i = internship;
-    final location = i.isRemote ? l10n.t(AppText.remote) : (i.location ?? l10n.t(AppText.internshipsNotSpecified));
+    final location = i.isRemote
+        ? l10n.t(AppText.remote)
+        : (i.location ?? l10n.t(AppText.internshipsNotSpecified));
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -174,7 +197,13 @@ class _MainDetail extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 18, offset: Offset(0, 8))],
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0A000000),
+            blurRadius: 18,
+            offset: Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -182,20 +211,35 @@ class _MainDetail extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: Text(i.title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
+                child: Text(
+                  i.title,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
               ),
               if (status != null) _StatusPill(status: status!),
             ],
           ),
           const SizedBox(height: 6),
-          Text(i.companyName, style: const TextStyle(color: Color(0xFF4B5563), fontWeight: FontWeight.w800)),
+          Text(
+            i.companyName,
+            style: const TextStyle(
+              color: Color(0xFF4B5563),
+              fontWeight: FontWeight.w800,
+            ),
+          ),
           const SizedBox(height: 12),
           Wrap(
             spacing: 8,
             runSpacing: 8,
             children: [
               _Chip(icon: Icons.place_outlined, text: location),
-              _Chip(icon: Icons.timelapse, text: l10n.internshipsMonths(i.durationMonths)),
+              _Chip(
+                icon: Icons.timelapse,
+                text: l10n.internshipsMonths(i.durationMonths),
+              ),
               if (i.deadline != null)
                 _Chip(
                   icon: Icons.event_outlined,
@@ -205,49 +249,74 @@ class _MainDetail extends StatelessWidget {
                 _Chip(
                   icon: Icons.payments_outlined,
                   text: i.monthlyStipend != null
-                      ? l10n.internshipsMonthlyStipend(i.monthlyStipend!.toStringAsFixed(0))
+                      ? l10n.internshipsMonthlyStipend(
+                          i.monthlyStipend!.toStringAsFixed(0),
+                        )
                       : l10n.t(AppText.internshipsPaid),
                   fg: const Color(0xFF16A34A),
                   bg: const Color(0xFFDCFCE7),
                 ),
               if (i.providesCertificate)
-                _Chip(icon: Icons.verified_outlined, text: l10n.t(AppText.internshipDetailCertificate)),
+                _Chip(
+                  icon: Icons.verified_outlined,
+                  text: l10n.t(AppText.internshipDetailCertificate),
+                ),
               if (i.possibilityOfEmployment)
-                _Chip(icon: Icons.trending_up, text: l10n.t(AppText.internshipDetailEmploymentChance)),
+                _Chip(
+                  icon: Icons.trending_up,
+                  text: l10n.t(AppText.internshipDetailEmploymentChance),
+                ),
             ],
           ),
           const SizedBox(height: 14),
           _SectionTitle(l10n.t(AppText.internshipDetailAbout)),
           const SizedBox(height: 8),
           Text(
-            i.description.isNotEmpty ? i.description : l10n.t(AppText.commonNoDescription),
-            style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
+            i.description.isNotEmpty
+                ? i.description
+                : l10n.t(AppText.commonNoDescription),
+            style: const TextStyle(
+              color: Color(0xFF6B7280),
+              fontWeight: FontWeight.w600,
+            ),
           ),
           const SizedBox(height: 14),
           _SectionTitle(l10n.t(AppText.internshipDetailBenefits)),
           const SizedBox(height: 8),
           if (benefits.isEmpty)
-            Text(l10n.t(AppText.internshipsNotSpecified),
-                style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600))
+            Text(
+              l10n.t(AppText.internshipsNotSpecified),
+              style: const TextStyle(
+                color: Color(0xFF6B7280),
+                fontWeight: FontWeight.w600,
+              ),
+            )
           else
             _Bullets(items: benefits),
           const SizedBox(height: 14),
           _SectionTitle(l10n.t(AppText.internshipDetailRequirements)),
           const SizedBox(height: 8),
           if (requirements.isEmpty)
-            Text(l10n.t(AppText.internshipsNotSpecified),
-                style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600))
+            Text(
+              l10n.t(AppText.internshipsNotSpecified),
+              style: const TextStyle(
+                color: Color(0xFF6B7280),
+                fontWeight: FontWeight.w600,
+              ),
+            )
           else
             _Bullets(items: requirements),
           const SizedBox(height: 14),
           _SectionTitle(l10n.t(AppText.internshipDetailProcess)),
           const SizedBox(height: 8),
-          _Bullets(items: [
-            l10n.t(AppText.internshipDetailProcessStep1),
-            l10n.t(AppText.internshipDetailProcessStep2),
-            l10n.t(AppText.internshipDetailProcessStep3),
-            l10n.t(AppText.internshipDetailProcessStep4),
-          ]),
+          _Bullets(
+            items: [
+              l10n.t(AppText.internshipDetailProcessStep1),
+              l10n.t(AppText.internshipDetailProcessStep2),
+              l10n.t(AppText.internshipDetailProcessStep3),
+              l10n.t(AppText.internshipDetailProcessStep4),
+            ],
+          ),
         ],
       ),
     );
@@ -282,22 +351,40 @@ class _ApplyCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 18, offset: Offset(0, 8))],
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0A000000),
+            blurRadius: 18,
+            offset: Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(l10n.t(AppText.internshipDetailApplyTitle),
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+          Text(
+            l10n.t(AppText.internshipDetailApplyTitle),
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+          ),
           const SizedBox(height: 10),
           if (hasApplied) ...[
             _StatusLine(status: s),
             const SizedBox(height: 10),
-            Text(l10n.t(AppText.internshipDetailAlreadyApplied),
-                style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600)),
+            Text(
+              l10n.t(AppText.internshipDetailAlreadyApplied),
+              style: const TextStyle(
+                color: Color(0xFF6B7280),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ] else ...[
-            Text(l10n.internshipDetailApplyHint(100),
-                style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600)),
+            Text(
+              l10n.internshipDetailApplyHint(100),
+              style: const TextStyle(
+                color: Color(0xFF6B7280),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
             const SizedBox(height: 12),
             SizedBox(
               height: 46,
@@ -307,11 +394,15 @@ class _ApplyCard extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF6D28D9),
                   foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                        elevation: 0,
-                      ),
-                child: Text(l10n.t(AppText.internshipDetailApplyButton),
-                    style: const TextStyle(fontWeight: FontWeight.w900)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  elevation: 0,
+                ),
+                child: Text(
+                  l10n.t(AppText.internshipDetailApplyButton),
+                  style: const TextStyle(fontWeight: FontWeight.w900),
+                ),
               ),
             ),
           ],
@@ -347,8 +438,13 @@ class _ApplyCard extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(l10n.t(AppText.internshipDetailMotivationTitle),
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+                  Text(
+                    l10n.t(AppText.internshipDetailMotivationTitle),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
                   const SizedBox(height: 10),
                   TextField(
                     controller: ctrl,
@@ -373,7 +469,9 @@ class _ApplyCard extends StatelessWidget {
                     '$len/100',
                     style: TextStyle(
                       fontWeight: FontWeight.w900,
-                      color: ok ? const Color(0xFF16A34A) : const Color(0xFFDC2626),
+                      color: ok
+                          ? const Color(0xFF16A34A)
+                          : const Color(0xFFDC2626),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -393,10 +491,15 @@ class _ApplyCard extends StatelessWidget {
                         foregroundColor: Colors.white,
                         disabledBackgroundColor: const Color(0xFFE5E7EB),
                         disabledForegroundColor: const Color(0xFF9CA3AF),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
                         elevation: 0,
                       ),
-                      child: Text(l10n.t(AppText.commonSend), style: const TextStyle(fontWeight: FontWeight.w900)),
+                      child: Text(
+                        l10n.t(AppText.commonSend),
+                        style: const TextStyle(fontWeight: FontWeight.w900),
+                      ),
                     ),
                   ),
                 ],
@@ -422,7 +525,10 @@ class _StatusLine extends StatelessWidget {
       children: [
         Icon(Icons.verified, color: color),
         const SizedBox(width: 8),
-        Text(label, style: TextStyle(fontWeight: FontWeight.w900, color: color)),
+        Text(
+          label,
+          style: TextStyle(fontWeight: FontWeight.w900, color: color),
+        ),
       ],
     );
   }
@@ -434,7 +540,10 @@ class _SectionTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(text, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16));
+    return Text(
+      text,
+      style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+    );
   }
 }
 
@@ -452,11 +561,20 @@ class _Bullets extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.check_circle_outline, size: 18, color: Color(0xFF16A34A)),
+                  const Icon(
+                    Icons.check_circle_outline,
+                    size: 18,
+                    color: Color(0xFF16A34A),
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
-                    child: Text(t,
-                        style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600)),
+                    child: Text(
+                      t,
+                      style: const TextStyle(
+                        color: Color(0xFF6B7280),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -479,8 +597,14 @@ class _StatusPill extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(999)),
-      child: Text(label, style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: fg)),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: fg),
+      ),
     );
   }
 }
@@ -502,13 +626,23 @@ class _Chip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(999)),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(999),
+      ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 16, color: fg),
           const SizedBox(width: 6),
-          Text(text, style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: fg)),
+          Text(
+            text,
+            style: TextStyle(
+              fontWeight: FontWeight.w900,
+              fontSize: 12,
+              color: fg,
+            ),
+          ),
         ],
       ),
     );

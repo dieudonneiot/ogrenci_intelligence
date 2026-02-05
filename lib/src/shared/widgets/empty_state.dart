@@ -54,11 +54,7 @@ class PlaceholderView extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 if (icon != null) ...[
-                  Icon(
-                    icon,
-                    size: 56,
-                    color: theme.colorScheme.primary,
-                  ),
+                  Icon(icon, size: 56, color: theme.colorScheme.primary),
                   const SizedBox(height: 12),
                 ],
                 Text(

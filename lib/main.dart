@@ -20,9 +20,7 @@ Future<void> main() async {
 
   runApp(
     ProviderScope(
-      overrides: [
-        initialLocaleProvider.overrideWithValue(savedLocale),
-      ],
+      overrides: [initialLocaleProvider.overrideWithValue(savedLocale)],
       child: const App(),
     ),
   );

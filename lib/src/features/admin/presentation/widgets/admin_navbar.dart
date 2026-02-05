@@ -21,6 +21,8 @@ class _AdminNavbarState extends ConsumerState<AdminNavbar> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final cs = Theme.of(context).colorScheme;
+    final fg = cs.onPrimary;
     final locale = ref.watch(appLocaleProvider);
     final admin = ref.watch(activeAdminProvider).valueOrNull;
     final isSuper = admin?.isSuperAdmin ?? false;
@@ -30,142 +32,212 @@ class _AdminNavbarState extends ConsumerState<AdminNavbar> {
     final currentPath = GoRouterState.of(context).uri.path;
 
     final navItems = <_AdminNavItem>[
-      _AdminNavItem(l10n.t(AppText.adminNavDashboard), Routes.adminDashboard, Icons.home_outlined),
-      _AdminNavItem(l10n.t(AppText.adminNavCompanies), Routes.adminCompanies, Icons.apartment_outlined),
-      _AdminNavItem(l10n.t(AppText.adminNavUsers), Routes.adminUsers, Icons.group_outlined),
-      _AdminNavItem(l10n.t(AppText.adminNavJobs), Routes.adminJobs, Icons.work_outline),
-      _AdminNavItem(l10n.t(AppText.adminNavSubscriptions), Routes.adminSubscriptions, Icons.credit_card_outlined),
-      _AdminNavItem(l10n.t(AppText.adminNavReports), Routes.adminReports, Icons.bar_chart_outlined),
+      _AdminNavItem(
+        l10n.t(AppText.adminNavDashboard),
+        Routes.adminDashboard,
+        Icons.home_outlined,
+      ),
+      _AdminNavItem(
+        l10n.t(AppText.adminNavCompanies),
+        Routes.adminCompanies,
+        Icons.apartment_outlined,
+      ),
+      _AdminNavItem(
+        l10n.t(AppText.adminNavUsers),
+        Routes.adminUsers,
+        Icons.group_outlined,
+      ),
+      _AdminNavItem(
+        l10n.t(AppText.adminNavJobs),
+        Routes.adminJobs,
+        Icons.work_outline,
+      ),
+      _AdminNavItem(
+        l10n.t(AppText.adminNavSubscriptions),
+        Routes.adminSubscriptions,
+        Icons.credit_card_outlined,
+      ),
+      _AdminNavItem(
+        l10n.t(AppText.adminNavReports),
+        Routes.adminReports,
+        Icons.bar_chart_outlined,
+      ),
     ];
 
-    return Material(
-      color: const Color(0xFF111827),
-      child: Column(
-        children: [
-          SafeArea(
-            bottom: false,
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 1120),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  child: Row(
-                    children: [
-                      InkWell(
-                        onTap: () => context.go(Routes.adminDashboard),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.security, color: Color(0xFFA78BFA), size: 28),
-                            const SizedBox(width: 10),
-                            Text(
-                              l10n.t(AppText.adminPanelTitle),
-                              style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800),
-                            ),
-                            if (isSuper) ...[
-                              const SizedBox(width: 8),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF7C3AED),
-                                  borderRadius: BorderRadius.circular(999),
-                                ),
-                                child: Text(
-                                  l10n.t(AppText.adminSuperBadge),
-                                  style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w800),
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [cs.primary, cs.secondary],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: Column(
+          children: [
+            SafeArea(
+              bottom: false,
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 1120),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    child: Row(
+                      children: [
+                        InkWell(
+                          onTap: () => context.go(Routes.adminDashboard),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.security,
+                                color: Color(0xFFA78BFA),
+                                size: 28,
+                              ),
+                              const SizedBox(width: 10),
+                              Text(
+                                l10n.t(AppText.adminPanelTitle),
+                                style: TextStyle(
+                                  color: fg,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w800,
                                 ),
                               ),
-                            ],
-                          ],
-                        ),
-                      ),
-                      if (isDesktop) ...[
-                        const SizedBox(width: 24),
-                        Expanded(
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            physics: const ClampingScrollPhysics(),
-                            child: Row(
-                              children: [
-                                for (final item in navItems)
-                                  _NavLink(
-                                    item: item,
-                                    isActive: _isActive(currentPath, item.path),
-                                    onTap: () => context.go(item.path),
+                              if (isSuper) ...[
+                                const SizedBox(width: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 3,
                                   ),
+                                  decoration: BoxDecoration(
+                                    color: fg.withAlpha(28),
+                                    borderRadius: BorderRadius.circular(999),
+                                  ),
+                                  child: Text(
+                                    l10n.t(AppText.adminSuperBadge),
+                                    style: TextStyle(
+                                      color: fg,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                ),
                               ],
-                            ),
+                            ],
                           ),
                         ),
-                      ] else
-                        const Spacer(),
-                      _AdminLanguageMenu(
-                        l10n: l10n,
-                        currentLocale: locale,
-                        onSelected: (next) => ref.read(appLocaleProvider.notifier).setLocale(next),
-                      ),
-                      const SizedBox(width: 10),
-                      _NotificationsButton(),
-                      const SizedBox(width: 12),
-                      _ProfileMenu(
-                        l10n: l10n,
-                        name: admin?.name.isNotEmpty == true ? admin!.name : l10n.t(AppText.adminRoleAdmin),
-                        email: admin?.email,
-                        onNavigate: (path) => context.go(path),
-                        onLogout: () => _handleLogout(context),
-                      ),
-                      if (!isDesktop)
-                        IconButton(
-                          tooltip: _mobileOpen ? l10n.t(AppText.close) : l10n.t(AppText.menu),
-                          onPressed: () => setState(() => _mobileOpen = !_mobileOpen),
-                          icon: Icon(_mobileOpen ? Icons.close : Icons.menu, color: Colors.white),
+                        if (isDesktop) ...[
+                          const SizedBox(width: 24),
+                          Expanded(
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              physics: const ClampingScrollPhysics(),
+                              child: Row(
+                                children: [
+                                  for (final item in navItems)
+                                    _NavLink(
+                                      item: item,
+                                      isActive: _isActive(
+                                        currentPath,
+                                        item.path,
+                                      ),
+                                      onTap: () => context.go(item.path),
+                                    ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ] else
+                          const Spacer(),
+                        _AdminLanguageMenu(
+                          l10n: l10n,
+                          currentLocale: locale,
+                          onSelected: (next) => ref
+                              .read(appLocaleProvider.notifier)
+                              .setLocale(next),
                         ),
-                    ],
+                        const SizedBox(width: 10),
+                        _NotificationsButton(),
+                        const SizedBox(width: 12),
+                        _ProfileMenu(
+                          l10n: l10n,
+                          name: admin?.name.isNotEmpty == true
+                              ? admin!.name
+                              : l10n.t(AppText.adminRoleAdmin),
+                          email: admin?.email,
+                          onNavigate: (path) => context.go(path),
+                          onLogout: () => _handleLogout(context),
+                        ),
+                        if (!isDesktop)
+                          IconButton(
+                            tooltip: _mobileOpen
+                                ? l10n.t(AppText.close)
+                                : l10n.t(AppText.menu),
+                            onPressed: () =>
+                                setState(() => _mobileOpen = !_mobileOpen),
+                            icon: Icon(
+                              _mobileOpen ? Icons.close : Icons.menu,
+                              color: fg,
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-          if (!isDesktop)
-            AnimatedSize(
-              duration: const Duration(milliseconds: 160),
-              curve: Curves.easeOut,
-              child: _mobileOpen
-                  ? Container(
-                      width: double.infinity,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF1F2937),
-                        border: Border(top: BorderSide(color: Color(0xFF374151))),
-                      ),
-                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-                      child: Center(
-                        child: ConstrainedBox(
-                          constraints: const BoxConstraints(maxWidth: 520),
-                          child: Column(
-                            children: [
-                              for (final item in navItems)
-                                _MobileNavLink(
-                                  item: item,
-                                  isActive: _isActive(currentPath, item.path),
-                                  onTap: () {
-                                    setState(() => _mobileOpen = false);
-                                    context.go(item.path);
-                                  },
-                                ),
-                              const SizedBox(height: 8),
-                              _MobileNavLink(
-                                item: _AdminNavItem(l10n.t(AppText.adminNavLogout), Routes.home, Icons.logout),
-                                isActive: false,
-                                onTap: () => _handleLogout(context),
-                                danger: true,
-                              ),
-                            ],
+            if (!isDesktop)
+              AnimatedSize(
+                duration: const Duration(milliseconds: 160),
+                curve: Curves.easeOut,
+                child: _mobileOpen
+                    ? Container(
+                        width: double.infinity,
+                        decoration: const BoxDecoration(
+                          color: Color(0xFF1F2937),
+                          border: Border(
+                            top: BorderSide(color: Color(0xFF374151)),
                           ),
                         ),
-                      ),
-                    )
-                  : const SizedBox.shrink(),
-            ),
-        ],
+                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+                        child: Center(
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 520),
+                            child: Column(
+                              children: [
+                                for (final item in navItems)
+                                  _MobileNavLink(
+                                    item: item,
+                                    isActive: _isActive(currentPath, item.path),
+                                    onTap: () {
+                                      setState(() => _mobileOpen = false);
+                                      context.go(item.path);
+                                    },
+                                  ),
+                                const SizedBox(height: 8),
+                                _MobileNavLink(
+                                  item: _AdminNavItem(
+                                    l10n.t(AppText.adminNavLogout),
+                                    Routes.home,
+                                    Icons.logout,
+                                  ),
+                                  isActive: false,
+                                  onTap: () => _handleLogout(context),
+                                  danger: true,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      )
+                    : const SizedBox.shrink(),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -180,9 +252,9 @@ class _AdminNavbarState extends ConsumerState<AdminNavbar> {
     final err = await ref.read(authActionLoadingProvider.notifier).signOut();
     if (!context.mounted) return;
     if (err != null && err.isNotEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.adminLogoutFailed(err))),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.adminLogoutFailed(err))));
       return;
     }
     context.go(Routes.home);
@@ -202,6 +274,8 @@ class _AdminLanguageMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final fg = cs.onPrimary;
     final current = AppLocalizations.languageFor(currentLocale);
     return PopupMenuButton<Locale>(
       tooltip: l10n.t(AppText.language),
@@ -225,21 +299,21 @@ class _AdminLanguageMenu extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         decoration: BoxDecoration(
-          border: Border.all(color: const Color(0xFF374151)),
+          border: Border.all(color: fg.withAlpha(80)),
           borderRadius: BorderRadius.circular(999),
-          color: const Color(0xFF111827),
+          color: fg.withAlpha(22),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.language, size: 16, color: Colors.white),
+            Icon(Icons.language, size: 16, color: fg),
             const SizedBox(width: 6),
             Text(
               current.code.toUpperCase(),
-              style: const TextStyle(fontWeight: FontWeight.w700, color: Colors.white),
+              style: TextStyle(fontWeight: FontWeight.w700, color: fg),
             ),
             const SizedBox(width: 4),
-            const Icon(Icons.expand_more, size: 16, color: Color(0xFFD1D5DB)),
+            Icon(Icons.expand_more, size: 16, color: fg.withAlpha(210)),
           ],
         ),
       ),
@@ -280,7 +354,11 @@ class _NavLink extends StatelessWidget {
           ),
           child: Row(
             children: [
-              Icon(item.icon, size: 16, color: isActive ? Colors.white : const Color(0xFFD1D5DB)),
+              Icon(
+                item.icon,
+                size: 16,
+                color: isActive ? Colors.white : const Color(0xFFD1D5DB),
+              ),
               const SizedBox(width: 6),
               Text(
                 item.label,
@@ -316,8 +394,8 @@ class _MobileNavLink extends StatelessWidget {
     final color = danger
         ? const Color(0xFFFCA5A5)
         : isActive
-            ? Colors.white
-            : const Color(0xFFD1D5DB);
+        ? Colors.white
+        : const Color(0xFFD1D5DB);
 
     return InkWell(
       borderRadius: BorderRadius.circular(8),
@@ -354,7 +432,10 @@ class _NotificationsButton extends StatelessWidget {
           child: Container(
             width: 8,
             height: 8,
-            decoration: const BoxDecoration(color: Color(0xFFEF4444), shape: BoxShape.circle),
+            decoration: const BoxDecoration(
+              color: Color(0xFFEF4444),
+              shape: BoxShape.circle,
+            ),
           ),
         ),
       ],
@@ -406,27 +487,46 @@ class _ProfileMenu extends StatelessWidget {
             children: [
               Text(name, style: const TextStyle(fontWeight: FontWeight.w800)),
               if (email != null && email!.isNotEmpty)
-                Text(email!, style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280))),
+                Text(
+                  email!,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Color(0xFF6B7280),
+                  ),
+                ),
             ],
           ),
         ),
         const PopupMenuDivider(),
         PopupMenuItem<_ProfileAction>(
           value: _ProfileAction.profile,
-          child: _ProfileMenuRow(icon: Icons.person_outline, label: l10n.t(AppText.adminNavProfile)),
+          child: _ProfileMenuRow(
+            icon: Icons.person_outline,
+            label: l10n.t(AppText.adminNavProfile),
+          ),
         ),
         PopupMenuItem<_ProfileAction>(
           value: _ProfileAction.settings,
-          child: _ProfileMenuRow(icon: Icons.settings_outlined, label: l10n.t(AppText.adminNavSettings)),
+          child: _ProfileMenuRow(
+            icon: Icons.settings_outlined,
+            label: l10n.t(AppText.adminNavSettings),
+          ),
         ),
         PopupMenuItem<_ProfileAction>(
           value: _ProfileAction.logs,
-          child: _ProfileMenuRow(icon: Icons.receipt_long_outlined, label: l10n.t(AppText.adminNavLogs)),
+          child: _ProfileMenuRow(
+            icon: Icons.receipt_long_outlined,
+            label: l10n.t(AppText.adminNavLogs),
+          ),
         ),
         const PopupMenuDivider(),
         PopupMenuItem<_ProfileAction>(
           value: _ProfileAction.logout,
-          child: _ProfileMenuRow(icon: Icons.logout, label: l10n.t(AppText.adminNavLogout), danger: true),
+          child: _ProfileMenuRow(
+            icon: Icons.logout,
+            label: l10n.t(AppText.adminNavLogout),
+            danger: true,
+          ),
         ),
       ],
       child: Row(
@@ -441,7 +541,13 @@ class _ProfileMenu extends StatelessWidget {
             child: const Icon(Icons.person, size: 18, color: Colors.white),
           ),
           const SizedBox(width: 8),
-          Text(name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+          Text(
+            name,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
           const SizedBox(width: 4),
           const Icon(Icons.expand_more, color: Color(0xFFD1D5DB)),
         ],
@@ -470,7 +576,10 @@ class _ProfileMenuRow extends StatelessWidget {
       children: [
         Icon(icon, size: 16, color: color),
         const SizedBox(width: 8),
-        Text(label, style: TextStyle(color: color, fontWeight: FontWeight.w600)),
+        Text(
+          label,
+          style: TextStyle(color: color, fontWeight: FontWeight.w600),
+        ),
       ],
     );
   }

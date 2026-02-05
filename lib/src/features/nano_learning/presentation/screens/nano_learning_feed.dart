@@ -41,7 +41,10 @@ class _NanoLearningFeedState extends ConsumerState<NanoLearningFeed> {
     final feedAsync = ref.watch(nanoLearningFeedProvider);
     return feedAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, _) => _ErrorState(text: e.toString(), onRetry: () => ref.invalidate(nanoLearningFeedProvider)),
+      error: (e, _) => _ErrorState(
+        text: e.toString(),
+        onRetry: () => ref.invalidate(nanoLearningFeedProvider),
+      ),
       data: (items) {
         if (items.isEmpty) {
           return const _EmptyState();
@@ -51,8 +54,12 @@ class _NanoLearningFeedState extends ConsumerState<NanoLearningFeed> {
           borderRadius: BorderRadius.circular(18),
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.black,
-              border: Border.all(color: const Color(0xFFE5E7EB)),
+              color: const Color(0xFF2E1065),
+              border: Border.all(
+                color: Theme.of(
+                  context,
+                ).colorScheme.outlineVariant.withAlpha(160),
+              ),
               borderRadius: BorderRadius.circular(18),
             ),
             child: PageView.builder(
@@ -146,7 +153,10 @@ class _NanoVideoPageState extends ConsumerState<_NanoVideoPage> {
         unawaited(ctrl.play());
       }
 
-      _tick = Timer.periodic(const Duration(milliseconds: 650), (_) => _onTick());
+      _tick = Timer.periodic(
+        const Duration(milliseconds: 650),
+        (_) => _onTick(),
+      );
     } catch (_) {
       setState(() => _error = true);
     }
@@ -173,7 +183,9 @@ class _NanoVideoPageState extends ConsumerState<_NanoVideoPage> {
     if ((progress - _lastProgressSent).abs() >= 15 || progress == 100) {
       _lastProgressSent = progress;
       try {
-        await ref.read(nanoLearningRepositoryProvider).upsertProgress(
+        await ref
+            .read(nanoLearningRepositoryProvider)
+            .upsertProgress(
               userId: widget.userId,
               courseId: widget.course.id,
               progress: progress,
@@ -199,14 +211,16 @@ class _NanoVideoPageState extends ConsumerState<_NanoVideoPage> {
   }
 
   Future<void> _openQuiz() async {
-    final questionAsync = await ref.read(nanoQuizQuestionProvider(widget.course.id).future);
+    final questionAsync = await ref.read(
+      nanoQuizQuestionProvider(widget.course.id).future,
+    );
     if (!mounted) return;
 
     final q = questionAsync;
     if (q == null || q.options.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No quiz configured yet.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('No quiz configured yet.')));
       return;
     }
 
@@ -216,7 +230,9 @@ class _NanoVideoPageState extends ConsumerState<_NanoVideoPage> {
       isScrollControlled: true,
       showDragHandle: true,
       backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(18))),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
+      ),
       builder: (ctx) => _NanoQuizSheet(
         course: widget.course,
         question: q,
@@ -243,7 +259,10 @@ class _NanoVideoPageState extends ConsumerState<_NanoVideoPage> {
           padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.black.withValues(alpha: 0.75), Colors.transparent],
+              colors: [
+                Theme.of(context).colorScheme.primary.withValues(alpha: 0.72),
+                Colors.transparent,
+              ],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
             ),
@@ -255,20 +274,34 @@ class _NanoVideoPageState extends ConsumerState<_NanoVideoPage> {
                 course.title,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 18),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 18,
+                ),
               ),
-              if (course.department != null && course.department!.trim().isNotEmpty) ...[
+              if (course.department != null &&
+                  course.department!.trim().isNotEmpty) ...[
                 const SizedBox(height: 4),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.18),
                     borderRadius: BorderRadius.circular(999),
-                    border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.18),
+                    ),
                   ),
                   child: Text(
                     course.department!,
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 12),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w800,
+                      fontSize: 12,
+                    ),
                   ),
                 ),
               ],
@@ -286,7 +319,9 @@ class _NanoVideoPageState extends ConsumerState<_NanoVideoPage> {
         child: Column(
           children: [
             _SideButton(
-              icon: (ctrl?.value.isPlaying ?? false) ? Icons.pause : Icons.play_arrow,
+              icon: (ctrl?.value.isPlaying ?? false)
+                  ? Icons.pause
+                  : Icons.play_arrow,
               label: (ctrl?.value.isPlaying ?? false) ? 'Pause' : 'Play',
               onTap: () {
                 final c = _controller;
@@ -303,7 +338,9 @@ class _NanoVideoPageState extends ConsumerState<_NanoVideoPage> {
             _SideButton(
               icon: Icons.quiz_outlined,
               label: _quizUnlocked ? 'Mini quiz' : 'Mini quiz',
-              accent: _quizUnlocked ? const Color(0xFF7C3AED) : const Color(0xFF6B7280),
+              accent: _quizUnlocked
+                  ? const Color(0xFF7C3AED)
+                  : const Color(0xFF6B7280),
               onTap: _quizUnlocked ? _openQuiz : null,
             ),
             const SizedBox(height: 10),
@@ -324,15 +361,15 @@ class _NanoVideoPageState extends ConsumerState<_NanoVideoPage> {
     final content = _error
         ? _VideoFallback(url: course.videoUrl)
         : (_ready && ctrl != null)
-            ? FittedBox(
-                fit: BoxFit.cover,
-                child: SizedBox(
-                  width: ctrl.value.size.width,
-                  height: ctrl.value.size.height,
-                  child: VideoPlayer(ctrl),
-                ),
-              )
-            : const Center(child: CircularProgressIndicator(color: Colors.white));
+        ? FittedBox(
+            fit: BoxFit.cover,
+            child: SizedBox(
+              width: ctrl.value.size.width,
+              height: ctrl.value.size.height,
+              child: VideoPlayer(ctrl),
+            ),
+          )
+        : const Center(child: CircularProgressIndicator(color: Colors.white));
 
     return Stack(
       fit: StackFit.expand,
@@ -393,7 +430,9 @@ class _NanoQuizSheetState extends State<_NanoQuizSheet> {
       if (!mounted) return;
       setState(() {
         _result = res.isCorrect
-            ? (res.pointsAwarded > 0 ? 'Correct! +${res.pointsAwarded} points' : 'Correct! (already counted)')
+            ? (res.pointsAwarded > 0
+                  ? 'Correct! +${res.pointsAwarded} points'
+                  : 'Correct! (already counted)')
             : 'Not correct. Try next video.';
       });
       if (res.isCorrect) widget.onSuccess();
@@ -416,23 +455,29 @@ class _NanoQuizSheetState extends State<_NanoQuizSheet> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Mini quiz', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+          const Text(
+            'Mini quiz',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+          ),
           const SizedBox(height: 8),
           Text(q.question, style: const TextStyle(fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
-          for (int i = 0; i < q.options.length; i++) _OptionTile(
-            label: q.options[i],
-            selected: _selected == i,
-            enabled: !_submitting,
-            onTap: () => setState(() => _selected = i),
-          ),
+          for (int i = 0; i < q.options.length; i++)
+            _OptionTile(
+              label: q.options[i],
+              selected: _selected == i,
+              enabled: !_submitting,
+              onTap: () => setState(() => _selected = i),
+            ),
           if (_result != null) ...[
             const SizedBox(height: 6),
             Text(
               _result!,
               style: TextStyle(
                 fontWeight: FontWeight.w800,
-                color: (_result!.toLowerCase().startsWith('correct')) ? const Color(0xFF16A34A) : const Color(0xFFDC2626),
+                color: (_result!.toLowerCase().startsWith('correct'))
+                    ? const Color(0xFF16A34A)
+                    : const Color(0xFFDC2626),
               ),
             ),
           ],
@@ -445,11 +490,23 @@ class _NanoQuizSheetState extends State<_NanoQuizSheet> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF7C3AED),
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
               ),
               child: _submitting
-                  ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                  : const Text('Submit', style: TextStyle(fontWeight: FontWeight.w900)),
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Text(
+                      'Submit',
+                      style: TextStyle(fontWeight: FontWeight.w900),
+                    ),
             ),
           ),
           const SizedBox(height: 10),
@@ -458,8 +515,15 @@ class _NanoQuizSheetState extends State<_NanoQuizSheet> {
             height: 44,
             child: OutlinedButton(
               onPressed: _submitting ? null : () => Navigator.of(context).pop(),
-              style: OutlinedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
-              child: const Text('Close', style: TextStyle(fontWeight: FontWeight.w800)),
+              style: OutlinedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
+              child: const Text(
+                'Close',
+                style: TextStyle(fontWeight: FontWeight.w800),
+              ),
             ),
           ),
         ],
@@ -507,13 +571,20 @@ class _OptionTile extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(color: border, width: 2),
-                  color: selected ? const Color(0xFF7C3AED) : Colors.transparent,
+                  color: selected
+                      ? const Color(0xFF7C3AED)
+                      : Colors.transparent,
                 ),
-                child: selected ? const Icon(Icons.check, size: 14, color: Colors.white) : null,
+                child: selected
+                    ? const Icon(Icons.check, size: 14, color: Colors.white)
+                    : null,
               ),
               const SizedBox(width: 10),
               Expanded(
-                child: Text(label, style: const TextStyle(fontWeight: FontWeight.w700)),
+                child: Text(
+                  label,
+                  style: const TextStyle(fontWeight: FontWeight.w700),
+                ),
               ),
             ],
           ),
@@ -549,7 +620,9 @@ class _SideButton extends StatelessWidget {
           width: 62,
           padding: const EdgeInsets.symmetric(vertical: 10),
           decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: 0.38),
+            color: Theme.of(
+              context,
+            ).colorScheme.primary.withValues(alpha: 0.32),
             borderRadius: BorderRadius.circular(18),
             border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
           ),
@@ -560,7 +633,11 @@ class _SideButton extends StatelessWidget {
               Text(
                 label,
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ],
           ),
@@ -579,7 +656,7 @@ class _SwipeHint extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.38),
+        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.32),
         borderRadius: BorderRadius.circular(999),
         border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
       ),
@@ -588,7 +665,14 @@ class _SwipeHint extends StatelessWidget {
         children: const [
           Icon(Icons.swap_vert, size: 16, color: Colors.white),
           SizedBox(width: 6),
-          Text('Swipe', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 12)),
+          Text(
+            'Swipe',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w800,
+              fontSize: 12,
+            ),
+          ),
         ],
       ),
     );
@@ -602,7 +686,7 @@ class _VideoFallback extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: const Color(0xFF0B1020),
+      color: const Color(0xFF2E1065),
       child: Center(
         child: Padding(
           padding: const EdgeInsets.all(22),
@@ -611,12 +695,20 @@ class _VideoFallback extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.play_disabled_outlined, size: 46, color: Colors.white),
+                const Icon(
+                  Icons.play_disabled_outlined,
+                  size: 46,
+                  color: Colors.white,
+                ),
                 const SizedBox(height: 10),
                 const Text(
                   'Video could not be played here.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 16),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 16,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -631,14 +723,22 @@ class _VideoFallback extends StatelessWidget {
                     onPressed: () async {
                       final uri = Uri.tryParse(url);
                       if (uri == null) return;
-                      await launchUrl(uri, mode: LaunchMode.externalApplication);
+                      await launchUrl(
+                        uri,
+                        mode: LaunchMode.externalApplication,
+                      );
                     },
                     icon: const Icon(Icons.open_in_new),
-                    label: const Text('Open video', style: TextStyle(fontWeight: FontWeight.w900)),
+                    label: const Text(
+                      'Open video',
+                      style: TextStyle(fontWeight: FontWeight.w900),
+                    ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
-                      foregroundColor: const Color(0xFF111827),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      foregroundColor: Theme.of(context).colorScheme.primary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
                     ),
                   ),
                 ),
@@ -662,7 +762,10 @@ class _EmptyState extends StatelessWidget {
         child: Text(
           'No nano-learning videos yet. Add courses with a video_url to enable the feed.',
           textAlign: TextAlign.center,
-          style: TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
+          style: TextStyle(
+            color: Color(0xFF6B7280),
+            fontWeight: FontWeight.w700,
+          ),
         ),
       ),
     );
@@ -684,13 +787,23 @@ class _ErrorState extends StatelessWidget {
           children: [
             const Icon(Icons.error_outline, color: Color(0xFFEF4444), size: 44),
             const SizedBox(height: 10),
-            const Text('Failed to load feed', style: TextStyle(fontWeight: FontWeight.w900)),
+            const Text(
+              'Failed to load feed',
+              style: TextStyle(fontWeight: FontWeight.w900),
+            ),
             const SizedBox(height: 6),
-            Text(text, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFF6B7280))),
+            Text(
+              text,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Color(0xFF6B7280)),
+            ),
             const SizedBox(height: 12),
             SizedBox(
               height: 44,
-              child: ElevatedButton(onPressed: onRetry, child: const Text('Retry')),
+              child: ElevatedButton(
+                onPressed: onRetry,
+                child: const Text('Retry'),
+              ),
             ),
           ],
         ),

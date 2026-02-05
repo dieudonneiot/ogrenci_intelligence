@@ -17,11 +17,15 @@ class OiRepository {
 
     final row = await SupabaseService.client
         .from('oi_scores')
-        .select('user_id,oi_score,technical,social,field_fit,consistency,updated_at')
+        .select(
+          'user_id,oi_score,technical,social,field_fit,consistency,updated_at',
+        )
         .eq('user_id', userId)
         .maybeSingle();
 
-    final base = row == null ? OiProfile.defaultFor(userId) : OiProfile.fromMap(row);
+    final base = row == null
+        ? OiProfile.defaultFor(userId)
+        : OiProfile.fromMap(row);
 
     // Trend data (best-effort): requires docs/sql/22_oi_score_history.sql
     try {
@@ -36,7 +40,9 @@ class OiRepository {
           .map(OiHistoryPoint.fromMap)
           .toList(growable: false);
 
-      final delta = points.length >= 2 ? (points[0].oiScore - points[1].oiScore) : 0;
+      final delta = points.length >= 2
+          ? (points[0].oiScore - points[1].oiScore)
+          : 0;
 
       return OiProfile(
         userId: base.userId,

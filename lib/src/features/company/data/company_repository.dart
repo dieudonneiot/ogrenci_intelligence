@@ -24,7 +24,9 @@ class CompanyRepository {
 
   /// Returns membership if the current user belongs to a company.
   /// Mirrors React: supabase.from("company_users").select("company_id, role").eq("user_id", user.id).maybeSingle()
-  Future<({String companyId, String role})?> getMembershipByUserId(String userId) async {
+  Future<({String companyId, String role})?> getMembershipByUserId(
+    String userId,
+  ) async {
     final row = await _client
         .from('company_users')
         .select('company_id, role')
@@ -49,14 +51,19 @@ class CompanyRepository {
     return row;
   }
 
-  Future<void> updateCompany(String companyId, Map<String, dynamic> updates) async {
+  Future<void> updateCompany(
+    String companyId,
+    Map<String, dynamic> updates,
+  ) async {
     await _client.from('companies').update(updates).eq('id', companyId);
   }
 
   Future<CompanyStatus> fetchCompanyStatus({required String companyId}) async {
     final row = await _client
         .from('companies')
-        .select('approval_status, rejection_reason, banned_at, company_subscriptions(is_active, ends_at)')
+        .select(
+          'approval_status, rejection_reason, banned_at, company_subscriptions(is_active, ends_at)',
+        )
         .eq('id', companyId)
         .maybeSingle();
 
@@ -64,7 +71,8 @@ class CompanyRepository {
       throw Exception('Company not found.');
     }
 
-    final subs = (row['company_subscriptions'] as List?)?.cast<dynamic>() ?? const [];
+    final subs =
+        (row['company_subscriptions'] as List?)?.cast<dynamic>() ?? const [];
     final now = DateTime.now();
     bool hasActiveSubscription = false;
 
@@ -93,8 +101,13 @@ class CompanyRepository {
         .eq('company_id', companyId);
 
     final jobRows = (jobs as List).cast<dynamic>();
-    final jobIds = jobRows.map((e) => (e as Map<String, dynamic>)['id']?.toString()).whereType<String>().toList();
-    final activeJobs = jobRows.where((e) => (e as Map<String, dynamic>)['is_active'] == true).length;
+    final jobIds = jobRows
+        .map((e) => (e as Map<String, dynamic>)['id']?.toString())
+        .whereType<String>()
+        .toList();
+    final activeJobs = jobRows
+        .where((e) => (e as Map<String, dynamic>)['is_active'] == true)
+        .length;
 
     // Internships
     final internships = await _client
@@ -107,8 +120,9 @@ class CompanyRepository {
         .map((e) => (e as Map<String, dynamic>)['id']?.toString())
         .whereType<String>()
         .toList();
-    final activeInternships =
-        internshipRows.where((e) => (e as Map<String, dynamic>)['is_active'] == true).length;
+    final activeInternships = internshipRows
+        .where((e) => (e as Map<String, dynamic>)['is_active'] == true)
+        .length;
 
     int totalApplications = 0;
     int pendingApplications = 0;
@@ -120,7 +134,9 @@ class CompanyRepository {
           .inFilter('job_id', jobIds);
       final jobAppRows = (jobApps as List).cast<dynamic>();
       totalApplications += jobAppRows.length;
-      pendingApplications += jobAppRows.where((e) => (e as Map<String, dynamic>)['status'] == 'pending').length;
+      pendingApplications += jobAppRows
+          .where((e) => (e as Map<String, dynamic>)['status'] == 'pending')
+          .length;
     }
 
     if (internshipIds.isNotEmpty) {
@@ -130,8 +146,9 @@ class CompanyRepository {
           .inFilter('internship_id', internshipIds);
       final internshipAppRows = (internshipApps as List).cast<dynamic>();
       totalApplications += internshipAppRows.length;
-      pendingApplications +=
-          internshipAppRows.where((e) => (e as Map<String, dynamic>)['status'] == 'pending').length;
+      pendingApplications += internshipAppRows
+          .where((e) => (e as Map<String, dynamic>)['status'] == 'pending')
+          .length;
     }
 
     return CompanyStats(
@@ -150,11 +167,15 @@ class CompanyRepository {
   }) async {
     final params = {
       'p_company_id': companyId,
-      if (startDate != null) 'p_start_date': startDate.toIso8601String().substring(0, 10),
+      if (startDate != null)
+        'p_start_date': startDate.toIso8601String().substring(0, 10),
     };
 
     try {
-      final result = await _client.rpc('get_company_report_summary', params: params);
+      final result = await _client.rpc(
+        'get_company_report_summary',
+        params: params,
+      );
       final row = result is List
           ? (result.isNotEmpty ? result.first as Map<String, dynamic> : null)
           : (result as Map<String, dynamic>?);
@@ -192,11 +213,15 @@ class CompanyRepository {
     final trendParams = {
       'p_company_id': companyId,
       'p_days': days,
-      if (startDate != null) 'p_start_date': startDate.toIso8601String().substring(0, 10),
+      if (startDate != null)
+        'p_start_date': startDate.toIso8601String().substring(0, 10),
     };
 
     try {
-      final trendRows = await _client.rpc('get_company_report_trends', params: trendParams);
+      final trendRows = await _client.rpc(
+        'get_company_report_trends',
+        params: trendParams,
+      );
       final trendsList = (trendRows as List?)?.cast<dynamic>() ?? const [];
       final views = <CompanyTrendPoint>[];
       final applications = <CompanyTrendPoint>[];
@@ -205,14 +230,17 @@ class CompanyRepository {
         final date = _asDate(row['metric_date']);
         if (date == null) continue;
         views.add(CompanyTrendPoint(date: date, count: _asInt(row['views'])));
-        applications.add(CompanyTrendPoint(date: date, count: _asInt(row['applications'])));
+        applications.add(
+          CompanyTrendPoint(date: date, count: _asInt(row['applications'])),
+        );
       }
 
       final deptRows = await _client.rpc(
         'get_company_report_departments',
         params: {
           'p_company_id': companyId,
-          if (startDate != null) 'p_start_date': startDate.toIso8601String().substring(0, 10),
+          if (startDate != null)
+            'p_start_date': startDate.toIso8601String().substring(0, 10),
         },
       );
       final departmentCounts = <String, int>{};
@@ -228,7 +256,8 @@ class CompanyRepository {
         'get_company_report_funnel',
         params: {
           'p_company_id': companyId,
-          if (startDate != null) 'p_start_date': startDate.toIso8601String().substring(0, 10),
+          if (startDate != null)
+            'p_start_date': startDate.toIso8601String().substring(0, 10),
         },
       );
       CompanyFunnel funnel = CompanyFunnel.empty();
@@ -260,7 +289,9 @@ class CompanyRepository {
   }) async {
     var query = _client
         .from('jobs')
-        .select('id,title,department,location,is_active,created_at,deadline,views_count,job_applications(status)')
+        .select(
+          'id,title,department,location,is_active,created_at,deadline,views_count,job_applications(status)',
+        )
         .eq('company_id', companyId);
 
     if (isActive != null) {
@@ -319,7 +350,10 @@ class CompanyRepository {
   }) async {
     await _client
         .from('job_applications')
-        .update({'status': status, 'updated_at': DateTime.now().toIso8601String()})
+        .update({
+          'status': status,
+          'updated_at': DateTime.now().toIso8601String(),
+        })
         .eq('id', applicationId);
   }
 
@@ -329,7 +363,9 @@ class CompanyRepository {
   }) async {
     var query = _client
         .from('internships')
-        .select('id,title,department,location,is_active,created_at,deadline,internship_applications(status)')
+        .select(
+          'id,title,department,location,is_active,created_at,deadline,internship_applications(status)',
+        )
         .eq('company_id', companyId);
 
     if (isActive != null) {
@@ -357,12 +393,18 @@ class CompanyRepository {
     await _client.from('internships').insert(payload);
   }
 
-  Future<void> updateInternship(String internshipId, Map<String, dynamic> updates) async {
+  Future<void> updateInternship(
+    String internshipId,
+    Map<String, dynamic> updates,
+  ) async {
     await _client.from('internships').update(updates).eq('id', internshipId);
   }
 
   Future<void> setInternshipActive(String internshipId, bool isActive) async {
-    await _client.from('internships').update({'is_active': isActive}).eq('id', internshipId);
+    await _client
+        .from('internships')
+        .update({'is_active': isActive})
+        .eq('id', internshipId);
   }
 
   Future<List<CompanyApplication>> listInternshipApplications({
@@ -378,7 +420,10 @@ class CompanyRepository {
         .order('applied_at', ascending: false);
 
     return (rows as List)
-        .map((e) => CompanyApplication.fromInternshipMap(e as Map<String, dynamic>))
+        .map(
+          (e) =>
+              CompanyApplication.fromInternshipMap(e as Map<String, dynamic>),
+        )
         .toList(growable: false);
   }
 
@@ -388,7 +433,10 @@ class CompanyRepository {
   }) async {
     await _client
         .from('internship_applications')
-        .update({'status': status, 'updated_at': DateTime.now().toIso8601String()})
+        .update({
+          'status': status,
+          'updated_at': DateTime.now().toIso8601String(),
+        })
         .eq('id', applicationId);
   }
 
@@ -425,8 +473,11 @@ class CompanyRepository {
           )
           .inFilter('job_id', jobIds)
           .order('applied_at', ascending: false);
-      applications.addAll((jobApps as List)
-          .map((e) => CompanyApplication.fromJobMap(e as Map<String, dynamic>)));
+      applications.addAll(
+        (jobApps as List).map(
+          (e) => CompanyApplication.fromJobMap(e as Map<String, dynamic>),
+        ),
+      );
     }
 
     if (internshipIds.isNotEmpty) {
@@ -439,8 +490,12 @@ class CompanyRepository {
           )
           .inFilter('internship_id', internshipIds)
           .order('applied_at', ascending: false);
-      applications.addAll((internshipApps as List)
-          .map((e) => CompanyApplication.fromInternshipMap(e as Map<String, dynamic>)));
+      applications.addAll(
+        (internshipApps as List).map(
+          (e) =>
+              CompanyApplication.fromInternshipMap(e as Map<String, dynamic>),
+        ),
+      );
     }
 
     applications.sort((a, b) => b.appliedAt.compareTo(a.appliedAt));

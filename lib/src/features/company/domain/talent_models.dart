@@ -8,7 +8,10 @@ int _asInt(dynamic v) {
 
 List<String> _asStringList(dynamic v) {
   if (v is List) {
-    return v.map((e) => e.toString().trim()).where((e) => e.isNotEmpty).toList(growable: false);
+    return v
+        .map((e) => e.toString().trim())
+        .where((e) => e.isNotEmpty)
+        .toList(growable: false);
   }
   return const <String>[];
 }
@@ -48,4 +51,3 @@ class TalentCandidate {
     );
   }
 }
-

@@ -2,6 +2,11 @@
 cmake_minimum_required(VERSION 3.14)
 project(ogrenci_intelligence LANGUAGES CXX)
 
+# Suppress deprecation warnings from third-party CMake projects that Flutter
+# fetches/extracts during the Windows build (e.g. Firebase C++ SDK).
+set(CMAKE_WARN_DEPRECATED OFF CACHE BOOL "Suppress deprecation warnings" FORCE)
+set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS 1 CACHE BOOL "Suppress developer warnings" FORCE)
+
 # CMake 4.x removed compatibility with policy settings below 3.5. Some third-
 # party CMake projects (e.g. Firebase C++ SDK) still declare older minimum
 # versions, which causes configuration to fail unless this is set.

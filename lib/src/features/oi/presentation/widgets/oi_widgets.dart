@@ -16,7 +16,11 @@ class OiScoreCard extends StatelessWidget {
     final delta = profile.deltaFromLastMonth;
     final spark = hist.isEmpty
         ? const <int>[]
-        : hist.map((e) => e.oiScore.clamp(0, 100)).toList(growable: false).reversed.toList(growable: false);
+        : hist
+              .map((e) => e.oiScore.clamp(0, 100))
+              .toList(growable: false)
+              .reversed
+              .toList(growable: false);
 
     return Container(
       padding: const EdgeInsets.all(18),
@@ -24,7 +28,13 @@ class OiScoreCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: const [BoxShadow(color: Color(0x07000000), blurRadius: 14, offset: Offset(0, 8))],
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x07000000),
+            blurRadius: 14,
+            offset: Offset(0, 8),
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -42,7 +52,11 @@ class OiScoreCard extends StatelessWidget {
                 ),
                 Text(
                   '$score',
-                  style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 20, color: Color(0xFF111827)),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 20,
+                    color: Color(0xFF1F2937),
+                  ),
                 ),
               ],
             ),
@@ -52,11 +66,17 @@ class OiScoreCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('OI Score', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
+                const Text(
+                  'OI Score',
+                  style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+                ),
                 const SizedBox(height: 6),
                 const Text(
                   'Your score is computed from 4 dimensions (0–100).',
-                  style: TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                    color: Color(0xFF6B7280),
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 if (spark.length >= 2) ...[
                   const SizedBox(height: 10),
@@ -69,7 +89,11 @@ class OiScoreCard extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   'Updated: ${profile.updatedAt.toLocal()}',
-                  style: const TextStyle(color: Color(0xFF9CA3AF), fontWeight: FontWeight.w600, fontSize: 12),
+                  style: const TextStyle(
+                    color: Color(0xFF9CA3AF),
+                    fontWeight: FontWeight.w600,
+                    fontSize: 12,
+                  ),
                 ),
               ],
             ),
@@ -96,7 +120,10 @@ class OiRadarCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Detailed Analysis', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
+          const Text(
+            'Detailed Analysis',
+            style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+          ),
           const SizedBox(height: 10),
           SizedBox(
             height: 220,
@@ -157,7 +184,10 @@ class _DeltaRow extends StatelessWidget {
       children: [
         Icon(icon, size: 18, color: fg),
         const SizedBox(width: 6),
-        Text(label, style: TextStyle(fontWeight: FontWeight.w800, color: fg)),
+        Text(
+          label,
+          style: TextStyle(fontWeight: FontWeight.w800, color: fg),
+        ),
       ],
     );
   }
@@ -189,7 +219,8 @@ class _SparklinePainter extends CustomPainter {
     final range = (maxV - minV).abs() < 0.001 ? 1.0 : (maxV - minV);
 
     final dx = size.width / (values.length - 1);
-    double yFor(num v) => size.height - (((v.toDouble() - minV) / range) * size.height);
+    double yFor(num v) =>
+        size.height - (((v.toDouble() - minV) / range) * size.height);
 
     final path = Path();
     for (int i = 0; i < values.length; i++) {
@@ -245,7 +276,13 @@ class _Tag extends StatelessWidget {
         borderRadius: BorderRadius.circular(999),
         border: Border.all(color: const Color(0xFFE9D5FF)),
       ),
-      child: Text('$label: $value', style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF4B5563))),
+      child: Text(
+        '$label: $value',
+        style: const TextStyle(
+          fontWeight: FontWeight.w800,
+          color: Color(0xFF4B5563),
+        ),
+      ),
     );
   }
 }
@@ -288,12 +325,7 @@ class _RadarPainter extends CustomPainter {
       ..color = const Color(0xFF6D28D9);
 
     // 4 axes: top, right, bottom, left
-    final angles = <double>[
-      -pi / 2,
-      0,
-      pi / 2,
-      pi,
-    ];
+    final angles = <double>[-pi / 2, 0, pi / 2, pi];
 
     // grid rings
     for (final t in [0.25, 0.5, 0.75, 1.0]) {
@@ -314,12 +346,21 @@ class _RadarPainter extends CustomPainter {
 
     // axes
     for (final a in angles) {
-      canvas.drawLine(center, center + Offset(cos(a) * radius, sin(a) * radius), axisPaint);
+      canvas.drawLine(
+        center,
+        center + Offset(cos(a) * radius, sin(a) * radius),
+        axisPaint,
+      );
     }
 
     double n(int v) => (v.clamp(0, 100)) / 100.0;
 
-    final values = <double>[n(technical), n(social), n(fieldFit), n(consistency)];
+    final values = <double>[
+      n(technical),
+      n(social),
+      n(fieldFit),
+      n(consistency),
+    ];
 
     final poly = Path();
     for (int i = 0; i < angles.length; i++) {

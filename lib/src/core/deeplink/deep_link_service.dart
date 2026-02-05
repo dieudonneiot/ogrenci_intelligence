@@ -11,8 +11,8 @@ import '../routing/routes.dart';
 
 class DeepLinkService {
   DeepLinkService({SupabaseClient? client, GoRouter? router})
-      : _client = client ?? Supabase.instance.client,
-        _router = router;
+    : _client = client ?? Supabase.instance.client,
+      _router = router;
 
   final SupabaseClient _client;
   final GoRouter? _router;

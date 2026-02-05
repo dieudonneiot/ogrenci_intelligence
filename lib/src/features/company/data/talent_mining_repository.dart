@@ -34,4 +34,3 @@ class TalentMiningRepository {
         .toList(growable: false);
   }
 }
-

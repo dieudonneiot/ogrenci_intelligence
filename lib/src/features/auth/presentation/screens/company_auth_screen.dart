@@ -86,10 +86,7 @@ class _CompanyAuthScreenState extends ConsumerState<CompanyAuthScreen> {
   void _snack(String msg, {bool error = false}) {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(msg),
-        backgroundColor: error ? Colors.red : null,
-      ),
+      SnackBar(content: Text(msg), backgroundColor: error ? Colors.red : null),
     );
   }
 
@@ -202,7 +199,10 @@ class _CompanyAuthScreenState extends ConsumerState<CompanyAuthScreen> {
       final alreadyExists = exists == true;
 
       if (alreadyExists) {
-        _snack('Bu vergi numaras?? ile kay??tl?? bir ??irket zaten var', error: true);
+        _snack(
+          'Bu vergi numaras?? ile kay??tl?? bir ??irket zaten var',
+          error: true,
+        );
         return;
       }
 
@@ -235,13 +235,17 @@ class _CompanyAuthScreenState extends ConsumerState<CompanyAuthScreen> {
 
       // Optional: route to email verification page (recommended UX)
       context.go(
-        Uri(path: Routes.emailVerification, queryParameters: {'email': email})
-            .toString(),
+        Uri(
+          path: Routes.emailVerification,
+          queryParameters: {'email': email},
+        ).toString(),
       );
     } on PostgrestException catch (e) {
       if (e.code == '23503') {
-        setState(() => _error =
-            'Account was created but not fully linked yet. Please verify your email and try again.');
+        setState(
+          () => _error =
+              'Account was created but not fully linked yet. Please verify your email and try again.',
+        );
       } else {
         setState(() => _error = 'Bir hata oluştu: ${e.message}');
       }
@@ -272,9 +276,7 @@ class _CompanyAuthScreenState extends ConsumerState<CompanyAuthScreen> {
     // If someone is already logged in, let router redirects handle it.
     // (Your app_router already pushes company->dashboard, student->dashboard)
     if (isAuthed) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     final w = MediaQuery.of(context).size.width;
@@ -314,39 +316,51 @@ class _CompanyAuthScreenState extends ConsumerState<CompanyAuthScreen> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(20),
                                 gradient: const LinearGradient(
-                                  colors: [Color(0xFF3B82F6), Color(0xFF7C3AED)],
+                                  colors: [
+                                    Color(0xFF3B82F6),
+                                    Color(0xFF7C3AED),
+                                  ],
                                 ),
                                 boxShadow: const [
                                   BoxShadow(
                                     blurRadius: 20,
                                     offset: Offset(0, 8),
-                                    color: Colors.black26,
-                                  )
+                                    color: Color(0x336D28D9),
+                                  ),
                                 ],
                               ),
-                              child: const Icon(Icons.business, color: Colors.white, size: 44),
+                              child: const Icon(
+                                Icons.business,
+                                color: Colors.white,
+                                size: 44,
+                              ),
                             ),
                           ),
                           const SizedBox(height: 14),
                           Text(
                             _isLogin ? 'İşletme Girişi' : 'İşletme Kaydı',
                             textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                            style: Theme.of(context).textTheme.headlineSmall
+                                ?.copyWith(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w800,
                                 ),
                           ),
                           const SizedBox(height: 6),
                           Text(
-                            _isLogin ? 'Hesabınıza giriş yapın' : 'Yeni işletme hesabı oluşturun',
+                            _isLogin
+                                ? 'Hesabınıza giriş yapın'
+                                : 'Yeni işletme hesabı oluşturun',
                             textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: Colors.white70,
-                                ),
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(color: Colors.white70),
                           ),
                           const SizedBox(height: 18),
 
-                          if (_isLogin) _buildLoginForm(context) else _buildRegisterForm(context),
+                          if (_isLogin)
+                            _buildLoginForm(context)
+                          else
+                            _buildRegisterForm(context),
 
                           const SizedBox(height: 14),
 
@@ -356,7 +370,9 @@ class _CompanyAuthScreenState extends ConsumerState<CompanyAuthScreen> {
                               decoration: BoxDecoration(
                                 color: Colors.red.withValues(alpha: 0.12),
                                 borderRadius: BorderRadius.circular(14),
-                                border: Border.all(color: Colors.red.withValues(alpha: 0.25)),
+                                border: Border.all(
+                                  color: Colors.red.withValues(alpha: 0.25),
+                                ),
                               ),
                               child: Text(
                                 _error!,
@@ -369,13 +385,15 @@ class _CompanyAuthScreenState extends ConsumerState<CompanyAuthScreen> {
                           _GradientButton(
                             text: _isLogin ? 'Giriş Yap' : 'Kayıt Ol',
                             loading: _loading,
-                            onPressed: _loading ? null : () async {
-                              if (_isLogin) {
-                                await _handleLogin();
-                              } else {
-                                await _handleRegister();
-                              }
-                            },
+                            onPressed: _loading
+                                ? null
+                                : () async {
+                                    if (_isLogin) {
+                                      await _handleLogin();
+                                    } else {
+                                      await _handleRegister();
+                                    }
+                                  },
                           ),
 
                           const SizedBox(height: 16),
@@ -386,16 +404,18 @@ class _CompanyAuthScreenState extends ConsumerState<CompanyAuthScreen> {
                               crossAxisAlignment: WrapCrossAlignment.center,
                               children: [
                                 Text(
-                                  _isLogin ? 'Hesabınız yok mu?' : 'Zaten hesabınız var mı?',
+                                  _isLogin
+                                      ? 'Hesabınız yok mu?'
+                                      : 'Zaten hesabınız var mı?',
                                   style: const TextStyle(color: Colors.white70),
                                 ),
                                 TextButton(
                                   onPressed: _loading
                                       ? null
                                       : () => setState(() {
-                                            _error = null;
-                                            _isLogin = !_isLogin;
-                                          }),
+                                          _error = null;
+                                          _isLogin = !_isLogin;
+                                        }),
                                   child: Text(
                                     _isLogin ? 'Kayıt Ol' : 'Giriş Yap',
                                     style: const TextStyle(
@@ -411,7 +431,9 @@ class _CompanyAuthScreenState extends ConsumerState<CompanyAuthScreen> {
                           const SizedBox(height: 6),
                           Center(
                             child: TextButton(
-                              onPressed: _loading ? null : () => context.go(Routes.login),
+                              onPressed: _loading
+                                  ? null
+                                  : () => context.go(Routes.login),
                               child: const Text(
                                 'Öğrenci girişine dön',
                                 style: TextStyle(color: Colors.white70),
@@ -579,10 +601,26 @@ class _LeftPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final features = const [
-      (Icons.work_outline, 'İlan Yönetimi', 'İş ve staj ilanlarınızı kolayca yönetin'),
-      (Icons.people_outline, 'Başvuru Takibi', 'Tüm başvuruları tek panelden inceleyin'),
-      (Icons.trending_up, 'Detaylı Analizler', 'İlan performanslarını takip edin'),
-      (Icons.emoji_events_outlined, 'Yetenekleri Keşfedin', 'En uygun adayları bulun'),
+      (
+        Icons.work_outline,
+        'İlan Yönetimi',
+        'İş ve staj ilanlarınızı kolayca yönetin',
+      ),
+      (
+        Icons.people_outline,
+        'Başvuru Takibi',
+        'Tüm başvuruları tek panelden inceleyin',
+      ),
+      (
+        Icons.trending_up,
+        'Detaylı Analizler',
+        'İlan performanslarını takip edin',
+      ),
+      (
+        Icons.emoji_events_outlined,
+        'Yetenekleri Keşfedin',
+        'En uygun adayları bulun',
+      ),
     ];
 
     return Stack(
@@ -610,7 +648,11 @@ class _LeftPanel extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.business, size: 68, color: Color(0xFF60A5FA)),
+                  const Icon(
+                    Icons.business,
+                    size: 68,
+                    color: Color(0xFF60A5FA),
+                  ),
                   const SizedBox(height: 14),
                   const Text(
                     'İşletme Yönetim Paneli',
@@ -637,7 +679,9 @@ class _LeftPanel extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.10),
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.18),
+                        ),
                       ),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -666,7 +710,10 @@ class _LeftPanel extends StatelessWidget {
                                   ),
                                 ),
                                 const SizedBox(height: 4),
-                                Text(desc, style: const TextStyle(color: Colors.white70)),
+                                Text(
+                                  desc,
+                                  style: const TextStyle(color: Colors.white70),
+                                ),
                               ],
                             ),
                           ),
@@ -697,7 +744,11 @@ class _GlassCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
         boxShadow: const [
-          BoxShadow(blurRadius: 28, offset: Offset(0, 14), color: Colors.black38),
+          BoxShadow(
+            blurRadius: 28,
+            offset: Offset(0, 14),
+            color: Color(0x3D6D28D9),
+          ),
         ],
       ),
       child: child,
@@ -775,13 +826,15 @@ class _DarkDropdown extends StatelessWidget {
   Widget build(BuildContext context) {
     return DropdownButtonFormField<String>(
       initialValue: value,
-      dropdownColor: const Color(0xFF111827),
+      dropdownColor: const Color(0xFF2E1065),
       style: const TextStyle(color: Colors.white),
       items: items
-          .map((v) => DropdownMenuItem<String>(
-                value: v,
-                child: Text(v, style: const TextStyle(color: Colors.white)),
-              ))
+          .map(
+            (v) => DropdownMenuItem<String>(
+              value: v,
+              child: Text(v, style: const TextStyle(color: Colors.white)),
+            ),
+          )
           .toList(),
       onChanged: onChanged,
       decoration: InputDecoration(
@@ -818,10 +871,16 @@ class _GradientButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: [Color(0xFF2563EB), Color(0xFF7C3AED)]),
+        gradient: const LinearGradient(
+          colors: [Color(0xFF2563EB), Color(0xFF7C3AED)],
+        ),
         borderRadius: BorderRadius.circular(14),
         boxShadow: const [
-          BoxShadow(blurRadius: 22, offset: Offset(0, 10), color: Colors.black26),
+          BoxShadow(
+            blurRadius: 22,
+            offset: Offset(0, 10),
+            color: Color(0x336D28D9),
+          ),
         ],
       ),
       child: ElevatedButton(
@@ -829,19 +888,27 @@ class _GradientButton extends StatelessWidget {
           backgroundColor: Colors.transparent,
           shadowColor: Colors.transparent,
           padding: const EdgeInsets.symmetric(vertical: 14),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
         ),
         onPressed: onPressed,
         child: loading
             ? const SizedBox(
                 width: 22,
                 height: 22,
-                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
               )
             : Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(text, style: const TextStyle(fontWeight: FontWeight.w800)),
+                  Text(
+                    text,
+                    style: const TextStyle(fontWeight: FontWeight.w800),
+                  ),
                   const SizedBox(width: 10),
                   const Icon(Icons.arrow_forward, size: 18),
                 ],

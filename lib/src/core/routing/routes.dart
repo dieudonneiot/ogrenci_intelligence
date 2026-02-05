@@ -53,7 +53,8 @@ class Routes {
   static const companyInternships = '/company/internships';
   static const companyInternshipsCreate = '/company/internships/create';
   static const companyInternshipsEdit = '/company/internships/:id/edit';
-  static const companyInternshipApplications = '/company/internships/:id/applications';
+  static const companyInternshipApplications =
+      '/company/internships/:id/applications';
 
   static const companyProfile = '/company/profile';
   static const companyReports = '/company/reports';

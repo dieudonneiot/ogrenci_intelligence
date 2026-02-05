@@ -4,7 +4,9 @@ import '../domain/excuse_models.dart';
 class ExcuseRepository {
   const ExcuseRepository();
 
-  Future<List<AcceptedInternshipOption>> listMyAcceptedInternships({required String userId}) async {
+  Future<List<AcceptedInternshipOption>> listMyAcceptedInternships({
+    required String userId,
+  }) async {
     final rows = await SupabaseService.client
         .from('internship_applications')
         .select('id, status, internships(title, company_name)')
@@ -15,7 +17,8 @@ class ExcuseRepository {
     return (rows as List)
         .map((e) {
           final m = e as Map<String, dynamic>;
-          final internship = (m['internships'] as Map?)?.cast<String, dynamic>() ?? const {};
+          final internship =
+              (m['internships'] as Map?)?.cast<String, dynamic>() ?? const {};
           return AcceptedInternshipOption(
             applicationId: (m['id'] ?? '').toString(),
             internshipTitle: (internship['title'] ?? '').toString(),
@@ -45,7 +48,9 @@ class ExcuseRepository {
   Future<List<MyExcuseRequest>> listMyRequests({required String userId}) async {
     final rows = await SupabaseService.client
         .from('excuse_requests')
-        .select('id, reason_type, details, status, created_at, reviewed_at, reviewer_note')
+        .select(
+          'id, reason_type, details, status, created_at, reviewed_at, reviewer_note',
+        )
         .eq('user_id', userId)
         .order('created_at', ascending: false)
         .limit(50);
@@ -62,11 +67,7 @@ class ExcuseRepository {
   }) async {
     final raw = await SupabaseService.client.rpc(
       'list_company_excuse_requests',
-      params: {
-        'p_company_id': companyId,
-        'p_status': status,
-        'p_limit': limit,
-      },
+      params: {'p_company_id': companyId, 'p_status': status, 'p_limit': limit},
     );
 
     final list = (raw is List) ? raw : const <dynamic>[];
@@ -91,4 +92,3 @@ class ExcuseRepository {
     );
   }
 }
-

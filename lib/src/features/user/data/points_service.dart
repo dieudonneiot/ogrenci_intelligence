@@ -60,7 +60,9 @@ class PointsService {
     }
   }
 
-  Future<({bool weeklyAwarded, int currentStreak})> _checkWeeklyStreak({required String userId}) async {
+  Future<({bool weeklyAwarded, int currentStreak})> _checkWeeklyStreak({
+    required String userId,
+  }) async {
     try {
       final nowUtc = DateTime.now().toUtc();
       final sevenDaysAgo = nowUtc.subtract(const Duration(days: 7));
@@ -133,4 +135,6 @@ class PointsService {
   }
 }
 
-final pointsServiceProvider = Provider<PointsService>((ref) => const PointsService());
+final pointsServiceProvider = Provider<PointsService>(
+  (ref) => const PointsService(),
+);

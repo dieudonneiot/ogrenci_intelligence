@@ -1,4 +1,4 @@
-﻿import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/supabase/supabase_service.dart';
@@ -12,4 +12,3 @@ final companyRepositoryProvider = Provider<CompanyRepository>((ref) {
 final companyClientProvider = Provider<SupabaseClient>((ref) {
   return SupabaseService.client;
 });
-

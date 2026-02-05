@@ -12,7 +12,8 @@ class DatabaseDebugScreen extends ConsumerStatefulWidget {
   const DatabaseDebugScreen({super.key});
 
   @override
-  ConsumerState<DatabaseDebugScreen> createState() => _DatabaseDebugScreenState();
+  ConsumerState<DatabaseDebugScreen> createState() =>
+      _DatabaseDebugScreenState();
 }
 
 class _DatabaseDebugScreenState extends ConsumerState<DatabaseDebugScreen> {
@@ -45,18 +46,26 @@ class _DatabaseDebugScreenState extends ConsumerState<DatabaseDebugScreen> {
     final client = SupabaseService.client;
 
     try {
-      final profile = await client.from('profiles').select('*').eq('id', user.id).maybeSingle();
+      final profile = await client
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .maybeSingle();
       if (profile != null) {
         _profile = Map<String, dynamic>.from(profile);
         final dept = (_profile?['department'] ?? '').toString();
         results['profiles'] = _TableResult.success(
           count: 1,
-          message: l10n.dbDebugProfileFound(dept.isEmpty ? l10n.t(AppText.commonNotSpecified) : dept),
+          message: l10n.dbDebugProfileFound(
+            dept.isEmpty ? l10n.t(AppText.commonNotSpecified) : dept,
+          ),
           sample: [Map<String, dynamic>.from(profile)],
           columns: _columnsFromRows([profile]),
         );
       } else {
-        results['profiles'] = _TableResult.error(l10n.t(AppText.dbDebugProfileNotFound));
+        results['profiles'] = _TableResult.error(
+          l10n.t(AppText.dbDebugProfileNotFound),
+        );
       }
     } catch (e) {
       results['profiles'] = _TableResult.error(e.toString());
@@ -99,18 +108,27 @@ class _DatabaseDebugScreenState extends ConsumerState<DatabaseDebugScreen> {
     try {
       final rows = await client.from(table).select('*').limit(200);
       final list = (rows as List).cast<dynamic>();
-      final sample = list.take(3).map((e) => Map<String, dynamic>.from(e as Map)).toList();
+      final sample = list
+          .take(3)
+          .map((e) => Map<String, dynamic>.from(e as Map))
+          .toList();
       final columns = _columnsFromRows(list);
 
       int? deptCount;
       if (department.isNotEmpty) {
-        final deptRows = await client.from(table).select('*').eq('department', department);
+        final deptRows = await client
+            .from(table)
+            .select('*')
+            .eq('department', department);
         deptCount = (deptRows as List).length;
       }
 
       int? partTimeCount;
       if (includePartTime) {
-        final ptRows = await client.from(table).select('*').eq('type', 'part-time');
+        final ptRows = await client
+            .from(table)
+            .select('*')
+            .eq('type', 'part-time');
         partTimeCount = (ptRows as List).length;
       }
 
@@ -150,7 +168,10 @@ class _DatabaseDebugScreenState extends ConsumerState<DatabaseDebugScreen> {
             color: const Color(0xFFFEE2E2),
             borderRadius: BorderRadius.circular(12),
           ),
-          child: Text(l10n.t(AppText.commonPleaseSignIn), style: const TextStyle(color: Color(0xFF991B1B))),
+          child: Text(
+            l10n.t(AppText.commonPleaseSignIn),
+            style: const TextStyle(color: Color(0xFF991B1B)),
+          ),
         ),
       );
     }
@@ -167,10 +188,19 @@ class _DatabaseDebugScreenState extends ConsumerState<DatabaseDebugScreen> {
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.storage_outlined, color: Color(0xFF6D28D9), size: 28),
+                    const Icon(
+                      Icons.storage_outlined,
+                      color: Color(0xFF6D28D9),
+                      size: 28,
+                    ),
                     const SizedBox(width: 10),
-                    Text(l10n.t(AppText.dbDebugTitle),
-                        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900)),
+                    Text(
+                      l10n.t(AppText.dbDebugTitle),
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 6),
@@ -218,7 +248,10 @@ class _UserCard extends StatelessWidget {
             children: [
               const Icon(Icons.table_chart_outlined, color: Color(0xFF6B7280)),
               const SizedBox(width: 8),
-              Text(l10n.t(AppText.dbDebugUserInfoTitle), style: const TextStyle(fontWeight: FontWeight.w800)),
+              Text(
+                l10n.t(AppText.dbDebugUserInfoTitle),
+                style: const TextStyle(fontWeight: FontWeight.w800),
+              ),
             ],
           ),
           const SizedBox(height: 12),
@@ -227,14 +260,21 @@ class _UserCard extends StatelessWidget {
             runSpacing: 8,
             children: [
               _InfoLine(label: l10n.t(AppText.commonUserId), value: user.id),
-              _InfoLine(label: l10n.t(AppText.commonEmail), value: user.email ?? '-'),
+              _InfoLine(
+                label: l10n.t(AppText.commonEmail),
+                value: user.email ?? '-',
+              ),
               _InfoLine(
                 label: l10n.t(AppText.commonDepartment),
-                value: profile?['department']?.toString() ?? l10n.t(AppText.commonNotSpecified),
+                value:
+                    profile?['department']?.toString() ??
+                    l10n.t(AppText.commonNotSpecified),
               ),
               _InfoLine(
                 label: l10n.t(AppText.commonYear),
-                value: profile?['year']?.toString() ?? l10n.t(AppText.commonNotSpecified),
+                value:
+                    profile?['year']?.toString() ??
+                    l10n.t(AppText.commonNotSpecified),
               ),
             ],
           ),
@@ -255,7 +295,10 @@ class _InfoLine extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: Color(0xFF6B7280), fontSize: 12)),
+        Text(
+          label,
+          style: const TextStyle(color: Color(0xFF6B7280), fontSize: 12),
+        ),
         const SizedBox(height: 2),
         Text(value, style: const TextStyle(fontWeight: FontWeight.w700)),
       ],
@@ -331,11 +374,16 @@ class _TableCard extends StatelessWidget {
             children: [
               const Icon(Icons.table_chart_outlined, color: Color(0xFF6B7280)),
               const SizedBox(width: 8),
-              Text(l10n.dbDebugTableTitle(name), style: const TextStyle(fontWeight: FontWeight.w800)),
+              Text(
+                l10n.dbDebugTableTitle(name),
+                style: const TextStyle(fontWeight: FontWeight.w800),
+              ),
               const Spacer(),
               Icon(
                 result.success ? Icons.check_circle : Icons.error_outline,
-                color: result.success ? const Color(0xFF16A34A) : const Color(0xFFDC2626),
+                color: result.success
+                    ? const Color(0xFF16A34A)
+                    : const Color(0xFFDC2626),
               ),
             ],
           ),
@@ -345,29 +393,45 @@ class _TableCard extends StatelessWidget {
               spacing: 12,
               runSpacing: 8,
               children: [
-                _Tag(label: l10n.dbDebugTotalRecords(result.count), bg: const Color(0xFFF3F4F6)),
+                _Tag(
+                  label: l10n.dbDebugTotalRecords(result.count),
+                  bg: const Color(0xFFF3F4F6),
+                ),
                 if (result.departmentCount != null)
                   _Tag(
-                    label: l10n.dbDebugDepartmentRecords(result.departmentCount!),
+                    label: l10n.dbDebugDepartmentRecords(
+                      result.departmentCount!,
+                    ),
                     bg: const Color(0xFFEDE9FE),
                   ),
                 if (result.partTimeCount != null)
-                  _Tag(label: l10n.dbDebugPartTimeRecords(result.partTimeCount!), bg: const Color(0xFFDBEAFE)),
+                  _Tag(
+                    label: l10n.dbDebugPartTimeRecords(result.partTimeCount!),
+                    bg: const Color(0xFFDBEAFE),
+                  ),
               ],
             ),
             if (result.columns.isNotEmpty) ...[
               const SizedBox(height: 12),
-              Text(l10n.t(AppText.dbDebugTableColumnsTitle), style: const TextStyle(fontWeight: FontWeight.w700)),
+              Text(
+                l10n.t(AppText.dbDebugTableColumnsTitle),
+                style: const TextStyle(fontWeight: FontWeight.w700),
+              ),
               const SizedBox(height: 6),
               Wrap(
                 spacing: 6,
                 runSpacing: 6,
-                children: result.columns.map((c) => _Tag(label: c, bg: const Color(0xFFF3F4F6))).toList(),
+                children: result.columns
+                    .map((c) => _Tag(label: c, bg: const Color(0xFFF3F4F6)))
+                    .toList(),
               ),
             ],
             if (result.sample.isNotEmpty) ...[
               const SizedBox(height: 12),
-              Text(l10n.t(AppText.dbDebugSampleRecordsTitle), style: const TextStyle(fontWeight: FontWeight.w700)),
+              Text(
+                l10n.t(AppText.dbDebugSampleRecordsTitle),
+                style: const TextStyle(fontWeight: FontWeight.w700),
+              ),
               const SizedBox(height: 6),
               Container(
                 width: double.infinity,
@@ -379,13 +443,19 @@ class _TableCard extends StatelessWidget {
                 ),
                 child: Text(
                   const JsonEncoder.withIndent('  ').convert(result.sample),
-                  style: const TextStyle(fontSize: 11, color: Color(0xFF374151)),
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: Color(0xFF374151),
+                  ),
                 ),
               ),
             ],
             if (result.message != null) ...[
               const SizedBox(height: 8),
-              Text(result.message!, style: const TextStyle(color: Color(0xFF16A34A))),
+              Text(
+                result.message!,
+                style: const TextStyle(color: Color(0xFF16A34A)),
+              ),
             ],
           ] else
             Container(
@@ -395,7 +465,9 @@ class _TableCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
-                l10n.dbDebugError(result.error ?? l10n.t(AppText.commonUnknownError)),
+                l10n.dbDebugError(
+                  result.error ?? l10n.t(AppText.commonUnknownError),
+                ),
                 style: const TextStyle(color: Color(0xFF991B1B)),
               ),
             ),
@@ -419,7 +491,10 @@ class _Tag extends StatelessWidget {
         color: bg,
         borderRadius: BorderRadius.circular(999),
       ),
-      child: Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+      child: Text(
+        label,
+        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+      ),
     );
   }
 }
@@ -444,7 +519,10 @@ class _TipsCard extends StatelessWidget {
               const SizedBox(width: 8),
               Text(
                 l10n.t(AppText.dbDebugTipsTitle),
-                style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF92400E)),
+                style: const TextStyle(
+                  fontWeight: FontWeight.w800,
+                  color: Color(0xFF92400E),
+                ),
               ),
             ],
           ),

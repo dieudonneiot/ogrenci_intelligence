@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -13,10 +13,12 @@ class CompanyInternshipsScreen extends ConsumerStatefulWidget {
   const CompanyInternshipsScreen({super.key});
 
   @override
-  ConsumerState<CompanyInternshipsScreen> createState() => _CompanyInternshipsScreenState();
+  ConsumerState<CompanyInternshipsScreen> createState() =>
+      _CompanyInternshipsScreenState();
 }
 
-class _CompanyInternshipsScreenState extends ConsumerState<CompanyInternshipsScreen> {
+class _CompanyInternshipsScreenState
+    extends ConsumerState<CompanyInternshipsScreen> {
   bool _loading = true;
   String _search = '';
   String _filter = 'all';
@@ -71,7 +73,9 @@ class _CompanyInternshipsScreenState extends ConsumerState<CompanyInternshipsScr
     }
 
     final auth = authAsync.value;
-    if (auth == null || !auth.isAuthenticated || auth.userType != UserType.company) {
+    if (auth == null ||
+        !auth.isAuthenticated ||
+        auth.userType != UserType.company) {
       return Center(child: Text(l10n.t(AppText.companyPanelLoginRequired)));
     }
 
@@ -87,7 +91,10 @@ class _CompanyInternshipsScreenState extends ConsumerState<CompanyInternshipsScr
 
     final activeCount = _internships.where((i) => i.isActive).length;
     final inactiveCount = _internships.length - activeCount;
-    final totalApps = _internships.fold<int>(0, (sum, i) => sum + i.applicationsCount);
+    final totalApps = _internships.fold<int>(
+      0,
+      (sum, i) => sum + i.applicationsCount,
+    );
 
     return Container(
       color: const Color(0xFFF9FAFB),
@@ -102,18 +109,27 @@ class _CompanyInternshipsScreenState extends ConsumerState<CompanyInternshipsScr
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.school_outlined, color: Color(0xFF6D28D9)),
+                      const Icon(
+                        Icons.school_outlined,
+                        color: Color(0xFF6D28D9),
+                      ),
                       const SizedBox(width: 8),
                       Text(
                         l10n.t(AppText.companyInternshipsTitle),
-                        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900),
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w900,
+                        ),
                       ),
                       const Spacer(),
                       ElevatedButton.icon(
-                        onPressed: () => context.go(Routes.companyInternshipsCreate),
+                        onPressed: () =>
+                            context.go(Routes.companyInternshipsCreate),
                         icon: const Icon(Icons.add),
                         label: Text(l10n.t(AppText.newListing)),
-                        style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6D28D9)),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF6D28D9),
+                        ),
                       ),
                     ],
                   ),
@@ -122,10 +138,22 @@ class _CompanyInternshipsScreenState extends ConsumerState<CompanyInternshipsScr
                     spacing: 12,
                     runSpacing: 12,
                     children: [
-                      _MiniStat(label: l10n.t(AppText.commonTotal), value: _internships.length),
-                      _MiniStat(label: l10n.t(AppText.commonActive), value: activeCount),
-                      _MiniStat(label: l10n.t(AppText.commonInactive), value: inactiveCount),
-                      _MiniStat(label: l10n.t(AppText.commonApplications), value: totalApps),
+                      _MiniStat(
+                        label: l10n.t(AppText.commonTotal),
+                        value: _internships.length,
+                      ),
+                      _MiniStat(
+                        label: l10n.t(AppText.commonActive),
+                        value: activeCount,
+                      ),
+                      _MiniStat(
+                        label: l10n.t(AppText.commonInactive),
+                        value: inactiveCount,
+                      ),
+                      _MiniStat(
+                        label: l10n.t(AppText.commonApplications),
+                        value: totalApps,
+                      ),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -138,10 +166,16 @@ class _CompanyInternshipsScreenState extends ConsumerState<CompanyInternshipsScr
                   ),
                   const SizedBox(height: 16),
                   if (_loading)
-                    const Center(child: Padding(padding: EdgeInsets.all(24), child: CircularProgressIndicator()))
+                    const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(24),
+                        child: CircularProgressIndicator(),
+                      ),
+                    )
                   else if (filtered.isEmpty)
                     _EmptyState(
-                      onCreate: () => context.go(Routes.companyInternshipsCreate),
+                      onCreate: () =>
+                          context.go(Routes.companyInternshipsCreate),
                       hasSearch: _search.trim().isNotEmpty || _filter != 'all',
                     )
                   else
@@ -150,9 +184,12 @@ class _CompanyInternshipsScreenState extends ConsumerState<CompanyInternshipsScr
                         for (final item in filtered)
                           _InternshipCard(
                             item: item,
-                            onEdit: () => context.go('${Routes.companyInternships}/${item.id}/edit'),
-                            onApplications: () =>
-                                context.go('${Routes.companyInternships}/${item.id}/applications'),
+                            onEdit: () => context.go(
+                              '${Routes.companyInternships}/${item.id}/edit',
+                            ),
+                            onApplications: () => context.go(
+                              '${Routes.companyInternships}/${item.id}/applications',
+                            ),
                             onToggle: (v) => _toggleStatus(item, v),
                           ),
                       ],
@@ -203,7 +240,9 @@ class _FiltersBar extends StatelessWidget {
               decoration: InputDecoration(
                 prefixIcon: const Icon(Icons.search),
                 hintText: l10n.t(AppText.companyInternshipsSearchHint),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 isDense: true,
               ),
               onChanged: onSearch,
@@ -283,9 +322,18 @@ class _MiniStat extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(value.toString(), style: const TextStyle(fontWeight: FontWeight.w900)),
+          Text(
+            value.toString(),
+            style: const TextStyle(fontWeight: FontWeight.w900),
+          ),
           const SizedBox(width: 8),
-          Text(label, style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600)),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Color(0xFF6B7280),
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ],
       ),
     );
@@ -319,7 +367,13 @@ class _InternshipCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: const [BoxShadow(color: Color(0x08000000), blurRadius: 12, offset: Offset(0, 6))],
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x08000000),
+            blurRadius: 12,
+            offset: Offset(0, 6),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -327,7 +381,10 @@ class _InternshipCard extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: Text(item.title, style: const TextStyle(fontWeight: FontWeight.w900)),
+                child: Text(
+                  item.title,
+                  style: const TextStyle(fontWeight: FontWeight.w900),
+                ),
               ),
               Switch(
                 value: item.isActive,
@@ -339,7 +396,10 @@ class _InternshipCard extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             '${item.department ?? '—'} • ${item.location ?? '—'}',
-            style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
+            style: const TextStyle(
+              color: Color(0xFF6B7280),
+              fontWeight: FontWeight.w600,
+            ),
           ),
           const SizedBox(height: 10),
           Wrap(
@@ -347,13 +407,18 @@ class _InternshipCard extends StatelessWidget {
             children: [
               _InfoChip(
                 icon: Icons.people_outline,
-                text: '${l10n.t(AppText.commonApplications)}: ${item.applicationsCount}',
+                text:
+                    '${l10n.t(AppText.commonApplications)}: ${item.applicationsCount}',
               ),
               _InfoChip(
                 icon: Icons.check_circle_outline,
-                text: '${l10n.t(AppText.statusAccepted)}: ${item.acceptedCount}',
+                text:
+                    '${l10n.t(AppText.statusAccepted)}: ${item.acceptedCount}',
               ),
-              _InfoChip(icon: Icons.event_outlined, text: '${l10n.t(AppText.deadline)}: $deadlineText'),
+              _InfoChip(
+                icon: Icons.event_outlined,
+                text: '${l10n.t(AppText.deadline)}: $deadlineText',
+              ),
             ],
           ),
           const SizedBox(height: 12),
@@ -391,7 +456,10 @@ class _InfoChip extends StatelessWidget {
       children: [
         Icon(icon, size: 14, color: const Color(0xFF6B7280)),
         const SizedBox(width: 4),
-        Text(text, style: const TextStyle(color: Color(0xFF6B7280), fontSize: 12)),
+        Text(
+          text,
+          style: const TextStyle(color: Color(0xFF6B7280), fontSize: 12),
+        ),
       ],
     );
   }
@@ -418,8 +486,13 @@ class _EmptyState extends StatelessWidget {
           const Icon(Icons.school_outlined, size: 44, color: Color(0xFFD1D5DB)),
           const SizedBox(height: 10),
           Text(
-            hasSearch ? l10n.t(AppText.noResults) : l10n.t(AppText.companyInternshipsEmptyNoListings),
-            style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF6B7280)),
+            hasSearch
+                ? l10n.t(AppText.noResults)
+                : l10n.t(AppText.companyInternshipsEmptyNoListings),
+            style: const TextStyle(
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF6B7280),
+            ),
           ),
           const SizedBox(height: 10),
           if (!hasSearch)
@@ -427,7 +500,9 @@ class _EmptyState extends StatelessWidget {
               onPressed: onCreate,
               icon: const Icon(Icons.add),
               label: Text(l10n.t(AppText.newListing)),
-              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6D28D9)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF6D28D9),
+              ),
             ),
         ],
       ),

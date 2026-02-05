@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
 import '../../../../core/localization/app_localizations.dart';
 
@@ -46,7 +46,7 @@ class CompanyPricingScreen extends StatelessWidget {
           l10n.t(AppText.companyPricingEnterpriseFeature4),
           l10n.t(AppText.companyPricingEnterpriseFeature5),
         ],
-        accent: Color(0xFF111827),
+        accent: const Color(0xFF1F2937),
       ),
     ];
 
@@ -63,12 +63,18 @@ class CompanyPricingScreen extends StatelessWidget {
                 children: [
                   Text(
                     l10n.t(AppText.companyPricingTitle),
-                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900),
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w900,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     l10n.t(AppText.companyPricingSubtitle),
-                    style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600),
+                    style: const TextStyle(
+                      color: Color(0xFF6B7280),
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   LayoutBuilder(
@@ -76,8 +82,8 @@ class CompanyPricingScreen extends StatelessWidget {
                       final crossAxis = c.maxWidth >= 980
                           ? 3
                           : c.maxWidth >= 720
-                              ? 2
-                              : 1;
+                          ? 2
+                          : 1;
                       return GridView.count(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
@@ -132,18 +138,42 @@ class _PackageCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: pkg.highlighted ? pkg.accent : const Color(0xFFE5E7EB), width: 1.5),
-        boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 16, offset: Offset(0, 8))],
+        border: Border.all(
+          color: pkg.highlighted ? pkg.accent : const Color(0xFFE5E7EB),
+          width: 1.5,
+        ),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0A000000),
+            blurRadius: 16,
+            offset: Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(pkg.name, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+          Text(
+            pkg.name,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+          ),
           const SizedBox(height: 6),
-          Text(pkg.description,
-              style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600)),
+          Text(
+            pkg.description,
+            style: const TextStyle(
+              color: Color(0xFF6B7280),
+              fontWeight: FontWeight.w600,
+            ),
+          ),
           const SizedBox(height: 12),
-          Text(pkg.price, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: pkg.accent)),
+          Text(
+            pkg.price,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w900,
+              color: pkg.accent,
+            ),
+          ),
           const SizedBox(height: 14),
           for (final feature in pkg.features)
             Padding(
@@ -153,7 +183,12 @@ class _PackageCard extends StatelessWidget {
                 children: [
                   Icon(Icons.check_circle, size: 16, color: pkg.accent),
                   const SizedBox(width: 8),
-                  Expanded(child: Text(feature, style: const TextStyle(fontWeight: FontWeight.w600))),
+                  Expanded(
+                    child: Text(
+                      feature,
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -163,7 +198,9 @@ class _PackageCard extends StatelessWidget {
             child: ElevatedButton(
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(l10n.t(AppText.companyPricingSalesContacted))),
+                  SnackBar(
+                    content: Text(l10n.t(AppText.companyPricingSalesContacted)),
+                  ),
                 );
               },
               style: ElevatedButton.styleFrom(backgroundColor: pkg.accent),

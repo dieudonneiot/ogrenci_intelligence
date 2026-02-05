@@ -12,10 +12,12 @@ class CompanyTalentMiningScreen extends ConsumerStatefulWidget {
   const CompanyTalentMiningScreen({super.key});
 
   @override
-  ConsumerState<CompanyTalentMiningScreen> createState() => _CompanyTalentMiningScreenState();
+  ConsumerState<CompanyTalentMiningScreen> createState() =>
+      _CompanyTalentMiningScreenState();
 }
 
-class _CompanyTalentMiningScreenState extends ConsumerState<CompanyTalentMiningScreen> {
+class _CompanyTalentMiningScreenState
+    extends ConsumerState<CompanyTalentMiningScreen> {
   bool _loading = true;
   List<TalentCandidate> _items = const [];
 
@@ -47,16 +49,19 @@ class _CompanyTalentMiningScreenState extends ConsumerState<CompanyTalentMiningS
         department: _department,
         minScore: _oiRange.start.round(),
         maxScore: _oiRange.end.round(),
-        badges: _badgeFilters.isEmpty ? null : _badgeFilters.toList(growable: false),
+        badges: _badgeFilters.isEmpty
+            ? null
+            : _badgeFilters.toList(growable: false),
         limit: 60,
       );
 
-      final departments = list
-          .map((e) => (e.department ?? '').trim())
-          .where((e) => e.isNotEmpty)
-          .toSet()
-          .toList(growable: false)
-        ..sort();
+      final departments =
+          list
+              .map((e) => (e.department ?? '').trim())
+              .where((e) => e.isNotEmpty)
+              .toSet()
+              .toList(growable: false)
+            ..sort();
 
       final badges = <String>{};
       for (final c in list) {
@@ -72,7 +77,9 @@ class _CompanyTalentMiningScreenState extends ConsumerState<CompanyTalentMiningS
       });
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed: $e')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Failed: $e')));
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -97,7 +104,12 @@ class _CompanyTalentMiningScreenState extends ConsumerState<CompanyTalentMiningS
     }
 
     if (_loading) {
-      return const Center(child: Padding(padding: EdgeInsets.all(24), child: CircularProgressIndicator()));
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(24),
+          child: CircularProgressIndicator(),
+        ),
+      );
     }
 
     return Container(
@@ -116,17 +128,29 @@ class _CompanyTalentMiningScreenState extends ConsumerState<CompanyTalentMiningS
                     Row(
                       children: [
                         const Expanded(
-                          child: Text('Talent Mining', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900)),
+                          child: Text(
+                            'Talent Mining',
+                            style: TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
                         ),
                         TextButton(
                           onPressed: _clear,
-                          child: const Text('Clear', style: TextStyle(fontWeight: FontWeight.w900)),
+                          child: const Text(
+                            'Clear',
+                            style: TextStyle(fontWeight: FontWeight.w900),
+                          ),
                         ),
                         const SizedBox(width: 6),
                         ElevatedButton.icon(
                           onPressed: _load,
                           icon: const Icon(Icons.refresh),
-                          label: Text(l10n.t(AppText.retry), style: const TextStyle(fontWeight: FontWeight.w900)),
+                          label: Text(
+                            l10n.t(AppText.retry),
+                            style: const TextStyle(fontWeight: FontWeight.w900),
+                          ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF6D28D9),
                             foregroundColor: Colors.white,
@@ -142,7 +166,8 @@ class _CompanyTalentMiningScreenState extends ConsumerState<CompanyTalentMiningS
                         selectedDepartment: _department,
                         oiRange: _oiRange,
                         selectedBadges: _badgeFilters,
-                        onDepartmentChanged: (v) => setState(() => _department = v),
+                        onDepartmentChanged: (v) =>
+                            setState(() => _department = v),
                         onOiRangeChanged: (v) => setState(() => _oiRange = v),
                         onToggleBadge: (b) => setState(() {
                           if (_badgeFilters.contains(b)) {
@@ -168,8 +193,10 @@ class _CompanyTalentMiningScreenState extends ConsumerState<CompanyTalentMiningS
                                 selectedDepartment: _department,
                                 oiRange: _oiRange,
                                 selectedBadges: _badgeFilters,
-                                onDepartmentChanged: (v) => setState(() => _department = v),
-                                onOiRangeChanged: (v) => setState(() => _oiRange = v),
+                                onDepartmentChanged: (v) =>
+                                    setState(() => _department = v),
+                                onOiRangeChanged: (v) =>
+                                    setState(() => _oiRange = v),
                                 onToggleBadge: (b) => setState(() {
                                   if (_badgeFilters.contains(b)) {
                                     _badgeFilters.remove(b);
@@ -227,39 +254,64 @@ class _FiltersCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: const [BoxShadow(color: Color(0x07000000), blurRadius: 14, offset: Offset(0, 8))],
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x07000000),
+            blurRadius: 14,
+            offset: Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Smart Filters', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
+          const Text(
+            'Smart Filters',
+            style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+          ),
           const SizedBox(height: 12),
           DropdownButtonFormField<String?>(
             key: ValueKey<String?>('dept:$selectedDepartment'),
             initialValue: selectedDepartment,
             decoration: InputDecoration(
               labelText: 'Department',
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
             ),
             items: [
-              const DropdownMenuItem(value: null, child: Text('All departments')),
-              ...departments.map((d) => DropdownMenuItem(value: d, child: Text(d))),
+              const DropdownMenuItem(
+                value: null,
+                child: Text('All departments'),
+              ),
+              ...departments.map(
+                (d) => DropdownMenuItem(value: d, child: Text(d)),
+              ),
             ],
             onChanged: onDepartmentChanged,
           ),
           const SizedBox(height: 14),
-          const Text('OI score range', style: TextStyle(fontWeight: FontWeight.w900)),
+          const Text(
+            'OI score range',
+            style: TextStyle(fontWeight: FontWeight.w900),
+          ),
           RangeSlider(
             values: oiRange,
             min: 0,
             max: 100,
             divisions: 20,
-            labels: RangeLabels('${oiRange.start.round()}', '${oiRange.end.round()}'),
+            labels: RangeLabels(
+              '${oiRange.start.round()}',
+              '${oiRange.end.round()}',
+            ),
             onChanged: onOiRangeChanged,
           ),
           const SizedBox(height: 10),
           if (badges.isNotEmpty) ...[
-            const Text('Badges / types', style: TextStyle(fontWeight: FontWeight.w900)),
+            const Text(
+              'Badges / types',
+              style: TextStyle(fontWeight: FontWeight.w900),
+            ),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
@@ -283,11 +335,16 @@ class _FiltersCard extends StatelessWidget {
             child: ElevatedButton.icon(
               onPressed: onApply,
               icon: const Icon(Icons.search),
-              label: const Text('Apply', style: TextStyle(fontWeight: FontWeight.w900)),
+              label: const Text(
+                'Apply',
+                style: TextStyle(fontWeight: FontWeight.w900),
+              ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF6D28D9),
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
               ),
             ),
           ),
@@ -305,7 +362,13 @@ class _Results extends StatelessWidget {
   Widget build(BuildContext context) {
     if (items.isEmpty) {
       return const Center(
-        child: Text('No results.', style: TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w800)),
+        child: Text(
+          'No results.',
+          style: TextStyle(
+            color: Color(0xFF6B7280),
+            fontWeight: FontWeight.w800,
+          ),
+        ),
       );
     }
 
@@ -327,15 +390,17 @@ class _CandidateCard extends StatelessWidget {
     final Color bg = score >= 80
         ? const Color(0xFFDCFCE7)
         : score >= 60
-            ? const Color(0xFFFEF3C7)
-            : const Color(0xFFF3F4F6);
+        ? const Color(0xFFFEF3C7)
+        : const Color(0xFFF3F4F6);
     final Color fg = score >= 80
         ? const Color(0xFF16A34A)
         : score >= 60
-            ? const Color(0xFFB45309)
-            : const Color(0xFF374151);
+        ? const Color(0xFFB45309)
+        : const Color(0xFF374151);
 
-    final name = item.fullName.trim().isEmpty ? item.email : item.fullName.trim();
+    final name = item.fullName.trim().isEmpty
+        ? item.email
+        : item.fullName.trim();
 
     return Container(
       padding: const EdgeInsets.all(14),
@@ -343,7 +408,13 @@ class _CandidateCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: const [BoxShadow(color: Color(0x07000000), blurRadius: 14, offset: Offset(0, 8))],
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x07000000),
+            blurRadius: 14,
+            offset: Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -356,19 +427,41 @@ class _CandidateCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(name, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
+                    Text(
+                      name,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w900,
+                        fontSize: 16,
+                      ),
+                    ),
                     const SizedBox(height: 4),
                     Text(
                       '${item.department ?? '—'} • Year ${item.year ?? '—'}',
-                      style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
+                      style: const TextStyle(
+                        color: Color(0xFF6B7280),
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ],
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(999)),
-                child: Text('$score', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: fg)),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: bg,
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Text(
+                  '$score',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 12,
+                    color: fg,
+                  ),
+                ),
               ),
             ],
           ),
@@ -380,13 +473,22 @@ class _CandidateCard extends StatelessWidget {
               children: [
                 for (final b in item.badges.take(10))
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: const Color(0xFFF5F3FF),
                       borderRadius: BorderRadius.circular(999),
                       border: Border.all(color: const Color(0xFFE9D5FF)),
                     ),
-                    child: Text(b, style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF4B5563))),
+                    child: Text(
+                      b,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF4B5563),
+                      ),
+                    ),
                   ),
               ],
             ),
@@ -398,14 +500,23 @@ class _CandidateCard extends StatelessWidget {
                   onPressed: item.email.isEmpty
                       ? null
                       : () async {
-                          await Clipboard.setData(ClipboardData(text: item.email));
+                          await Clipboard.setData(
+                            ClipboardData(text: item.email),
+                          );
                           if (!context.mounted) return;
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Email copied.')));
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Email copied.')),
+                          );
                         },
                   icon: const Icon(Icons.copy),
-                  label: const Text('Copy email', style: TextStyle(fontWeight: FontWeight.w900)),
+                  label: const Text(
+                    'Copy email',
+                    style: TextStyle(fontWeight: FontWeight.w900),
+                  ),
                   style: OutlinedButton.styleFrom(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
                   ),
                 ),
               ),
@@ -416,10 +527,15 @@ class _CandidateCard extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF6D28D9),
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
                     elevation: 0,
                   ),
-                  child: const Text('View profile', style: TextStyle(fontWeight: FontWeight.w900)),
+                  child: const Text(
+                    'View profile',
+                    style: TextStyle(fontWeight: FontWeight.w900),
+                  ),
                 ),
               ),
             ],
@@ -433,7 +549,11 @@ class _CandidateCard extends StatelessWidget {
     await showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(item.fullName.trim().isEmpty ? 'Student profile' : item.fullName.trim()),
+        title: Text(
+          item.fullName.trim().isEmpty
+              ? 'Student profile'
+              : item.fullName.trim(),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -448,7 +568,10 @@ class _CandidateCard extends StatelessWidget {
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close')),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
         ],
       ),
     );
@@ -462,7 +585,9 @@ class _Avatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final initial = fallback.trim().isEmpty ? '?' : fallback.trim().characters.first.toUpperCase();
+    final initial = fallback.trim().isEmpty
+        ? '?'
+        : fallback.trim().characters.first.toUpperCase();
     if (url == null || url!.trim().isEmpty) {
       return _initial(initial);
     }
@@ -487,7 +612,13 @@ class _Avatar extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
       ),
       alignment: Alignment.center,
-      child: Text(t, style: const TextStyle(fontWeight: FontWeight.w900, color: Color(0xFF6D28D9))),
+      child: Text(
+        t,
+        style: const TextStyle(
+          fontWeight: FontWeight.w900,
+          color: Color(0xFF6D28D9),
+        ),
+      ),
     );
   }
 }

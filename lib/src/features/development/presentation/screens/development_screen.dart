@@ -11,7 +11,8 @@ class DevelopmentScreen extends ConsumerStatefulWidget {
   ConsumerState<DevelopmentScreen> createState() => _DevelopmentScreenState();
 }
 
-class _DevelopmentScreenState extends ConsumerState<DevelopmentScreen> with SingleTickerProviderStateMixin {
+class _DevelopmentScreenState extends ConsumerState<DevelopmentScreen>
+    with SingleTickerProviderStateMixin {
   late final TabController _tabs;
 
   @override
@@ -28,8 +29,11 @@ class _DevelopmentScreenState extends ConsumerState<DevelopmentScreen> with Sing
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FAFB),
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 1120),
@@ -38,21 +42,23 @@ class _DevelopmentScreenState extends ConsumerState<DevelopmentScreen> with Sing
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Development', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900)),
+                const Text(
+                  'Development',
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900),
+                ),
                 const SizedBox(height: 10),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
+                Card(
+                  shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: const Color(0xFFE5E7EB)),
+                    side: BorderSide(color: cs.outlineVariant.withAlpha(150)),
                   ),
                   child: TabBar(
                     controller: _tabs,
                     isScrollable: true,
-                    labelColor: const Color(0xFF111827),
-                    unselectedLabelColor: const Color(0xFF6B7280),
+                    labelColor: cs.onSurface,
+                    unselectedLabelColor: cs.onSurfaceVariant,
                     labelStyle: const TextStyle(fontWeight: FontWeight.w900),
-                    indicatorColor: const Color(0xFF6D28D9),
+                    indicatorColor: cs.primary,
                     tabs: const [
                       Tab(text: 'Case Analysis'),
                       Tab(text: 'Nano-Learning'),

@@ -16,7 +16,12 @@ class JobDetailScreen extends ConsumerWidget {
 
     return asyncVm.when(
       loading: () => const Scaffold(
-        body: Center(child: Padding(padding: EdgeInsets.all(24), child: CircularProgressIndicator())),
+        body: Center(
+          child: Padding(
+            padding: EdgeInsets.all(24),
+            child: CircularProgressIndicator(),
+          ),
+        ),
       ),
       error: (e, _) => Scaffold(
         body: Center(
@@ -25,17 +30,32 @@ class JobDetailScreen extends ConsumerWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.error_outline, size: 48, color: Color(0xFFEF4444)),
+                const Icon(
+                  Icons.error_outline,
+                  size: 48,
+                  color: Color(0xFFEF4444),
+                ),
                 const SizedBox(height: 12),
-                Text(l10n.t(AppText.jobDetailLoadFailed),
-                    style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
+                Text(
+                  l10n.t(AppText.jobDetailLoadFailed),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 16,
+                  ),
+                ),
                 const SizedBox(height: 8),
-                Text(e.toString(), textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFF6B7280))),
+                Text(
+                  e.toString(),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Color(0xFF6B7280)),
+                ),
                 const SizedBox(height: 14),
                 SizedBox(
                   height: 44,
                   child: ElevatedButton(
-                    onPressed: () => ref.read(jobDetailViewProvider(jobId).notifier).refresh(),
+                    onPressed: () => ref
+                        .read(jobDetailViewProvider(jobId).notifier)
+                        .refresh(),
                     child: Text(l10n.t(AppText.retry)),
                   ),
                 ),
@@ -63,22 +83,32 @@ class _Body extends ConsumerWidget {
       backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
         backgroundColor: Colors.white,
-        foregroundColor: const Color(0xFF111827),
+        foregroundColor: const Color(0xFF1F2937),
         elevation: 0,
-        title: Text(l10n.t(AppText.jobDetailTitle), style: const TextStyle(fontWeight: FontWeight.w900)),
+        title: Text(
+          l10n.t(AppText.jobDetailTitle),
+          style: const TextStyle(fontWeight: FontWeight.w900),
+        ),
         actions: [
           IconButton(
             onPressed: () async {
               try {
-                await ref.read(jobDetailViewProvider(j.id).notifier).toggleFavorite();
+                await ref
+                    .read(jobDetailViewProvider(j.id).notifier)
+                    .toggleFavorite();
               } catch (e) {
                 if (!context.mounted) return;
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(l10n.favoriteUpdateFailed(e.toString()))),
+                  SnackBar(
+                    content: Text(l10n.favoriteUpdateFailed(e.toString())),
+                  ),
                 );
               }
             },
-            icon: Icon(vm.isFavorite ? Icons.favorite : Icons.favorite_border, color: const Color(0xFFEF4444)),
+            icon: Icon(
+              vm.isFavorite ? Icons.favorite : Icons.favorite_border,
+              color: const Color(0xFFEF4444),
+            ),
           ),
         ],
       ),
@@ -97,7 +127,13 @@ class _Body extends ConsumerWidget {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(18),
                       border: Border.all(color: const Color(0xFFE5E7EB)),
-                      boxShadow: const [BoxShadow(color: Color(0x07000000), blurRadius: 14, offset: Offset(0, 8))],
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Color(0x07000000),
+                          blurRadius: 14,
+                          offset: Offset(0, 8),
+                        ),
+                      ],
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -106,28 +142,52 @@ class _Body extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Expanded(
-                              child: Text(j.title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
+                              child: Text(
+                                j.title,
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
                             ),
-                            if (applied) _StatusPill(status: vm.applicationStatus!),
+                            if (applied)
+                              _StatusPill(status: vm.applicationStatus!),
                           ],
                         ),
                         const SizedBox(height: 6),
                         Text(
                           '${j.companyName} - ${j.location}',
-                          style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
+                          style: const TextStyle(
+                            color: Color(0xFF6B7280),
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                         const SizedBox(height: 10),
                         Wrap(
                           spacing: 8,
                           runSpacing: 8,
                           children: [
-                            _Chip(text: j.department, bg: const Color(0xFFEDE9FE), fg: const Color(0xFF6D28D9)),
-                            _Chip(text: j.workType, bg: const Color(0xFFF3F4F6), fg: const Color(0xFF374151)),
+                            _Chip(
+                              text: j.department,
+                              bg: const Color(0xFFEDE9FE),
+                              fg: const Color(0xFF6D28D9),
+                            ),
+                            _Chip(
+                              text: j.workType,
+                              bg: const Color(0xFFF3F4F6),
+                              fg: const Color(0xFF374151),
+                            ),
                             if (j.isRemote)
-                              _Chip(text: l10n.t(AppText.remote), bg: const Color(0xFFDCFCE7), fg: const Color(0xFF16A34A)),
+                              _Chip(
+                                text: l10n.t(AppText.remote),
+                                bg: const Color(0xFFDCFCE7),
+                                fg: const Color(0xFF16A34A),
+                              ),
                             if (j.deadline != null)
                               _Chip(
-                                text: l10n.deadlineLabel(_fmtDate(context, j.deadline!)),
+                                text: l10n.deadlineLabel(
+                                  _fmtDate(context, j.deadline!),
+                                ),
                                 bg: const Color(0xFFFFF7ED),
                                 fg: const Color(0xFFB45309),
                               ),
@@ -135,7 +195,12 @@ class _Body extends ConsumerWidget {
                                 (j.salaryMin ?? 0) > 0 ||
                                 (j.salaryMax ?? 0) > 0)
                               _Chip(
-                                text: _salaryText(l10n, j.salaryText, j.salaryMin, j.salaryMax),
+                                text: _salaryText(
+                                  l10n,
+                                  j.salaryText,
+                                  j.salaryMin,
+                                  j.salaryMax,
+                                ),
                                 bg: const Color(0xFFDBEAFE),
                                 fg: const Color(0xFF1D4ED8),
                               ),
@@ -145,9 +210,15 @@ class _Body extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 14),
-                  _Section(title: l10n.t(AppText.jobDetailDescription), text: j.description),
+                  _Section(
+                    title: l10n.t(AppText.jobDetailDescription),
+                    text: j.description,
+                  ),
                   const SizedBox(height: 12),
-                  _Section(title: l10n.t(AppText.jobDetailRequirements), text: j.requirements),
+                  _Section(
+                    title: l10n.t(AppText.jobDetailRequirements),
+                    text: j.requirements,
+                  ),
                   const SizedBox(height: 18),
                   if (!applied)
                     SizedBox(
@@ -156,11 +227,16 @@ class _Body extends ConsumerWidget {
                       child: ElevatedButton.icon(
                         onPressed: () => _openApplySheet(context, ref, j.id),
                         icon: const Icon(Icons.send_outlined),
-                        label: Text(l10n.t(AppText.jobDetailApply), style: const TextStyle(fontWeight: FontWeight.w900)),
+                        label: Text(
+                          l10n.t(AppText.jobDetailApply),
+                          style: const TextStyle(fontWeight: FontWeight.w900),
+                        ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF6D28D9),
                           foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
                           elevation: 0,
                         ),
                       ),
@@ -175,12 +251,20 @@ class _Body extends ConsumerWidget {
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.verified_outlined, color: Color(0xFF6D28D9)),
+                          const Icon(
+                            Icons.verified_outlined,
+                            color: Color(0xFF6D28D9),
+                          ),
                           const SizedBox(width: 10),
                           Expanded(
                             child: Text(
-                              l10n.jobDetailAppliedStatus(_statusText(l10n, vm.applicationStatus!)),
-                              style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF4B5563)),
+                              l10n.jobDetailAppliedStatus(
+                                _statusText(l10n, vm.applicationStatus!),
+                              ),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w800,
+                                color: Color(0xFF4B5563),
+                              ),
                             ),
                           ),
                         ],
@@ -213,7 +297,12 @@ class _Body extends ConsumerWidget {
     }
   }
 
-  static String _salaryText(AppLocalizations l10n, String? salaryText, int? min, int? max) {
+  static String _salaryText(
+    AppLocalizations l10n,
+    String? salaryText,
+    int? min,
+    int? max,
+  ) {
     final s = (salaryText ?? '').trim();
     if (s.isNotEmpty) return s;
     final a = min ?? 0;
@@ -224,7 +313,11 @@ class _Body extends ConsumerWidget {
     return '';
   }
 
-  static Future<void> _openApplySheet(BuildContext context, WidgetRef ref, String jobId) async {
+  static Future<void> _openApplySheet(
+    BuildContext context,
+    WidgetRef ref,
+    String jobId,
+  ) async {
     final l10n = AppLocalizations.of(context);
     final ctrl = TextEditingController();
 
@@ -232,7 +325,9 @@ class _Body extends ConsumerWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       builder: (ctx) {
         return Padding(
           padding: EdgeInsets.only(
@@ -245,18 +340,30 @@ class _Body extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(l10n.t(AppText.jobDetailApplySheetTitle),
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+              Text(
+                l10n.t(AppText.jobDetailApplySheetTitle),
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
               const SizedBox(height: 6),
-              Text(l10n.t(AppText.jobDetailApplySheetSubtitle),
-                  style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700)),
+              Text(
+                l10n.t(AppText.jobDetailApplySheetSubtitle),
+                style: const TextStyle(
+                  color: Color(0xFF6B7280),
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
               const SizedBox(height: 12),
               TextField(
                 controller: ctrl,
                 maxLines: 6,
                 decoration: InputDecoration(
                   hintText: l10n.t(AppText.jobDetailApplySheetHint),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
                 ),
               ),
               const SizedBox(height: 12),
@@ -266,26 +373,39 @@ class _Body extends ConsumerWidget {
                 child: ElevatedButton(
                   onPressed: () async {
                     try {
-                      await ref.read(jobDetailViewProvider(jobId).notifier).apply(ctrl.text);
+                      await ref
+                          .read(jobDetailViewProvider(jobId).notifier)
+                          .apply(ctrl.text);
                       if (ctx.mounted) Navigator.pop(ctx);
                       if (!context.mounted) return;
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(l10n.t(AppText.jobDetailApplySuccess))),
+                        SnackBar(
+                          content: Text(l10n.t(AppText.jobDetailApplySuccess)),
+                        ),
                       );
                     } catch (e) {
                       if (!context.mounted) return;
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(l10n.jobDetailApplyFailed(e.toString()))),
+                        SnackBar(
+                          content: Text(
+                            l10n.jobDetailApplyFailed(e.toString()),
+                          ),
+                        ),
                       );
                     }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF6D28D9),
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
                     elevation: 0,
                   ),
-                  child: Text(l10n.t(AppText.commonSend), style: const TextStyle(fontWeight: FontWeight.w900)),
+                  child: Text(
+                    l10n.t(AppText.commonSend),
+                    style: const TextStyle(fontWeight: FontWeight.w900),
+                  ),
                 ),
               ),
             ],
@@ -310,16 +430,29 @@ class _Section extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: const [BoxShadow(color: Color(0x07000000), blurRadius: 14, offset: Offset(0, 8))],
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x07000000),
+            blurRadius: 14,
+            offset: Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
+          Text(
+            title,
+            style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+          ),
           const SizedBox(height: 10),
           Text(
             text.isEmpty ? l10n.t(AppText.commonNotSpecified) : text,
-            style: const TextStyle(color: Color(0xFF374151), fontWeight: FontWeight.w600, height: 1.4),
+            style: const TextStyle(
+              color: Color(0xFF374151),
+              fontWeight: FontWeight.w600,
+              height: 1.4,
+            ),
           ),
         ],
       ),
@@ -337,8 +470,14 @@ class _Chip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(999)),
-      child: Text(text, style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: fg)),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: fg),
+      ),
     );
   }
 }
@@ -375,8 +514,14 @@ class _StatusPill extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(999)),
-      child: Text(label, style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: fg)),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: fg),
+      ),
     );
   }
 }

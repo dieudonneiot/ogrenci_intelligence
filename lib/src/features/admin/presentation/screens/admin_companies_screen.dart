@@ -12,7 +12,8 @@ class AdminCompaniesScreen extends ConsumerStatefulWidget {
   const AdminCompaniesScreen({super.key});
 
   @override
-  ConsumerState<AdminCompaniesScreen> createState() => _AdminCompaniesScreenState();
+  ConsumerState<AdminCompaniesScreen> createState() =>
+      _AdminCompaniesScreenState();
 }
 
 class _AdminCompaniesScreenState extends ConsumerState<AdminCompaniesScreen> {
@@ -26,7 +27,8 @@ class _AdminCompaniesScreenState extends ConsumerState<AdminCompaniesScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final status = GoRouterState.of(context).uri.queryParameters['status'] ?? 'all';
+    final status =
+        GoRouterState.of(context).uri.queryParameters['status'] ?? 'all';
     if (status != _filterStatus) {
       _filterStatus = status;
       if (_initialized) {
@@ -85,7 +87,9 @@ class _AdminCompaniesScreenState extends ConsumerState<AdminCompaniesScreen> {
     setState(() => _filterStatus = status);
     final params = <String, String>{};
     if (status != 'all') params['status'] = status;
-    context.go(Uri(path: Routes.adminCompanies, queryParameters: params).toString());
+    context.go(
+      Uri(path: Routes.adminCompanies, queryParameters: params).toString(),
+    );
     _fetchCompanies();
   }
 
@@ -105,9 +109,9 @@ class _AdminCompaniesScreenState extends ConsumerState<AdminCompaniesScreen> {
               if (!context.mounted) return;
               setDialogState(() => actionLoading = false);
               if (err != null) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(err)),
-                );
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(err)));
                 return;
               }
               Navigator.of(context).pop();
@@ -131,9 +135,19 @@ class _AdminCompaniesScreenState extends ConsumerState<AdminCompaniesScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(company.name, style: const TextStyle(fontWeight: FontWeight.w800)),
+                                Text(
+                                  company.name,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
                                 const SizedBox(height: 4),
-                                Text(company.sector ?? '-', style: const TextStyle(color: Color(0xFF6B7280))),
+                                Text(
+                                  company.sector ?? '-',
+                                  style: const TextStyle(
+                                    color: Color(0xFF6B7280),
+                                  ),
+                                ),
                                 const SizedBox(height: 8),
                                 _StatusBadge(status: company.approvalStatus),
                               ],
@@ -142,24 +156,53 @@ class _AdminCompaniesScreenState extends ConsumerState<AdminCompaniesScreen> {
                         ],
                       ),
                       const SizedBox(height: 16),
-                      _DetailGrid(items: [
-                        _DetailItem(label: l10n.t(AppText.commonEmail), value: company.email ?? '-'),
-                        _DetailItem(label: l10n.t(AppText.commonPhone), value: company.phone ?? '-'),
-                        _DetailItem(label: l10n.t(AppText.companyRegisterCityLabel), value: company.city ?? '-'),
-                        _DetailItem(label: l10n.t(AppText.companyProfileFieldCompanySize), value: company.employeeCount ?? '-'),
-                        _DetailItem(label: l10n.t(AppText.companyProfileFieldFoundedYear), value: company.foundedYear?.toString() ?? '-'),
-                        _DetailItem(label: l10n.t(AppText.companyProfileFieldWebsite), value: company.website ?? '-'),
-                      ]),
-                      if (company.description != null && company.description!.isNotEmpty) ...[
+                      _DetailGrid(
+                        items: [
+                          _DetailItem(
+                            label: l10n.t(AppText.commonEmail),
+                            value: company.email ?? '-',
+                          ),
+                          _DetailItem(
+                            label: l10n.t(AppText.commonPhone),
+                            value: company.phone ?? '-',
+                          ),
+                          _DetailItem(
+                            label: l10n.t(AppText.companyRegisterCityLabel),
+                            value: company.city ?? '-',
+                          ),
+                          _DetailItem(
+                            label: l10n.t(
+                              AppText.companyProfileFieldCompanySize,
+                            ),
+                            value: company.employeeCount ?? '-',
+                          ),
+                          _DetailItem(
+                            label: l10n.t(
+                              AppText.companyProfileFieldFoundedYear,
+                            ),
+                            value: company.foundedYear?.toString() ?? '-',
+                          ),
+                          _DetailItem(
+                            label: l10n.t(AppText.companyProfileFieldWebsite),
+                            value: company.website ?? '-',
+                          ),
+                        ],
+                      ),
+                      if (company.description != null &&
+                          company.description!.isNotEmpty) ...[
                         const SizedBox(height: 12),
                         Text(
                           l10n.t(AppText.adminCompanyDescriptionLabel),
                           style: const TextStyle(fontWeight: FontWeight.w700),
                         ),
                         const SizedBox(height: 4),
-                        Text(company.description!, style: const TextStyle(color: Color(0xFF6B7280))),
+                        Text(
+                          company.description!,
+                          style: const TextStyle(color: Color(0xFF6B7280)),
+                        ),
                       ],
-                      if (company.rejectionReason != null && company.rejectionReason!.isNotEmpty) ...[
+                      if (company.rejectionReason != null &&
+                          company.rejectionReason!.isNotEmpty) ...[
                         const SizedBox(height: 12),
                         Container(
                           width: double.infinity,
@@ -173,10 +216,18 @@ class _AdminCompaniesScreenState extends ConsumerState<AdminCompaniesScreen> {
                             children: [
                               Text(
                                 l10n.t(AppText.adminCompanyRejectReasonTitle),
-                                style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF991B1B)),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                  color: Color(0xFF991B1B),
+                                ),
                               ),
                               const SizedBox(height: 6),
-                              Text(company.rejectionReason!, style: const TextStyle(color: Color(0xFF7F1D1D))),
+                              Text(
+                                company.rejectionReason!,
+                                style: const TextStyle(
+                                  color: Color(0xFF7F1D1D),
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -193,8 +244,12 @@ class _AdminCompaniesScreenState extends ConsumerState<AdminCompaniesScreen> {
                           maxLines: 5,
                           onChanged: (v) => rejectionReason = v,
                           decoration: InputDecoration(
-                            hintText: l10n.t(AppText.adminCompanyRejectReasonHint),
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                            hintText: l10n.t(
+                              AppText.adminCompanyRejectReasonHint,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                           ),
                         ),
                       ],
@@ -220,12 +275,17 @@ class _AdminCompaniesScreenState extends ConsumerState<AdminCompaniesScreen> {
                           )
                         : const Icon(Icons.check_circle_outline),
                     label: Text(l10n.t(AppText.adminCompanyApprove)),
-                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF16A34A)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF16A34A),
+                    ),
                   ),
                   ElevatedButton.icon(
                     onPressed: actionLoading || rejectionReason.trim().isEmpty
                         ? null
-                        : () => runAction(() => _rejectCompany(company, rejectionReason.trim())),
+                        : () => runAction(
+                            () =>
+                                _rejectCompany(company, rejectionReason.trim()),
+                          ),
                     icon: actionLoading
                         ? const SizedBox(
                             width: 16,
@@ -234,7 +294,9 @@ class _AdminCompaniesScreenState extends ConsumerState<AdminCompaniesScreen> {
                           )
                         : const Icon(Icons.cancel_outlined),
                     label: Text(l10n.t(AppText.adminCompanyReject)),
-                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFDC2626)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFDC2626),
+                    ),
                   ),
                 ],
                 if (company.approvalStatus == 'approved')
@@ -254,7 +316,9 @@ class _AdminCompaniesScreenState extends ConsumerState<AdminCompaniesScreen> {
                           )
                         : const Icon(Icons.block),
                     label: Text(l10n.t(AppText.adminCompanyBan)),
-                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFDC2626)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFDC2626),
+                    ),
                   ),
               ],
             );
@@ -278,7 +342,9 @@ class _AdminCompaniesScreenState extends ConsumerState<AdminCompaniesScreen> {
           ),
           ElevatedButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFDC2626)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFDC2626),
+            ),
             child: Text(l10n.t(AppText.adminCompanyBanAction)),
           ),
         ],
@@ -298,14 +364,19 @@ class _AdminCompaniesScreenState extends ConsumerState<AdminCompaniesScreen> {
         if (admin?.id.isNotEmpty == true) 'approved_by': admin!.id,
       };
 
-      await SupabaseService.client.from('companies').update(payload).eq('id', company.id);
+      await SupabaseService.client
+          .from('companies')
+          .update(payload)
+          .eq('id', company.id);
 
-      await ref.read(adminActionControllerProvider.notifier).logAction(
+      await ref
+          .read(adminActionControllerProvider.notifier)
+          .logAction(
             actionType: 'company_approve',
             targetType: 'company',
             targetId: company.id,
             details: {'company_name': company.name},
-      );
+          );
       return null;
     } catch (e) {
       return l10n.commonActionFailed(e.toString());
@@ -324,14 +395,19 @@ class _AdminCompaniesScreenState extends ConsumerState<AdminCompaniesScreen> {
         if (admin?.id.isNotEmpty == true) 'approved_by': admin!.id,
       };
 
-      await SupabaseService.client.from('companies').update(payload).eq('id', company.id);
+      await SupabaseService.client
+          .from('companies')
+          .update(payload)
+          .eq('id', company.id);
 
-      await ref.read(adminActionControllerProvider.notifier).logAction(
+      await ref
+          .read(adminActionControllerProvider.notifier)
+          .logAction(
             actionType: 'company_reject',
             targetType: 'company',
             targetId: company.id,
             details: {'company_name': company.name, 'reason': reason},
-      );
+          );
       return null;
     } catch (e) {
       return l10n.commonActionFailed(e.toString());
@@ -342,21 +418,32 @@ class _AdminCompaniesScreenState extends ConsumerState<AdminCompaniesScreen> {
     final l10n = AppLocalizations.of(context);
     try {
       await Future.wait<void>([
-        SupabaseService.client.from('jobs').update({'is_active': false}).eq('company_id', company.id),
-        SupabaseService.client.from('internships').update({'is_active': false}).eq('company_id', company.id),
+        SupabaseService.client
+            .from('jobs')
+            .update({'is_active': false})
+            .eq('company_id', company.id),
+        SupabaseService.client
+            .from('internships')
+            .update({'is_active': false})
+            .eq('company_id', company.id),
       ]);
 
-      await SupabaseService.client.from('companies').update({
-        'approval_status': 'banned',
-        'banned_at': DateTime.now().toUtc().toIso8601String(),
-      }).eq('id', company.id);
+      await SupabaseService.client
+          .from('companies')
+          .update({
+            'approval_status': 'banned',
+            'banned_at': DateTime.now().toUtc().toIso8601String(),
+          })
+          .eq('id', company.id);
 
-      await ref.read(adminActionControllerProvider.notifier).logAction(
+      await ref
+          .read(adminActionControllerProvider.notifier)
+          .logAction(
             actionType: 'company_ban',
             targetType: 'company',
             targetId: company.id,
             details: {'company_name': company.name},
-      );
+          );
       return null;
     } catch (e) {
       return l10n.commonActionFailed(e.toString());
@@ -394,16 +481,18 @@ class _AdminCompaniesScreenState extends ConsumerState<AdminCompaniesScreen> {
           ),
           const SizedBox(height: 16),
           if (_loading)
-            const Center(child: Padding(padding: EdgeInsets.all(24), child: CircularProgressIndicator()))
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.all(24),
+                child: CircularProgressIndicator(),
+              ),
+            )
           else if (_error != null)
             _ErrorState(text: _error!, onRetry: _fetchCompanies)
           else if (filtered.isEmpty)
             const _EmptyState()
           else
-            _CompaniesTable(
-              companies: filtered,
-              onOpen: _showCompanyDetail,
-            ),
+            _CompaniesTable(companies: filtered, onOpen: _showCompanyDetail),
         ],
       ),
     );
@@ -459,9 +548,17 @@ class _FiltersBar extends StatelessWidget {
               return OutlinedButton(
                 onPressed: () => onStatusChanged(s),
                 style: OutlinedButton.styleFrom(
-                  backgroundColor: active ? const Color(0xFF7C3AED) : const Color(0xFFF3F4F6),
-                  foregroundColor: active ? Colors.white : const Color(0xFF374151),
-                  side: BorderSide(color: active ? const Color(0xFF7C3AED) : const Color(0xFFE5E7EB)),
+                  backgroundColor: active
+                      ? const Color(0xFF7C3AED)
+                      : const Color(0xFFF3F4F6),
+                  foregroundColor: active
+                      ? Colors.white
+                      : const Color(0xFF374151),
+                  side: BorderSide(
+                    color: active
+                        ? const Color(0xFF7C3AED)
+                        : const Color(0xFFE5E7EB),
+                  ),
                 ),
                 child: Text(_statusLabel(l10n, s)),
               );
@@ -490,10 +587,7 @@ class _FiltersBar extends StatelessWidget {
 }
 
 class _CompaniesTable extends StatelessWidget {
-  const _CompaniesTable({
-    required this.companies,
-    required this.onOpen,
-  });
+  const _CompaniesTable({required this.companies, required this.onOpen});
 
   final List<_AdminCompany> companies;
   final void Function(_AdminCompany) onOpen;
@@ -529,8 +623,17 @@ class _CompaniesTable extends StatelessWidget {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(company.name, style: const TextStyle(fontWeight: FontWeight.w700)),
-                          Text(company.sector ?? '-', style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280))),
+                          Text(
+                            company.name,
+                            style: const TextStyle(fontWeight: FontWeight.w700),
+                          ),
+                          Text(
+                            company.sector ?? '-',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Color(0xFF6B7280),
+                            ),
+                          ),
                         ],
                       ),
                     ],
@@ -540,13 +643,26 @@ class _CompaniesTable extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(company.email ?? '-', style: const TextStyle(fontSize: 12)),
+                      Text(
+                        company.email ?? '-',
+                        style: const TextStyle(fontSize: 12),
+                      ),
                       const SizedBox(height: 4),
                       Row(
                         children: [
-                          const Icon(Icons.location_on_outlined, size: 12, color: Color(0xFF6B7280)),
+                          const Icon(
+                            Icons.location_on_outlined,
+                            size: 12,
+                            color: Color(0xFF6B7280),
+                          ),
                           const SizedBox(width: 4),
-                          Text(company.city ?? '-', style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280))),
+                          Text(
+                            company.city ?? '-',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Color(0xFF6B7280),
+                            ),
+                          ),
                         ],
                       ),
                     ],
@@ -555,21 +671,36 @@ class _CompaniesTable extends StatelessWidget {
                 DataCell(_StatusBadge(status: company.approvalStatus)),
                 DataCell(
                   company.activeSubscription == null
-                      ? Text(l10n.t(AppText.commonNotSpecified),
-                          style: const TextStyle(color: Color(0xFF6B7280)))
+                      ? Text(
+                          l10n.t(AppText.commonNotSpecified),
+                          style: const TextStyle(color: Color(0xFF6B7280)),
+                        )
                       : Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(company.activeSubscription!.planLabel, style: const TextStyle(fontWeight: FontWeight.w700)),
+                            Text(
+                              company.activeSubscription!.planLabel,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
                             const SizedBox(height: 4),
-                            Text(company.activeSubscription!.endsAtText,
-                                style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280))),
+                            Text(
+                              company.activeSubscription!.endsAtText,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Color(0xFF6B7280),
+                              ),
+                            ),
                           ],
                         ),
                 ),
                 DataCell(
                   Text(
-                    l10n.adminStatActiveListingsSubtitle(jobs: company.totalJobs, internships: company.totalInternships),
+                    l10n.adminStatActiveListingsSubtitle(
+                      jobs: company.totalJobs,
+                      internships: company.totalInternships,
+                    ),
                     style: const TextStyle(fontSize: 12),
                   ),
                 ),
@@ -577,7 +708,10 @@ class _CompaniesTable extends StatelessWidget {
                   IconButton(
                     tooltip: l10n.t(AppText.commonViewDetails),
                     onPressed: () => onOpen(company),
-                    icon: const Icon(Icons.remove_red_eye_outlined, color: Color(0xFF7C3AED)),
+                    icon: const Icon(
+                      Icons.remove_red_eye_outlined,
+                      color: Color(0xFF7C3AED),
+                    ),
                   ),
                 ),
               ],
@@ -604,9 +738,16 @@ class _EmptyState extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const Icon(Icons.apartment_outlined, size: 56, color: Color(0xFF9CA3AF)),
+          const Icon(
+            Icons.apartment_outlined,
+            size: 56,
+            color: Color(0xFF9CA3AF),
+          ),
           const SizedBox(height: 8),
-          Text(l10n.t(AppText.noResults), style: const TextStyle(fontWeight: FontWeight.w800)),
+          Text(
+            l10n.t(AppText.noResults),
+            style: const TextStyle(fontWeight: FontWeight.w800),
+          ),
         ],
       ),
     );
@@ -629,9 +770,16 @@ class _ErrorState extends StatelessWidget {
           children: [
             const Icon(Icons.error_outline, size: 48, color: Color(0xFFEF4444)),
             const SizedBox(height: 10),
-            Text(text, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFF6B7280))),
+            Text(
+              text,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Color(0xFF6B7280)),
+            ),
             const SizedBox(height: 12),
-            ElevatedButton(onPressed: onRetry, child: Text(l10n.t(AppText.retry))),
+            ElevatedButton(
+              onPressed: onRetry,
+              child: Text(l10n.t(AppText.retry)),
+            ),
           ],
         ),
       ),
@@ -673,7 +821,7 @@ class _StatusBadge extends StatelessWidget {
           icon: Icons.block,
           text: l10n.t(AppText.adminCompaniesFilterBanned),
           fg: Colors.white,
-          bg: const Color(0xFF111827),
+          bg: const Color(0xFF7F1D1D),
         );
       default:
         return const SizedBox.shrink();
@@ -682,7 +830,12 @@ class _StatusBadge extends StatelessWidget {
 }
 
 class _Pill extends StatelessWidget {
-  const _Pill({required this.icon, required this.text, required this.fg, required this.bg});
+  const _Pill({
+    required this.icon,
+    required this.text,
+    required this.fg,
+    required this.bg,
+  });
   final IconData icon;
   final String text;
   final Color fg;
@@ -692,13 +845,23 @@ class _Pill extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(999)),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(999),
+      ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 14, color: fg),
           const SizedBox(width: 4),
-          Text(text, style: TextStyle(color: fg, fontSize: 12, fontWeight: FontWeight.w700)),
+          Text(
+            text,
+            style: TextStyle(
+              color: fg,
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
         ],
       ),
     );
@@ -731,7 +894,10 @@ class _CompanyAvatar extends StatelessWidget {
     return Container(
       width: size,
       height: size,
-      decoration: BoxDecoration(color: const Color(0xFFE5E7EB), borderRadius: BorderRadius.circular(10)),
+      decoration: BoxDecoration(
+        color: const Color(0xFFE5E7EB),
+        borderRadius: BorderRadius.circular(10),
+      ),
       child: const Icon(Icons.apartment_outlined, color: Color(0xFF6B7280)),
     );
   }
@@ -753,9 +919,18 @@ class _DetailGrid extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(item.label, style: const TextStyle(color: Color(0xFF6B7280), fontSize: 12)),
+                  Text(
+                    item.label,
+                    style: const TextStyle(
+                      color: Color(0xFF6B7280),
+                      fontSize: 12,
+                    ),
+                  ),
                   const SizedBox(height: 2),
-                  Text(item.value, style: const TextStyle(fontWeight: FontWeight.w700)),
+                  Text(
+                    item.value,
+                    style: const TextStyle(fontWeight: FontWeight.w700),
+                  ),
                 ],
               ),
             ),
@@ -813,7 +988,8 @@ class _AdminCompany {
   final int totalInternships;
 
   factory _AdminCompany.fromMap(Map<String, dynamic> map) {
-    final subs = (map['company_subscriptions'] as List?)?.cast<dynamic>() ?? const [];
+    final subs =
+        (map['company_subscriptions'] as List?)?.cast<dynamic>() ?? const [];
     final activeSub = _CompanySubscription.pickActive(subs);
 
     final jobsCount = _extractCount(map['jobs']);
@@ -844,10 +1020,7 @@ class _AdminCompany {
 }
 
 class _CompanySubscription {
-  const _CompanySubscription({
-    required this.planType,
-    required this.endsAt,
-  });
+  const _CompanySubscription({required this.planType, required this.endsAt});
 
   final String planType;
   final DateTime? endsAt;

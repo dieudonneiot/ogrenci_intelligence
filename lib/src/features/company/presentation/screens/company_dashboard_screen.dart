@@ -18,10 +18,12 @@ class CompanyDashboardScreen extends ConsumerStatefulWidget {
   const CompanyDashboardScreen({super.key});
 
   @override
-  ConsumerState<CompanyDashboardScreen> createState() => _CompanyDashboardScreenState();
+  ConsumerState<CompanyDashboardScreen> createState() =>
+      _CompanyDashboardScreenState();
 }
 
-class _CompanyDashboardScreenState extends ConsumerState<CompanyDashboardScreen> {
+class _CompanyDashboardScreenState
+    extends ConsumerState<CompanyDashboardScreen> {
   bool _loading = true;
   Map<String, dynamic>? _company;
   CompanyStats _stats = CompanyStats.empty();
@@ -57,7 +59,11 @@ class _CompanyDashboardScreenState extends ConsumerState<CompanyDashboardScreen>
           startDate: DateTime.now().subtract(const Duration(days: 30)),
         ),
         evidenceRepo.listCompanyPendingEvidence(companyId: companyId, limit: 6),
-        excuseRepo.listCompanyRequests(companyId: companyId, status: 'pending', limit: 6),
+        excuseRepo.listCompanyRequests(
+          companyId: companyId,
+          status: 'pending',
+          limit: 6,
+        ),
         _loadActiveInterns(companyId),
       ]);
 
@@ -68,7 +74,10 @@ class _CompanyDashboardScreenState extends ConsumerState<CompanyDashboardScreen>
       final pendingExcuses = results[4] as List<CompanyExcuseRequest>;
       final internBundle = results[5] as _InternBundle;
 
-      final evidenceUserIds = pendingEvidenceItems.map((e) => e.userId).where((e) => e.isNotEmpty).toSet();
+      final evidenceUserIds = pendingEvidenceItems
+          .map((e) => e.userId)
+          .where((e) => e.isNotEmpty)
+          .toSet();
       Map<String, String> nameByUserId = {};
       if (evidenceUserIds.isNotEmpty) {
         final rows = await SupabaseService.client
@@ -77,7 +86,8 @@ class _CompanyDashboardScreenState extends ConsumerState<CompanyDashboardScreen>
             .inFilter('id', evidenceUserIds.toList(growable: false));
         nameByUserId = {
           for (final r in (rows as List))
-            (r as Map<String, dynamic>)['id']?.toString() ?? '': ((r['full_name'] ?? r['email'] ?? '').toString())
+            (r as Map<String, dynamic>)['id']?.toString() ?? '':
+                ((r['full_name'] ?? r['email'] ?? '').toString()),
         }..removeWhere((k, v) => k.isEmpty);
       }
 
@@ -91,7 +101,8 @@ class _CompanyDashboardScreenState extends ConsumerState<CompanyDashboardScreen>
         for (final r in pendingExcuses.take(4))
           _CompanyFeedItem(
             kind: _FeedKind.excuse,
-            message: '${r.studentName.isEmpty ? 'A student' : r.studentName} reported an excuse.',
+            message:
+                '${r.studentName.isEmpty ? 'A student' : r.studentName} reported an excuse.',
             createdAt: r.createdAt,
           ),
       ]..sort((a, b) => b.createdAt.compareTo(a.createdAt));
@@ -114,7 +125,10 @@ class _CompanyDashboardScreenState extends ConsumerState<CompanyDashboardScreen>
   }
 
   Future<_InternBundle> _loadActiveInterns(String companyId) async {
-    final internshipRows = await SupabaseService.client.from('internships').select('id').eq('company_id', companyId);
+    final internshipRows = await SupabaseService.client
+        .from('internships')
+        .select('id')
+        .eq('company_id', companyId);
     final internshipIds = (internshipRows as List)
         .map((e) => (e as Map<String, dynamic>)['id']?.toString())
         .whereType<String>()
@@ -122,7 +136,11 @@ class _CompanyDashboardScreenState extends ConsumerState<CompanyDashboardScreen>
         .toList(growable: false);
 
     if (internshipIds.isEmpty) {
-      return const _InternBundle(activeInterns: 0, avgOiScore: 0, departmentDistribution: <String, int>{});
+      return const _InternBundle(
+        activeInterns: 0,
+        avgOiScore: 0,
+        departmentDistribution: <String, int>{},
+      );
     }
 
     final appsRows = await SupabaseService.client
@@ -139,19 +157,31 @@ class _CompanyDashboardScreenState extends ConsumerState<CompanyDashboardScreen>
         .toList(growable: false);
 
     if (userIds.isEmpty) {
-      return const _InternBundle(activeInterns: 0, avgOiScore: 0, departmentDistribution: <String, int>{});
+      return const _InternBundle(
+        activeInterns: 0,
+        avgOiScore: 0,
+        departmentDistribution: <String, int>{},
+      );
     }
 
-    final profRows = await SupabaseService.client.from('profiles').select('department').inFilter('id', userIds);
+    final profRows = await SupabaseService.client
+        .from('profiles')
+        .select('department')
+        .inFilter('id', userIds);
     final dist = <String, int>{};
     for (final r in (profRows as List)) {
-      final dept = ((r as Map<String, dynamic>)['department'] ?? '').toString().trim();
+      final dept = ((r as Map<String, dynamic>)['department'] ?? '')
+          .toString()
+          .trim();
       if (dept.isEmpty) continue;
       dist[dept] = (dist[dept] ?? 0) + 1;
     }
 
     var avg = 0;
-    final oiRows = await SupabaseService.client.from('oi_scores').select('oi_score').inFilter('user_id', userIds);
+    final oiRows = await SupabaseService.client
+        .from('oi_scores')
+        .select('oi_score')
+        .inFilter('user_id', userIds);
     var sum = 0;
     var count = 0;
     for (final r in (oiRows as List)) {
@@ -163,7 +193,11 @@ class _CompanyDashboardScreenState extends ConsumerState<CompanyDashboardScreen>
     }
     if (count > 0) avg = (sum / count).round();
 
-    return _InternBundle(activeInterns: userIds.length, avgOiScore: avg, departmentDistribution: dist);
+    return _InternBundle(
+      activeInterns: userIds.length,
+      avgOiScore: avg,
+      departmentDistribution: dist,
+    );
   }
 
   @override
@@ -176,7 +210,9 @@ class _CompanyDashboardScreenState extends ConsumerState<CompanyDashboardScreen>
 
     final auth = authAsync.value;
     final user = auth?.user;
-    if (auth == null || !auth.isAuthenticated || auth.userType != UserType.company) {
+    if (auth == null ||
+        !auth.isAuthenticated ||
+        auth.userType != UserType.company) {
       return const _GuestView();
     }
 
@@ -200,7 +236,9 @@ class _CompanyDashboardScreenState extends ConsumerState<CompanyDashboardScreen>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _Header(
-                    companyName: companyName.isEmpty ? l10n.t(AppText.companyPanel) : companyName,
+                    companyName: companyName.isEmpty
+                        ? l10n.t(AppText.companyPanel)
+                        : companyName,
                     userLabel: user?.email ?? l10n.t(AppText.user),
                   ),
                   const SizedBox(height: 16),
@@ -216,8 +254,8 @@ class _CompanyDashboardScreenState extends ConsumerState<CompanyDashboardScreen>
                       final crossAxis = c.maxWidth >= 980
                           ? 4
                           : c.maxWidth >= 720
-                              ? 2
-                              : 1;
+                          ? 2
+                          : 1;
                       return GridView.count(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
@@ -233,19 +271,25 @@ class _CompanyDashboardScreenState extends ConsumerState<CompanyDashboardScreen>
                             icon: Icons.work_outline,
                           ),
                           _StatCard(
-                            title: l10n.t(AppText.companyDashboardActiveInternships),
+                            title: l10n.t(
+                              AppText.companyDashboardActiveInternships,
+                            ),
                             value: _stats.activeInternships.toString(),
                             color: const Color(0xFF2563EB),
                             icon: Icons.school_outlined,
                           ),
                           _StatCard(
-                            title: l10n.t(AppText.companyDashboardPendingApplications),
+                            title: l10n.t(
+                              AppText.companyDashboardPendingApplications,
+                            ),
                             value: _stats.pendingApplications.toString(),
                             color: const Color(0xFFF59E0B),
                             icon: Icons.pending_actions,
                           ),
                           _StatCard(
-                            title: l10n.t(AppText.companyDashboardTotalApplications),
+                            title: l10n.t(
+                              AppText.companyDashboardTotalApplications,
+                            ),
                             value: _stats.totalApplications.toString(),
                             color: const Color(0xFF16A34A),
                             icon: Icons.people_outline,
@@ -257,8 +301,13 @@ class _CompanyDashboardScreenState extends ConsumerState<CompanyDashboardScreen>
                   const SizedBox(height: 12),
                   LayoutBuilder(
                     builder: (_, c) {
-                      final crossAxis = c.maxWidth >= 980 ? 3 : c.maxWidth >= 720 ? 3 : 1;
-                      final pendingApprovals = _pendingEvidence + _pendingExcuses;
+                      final crossAxis = c.maxWidth >= 980
+                          ? 3
+                          : c.maxWidth >= 720
+                          ? 3
+                          : 1;
+                      final pendingApprovals =
+                          _pendingEvidence + _pendingExcuses;
                       return GridView.count(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
@@ -276,7 +325,9 @@ class _CompanyDashboardScreenState extends ConsumerState<CompanyDashboardScreen>
                           _StatCard(
                             title: 'Pending approvals',
                             value: pendingApprovals.toString(),
-                            color: pendingApprovals > 0 ? const Color(0xFFDC2626) : const Color(0xFF6B7280),
+                            color: pendingApprovals > 0
+                                ? const Color(0xFFDC2626)
+                                : const Color(0xFF6B7280),
                             icon: Icons.notifications_active_outlined,
                           ),
                           _StatCard(
@@ -313,10 +364,7 @@ class _CompanyDashboardScreenState extends ConsumerState<CompanyDashboardScreen>
 }
 
 class _Header extends StatelessWidget {
-  const _Header({
-    required this.companyName,
-    required this.userLabel,
-  });
+  const _Header({required this.companyName, required this.userLabel});
 
   final String companyName;
   final String userLabel;
@@ -333,7 +381,13 @@ class _Header extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        boxShadow: const [BoxShadow(color: Color(0x22000000), blurRadius: 18, offset: Offset(0, 8))],
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x22000000),
+            blurRadius: 18,
+            offset: Offset(0, 8),
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -353,12 +407,19 @@ class _Header extends StatelessWidget {
               children: [
                 Text(
                   companyName,
-                  style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                  ),
                 ),
                 const SizedBox(height: 6),
                 Text(
                   l10n.companyDashboardWelcome(userLabel),
-                  style: const TextStyle(color: Color(0xCCFFFFFF), fontWeight: FontWeight.w600),
+                  style: const TextStyle(
+                    color: Color(0xCCFFFFFF),
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ],
             ),
@@ -425,7 +486,12 @@ class _StatusBanner extends StatelessWidget {
     return const SizedBox.shrink();
   }
 
-  Widget _banner({required IconData icon, required Color color, required Color bg, required String text}) {
+  Widget _banner({
+    required IconData icon,
+    required Color color,
+    required Color bg,
+    required String text,
+  }) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -437,7 +503,12 @@ class _StatusBanner extends StatelessWidget {
         children: [
           Icon(icon, color: color),
           const SizedBox(width: 10),
-          Expanded(child: Text(text, style: TextStyle(color: color, fontWeight: FontWeight.w600))),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(color: color, fontWeight: FontWeight.w600),
+            ),
+          ),
         ],
       ),
     );
@@ -465,7 +536,13 @@ class _StatCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 12, offset: Offset(0, 6))],
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0A000000),
+            blurRadius: 12,
+            offset: Offset(0, 6),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -480,9 +557,18 @@ class _StatCard extends StatelessWidget {
             child: Icon(icon, color: color),
           ),
           const Spacer(),
-          Text(value, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900)),
+          Text(
+            value,
+            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900),
+          ),
           const SizedBox(height: 6),
-          Text(title, style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w600)),
+          Text(
+            title,
+            style: const TextStyle(
+              color: Color(0xFF6B7280),
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ],
       ),
     );
@@ -583,7 +669,13 @@ class _NotificationFeed extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: const [BoxShadow(color: Color(0x07000000), blurRadius: 14, offset: Offset(0, 8))],
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x07000000),
+            blurRadius: 14,
+            offset: Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -591,16 +683,25 @@ class _NotificationFeed extends StatelessWidget {
           Row(
             children: [
               const Expanded(
-                child: Text('Notification Feed', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
+                child: Text(
+                  'Notification Feed',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
+                ),
               ),
               TextButton(
                 onPressed: onOpenEvidence,
-                child: const Text('Evidence', style: TextStyle(fontWeight: FontWeight.w900)),
+                child: const Text(
+                  'Evidence',
+                  style: TextStyle(fontWeight: FontWeight.w900),
+                ),
               ),
               const SizedBox(width: 6),
               TextButton(
                 onPressed: onOpenExcuses,
-                child: const Text('Excuses', style: TextStyle(fontWeight: FontWeight.w900)),
+                child: const Text(
+                  'Excuses',
+                  style: TextStyle(fontWeight: FontWeight.w900),
+                ),
               ),
             ],
           ),
@@ -612,9 +713,15 @@ class _NotificationFeed extends StatelessWidget {
             separatorBuilder: (context, index) => const SizedBox(height: 10),
             itemBuilder: (_, i) {
               final it = items[i];
-              final icon = it.kind == _FeedKind.evidence ? Icons.verified_outlined : Icons.event_busy_outlined;
-              final color = it.kind == _FeedKind.evidence ? const Color(0xFF7C3AED) : const Color(0xFFF59E0B);
-              final onTap = it.kind == _FeedKind.evidence ? onOpenEvidence : onOpenExcuses;
+              final icon = it.kind == _FeedKind.evidence
+                  ? Icons.verified_outlined
+                  : Icons.event_busy_outlined;
+              final color = it.kind == _FeedKind.evidence
+                  ? const Color(0xFF7C3AED)
+                  : const Color(0xFFF59E0B);
+              final onTap = it.kind == _FeedKind.evidence
+                  ? onOpenEvidence
+                  : onOpenExcuses;
               return InkWell(
                 borderRadius: BorderRadius.circular(14),
                 onTap: onTap,
@@ -640,7 +747,10 @@ class _NotificationFeed extends StatelessWidget {
                       Expanded(
                         child: Text(
                           it.message,
-                          style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF374151)),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w800,
+                            color: Color(0xFF374151),
+                          ),
                         ),
                       ),
                       const Icon(Icons.chevron_right, color: Color(0xFF9CA3AF)),
@@ -677,7 +787,10 @@ class _DepartmentChart extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Department distribution', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
+          const Text(
+            'Department distribution',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
+          ),
           const SizedBox(height: 10),
           for (final e in sorted.take(8)) ...[
             Row(
@@ -688,7 +801,10 @@ class _DepartmentChart extends StatelessWidget {
                     e.key,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF374151)),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF374151),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -699,7 +815,9 @@ class _DepartmentChart extends StatelessWidget {
                       value: e.value / maxV,
                       minHeight: 10,
                       backgroundColor: const Color(0xFFE5E7EB),
-                      valueColor: const AlwaysStoppedAnimation(Color(0xFF6D28D9)),
+                      valueColor: const AlwaysStoppedAnimation(
+                        Color(0xFF6D28D9),
+                      ),
                     ),
                   ),
                 ),
@@ -709,7 +827,10 @@ class _DepartmentChart extends StatelessWidget {
                   child: Text(
                     e.value.toString(),
                     textAlign: TextAlign.right,
-                    style: const TextStyle(fontWeight: FontWeight.w900, color: Color(0xFF111827)),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w900,
+                      color: Color(0xFF1F2937),
+                    ),
                   ),
                 ),
               ],
@@ -742,7 +863,13 @@ class _PerformanceSummary extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 12, offset: Offset(0, 6))],
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0A000000),
+            blurRadius: 12,
+            offset: Offset(0, 6),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -768,7 +895,8 @@ class _PerformanceSummary extends StatelessWidget {
           const SizedBox(height: 10),
           _ProgressRow(
             label: l10n.t(AppText.companyReportsMetricAvgResponseTime),
-            value: '${report.avgResponseTimeHours.toStringAsFixed(1)} ${l10n.t(AppText.companyReportsHoursUnit)}',
+            value:
+                '${report.avgResponseTimeHours.toStringAsFixed(1)} ${l10n.t(AppText.companyReportsHoursUnit)}',
             ratio: responseRatio,
             color: const Color(0xFF10B981),
           ),
@@ -799,7 +927,10 @@ class _ProgressRow extends StatelessWidget {
         Row(
           children: [
             Expanded(
-              child: Text(label, style: const TextStyle(fontWeight: FontWeight.w700)),
+              child: Text(
+                label,
+                style: const TextStyle(fontWeight: FontWeight.w700),
+              ),
             ),
             Text(value, style: const TextStyle(color: Color(0xFF6B7280))),
           ],
@@ -864,4 +995,3 @@ class _GuestView extends StatelessWidget {
     return Center(child: Text(l10n.t(AppText.companyPanelLoginRequired)));
   }
 }
-

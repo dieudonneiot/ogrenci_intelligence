@@ -1,4 +1,4 @@
-﻿// lib/src/features/chat/data/chat_repository.dart
+// lib/src/features/chat/data/chat_repository.dart
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
@@ -44,18 +44,28 @@ class ChatRepository {
 
   bool _isEdgeFunctionMissing(Object error) {
     final s = error.toString().toLowerCase();
-    return s.contains('requested function was not found') || s.contains('not_found') || s.contains('status 404') || s.contains('(404)');
+    return s.contains('requested function was not found') ||
+        s.contains('not_found') ||
+        s.contains('status 404') ||
+        s.contains('(404)');
   }
 
-  Future<String> _ensureSessionForFallback(String userId, {String? sessionId}) async {
+  Future<String> _ensureSessionForFallback(
+    String userId, {
+    String? sessionId,
+  }) async {
     final existing = (sessionId ?? '').trim();
     if (existing.isNotEmpty) return existing;
 
-    final row = await _client.from('chat_sessions').insert({
-      'user_id': userId,
-      'started_at': DateTime.now().toUtc().toIso8601String(),
-      'message_count': 0,
-    }).select('id').single();
+    final row = await _client
+        .from('chat_sessions')
+        .insert({
+          'user_id': userId,
+          'started_at': DateTime.now().toUtc().toIso8601String(),
+          'message_count': 0,
+        })
+        .select('id')
+        .single();
 
     return (row['id'] ?? '').toString();
   }
@@ -84,7 +94,12 @@ class ChatRepository {
     final sid = await _ensureSessionForFallback(userId, sessionId: sessionId);
 
     // Persist the user message.
-    await _insertChatMessage(userId: userId, sessionId: sid, message: message, type: 'user');
+    await _insertChatMessage(
+      userId: userId,
+      sessionId: sid,
+      message: message,
+      type: 'user',
+    );
 
     String reply;
     try {
@@ -93,7 +108,12 @@ class ChatRepository {
           .from('chatbot_faqs')
           .select('answer')
           .eq('is_active', true)
-          .textSearch('search_vector', message, type: TextSearchType.plain, config: 'simple')
+          .textSearch(
+            'search_vector',
+            message,
+            type: TextSearchType.plain,
+            config: 'simple',
+          )
           .limit(1);
 
       final list = (rows as List).cast<Map<String, dynamic>>();
@@ -127,7 +147,12 @@ class ChatRepository {
     }
 
     // Persist bot reply.
-    await _insertChatMessage(userId: userId, sessionId: sid, message: reply, type: 'bot');
+    await _insertChatMessage(
+      userId: userId,
+      sessionId: sid,
+      message: reply,
+      type: 'bot',
+    );
 
     return ChatAiResponse(
       sessionId: sid,
@@ -136,7 +161,10 @@ class ChatRepository {
     );
   }
 
-  Future<List<ChatMessage>> fetchHistory(String userId, {int limit = 50}) async {
+  Future<List<ChatMessage>> fetchHistory(
+    String userId, {
+    int limit = 50,
+  }) async {
     final res = await _client
         .from('chat_messages')
         .select('id, message, type, created_at, session_id')
@@ -162,7 +190,13 @@ class ChatRepository {
     };
 
     try {
-      final response = await _client.functions.invoke('chatbot', body: payload);
+      final token = _client.auth.currentSession?.accessToken;
+      final headers = (token == null || token.isEmpty)
+          ? null
+          : <String, String>{'Authorization': 'Bearer $token'};
+
+      final response =
+          await _client.functions.invoke('chatbot', body: payload, headers: headers);
       if (response.data == null) {
         throw const ChatRepositoryException('Empty response from AI service');
       }
@@ -176,9 +210,16 @@ class ChatRepository {
       if (_isEdgeFunctionMissing(e)) {
         final uid = _client.auth.currentUser?.id;
         if (uid == null || uid.isEmpty) {
-          throw const ChatRepositoryException('AI function missing and not authenticated for FAQ fallback');
+          throw const ChatRepositoryException(
+            'AI function missing and not authenticated for FAQ fallback',
+          );
         }
-        return _faqFallback(message: message, userId: uid, sessionId: sessionId, locale: locale);
+        return _faqFallback(
+          message: message,
+          userId: uid,
+          sessionId: sessionId,
+          locale: locale,
+        );
       }
       rethrow;
     }
@@ -192,7 +233,10 @@ class ChatRepository {
   }) async* {
     final url = Uri.parse('${Env.supabaseUrl}/functions/v1/chatbot');
 
-    Future<http.StreamedResponse> sendRequest(http.Client client, {required String token}) {
+    Future<http.StreamedResponse> sendRequest(
+      http.Client client, {
+      required String token,
+    }) {
       final request = http.Request('POST', url);
 
       request.headers['Authorization'] = 'Bearer $token';
@@ -233,7 +277,9 @@ class ChatRepository {
         }
 
         if (status == 401 && lower.contains('invalid jwt')) {
-          return const ChatRepositoryException('Your login session expired. Please log out and log in again.');
+          return const ChatRepositoryException(
+            'Your login session expired. Please log out and log in again.',
+          );
         }
 
         return ChatRepositoryException('Stream error ($status): $body');
@@ -241,7 +287,9 @@ class ChatRepository {
 
       Stream<ChatStreamEvent> faqFallbackStream() async* {
         if (uid == null || uid.isEmpty) {
-          throw const ChatRepositoryException('Not authenticated for FAQ fallback');
+          throw const ChatRepositoryException(
+            'Not authenticated for FAQ fallback',
+          );
         }
 
         final fallback = await _faqFallback(
@@ -251,13 +299,18 @@ class ChatRepository {
           locale: locale,
         );
 
-        yield ChatStreamEvent(type: ChatStreamEventType.meta, data: {'session_id': fallback.sessionId});
+        yield ChatStreamEvent(
+          type: ChatStreamEventType.meta,
+          data: {'session_id': fallback.sessionId},
+        );
         final reply = fallback.reply;
         const chunk = 64;
         for (var i = 0; i < reply.length; i += chunk) {
           yield ChatStreamEvent(
             type: ChatStreamEventType.delta,
-            data: {'text': reply.substring(i, (i + chunk).clamp(0, reply.length))},
+            data: {
+              'text': reply.substring(i, (i + chunk).clamp(0, reply.length)),
+            },
           );
         }
         yield ChatStreamEvent(

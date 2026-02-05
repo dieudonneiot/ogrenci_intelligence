@@ -31,7 +31,9 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
     _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 350), () {
       final f = ref.read(jobsFiltersProvider);
-      ref.read(jobsFiltersProvider.notifier).state = f.copyWith(query: v.trim());
+      ref.read(jobsFiltersProvider.notifier).state = f.copyWith(
+        query: v.trim(),
+      );
     });
   }
 
@@ -62,16 +64,25 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.error_outline, size: 48, color: Color(0xFFEF4444)),
+              const Icon(
+                Icons.error_outline,
+                size: 48,
+                color: Color(0xFFEF4444),
+              ),
               const SizedBox(height: 12),
               Text(
                 l10n.t(AppText.jobsLoadFailed),
-                style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+                style: const TextStyle(
+                  fontWeight: FontWeight.w900,
+                  fontSize: 16,
+                ),
               ),
               const SizedBox(height: 8),
-              Text(e.toString(),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(color: Color(0xFF6B7280))),
+              Text(
+                e.toString(),
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Color(0xFF6B7280)),
+              ),
               const SizedBox(height: 14),
               SizedBox(
                 height: 44,
@@ -101,7 +112,10 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
                       children: [
                         Text(
                           l10n.t(AppText.jobsTitle),
-                          style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900),
+                          style: const TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.w900,
+                          ),
                         ),
                         const SizedBox(height: 6),
                         Text(
@@ -121,12 +135,19 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(color: const Color(0xFFE5E7EB)),
                             boxShadow: const [
-                              BoxShadow(color: Color(0x07000000), blurRadius: 14, offset: Offset(0, 8))
+                              BoxShadow(
+                                color: Color(0x07000000),
+                                blurRadius: 14,
+                                offset: Offset(0, 8),
+                              ),
                             ],
                           ),
                           child: Row(
                             children: [
-                              const Icon(Icons.search, color: Color(0xFF6B7280)),
+                              const Icon(
+                                Icons.search,
+                                color: Color(0xFF6B7280),
+                              ),
                               const SizedBox(width: 8),
                               Expanded(
                                 child: TextField(
@@ -156,7 +177,9 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
                         _FiltersRow(
                           vm: vm,
                           filters: filters,
-                          onChange: (next) => ref.read(jobsFiltersProvider.notifier).state = next,
+                          onChange: (next) =>
+                              ref.read(jobsFiltersProvider.notifier).state =
+                                  next,
                         ),
 
                         const SizedBox(height: 14),
@@ -168,7 +191,8 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
                             itemCount: vm.items.length,
-                            separatorBuilder: (_, index) => const SizedBox(height: 10),
+                            separatorBuilder: (_, index) =>
+                                const SizedBox(height: 10),
                             itemBuilder: (_, i) => _JobCard(item: vm.items[i]),
                           ),
                       ],
@@ -219,7 +243,9 @@ class _FiltersRow extends StatelessWidget {
           onClear: () => onChange(filters.copyWith(clearDepartment: true)),
         ),
         _DropdownFilter(
-          label: AppLocalizations.of(context).t(AppText.companyRegisterCityLabel),
+          label: AppLocalizations.of(
+            context,
+          ).t(AppText.companyRegisterCityLabel),
           value: filters.city,
           items: vm.availableCities,
           onChanged: (v) => onChange(filters.copyWith(city: v)),
@@ -264,10 +290,18 @@ class _DropdownFilter extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(label, style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF6B7280))),
+          Text(
+            label,
+            style: const TextStyle(
+              fontWeight: FontWeight.w800,
+              color: Color(0xFF6B7280),
+            ),
+          ),
           const SizedBox(width: 8),
           DropdownButton<String>(
-            value: (value != null && value!.isNotEmpty && items.contains(value)) ? value : null,
+            value: (value != null && value!.isNotEmpty && items.contains(value))
+                ? value
+                : null,
             hint: Text(AppLocalizations.of(context).t(AppText.select)),
             underline: const SizedBox.shrink(),
             items: items
@@ -307,7 +341,13 @@ class _JobCard extends ConsumerWidget {
           color: Colors.white,
           borderRadius: BorderRadius.circular(18),
           border: Border.all(color: const Color(0xFFE5E7EB)),
-          boxShadow: const [BoxShadow(color: Color(0x07000000), blurRadius: 14, offset: Offset(0, 8))],
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x07000000),
+              blurRadius: 14,
+              offset: Offset(0, 8),
+            ),
+          ],
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -345,17 +385,32 @@ class _JobCard extends ConsumerWidget {
                     '${j.companyName} • ${j.location}',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
+                    style: const TextStyle(
+                      color: Color(0xFF6B7280),
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
                     children: [
-                      _Chip(text: j.department, bg: const Color(0xFFEDE9FE), fg: const Color(0xFF6D28D9)),
-                      _Chip(text: j.workType, bg: const Color(0xFFF3F4F6), fg: const Color(0xFF374151)),
+                      _Chip(
+                        text: j.department,
+                        bg: const Color(0xFFEDE9FE),
+                        fg: const Color(0xFF6D28D9),
+                      ),
+                      _Chip(
+                        text: j.workType,
+                        bg: const Color(0xFFF3F4F6),
+                        fg: const Color(0xFF374151),
+                      ),
                       if (j.isRemote)
-                        _Chip(text: l10n.t(AppText.remote), bg: const Color(0xFFDCFCE7), fg: const Color(0xFF16A34A)),
+                        _Chip(
+                          text: l10n.t(AppText.remote),
+                          bg: const Color(0xFFDCFCE7),
+                          fg: const Color(0xFF16A34A),
+                        ),
                       if (j.deadline != null)
                         _Chip(
                           text: l10n.deadlineLabel(_fmtDate(j.deadline!)),
@@ -382,7 +437,10 @@ class _JobCard extends ConsumerWidget {
                   );
                 }
               },
-              icon: Icon(item.isFavorite ? Icons.favorite : Icons.favorite_border, color: const Color(0xFFEF4444)),
+              icon: Icon(
+                item.isFavorite ? Icons.favorite : Icons.favorite_border,
+                color: const Color(0xFFEF4444),
+              ),
             ),
           ],
         ),
@@ -419,7 +477,10 @@ class _CompatibilityPill extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(left: 8),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(999)),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(999),
+      ),
       child: Text(
         '$v%',
         style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: fg),
@@ -438,8 +499,14 @@ class _Chip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(999)),
-      child: Text(text, style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: fg)),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: fg),
+      ),
     );
   }
 }
@@ -476,8 +543,14 @@ class _StatusPill extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(999)),
-      child: Text(label, style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: fg)),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: fg),
+      ),
     );
   }
 }
@@ -491,7 +564,13 @@ class _Empty extends StatelessWidget {
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 32),
-        child: Text(text, style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w800)),
+        child: Text(
+          text,
+          style: const TextStyle(
+            color: Color(0xFF6B7280),
+            fontWeight: FontWeight.w800,
+          ),
+        ),
       ),
     );
   }

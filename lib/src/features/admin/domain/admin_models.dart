@@ -29,7 +29,8 @@ class AdminData {
       email: (json['email'] ?? '').toString(),
       role: (json['role'] ?? '').toString(),
       isActive: json['is_active'] == true,
-      permissions: (json['permissions'] as Map?)?.cast<String, dynamic>() ?? const {},
+      permissions:
+          (json['permissions'] as Map?)?.cast<String, dynamic>() ?? const {},
       raw: json,
     );
   }

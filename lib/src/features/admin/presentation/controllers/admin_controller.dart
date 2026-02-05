@@ -27,8 +27,8 @@ final isSuperAdminProvider = Provider<bool>((ref) {
 
 final adminActionControllerProvider =
     StateNotifierProvider<AdminActionController, bool>((ref) {
-  return AdminActionController(ref.watch(adminRepositoryProvider), ref);
-});
+      return AdminActionController(ref.watch(adminRepositoryProvider), ref);
+    });
 
 class AdminActionController extends StateNotifier<bool> {
   AdminActionController(this._repo, this._ref) : super(false);

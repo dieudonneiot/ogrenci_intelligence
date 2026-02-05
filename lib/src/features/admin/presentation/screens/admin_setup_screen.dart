@@ -48,7 +48,8 @@ class _AdminSetupScreenState extends State<AdminSetupScreen> {
   }
 
   bool get _isCooldownActive =>
-      _cooldownUntilUtc != null && DateTime.now().toUtc().isBefore(_cooldownUntilUtc!);
+      _cooldownUntilUtc != null &&
+      DateTime.now().toUtc().isBefore(_cooldownUntilUtc!);
 
   void _startCooldownSeconds(int seconds) {
     final s = seconds.clamp(1, 300);
@@ -80,9 +81,19 @@ class _AdminSetupScreenState extends State<AdminSetupScreen> {
   int? _extractCooldownSecondsFromMessage(String message) {
     final lower = message.toLowerCase();
 
-    final after = RegExp(r'after\s+(\d+)\s+second', caseSensitive: false).firstMatch(lower) ??
-        RegExp(r'after\s+(\d+)\s+seconds', caseSensitive: false).firstMatch(lower) ??
-        RegExp(r'wait\s+(\d+)\s+seconds', caseSensitive: false).firstMatch(lower);
+    final after =
+        RegExp(
+          r'after\s+(\d+)\s+second',
+          caseSensitive: false,
+        ).firstMatch(lower) ??
+        RegExp(
+          r'after\s+(\d+)\s+seconds',
+          caseSensitive: false,
+        ).firstMatch(lower) ??
+        RegExp(
+          r'wait\s+(\d+)\s+seconds',
+          caseSensitive: false,
+        ).firstMatch(lower);
 
     if (after == null) return null;
     return int.tryParse(after.group(1) ?? '');
@@ -114,7 +125,6 @@ class _AdminSetupScreenState extends State<AdminSetupScreen> {
         }
         return;
       }
-
     } catch (_) {
       if (mounted) {
         context.go(Routes.home);
@@ -210,8 +220,10 @@ class _AdminSetupScreenState extends State<AdminSetupScreen> {
 
       if (user.emailConfirmedAt == null) {
         context.go(
-          Uri(path: Routes.emailVerification, queryParameters: {'email': email})
-              .toString(),
+          Uri(
+            path: Routes.emailVerification,
+            queryParameters: {'email': email},
+          ).toString(),
         );
         return;
       }
@@ -231,7 +243,9 @@ class _AdminSetupScreenState extends State<AdminSetupScreen> {
       if (_isEmailRateLimitError(e)) {
         final secs = _extractCooldownSecondsFromMessage(e.toString()) ?? 45;
         _startCooldownSeconds(secs + 2);
-        _showError('Too many email requests. Please wait ${secs}s and try again.');
+        _showError(
+          'Too many email requests. Please wait ${secs}s and try again.',
+        );
       } else {
         _showError(e.toString());
       }
@@ -241,18 +255,16 @@ class _AdminSetupScreenState extends State<AdminSetupScreen> {
   }
 
   void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     if (_loading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     if (_hasAdmins) {
@@ -285,13 +297,20 @@ class _AdminSetupScreenState extends State<AdminSetupScreen> {
                     const CircleAvatar(
                       radius: 40,
                       backgroundColor: Color(0xFFEDE9FE),
-                      child: Icon(Icons.security, size: 36, color: Color(0xFF7C3AED)),
+                      child: Icon(
+                        Icons.security,
+                        size: 36,
+                        color: Color(0xFF7C3AED),
+                      ),
                     ),
                     const SizedBox(height: 12),
                     Text(
                       l10n.t(AppText.adminSetupTitle),
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900),
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w900,
+                      ),
                     ),
                     const SizedBox(height: 6),
                     Text(
@@ -309,12 +328,18 @@ class _AdminSetupScreenState extends State<AdminSetupScreen> {
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.info_outline, color: Color(0xFF2563EB)),
+                          const Icon(
+                            Icons.info_outline,
+                            color: Color(0xFF2563EB),
+                          ),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
                               l10n.t(AppText.adminSetupNotice),
-                              style: const TextStyle(color: Color(0xFF1E40AF), fontSize: 12),
+                              style: const TextStyle(
+                                color: Color(0xFF1E40AF),
+                                fontSize: 12,
+                              ),
                             ),
                           ),
                         ],
@@ -331,7 +356,10 @@ class _AdminSetupScreenState extends State<AdminSetupScreen> {
                     const SizedBox(height: 6),
                     Text(
                       l10n.t(AppText.adminSetupKeyHelp),
-                      style: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 12),
+                      style: const TextStyle(
+                        color: Color(0xFF9CA3AF),
+                        fontSize: 12,
+                      ),
                     ),
                     const SizedBox(height: 10),
                     _Field(
@@ -368,12 +396,17 @@ class _AdminSetupScreenState extends State<AdminSetupScreen> {
                     SizedBox(
                       height: 48,
                       child: ElevatedButton.icon(
-                        onPressed: (_creating || _isCooldownActive) ? null : _submit,
+                        onPressed: (_creating || _isCooldownActive)
+                            ? null
+                            : _submit,
                         icon: _creating
                             ? const SizedBox(
                                 width: 16,
                                 height: 16,
-                                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
                               )
                             : const Icon(Icons.check_circle_outline),
                         label: Text(
@@ -384,7 +417,9 @@ class _AdminSetupScreenState extends State<AdminSetupScreen> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF7C3AED),
                           foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
                       ),
                     ),
@@ -393,7 +428,10 @@ class _AdminSetupScreenState extends State<AdminSetupScreen> {
                       Text(
                         'Please wait ${_cooldownSeconds}s before retrying.',
                         textAlign: TextAlign.center,
-                        style: const TextStyle(color: Color(0xFF6B7280), fontWeight: FontWeight.w700),
+                        style: const TextStyle(
+                          color: Color(0xFF6B7280),
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ],
                     const SizedBox(height: 14),
@@ -401,22 +439,30 @@ class _AdminSetupScreenState extends State<AdminSetupScreen> {
                       children: [
                         Expanded(
                           child: OutlinedButton.icon(
-                            onPressed: _creating ? null : () => context.go(Routes.login),
+                            onPressed: _creating
+                                ? null
+                                : () => context.go(Routes.login),
                             icon: const Icon(Icons.school_outlined),
                             label: Text(l10n.t(AppText.studentLogin)),
                             style: OutlinedButton.styleFrom(
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
                             ),
                           ),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: OutlinedButton.icon(
-                            onPressed: _creating ? null : () => context.go(Routes.companyAuth),
+                            onPressed: _creating
+                                ? null
+                                : () => context.go(Routes.companyAuth),
                             icon: const Icon(Icons.apartment_outlined),
                             label: Text(l10n.t(AppText.companyLogin)),
                             style: OutlinedButton.styleFrom(
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
                             ),
                           ),
                         ),

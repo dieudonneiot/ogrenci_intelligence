@@ -66,7 +66,9 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
         return;
       }
 
-      final admin = await ref.read(adminRepositoryProvider).getActiveAdminByUserId(user.id);
+      final admin = await ref
+          .read(adminRepositoryProvider)
+          .getActiveAdminByUserId(user.id);
       if (admin == null) {
         await SupabaseService.client.auth.signOut();
         _error = l10n.t(AppText.adminLoginErrorNotAdmin);
@@ -100,12 +102,22 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
-                boxShadow: const [BoxShadow(color: Color(0x14000000), blurRadius: 20, offset: Offset(0, 12))],
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x14000000),
+                    blurRadius: 20,
+                    offset: Offset(0, 12),
+                  ),
+                ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Icon(Icons.security, size: 48, color: Color(0xFF7C3AED)),
+                  const Icon(
+                    Icons.security,
+                    size: 48,
+                    color: Color(0xFF7C3AED),
+                  ),
                   const SizedBox(height: 12),
                   Text(
                     l10n.t(AppText.adminLoginTitle),
@@ -128,10 +140,16 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.error_outline, color: Color(0xFFDC2626)),
+                          const Icon(
+                            Icons.error_outline,
+                            color: Color(0xFFDC2626),
+                          ),
                           const SizedBox(width: 8),
                           Expanded(
-                            child: Text(_error!, style: const TextStyle(color: Color(0xFF7F1D1D))),
+                            child: Text(
+                              _error!,
+                              style: const TextStyle(color: Color(0xFF7F1D1D)),
+                            ),
                           ),
                         ],
                       ),
@@ -158,10 +176,13 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
                     children: [
                       Checkbox(
                         value: _remember,
-                        onChanged: (v) => setState(() => _remember = v ?? false),
+                        onChanged: (v) =>
+                            setState(() => _remember = v ?? false),
                       ),
-                      Text(l10n.t(AppText.adminLoginRememberMe),
-                          style: const TextStyle(fontWeight: FontWeight.w600)),
+                      Text(
+                        l10n.t(AppText.adminLoginRememberMe),
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
                       const Spacer(),
                       TextButton(
                         onPressed: () => context.go(Routes.forgotPassword),
@@ -178,7 +199,10 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
                           ? const SizedBox(
                               width: 16,
                               height: 16,
-                              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
                             )
                           : const Icon(Icons.lock_outline),
                       label: Text(
@@ -189,7 +213,9 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF7C3AED),
                         foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                     ),
                   ),

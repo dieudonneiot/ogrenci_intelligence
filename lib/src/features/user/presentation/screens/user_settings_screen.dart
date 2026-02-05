@@ -63,14 +63,13 @@ class _UserSettingsScreenState extends ConsumerState<UserSettingsScreen> {
     final isLoggedIn = auth?.isAuthenticated ?? false;
 
     if (!isLoggedIn || user == null) {
-      return _GuestView(
-        title: l10n.t(AppText.settingsLoginRequired),
-      );
+      return _GuestView(title: l10n.t(AppText.settingsLoginRequired));
     }
 
     final meta = user.userMetadata;
-    final fullName =
-        (meta is Map<String, dynamic>) ? (meta['full_name'] as String?) : null;
+    final fullName = (meta is Map<String, dynamic>)
+        ? (meta['full_name'] as String?)
+        : null;
     _ensureLoaded(user.id, fullName);
 
     return Container(
@@ -106,9 +105,11 @@ class _UserSettingsScreenState extends ConsumerState<UserSettingsScreen> {
                         showCurrent: _showCurrent,
                         showNew: _showNew,
                         showConfirm: _showConfirm,
-                        onToggleCurrent: () => setState(() => _showCurrent = !_showCurrent),
+                        onToggleCurrent: () =>
+                            setState(() => _showCurrent = !_showCurrent),
                         onToggleNew: () => setState(() => _showNew = !_showNew),
-                        onToggleConfirm: () => setState(() => _showConfirm = !_showConfirm),
+                        onToggleConfirm: () =>
+                            setState(() => _showConfirm = !_showConfirm),
                         onSavePassword: _savePassword,
                         prefs: _prefs,
                         prefsLoading: _prefsLoading,
@@ -159,7 +160,9 @@ class _UserSettingsScreenState extends ConsumerState<UserSettingsScreen> {
     try {
       final row = await SupabaseService.client
           .from('notification_preferences')
-          .select('email_notifications, new_course_notifications, job_alerts, newsletter')
+          .select(
+            'email_notifications, new_course_notifications, job_alerts, newsletter',
+          )
           .eq('user_id', uid)
           .maybeSingle();
 
@@ -235,7 +238,9 @@ class _UserSettingsScreenState extends ConsumerState<UserSettingsScreen> {
     }
 
     setState(() => _loading = true);
-    final err = await ref.read(authActionLoadingProvider.notifier).updatePassword(newPassword);
+    final err = await ref
+        .read(authActionLoadingProvider.notifier)
+        .updatePassword(newPassword);
     if (!mounted) return;
 
     if (err != null && err.isNotEmpty) {
@@ -264,7 +269,9 @@ class _UserSettingsScreenState extends ConsumerState<UserSettingsScreen> {
 
     final updates = <String, dynamic>{};
     if (key == _PrefKey.email) updates['email_notifications'] = updated.email;
-    if (key == _PrefKey.newCourses) updates['new_course_notifications'] = updated.newCourses;
+    if (key == _PrefKey.newCourses) {
+      updates['new_course_notifications'] = updated.newCourses;
+    }
     if (key == _PrefKey.jobAlerts) updates['job_alerts'] = updated.jobAlerts;
     if (key == _PrefKey.newsletter) updates['newsletter'] = updated.newsletter;
 
@@ -316,8 +323,11 @@ class _UserSettingsScreenState extends ConsumerState<UserSettingsScreen> {
             child: Text(l10n.t(AppText.commonCancel)),
           ),
           ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(ctrl.text.trim() == phrase),
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFEF4444)),
+            onPressed: () =>
+                Navigator.of(context).pop(ctrl.text.trim() == phrase),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFEF4444),
+            ),
             child: Text(l10n.t(AppText.settingsDeleteAccountButton)),
           ),
         ],
@@ -362,7 +372,11 @@ class _HeaderCard extends StatelessWidget {
           end: Alignment.bottomRight,
         ),
         boxShadow: const [
-          BoxShadow(color: Color(0x22000000), blurRadius: 22, offset: Offset(0, 10)),
+          BoxShadow(
+            color: Color(0x22000000),
+            blurRadius: 22,
+            offset: Offset(0, 10),
+          ),
         ],
       ),
       child: Row(
@@ -371,7 +385,11 @@ class _HeaderCard extends StatelessWidget {
           const SizedBox(width: 10),
           Text(
             l10n.t(AppText.navSettings),
-            style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.w900,
+            ),
           ),
         ],
       ),
@@ -380,10 +398,7 @@ class _HeaderCard extends StatelessWidget {
 }
 
 class _SettingsSidebar extends StatelessWidget {
-  const _SettingsSidebar({
-    required this.activeTab,
-    required this.onSelect,
-  });
+  const _SettingsSidebar({required this.activeTab, required this.onSelect});
 
   final String activeTab;
   final ValueChanged<String> onSelect;
@@ -462,13 +477,19 @@ class _TabTile extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(icon, size: 18, color: active ? const Color(0xFF6D28D9) : const Color(0xFF6B7280)),
+            Icon(
+              icon,
+              size: 18,
+              color: active ? const Color(0xFF6D28D9) : const Color(0xFF6B7280),
+            ),
             const SizedBox(width: 8),
             Text(
               label,
               style: TextStyle(
                 fontWeight: FontWeight.w700,
-                color: active ? const Color(0xFF6D28D9) : const Color(0xFF374151),
+                color: active
+                    ? const Color(0xFF6D28D9)
+                    : const Color(0xFF374151),
               ),
             ),
           ],
@@ -530,20 +551,30 @@ class _SettingsContent extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 18, offset: Offset(0, 8))],
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0A000000),
+            blurRadius: 18,
+            offset: Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (activeTab == 'profile') ...[
-            Text(l10n.t(AppText.settingsProfileInfoTitle),
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+            Text(
+              l10n.t(AppText.settingsProfileInfoTitle),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+            ),
             const SizedBox(height: 14),
             TextField(
               controller: fullNameCtrl,
               decoration: InputDecoration(
                 labelText: l10n.t(AppText.commonFullName),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
             ),
             const SizedBox(height: 12),
@@ -554,20 +585,30 @@ class _SettingsContent extends StatelessWidget {
                 labelText: l10n.t(AppText.commonEmail),
                 filled: true,
                 fillColor: const Color(0xFFF3F4F6),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
             ),
             const SizedBox(height: 12),
             ElevatedButton.icon(
               onPressed: loading ? null : onSaveProfile,
               icon: const Icon(Icons.save),
-              label: Text(loading ? l10n.t(AppText.commonSaving) : l10n.t(AppText.settingsSaveChanges)),
-              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6D28D9)),
+              label: Text(
+                loading
+                    ? l10n.t(AppText.commonSaving)
+                    : l10n.t(AppText.settingsSaveChanges),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF6D28D9),
+              ),
             ),
           ],
           if (activeTab == 'password') ...[
-            Text(l10n.t(AppText.settingsChangePasswordTitle),
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+            Text(
+              l10n.t(AppText.settingsChangePasswordTitle),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+            ),
             const SizedBox(height: 14),
             _PasswordField(
               controller: currentPasswordCtrl,
@@ -593,13 +634,21 @@ class _SettingsContent extends StatelessWidget {
             ElevatedButton.icon(
               onPressed: loading ? null : onSavePassword,
               icon: const Icon(Icons.lock_outline),
-              label: Text(loading ? l10n.t(AppText.commonUpdating) : l10n.t(AppText.settingsUpdatePassword)),
-              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6D28D9)),
+              label: Text(
+                loading
+                    ? l10n.t(AppText.commonUpdating)
+                    : l10n.t(AppText.settingsUpdatePassword),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF6D28D9),
+              ),
             ),
           ],
           if (activeTab == 'notifications') ...[
-            Text(l10n.t(AppText.settingsNotificationPreferencesTitle),
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+            Text(
+              l10n.t(AppText.settingsNotificationPreferencesTitle),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+            ),
             const SizedBox(height: 14),
             if (prefsLoading)
               const Center(child: CircularProgressIndicator())
@@ -631,8 +680,10 @@ class _SettingsContent extends StatelessWidget {
             ],
           ],
           if (activeTab == 'privacy') ...[
-            Text(l10n.t(AppText.settingsPrivacySecurityTitle),
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+            Text(
+              l10n.t(AppText.settingsPrivacySecurityTitle),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+            ),
             const SizedBox(height: 14),
             _InfoBox(
               title: l10n.t(AppText.settingsTwoFactorTitle),
@@ -644,7 +695,11 @@ class _SettingsContent extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               l10n.t(AppText.settingsDangerZoneTitle),
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Color(0xFFEF4444)),
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w900,
+                color: Color(0xFFEF4444),
+              ),
             ),
             const SizedBox(height: 10),
             _DangerRow(
@@ -728,9 +783,18 @@ class _PrefTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: const TextStyle(fontWeight: FontWeight.w800)),
+                Text(
+                  title,
+                  style: const TextStyle(fontWeight: FontWeight.w800),
+                ),
                 const SizedBox(height: 4),
-                Text(subtitle, style: const TextStyle(color: Color(0xFF6B7280), fontSize: 12)),
+                Text(
+                  subtitle,
+                  style: const TextStyle(
+                    color: Color(0xFF6B7280),
+                    fontSize: 12,
+                  ),
+                ),
               ],
             ),
           ),
@@ -773,11 +837,26 @@ class _InfoBox extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: const TextStyle(fontWeight: FontWeight.w800)),
+                Text(
+                  title,
+                  style: const TextStyle(fontWeight: FontWeight.w800),
+                ),
                 const SizedBox(height: 4),
-                Text(subtitle, style: const TextStyle(color: Color(0xFF6B7280), fontSize: 12)),
+                Text(
+                  subtitle,
+                  style: const TextStyle(
+                    color: Color(0xFF6B7280),
+                    fontSize: 12,
+                  ),
+                ),
                 const SizedBox(height: 6),
-                Text(actionLabel, style: const TextStyle(color: Color(0xFF6D28D9), fontWeight: FontWeight.w700)),
+                Text(
+                  actionLabel,
+                  style: const TextStyle(
+                    color: Color(0xFF6D28D9),
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
               ],
             ),
           ),
@@ -801,11 +880,23 @@ class _VisibilityBox extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(l10n.t(AppText.settingsProfileVisibilityTitle), style: const TextStyle(fontWeight: FontWeight.w800)),
+          Text(
+            l10n.t(AppText.settingsProfileVisibilityTitle),
+            style: const TextStyle(fontWeight: FontWeight.w800),
+          ),
           const SizedBox(height: 8),
-          _RadioRow(label: l10n.t(AppText.settingsVisibilityPublic), value: true),
-          _RadioRow(label: l10n.t(AppText.settingsVisibilityRegistered), value: false),
-          _RadioRow(label: l10n.t(AppText.settingsVisibilityHidden), value: false),
+          _RadioRow(
+            label: l10n.t(AppText.settingsVisibilityPublic),
+            value: true,
+          ),
+          _RadioRow(
+            label: l10n.t(AppText.settingsVisibilityRegistered),
+            value: false,
+          ),
+          _RadioRow(
+            label: l10n.t(AppText.settingsVisibilityHidden),
+            value: false,
+          ),
         ],
       ),
     );
@@ -821,8 +912,11 @@ class _RadioRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(value ? Icons.radio_button_checked : Icons.radio_button_unchecked,
-            size: 16, color: const Color(0xFF6D28D9)),
+        Icon(
+          value ? Icons.radio_button_checked : Icons.radio_button_unchecked,
+          size: 16,
+          color: const Color(0xFF6D28D9),
+        ),
         const SizedBox(width: 8),
         Text(label, style: const TextStyle(color: Color(0xFF6B7280))),
       ],
@@ -854,7 +948,11 @@ class _DangerRow extends StatelessWidget {
             ? const Color(0xFFFEF2F2)
             : Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: actionColor == const Color(0xFFEF4444) ? const Color(0xFFFECACA) : const Color(0xFFE5E7EB)),
+        border: Border.all(
+          color: actionColor == const Color(0xFFEF4444)
+              ? const Color(0xFFFECACA)
+              : const Color(0xFFE5E7EB),
+        ),
       ),
       child: Row(
         children: [
@@ -862,9 +960,18 @@ class _DangerRow extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: const TextStyle(fontWeight: FontWeight.w800)),
+                Text(
+                  title,
+                  style: const TextStyle(fontWeight: FontWeight.w800),
+                ),
                 const SizedBox(height: 4),
-                Text(subtitle, style: const TextStyle(color: Color(0xFF6B7280), fontSize: 12)),
+                Text(
+                  subtitle,
+                  style: const TextStyle(
+                    color: Color(0xFF6B7280),
+                    fontSize: 12,
+                  ),
+                ),
               ],
             ),
           ),
@@ -893,11 +1000,20 @@ class _GuestView extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.lock_outline, size: 46, color: Color(0xFF6B7280)),
+              const Icon(
+                Icons.lock_outline,
+                size: 46,
+                color: Color(0xFF6B7280),
+              ),
               const SizedBox(height: 10),
-              Text(title,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF374151))),
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w800,
+                  color: Color(0xFF374151),
+                ),
+              ),
             ],
           ),
         ),

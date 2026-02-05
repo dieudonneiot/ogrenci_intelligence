@@ -11,14 +11,10 @@ import '../widgets/how_it_works_section.dart';
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
-  // Tailwind-like palette (close to your React UI)
-  static const _bgTop = Color(0xFFFFFFFF);
-  static const _bgBottom = Color(0xFFFAF5FF); // purple-50
-  static const _purple700 = Color(0xFF7E22CE);
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
+    final cs = Theme.of(context).colorScheme;
     final authAsync = ref.watch(authViewStateProvider);
 
     final isLoading = authAsync.isLoading;
@@ -26,11 +22,11 @@ class HomeScreen extends ConsumerWidget {
     final isLoggedIn = (!isLoading) && (auth?.isAuthenticated ?? false);
 
     return DecoratedBox(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [_bgTop, _bgBottom],
+          colors: [cs.surface, cs.primaryContainer.withAlpha(26)],
         ),
       ),
       child: SafeArea(
@@ -62,19 +58,19 @@ class HomeScreen extends ConsumerWidget {
                     cards: [
                       _InfoCard(
                         icon: Icons.school_outlined,
-                        iconColor: _purple700,
+                        iconColor: cs.primary,
                         title: l10n.t(AppText.homeCard1Title),
                         description: l10n.t(AppText.homeCard1Desc),
                       ),
                       _InfoCard(
                         icon: Icons.work_outline,
-                        iconColor: _purple700,
+                        iconColor: cs.primary,
                         title: l10n.t(AppText.homeCard2Title),
                         description: l10n.t(AppText.homeCard2Desc),
                       ),
                       _InfoCard(
                         icon: Icons.assignment_outlined,
-                        iconColor: _purple700,
+                        iconColor: cs.primary,
                         title: l10n.t(AppText.homeCard3Title),
                         description: l10n.t(AppText.homeCard3Desc),
                       ),
@@ -88,19 +84,19 @@ class HomeScreen extends ConsumerWidget {
                     cards: [
                       _InfoCard(
                         icon: Icons.track_changes_outlined,
-                        iconColor: _purple700,
+                        iconColor: cs.primary,
                         title: l10n.t(AppText.homeStudentCard1Title),
                         description: l10n.t(AppText.homeStudentCard1Desc),
                       ),
                       _InfoCard(
                         icon: Icons.star_outline,
-                        iconColor: _purple700,
+                        iconColor: cs.primary,
                         title: l10n.t(AppText.homeStudentCard2Title),
                         description: l10n.t(AppText.homeStudentCard2Desc),
                       ),
                       _InfoCard(
                         icon: Icons.bar_chart_outlined,
-                        iconColor: _purple700,
+                        iconColor: cs.primary,
                         title: l10n.t(AppText.homeStudentCard3Title),
                         description: l10n.t(AppText.homeStudentCard3Desc),
                       ),
@@ -114,19 +110,19 @@ class HomeScreen extends ConsumerWidget {
                     cards: [
                       _InfoCard(
                         icon: Icons.people_outline,
-                        iconColor: _purple700,
+                        iconColor: cs.primary,
                         title: l10n.t(AppText.homeCompanyCard1Title),
                         description: l10n.t(AppText.homeCompanyCard1Desc),
                       ),
                       _InfoCard(
                         icon: Icons.handshake_outlined,
-                        iconColor: _purple700,
+                        iconColor: cs.primary,
                         title: l10n.t(AppText.homeCompanyCard2Title),
                         description: l10n.t(AppText.homeCompanyCard2Desc),
                       ),
                       _InfoCard(
                         icon: Icons.query_stats_outlined,
-                        iconColor: _purple700,
+                        iconColor: cs.primary,
                         title: l10n.t(AppText.homeCompanyCard3Title),
                         description: l10n.t(AppText.homeCompanyCard3Desc),
                       ),
@@ -177,22 +173,25 @@ class _Hero extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final titleStyle = Theme.of(context).textTheme.headlineMedium?.copyWith(
-          color: Colors.white,
-          fontWeight: FontWeight.w800,
-          height: 1.15,
-        );
+      color: Colors.white,
+      fontWeight: FontWeight.w800,
+      height: 1.15,
+    );
 
     final subtitleStyle = Theme.of(context).textTheme.titleMedium?.copyWith(
-          color: const Color(0xFFC7D2FE), // indigo-200 vibe
-          height: 1.5,
-        );
+      color: const Color(0xFFC7D2FE), // indigo-200 vibe
+      height: 1.5,
+    );
 
     return TweenAnimationBuilder<double>(
       duration: const Duration(milliseconds: 900),
       tween: Tween(begin: 0, end: 1),
       builder: (context, t, child) => Opacity(
         opacity: t,
-        child: Transform.translate(offset: Offset(0, (1 - t) * 40), child: child),
+        child: Transform.translate(
+          offset: Offset(0, (1 - t) * 40),
+          child: child,
+        ),
       ),
       child: Container(
         padding: const EdgeInsets.all(18),
@@ -209,7 +208,7 @@ class _Hero extends StatelessWidget {
               spreadRadius: 2,
               offset: Offset(0, 10),
               color: Color(0x26000000),
-            )
+            ),
           ],
         ),
         child: Padding(
@@ -246,20 +245,20 @@ class _Hero extends StatelessWidget {
                       _FilledCta(
                         label: l10n.t(AppText.signUp),
                         color: _yellow400,
-                        textColor: Color(0xFF111827),
+                        textColor: const Color(0xFF1F2937),
                         onTap: onRegister,
                       ),
                       _FilledCta(
                         label: l10n.t(AppText.login),
                         color: _yellow400,
-                        textColor: Color(0xFF111827),
+                        textColor: const Color(0xFF1F2937),
                         onTap: onLogin,
                       ),
                     ] else ...[
                       _FilledCta(
                         label: l10n.t(AppText.profile),
                         color: _green400,
-                        textColor: Color(0xFF111827),
+                        textColor: const Color(0xFF1F2937),
                         icon: Icons.person_outline,
                         onTap: onProfile,
                       ),
@@ -270,7 +269,7 @@ class _Hero extends StatelessWidget {
                         icon: Icons.logout_outlined,
                         onTapAsync: onLogout,
                       ),
-                    ]
+                    ],
                   ],
                 ),
             ],
@@ -346,10 +345,7 @@ class _FilledCtaState extends State<_FilledCta> {
 }
 
 class _SectionGrid extends StatelessWidget {
-  const _SectionGrid({
-    required this.title,
-    required this.cards,
-  });
+  const _SectionGrid({required this.title, required this.cards});
 
   final String? title;
   final List<_InfoCard> cards;
@@ -357,9 +353,9 @@ class _SectionGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final headerStyle = Theme.of(context).textTheme.headlineSmall?.copyWith(
-          fontWeight: FontWeight.w800,
-          color: const Color(0xFF3B0764), // deep purple
-        );
+      fontWeight: FontWeight.w800,
+      color: const Color(0xFF3B0764), // deep purple
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -406,37 +402,44 @@ class _InfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final titleStyle = Theme.of(context).textTheme.titleLarge?.copyWith(
-          fontWeight: FontWeight.w700,
-          color: const Color(0xFF5B21B6),
-        );
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
 
-    final descStyle = Theme.of(context).textTheme.bodyMedium?.copyWith(
-          color: const Color(0xFF4B5563),
-          height: 1.45,
-        );
+    final titleStyle = theme.textTheme.titleMedium?.copyWith(
+      fontWeight: FontWeight.w800,
+      color: cs.onSurface,
+    );
 
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(26),
-        boxShadow: const [
-          BoxShadow(
-            blurRadius: 14,
-            offset: Offset(0, 8),
-            color: Color(0x1A000000),
-          )
-        ],
+    final descStyle = theme.textTheme.bodyMedium?.copyWith(
+      color: cs.onSurfaceVariant,
+      height: 1.45,
+    );
+
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: cs.outlineVariant.withAlpha(130)),
       ),
-      child: Column(
-        children: [
-          Icon(icon, size: 46, color: iconColor),
-          const SizedBox(height: 12),
-          Text(title, textAlign: TextAlign.center, style: titleStyle),
-          const SizedBox(height: 10),
-          Text(description, textAlign: TextAlign.center, style: descStyle),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            DecoratedBox(
+              decoration: BoxDecoration(
+                color: cs.primaryContainer.withAlpha(110),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: Icon(icon, size: 30, color: iconColor),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(title, textAlign: TextAlign.center, style: titleStyle),
+            const SizedBox(height: 10),
+            Text(description, textAlign: TextAlign.center, style: descStyle),
+          ],
+        ),
       ),
     );
   }

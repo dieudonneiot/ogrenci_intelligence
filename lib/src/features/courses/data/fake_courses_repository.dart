@@ -52,7 +52,8 @@ class FakeCoursesRepository {
       Course(
         id: 'c-001',
         title: 'Programlamaya Giriş',
-        description: 'Algoritma mantığı, temel veri tipleri, koşullar ve döngüler.',
+        description:
+            'Algoritma mantığı, temel veri tipleri, koşullar ve döngüler.',
         department: 'Bilgisayar Mühendisliği',
         duration: '4 saat',
         level: 'Başlangıç',
@@ -80,7 +81,8 @@ class FakeCoursesRepository {
       Course(
         id: 'c-003',
         title: 'SQL Temelleri',
-        description: 'SELECT, JOIN, indeks mantığı, normalizasyon ve pratik örnekler.',
+        description:
+            'SELECT, JOIN, indeks mantığı, normalizasyon ve pratik örnekler.',
         department: 'Bilgisayar Mühendisliği',
         duration: '3 saat',
         level: 'Başlangıç',
@@ -106,7 +108,8 @@ class FakeCoursesRepository {
       Course(
         id: 'c-005',
         title: 'Flutter ile Mobil UI',
-        description: 'Widget mantığı, layout, state, komponentleşme ve best practices.',
+        description:
+            'Widget mantığı, layout, state, komponentleşme ve best practices.',
         department: 'Bilgisayar Mühendisliği',
         duration: '5 saat',
         level: 'Orta',

@@ -10,7 +10,10 @@ import '../domain/evidence_models.dart';
 class EvidenceRepository {
   const EvidenceRepository();
 
-  Future<List<EvidenceItem>> listMyEvidence({required String userId, int limit = 50}) async {
+  Future<List<EvidenceItem>> listMyEvidence({
+    required String userId,
+    int limit = 50,
+  }) async {
     final rows = await SupabaseService.client
         .from('evidence_items')
         .select(
@@ -26,7 +29,10 @@ class EvidenceRepository {
         .toList(growable: false);
   }
 
-  Future<List<EvidenceItem>> listCompanyPendingEvidence({required String companyId, int limit = 80}) async {
+  Future<List<EvidenceItem>> listCompanyPendingEvidence({
+    required String companyId,
+    int limit = 80,
+  }) async {
     final rows = await SupabaseService.client
         .from('evidence_items')
         .select(
@@ -49,14 +55,19 @@ class EvidenceRepository {
   }) async {
     final rows = await SupabaseService.client
         .from('internship_applications')
-        .select('id,internship_id,status, internship:internships(id,title,company_id,company_name)')
+        .select(
+          'id,internship_id,status, internship:internships(id,title,company_id,company_name)',
+        )
         .eq('user_id', userId)
         .eq('status', 'accepted')
         .order('applied_at', ascending: false)
         .limit(limit);
 
     return (rows as List)
-        .map((e) => AcceptedInternshipApplication.fromMap(e as Map<String, dynamic>))
+        .map(
+          (e) =>
+              AcceptedInternshipApplication.fromMap(e as Map<String, dynamic>),
+        )
         .where((e) => e.applicationId.isNotEmpty && e.companyId.isNotEmpty)
         .toList(growable: false);
   }
@@ -94,7 +105,9 @@ class EvidenceRepository {
     final rand = Random().nextInt(1 << 20);
     final path = '$userId/${stamp}_${rand}_$safeName';
 
-    await SupabaseService.client.storage.from('evidence').uploadBinary(
+    await SupabaseService.client.storage
+        .from('evidence')
+        .uploadBinary(
           path,
           bytes,
           fileOptions: FileOptions(
@@ -140,8 +153,13 @@ class EvidenceRepository {
     return EvidenceItem.fromMap(row);
   }
 
-  Future<String> createSignedUrl({required String filePath, int seconds = 600}) async {
-    final url = await SupabaseService.client.storage.from('evidence').createSignedUrl(filePath, seconds);
+  Future<String> createSignedUrl({
+    required String filePath,
+    int seconds = 600,
+  }) async {
+    final url = await SupabaseService.client.storage
+        .from('evidence')
+        .createSignedUrl(filePath, seconds);
     return url;
   }
 

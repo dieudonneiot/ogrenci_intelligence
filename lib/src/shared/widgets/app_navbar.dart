@@ -58,9 +58,9 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
 
     if (err != null && err.isNotEmpty) {
       final l10n = AppLocalizations.of(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.signOutFailed(err))),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.signOutFailed(err))));
       return;
     }
     context.go(Routes.home);
@@ -69,6 +69,7 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final cs = Theme.of(context).colorScheme;
     final locale = ref.watch(appLocaleProvider);
     final authAsync = ref.watch(authViewStateProvider);
     final isLoading = authAsync.isLoading;
@@ -100,9 +101,15 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
 
     final companyMenu = <_NavItem>[
       _NavItem(l10n.t(AppText.navCompanyJobs), Routes.companyJobs),
-      _NavItem(l10n.t(AppText.navCompanyInternships), Routes.companyInternships),
+      _NavItem(
+        l10n.t(AppText.navCompanyInternships),
+        Routes.companyInternships,
+      ),
       _NavItem('Talent Mining', Routes.companyTalent),
-      _NavItem(l10n.t(AppText.navCompanyApplications), Routes.companyApplications),
+      _NavItem(
+        l10n.t(AppText.navCompanyApplications),
+        Routes.companyApplications,
+      ),
       _NavItem(l10n.t(AppText.navCompanyReports), Routes.companyReports),
     ];
 
@@ -140,13 +147,15 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
     final languageMenuDesktop = _LanguageMenu(
       l10n: l10n,
       currentLocale: locale,
-      onSelected: (next) => unawaited(ref.read(appLocaleProvider.notifier).setLocale(next)),
+      onSelected: (next) =>
+          unawaited(ref.read(appLocaleProvider.notifier).setLocale(next)),
       compact: false,
     );
     final languageMenuMobile = _LanguageMenu(
       l10n: l10n,
       currentLocale: locale,
-      onSelected: (next) => unawaited(ref.read(appLocaleProvider.notifier).setLocale(next)),
+      onSelected: (next) =>
+          unawaited(ref.read(appLocaleProvider.notifier).setLocale(next)),
       compact: true,
     );
 
@@ -164,16 +173,18 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
 
     return Material(
       elevation: 0,
-      color: Colors.white,
+      color: cs.surface,
       child: Container(
-        decoration: const BoxDecoration(
-          border: Border(bottom: BorderSide(color: Color(0xFFE5E7EB))),
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(color: cs.outlineVariant.withAlpha(160)),
+          ),
           boxShadow: [
             BoxShadow(
-              blurRadius: 10,
-              offset: Offset(0, 2),
-              color: Color(0x14000000),
-            )
+              blurRadius: 12,
+              offset: const Offset(0, 2),
+              color: cs.primary.withAlpha(14),
+            ),
           ],
         ),
         child: Column(
@@ -185,7 +196,10 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 1280),
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
+                    ),
                     child: LayoutBuilder(
                       builder: (context, constraints) {
                         final barW = constraints.maxWidth;
@@ -209,25 +223,48 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
                           double? maxTextWidth,
                         }) {
                           final w = measure(label, style);
-                          final tw = maxTextWidth == null ? w : w.clamp(0, maxTextWidth).toDouble();
+                          final tw = maxTextWidth == null
+                              ? w
+                              : w.clamp(0, maxTextWidth).toDouble();
                           // Matches _PrimaryPill padding (14 + 14) and keeps a tiny buffer.
                           return tw + 28 + 2;
                         }
 
                         // Rough widths for the logo block:
                         // icon/image (~40) + gap (10) + optional title.
-                        const brandStyle = TextStyle(fontSize: 20, fontWeight: FontWeight.w800);
-                        final brandLabel = isCompany ? l10n.t(AppText.companyPanel) : l10n.t(AppText.brandName);
+                        const brandStyle = TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w800,
+                        );
+                        final brandLabel = isCompany
+                            ? l10n.t(AppText.companyPanel)
+                            : l10n.t(AppText.brandName);
                         final brandTextW = measure(brandLabel, brandStyle);
                         final logoBaseW = 40 + 10;
 
                         // Language pill: icon(16) + gaps + label + chevron(16)
-                        const langStyle = TextStyle(fontWeight: FontWeight.w600);
-                        final currentLang = AppLocalizations.languageFor(locale);
+                        const langStyle = TextStyle(
+                          fontWeight: FontWeight.w600,
+                        );
+                        final currentLang = AppLocalizations.languageFor(
+                          locale,
+                        );
                         final langLabelWide = currentLang.nativeName;
                         final langLabelCompact = currentLang.code.toUpperCase();
-                        final langWideW = 16 + 6 + measure(langLabelWide, langStyle) + 4 + 16 + 20;
-                        final langCompactW = 16 + 6 + measure(langLabelCompact, langStyle) + 4 + 16 + 20;
+                        final langWideW =
+                            16 +
+                            6 +
+                            measure(langLabelWide, langStyle) +
+                            4 +
+                            16 +
+                            20;
+                        final langCompactW =
+                            16 +
+                            6 +
+                            measure(langLabelCompact, langStyle) +
+                            4 +
+                            16 +
+                            20;
 
                         // Wide guest actions (3 buttons) only if they fit.
                         const pillStyle = TextStyle(
@@ -235,7 +272,8 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
                           fontWeight: FontWeight.w700,
                           fontSize: 13,
                         );
-                        final guestButtonsW = pillWidth(
+                        final guestButtonsW =
+                            pillWidth(
                               l10n.t(AppText.companyLogin),
                               style: pillStyle,
                               maxTextWidth: 160,
@@ -267,9 +305,22 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
                           maxTextWidth: 160,
                         );
                         // Profile pill: icon(18) + gaps + name + optional badge + chevron.
-                        const profileStyle = TextStyle(fontWeight: FontWeight.w600, fontSize: 13);
-                        final profileNameW = measure(userName, profileStyle).clamp(0, 160).toDouble();
-                        final profileWideW = 18 + 8 + profileNameW + (isCompany ? (8 + 72) : 0) + 8 + 16 + 20;
+                        const profileStyle = TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                        );
+                        final profileNameW = measure(
+                          userName,
+                          profileStyle,
+                        ).clamp(0, 160).toDouble();
+                        final profileWideW =
+                            18 +
+                            8 +
+                            profileNameW +
+                            (isCompany ? (8 + 72) : 0) +
+                            8 +
+                            16 +
+                            20;
                         final profileCompactW = 18 + 8 + 16 + 20;
 
                         // Leave some breathing room for the center nav links.
@@ -282,16 +333,27 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
                         // When space is tight, prefer keeping the navbar stable (no overflow) over showing the brand text.
                         final minRightCushion = isLoggedIn
                             ? (langCompactW +
-                                10 +
-                                (isStudent ? (92 + 12) : 0) + // _PointsChip + gap
-                                (isCompany ? (48 + 12) : 0) + // compact new listing icon + gap
-                                profileCompactW)
+                                  10 +
+                                  (isStudent
+                                      ? (92 + 12)
+                                      : 0) + // _PointsChip + gap
+                                  (isCompany
+                                      ? (48 + 12)
+                                      : 0) + // compact new listing icon + gap
+                                  profileCompactW)
                             : (langCompactW + 10 + guestMenuW);
                         final canShowBrandText =
-                            barW >= (logoBaseW + brandTextW + gapLogoToNav + minNavW + gapNavToActions + minRightCushion);
+                            barW >=
+                            (logoBaseW +
+                                brandTextW +
+                                gapLogoToNav +
+                                minNavW +
+                                gapNavToActions +
+                                minRightCushion);
                         final showBrandText = canShowBrandText;
 
-                        final leftW = logoBaseW + (showBrandText ? brandTextW : 0);
+                        final leftW =
+                            logoBaseW + (showBrandText ? brandTextW : 0);
 
                         double rightWForGuest({required bool wide}) {
                           if (wide) return langWideW + 10 + guestButtonsW;
@@ -300,220 +362,259 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
 
                         double rightWForLoggedIn({required bool wide}) {
                           final langW = wide ? langWideW : langCompactW;
-                          final profileW = wide ? profileWideW : profileCompactW;
+                          final profileW = wide
+                              ? profileWideW
+                              : profileCompactW;
                           final companyW = isCompany
-                              ? (wide ? (newListingW + 12) : (48 + 12)) // IconButton ~48
+                              ? (wide
+                                    ? (newListingW + 12)
+                                    : (48 + 12)) // IconButton ~48
                               : 0.0;
-                          final studentW = isStudent ? (92 + 12) : 0.0; // _PointsChip ~92
+                          final studentW = isStudent
+                              ? (92 + 12)
+                              : 0.0; // _PointsChip ~92
                           return langW + 10 + studentW + companyW + profileW;
                         }
 
-                        final showWideActions = isDesktop &&
+                        final showWideActions =
+                            isDesktop &&
                             (isLoggedIn
-                                ? (leftW + gapLogoToNav + minNavW + gapNavToActions + rightWForLoggedIn(wide: true) <= barW)
-                                : (leftW + gapLogoToNav + minNavW + gapNavToActions + rightWForGuest(wide: true) <= barW));
+                                ? (leftW +
+                                          gapLogoToNav +
+                                          minNavW +
+                                          gapNavToActions +
+                                          rightWForLoggedIn(wide: true) <=
+                                      barW)
+                                : (leftW +
+                                          gapLogoToNav +
+                                          minNavW +
+                                          gapNavToActions +
+                                          rightWForGuest(wide: true) <=
+                                      barW));
 
                         final langMenu = showWideActions
                             ? languageMenuDesktop
                             : _LanguageMenu(
                                 l10n: l10n,
                                 currentLocale: locale,
-                                onSelected: (next) =>
-                                    unawaited(ref.read(appLocaleProvider.notifier).setLocale(next)),
+                                onSelected: (next) => unawaited(
+                                  ref
+                                      .read(appLocaleProvider.notifier)
+                                      .setLocale(next),
+                                ),
                                 compact: true,
                               );
 
                         return Row(
                           children: [
-                        // Logo + Title (React: logo changes for company)
-                        InkWell(
-                          onTap: () {
-                            _closeMobile();
-                            if (isCompany) {
-                              context.go(Routes.companyDashboard);
-                            } else {
-                              context.go(Routes.home);
-                            }
-                          },
-                          child: Row(
-                            children: [
-                              if (isCompany) ...[
-                                const Icon(Icons.apartment, size: 34, color: Color(0xFF6D28D9)),
-                                const SizedBox(width: 10),
-                                if (showBrandText)
-                                  Text(
-                                    l10n.t(AppText.companyPanel),
-                                    style: const TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w800,
+                            // Logo + Title (React: logo changes for company)
+                            InkWell(
+                              onTap: () {
+                                _closeMobile();
+                                if (isCompany) {
+                                  context.go(Routes.companyDashboard);
+                                } else {
+                                  context.go(Routes.home);
+                                }
+                              },
+                              child: Row(
+                                children: [
+                                  if (isCompany) ...[
+                                    const Icon(
+                                      Icons.apartment,
+                                      size: 34,
                                       color: Color(0xFF6D28D9),
                                     ),
-                                  ),
-                              ] else ...[
-                                Image.asset(
-                                  'assets/logo.png',
-                                  height: 40,
-                                  fit: BoxFit.contain,
-                                  errorBuilder: (_, error, stackTrace) => const Icon(
-                                    Icons.school,
-                                    size: 34,
-                                    color: Color(0xFF6D28D9),
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                if (showBrandText)
-                                  Text(
-                                    l10n.t(AppText.brandName),
-                                    style: const TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w800,
-                                      color: Color(0xFF6D28D9),
+                                    const SizedBox(width: 10),
+                                    if (showBrandText)
+                                      Text(
+                                        l10n.t(AppText.companyPanel),
+                                        style: const TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.w800,
+                                          color: Color(0xFF6D28D9),
+                                        ),
+                                      ),
+                                  ] else ...[
+                                    Image.asset(
+                                      'assets/logo.png',
+                                      height: 40,
+                                      fit: BoxFit.contain,
+                                      errorBuilder: (_, error, stackTrace) =>
+                                          const Icon(
+                                            Icons.school,
+                                            size: 34,
+                                            color: Color(0xFF6D28D9),
+                                          ),
                                     ),
-                                  ),
-                              ]
-                            ],
-                          ),
-                        ),
-
-                        const SizedBox(width: 12),
-
-                        // Desktop menu
-                        if (isDesktop) ...[
-                          Expanded(
-                            child: Align(
-                              alignment: Alignment.center,
-                              child: SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                physics: const ClampingScrollPhysics(),
-                                child: Row(
-                                  children: [
-                                    for (final item in menuItems)
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                                        child: _NavTextLink(
-                                          label: item.label,
-                                          onTap: () {
-                                            _closeMobile();
-                                            context.go(item.path);
-                                          },
+                                    const SizedBox(width: 10),
+                                    if (showBrandText)
+                                      Text(
+                                        l10n.t(AppText.brandName),
+                                        style: const TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.w800,
+                                          color: Color(0xFF6D28D9),
                                         ),
                                       ),
                                   ],
-                                ),
+                                ],
                               ),
                             ),
-                          ),
 
-                          const SizedBox(width: 12),
+                            const SizedBox(width: 12),
 
-                          langMenu,
-                          const SizedBox(width: 10),
-
-                          // Right actions (React-like)
-                          if (isLoading)
-                            const SizedBox(width: 90, height: 36, child: _SkeletonPill())
-                          else if (isLoggedIn) ...[
-                            if (isStudent) ...[
-                              _PointsChip(
-                                future: _pointsFuture,
-                                onTap: () {
-                                  _closeMobile();
-                                  context.go(Routes.pointsSystem);
-                                },
-                              ),
-                              const SizedBox(width: 12),
-                            ], 
-
-                            if (isCompany) ...[
-                              if (showWideActions)
-                                _PrimaryPill(
-                                  label: l10n.t(AppText.newListing),
-                                  maxWidth: 160,
-                                  rounded: 14,
-                                  onTap: () {
-                                    _closeMobile();
-                                    context.go(Routes.companyJobsCreate);
-                                  },
-                                )
-                              else
-                                IconButton(
-                                  tooltip: l10n.t(AppText.newListing),
-                                  onPressed: () {
-                                    _closeMobile();
-                                    context.go(Routes.companyJobsCreate);
-                                  },
-                                  icon: const Icon(Icons.add_circle_outline, color: Color(0xFF6D28D9)),
+                            // Desktop menu
+                            if (isDesktop) ...[
+                              Expanded(
+                                child: Align(
+                                  alignment: Alignment.center,
+                                  child: SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    physics: const ClampingScrollPhysics(),
+                                    child: Row(
+                                      children: [
+                                        for (final item in menuItems)
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 8,
+                                            ),
+                                            child: _NavTextLink(
+                                              label: item.label,
+                                              onTap: () {
+                                                _closeMobile();
+                                                context.go(item.path);
+                                              },
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                  ),
                                 ),
+                              ),
+
                               const SizedBox(width: 12),
+
+                              langMenu,
+                              const SizedBox(width: 10),
+
+                              // Right actions (React-like)
+                              if (isLoading)
+                                const SizedBox(
+                                  width: 90,
+                                  height: 36,
+                                  child: _SkeletonPill(),
+                                )
+                              else if (isLoggedIn) ...[
+                                if (isStudent) ...[
+                                  _PointsChip(
+                                    future: _pointsFuture,
+                                    onTap: () {
+                                      _closeMobile();
+                                      context.go(Routes.pointsSystem);
+                                    },
+                                  ),
+                                  const SizedBox(width: 12),
+                                ],
+
+                                if (isCompany) ...[
+                                  if (showWideActions)
+                                    _PrimaryPill(
+                                      label: l10n.t(AppText.newListing),
+                                      maxWidth: 160,
+                                      rounded: 14,
+                                      onTap: () {
+                                        _closeMobile();
+                                        context.go(Routes.companyJobsCreate);
+                                      },
+                                    )
+                                  else
+                                    IconButton(
+                                      tooltip: l10n.t(AppText.newListing),
+                                      onPressed: () {
+                                        _closeMobile();
+                                        context.go(Routes.companyJobsCreate);
+                                      },
+                                      icon: const Icon(
+                                        Icons.add_circle_outline,
+                                        color: Color(0xFF6D28D9),
+                                      ),
+                                    ),
+                                  const SizedBox(width: 12),
+                                ],
+
+                                _ProfileDropdown(
+                                  userName: userName,
+                                  isCompany: isCompany,
+                                  items: dropdownItems,
+                                  onItemTap: (path) {
+                                    _closeMobile();
+                                    context.go(path);
+                                  },
+                                  // Use controller signOut (type-safe flow)
+                                  onLogout: () => _logout(context),
+                                  compact: !showWideActions,
+                                ),
+                              ] else ...[
+                                if (showWideActions) ...[
+                                  _PrimaryPill(
+                                    label: l10n.t(AppText.companyLogin),
+                                    maxWidth: 160,
+                                    onTap: () {
+                                      _closeMobile();
+                                      context.go(Routes.companyAuth);
+                                    },
+                                  ),
+                                  const SizedBox(width: 10),
+                                  _PrimaryPill(
+                                    label: l10n.t(AppText.studentLogin),
+                                    maxWidth: 160,
+                                    onTap: () {
+                                      _closeMobile();
+                                      context.go(Routes.login);
+                                    },
+                                  ),
+                                  const SizedBox(width: 10),
+                                  _PrimaryPill(
+                                    label: l10n.t(AppText.signUp),
+                                    maxWidth: 160,
+                                    onTap: () {
+                                      _closeMobile();
+                                      context.go(Routes.register);
+                                    },
+                                  ),
+                                ] else
+                                  _LoginMenuPill(
+                                    l10n: l10n,
+                                    onStudent: () {
+                                      _closeMobile();
+                                      context.go(Routes.login);
+                                    },
+                                    onCompany: () {
+                                      _closeMobile();
+                                      context.go(Routes.companyAuth);
+                                    },
+                                    onSignUp: () {
+                                      _closeMobile();
+                                      context.go(Routes.register);
+                                    },
+                                  ),
+                              ],
                             ],
 
-                            _ProfileDropdown(
-                              userName: userName,
-                              isCompany: isCompany,
-                              items: dropdownItems,
-                              onItemTap: (path) {
-                                _closeMobile();
-                                context.go(path);
-                              },
-                              // Use controller signOut (type-safe flow)
-                              onLogout: () => _logout(context),
-                              compact: !showWideActions,
-                            ),
-                          ] else ...[
-                            if (showWideActions) ...[
-                              _PrimaryPill(
-                                label: l10n.t(AppText.companyLogin),
-                                maxWidth: 160,
-                                onTap: () {
-                                  _closeMobile();
-                                  context.go(Routes.companyAuth);
-                                },
-                              ),
-                              const SizedBox(width: 10),
-                              _PrimaryPill(
-                                label: l10n.t(AppText.studentLogin),
-                                maxWidth: 160,
-                                onTap: () {
-                                  _closeMobile();
-                                  context.go(Routes.login);
-                                },
-                              ),
-                              const SizedBox(width: 10),
-                              _PrimaryPill(
-                                label: l10n.t(AppText.signUp),
-                                maxWidth: 160,
-                                onTap: () {
-                                  _closeMobile();
-                                  context.go(Routes.register);
-                                },
-                              ),
-                            ] else
-                              _LoginMenuPill(
-                                l10n: l10n,
-                                onStudent: () {
-                                  _closeMobile();
-                                  context.go(Routes.login);
-                                },
-                                onCompany: () {
-                                  _closeMobile();
-                                  context.go(Routes.companyAuth);
-                                },
-                                onSignUp: () {
-                                  _closeMobile();
-                                  context.go(Routes.register);
-                                },
+                            // Mobile hamburger
+                            if (!isDesktop)
+                              IconButton(
+                                tooltip: _mobileOpen
+                                    ? l10n.t(AppText.close)
+                                    : l10n.t(AppText.menu),
+                                onPressed: () =>
+                                    setState(() => _mobileOpen = !_mobileOpen),
+                                icon: Icon(
+                                  _mobileOpen ? Icons.close : Icons.menu,
+                                ),
                               ),
                           ],
-                        ],
-
-                        // Mobile hamburger
-                        if (!isDesktop)
-                          IconButton(
-                            tooltip: _mobileOpen ? l10n.t(AppText.close) : l10n.t(AppText.menu),
-                            onPressed: () => setState(() => _mobileOpen = !_mobileOpen),
-                            icon: Icon(_mobileOpen ? Icons.close : Icons.menu),
-                          ),
-                      ],
                         );
                       },
                     ),
@@ -531,7 +632,9 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
                     ? Container(
                         width: double.infinity,
                         decoration: const BoxDecoration(
-                          border: Border(top: BorderSide(color: Color(0xFFE5E7EB))),
+                          border: Border(
+                            top: BorderSide(color: Color(0xFFE5E7EB)),
+                          ),
                         ),
                         padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
                         child: Center(
@@ -570,7 +673,10 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
                                   if (isStudent)
                                     _MobileTile(
                                       label: l10n.t(AppText.pointsSystem),
-                                      leading: const Icon(Icons.emoji_events, size: 18),
+                                      leading: const Icon(
+                                        Icons.emoji_events,
+                                        size: 18,
+                                      ),
                                       onTap: () {
                                         _closeMobile();
                                         context.go(Routes.pointsSystem);
@@ -592,7 +698,9 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
 
                                   _MobileHeader(
                                     title: userName,
-                                    badge: isCompany ? l10n.t(AppText.companyBadge) : null,
+                                    badge: isCompany
+                                        ? l10n.t(AppText.companyBadge)
+                                        : null,
                                   ),
 
                                   for (final it in dropdownItems)
@@ -746,8 +854,8 @@ class _PrimaryPillState extends State<_PrimaryPill> {
                 BoxShadow(
                   blurRadius: 10,
                   offset: Offset(0, 6),
-                  color: Color(0x14000000),
-                )
+                  color: Color(0x167C3AED),
+                ),
               ],
             ),
             child: widget.maxWidth == null
@@ -852,7 +960,11 @@ class _ProfileDropdown extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(isCompany ? Icons.apartment : Icons.person, size: 18, color: const Color(0xFF374151)),
+          Icon(
+            isCompany ? Icons.apartment : Icons.person,
+            size: 18,
+            color: const Color(0xFF374151),
+          ),
           if (!compact) ...[
             const SizedBox(width: 8),
             ConstrainedBox(
@@ -861,7 +973,11 @@ class _ProfileDropdown extends StatelessWidget {
                 userName,
                 overflow: TextOverflow.ellipsis,
                 softWrap: false,
-                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Color(0xFF374151)),
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                  color: Color(0xFF374151),
+                ),
               ),
             ),
             if (isCompany) ...[
@@ -874,7 +990,11 @@ class _ProfileDropdown extends StatelessWidget {
                 ),
                 child: Text(
                   l10n.t(AppText.companyBadge),
-                  style: const TextStyle(color: Color(0xFF6D28D9), fontSize: 11, fontWeight: FontWeight.w700),
+                  style: const TextStyle(
+                    color: Color(0xFF6D28D9),
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
             ],
@@ -936,7 +1056,10 @@ class _LanguageMenu extends StatelessWidget {
             const SizedBox(width: 6),
             Text(
               compact ? current.code.toUpperCase() : current.nativeName,
-              style: const TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF374151)),
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF374151),
+              ),
             ),
             const SizedBox(width: 4),
             const Icon(Icons.expand_more, size: 16, color: Color(0xFF6B7280)),
@@ -1002,8 +1125,8 @@ class _LoginMenuPill extends StatelessWidget {
             BoxShadow(
               blurRadius: 10,
               offset: Offset(0, 6),
-              color: Color(0x14000000),
-            )
+              color: Color(0x167C3AED),
+            ),
           ],
         ),
         child: Row(
@@ -1014,7 +1137,11 @@ class _LoginMenuPill extends StatelessWidget {
             Text(
               l10n.t(AppText.login),
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 13),
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w800,
+                fontSize: 13,
+              ),
             ),
             const SizedBox(width: 6),
             const Icon(Icons.expand_more, size: 16, color: Color(0xDDFFFFFF)),
@@ -1060,7 +1187,10 @@ class _MobileTile extends StatelessWidget {
             if (leading != null) ...[leading!, const SizedBox(width: 8)],
             Text(
               label,
-              style: const TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF374151)),
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF374151),
+              ),
             ),
           ],
         ),
@@ -1100,7 +1230,10 @@ class _MobileDanger extends StatelessWidget {
         child: Center(
           child: Text(
             label,
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w800,
+            ),
           ),
         ),
       ),
@@ -1120,7 +1253,13 @@ class _MobileHeader extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(title, style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF6D28D9))),
+          Text(
+            title,
+            style: const TextStyle(
+              fontWeight: FontWeight.w800,
+              color: Color(0xFF6D28D9),
+            ),
+          ),
           if (badge != null) ...[
             const SizedBox(width: 8),
             Container(
@@ -1131,9 +1270,13 @@ class _MobileHeader extends StatelessWidget {
               ),
               child: Text(
                 badge!,
-                style: const TextStyle(color: Color(0xFF6D28D9), fontSize: 11, fontWeight: FontWeight.w800),
+                style: const TextStyle(
+                  color: Color(0xFF6D28D9),
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
-            )
+            ),
           ],
         ],
       ),

@@ -12,10 +12,7 @@ class AuthRepository {
 
   Stream<AuthState> authStateChanges() => _client.auth.onAuthStateChange;
 
-  Future<User> signIn({
-    required String email,
-    required String password,
-  }) async {
+  Future<User> signIn({required String email, required String password}) async {
     final res = await _client.auth.signInWithPassword(
       email: email,
       password: password,
@@ -82,10 +79,7 @@ class AuthRepository {
   }
 
   Future<void> resendSignupOtp({required String email}) async {
-    await _client.auth.resend(
-      type: OtpType.signup,
-      email: email,
-    );
+    await _client.auth.resend(type: OtpType.signup, email: email);
   }
 
   Future<void> upsertStudentProfile({
@@ -124,5 +118,4 @@ class AuthRepository {
   Future<void> resendSignupVerificationEmail(String email) async {
     await _client.auth.resend(type: OtpType.signup, email: email);
   }
-
 }

@@ -10,21 +10,22 @@ final applicationsRepositoryProvider = Provider<ApplicationsRepository>((ref) {
 
 String? _uid(Ref ref) => ref.read(authViewStateProvider).value?.user?.id;
 
-final myApplicationsBundleProvider = FutureProvider.autoDispose<ApplicationsBundle>((ref) async {
-  final uid = _uid(ref);
-  if (uid == null || uid.isEmpty) return ApplicationsBundle.empty();
+final myApplicationsBundleProvider =
+    FutureProvider.autoDispose<ApplicationsBundle>((ref) async {
+      final uid = _uid(ref);
+      if (uid == null || uid.isEmpty) return ApplicationsBundle.empty();
 
-  final repo = ref.read(applicationsRepositoryProvider);
+      final repo = ref.read(applicationsRepositoryProvider);
 
-  final results = await Future.wait<List<ApplicationListItem>>([
-    repo.fetchMyJobApplications(userId: uid),
-    repo.fetchMyInternshipApplications(userId: uid),
-    repo.fetchMyCourseApplications(userId: uid),
-  ]);
+      final results = await Future.wait<List<ApplicationListItem>>([
+        repo.fetchMyJobApplications(userId: uid),
+        repo.fetchMyInternshipApplications(userId: uid),
+        repo.fetchMyCourseApplications(userId: uid),
+      ]);
 
-  return ApplicationsBundle(
-    jobs: results[0],
-    internships: results[1],
-    courses: results[2],
-  );
-});
+      return ApplicationsBundle(
+        jobs: results[0],
+        internships: results[1],
+        courses: results[2],
+      );
+    });

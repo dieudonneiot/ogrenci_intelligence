@@ -34,90 +34,143 @@ class PrivacyPolicyScreen extends StatelessWidget {
                         'Öğrenci Intelligence olarak, kullanıcılarımızın gizliliğini korumak en önemli önceliklerimizden biridir. Bu gizlilik politikası, kişisel verilerinizin nasıl toplandığını, kullanıldığını, saklandığını ve korunduğunu açıklar.',
                       ),
                       SizedBox(height: 18),
-                      _SectionTitle(icon: Icons.storage_outlined, title: 'Toplanan Bilgiler'),
+                      _SectionTitle(
+                        icon: Icons.storage_outlined,
+                        title: 'Toplanan Bilgiler',
+                      ),
                       _SubTitle('Kayıt Bilgileri'),
-                      _BulletList(items: [
-                        'Ad ve soyad',
-                        'E-posta adresi',
-                        'Telefon numarası (isteğe bağlı)',
-                        'Üniversite ve bölüm bilgisi',
-                        'Mezuniyet yılı',
-                      ]),
+                      _BulletList(
+                        items: [
+                          'Ad ve soyad',
+                          'E-posta adresi',
+                          'Telefon numarası (isteğe bağlı)',
+                          'Üniversite ve bölüm bilgisi',
+                          'Mezuniyet yılı',
+                        ],
+                      ),
                       SizedBox(height: 12),
                       _SubTitle('Kullanım Verileri'),
-                      _BulletList(items: [
-                        'Platform üzerindeki aktiviteleriniz',
-                        'Tamamladığınız kurslar',
-                        'Başvurduğunuz iş ve staj ilanları',
-                        'Kazandığınız puanlar ve rozetler',
-                      ]),
+                      _BulletList(
+                        items: [
+                          'Platform üzerindeki aktiviteleriniz',
+                          'Tamamladığınız kurslar',
+                          'Başvurduğunuz iş ve staj ilanları',
+                          'Kazandığınız puanlar ve rozetler',
+                        ],
+                      ),
                       SizedBox(height: 12),
                       _SubTitle('Teknik Bilgiler'),
-                      _BulletList(items: [
-                        'IP adresi',
-                        'Tarayıcı türü ve versiyonu',
-                        'İşletim sistemi',
-                        'Ziyaret tarihi ve saati',
-                      ]),
+                      _BulletList(
+                        items: [
+                          'IP adresi',
+                          'Tarayıcı türü ve versiyonu',
+                          'İşletim sistemi',
+                          'Ziyaret tarihi ve saati',
+                        ],
+                      ),
                       SizedBox(height: 18),
-                      _SectionTitle(icon: Icons.visibility_outlined, title: 'Bilgilerin Kullanımı'),
-                      _Paragraph('Topladığımız bilgileri şu amaçlarla kullanırız:'),
-                      _BulletList(items: [
-                        'Size daha iyi bir kullanıcı deneyimi sunmak',
-                        'İlgi alanlarınıza uygun kurs ve iş önerileri yapmak',
-                        'Platform güvenliğini sağlamak',
-                        'İstatistiksel analizler yapmak',
-                        'Yasal yükümlülüklerimizi yerine getirmek',
-                        'Size bilgilendirme e-postaları göndermek (izninizle)',
-                      ]),
+                      _SectionTitle(
+                        icon: Icons.visibility_outlined,
+                        title: 'Bilgilerin Kullanımı',
+                      ),
+                      _Paragraph(
+                        'Topladığımız bilgileri şu amaçlarla kullanırız:',
+                      ),
+                      _BulletList(
+                        items: [
+                          'Size daha iyi bir kullanıcı deneyimi sunmak',
+                          'İlgi alanlarınıza uygun kurs ve iş önerileri yapmak',
+                          'Platform güvenliğini sağlamak',
+                          'İstatistiksel analizler yapmak',
+                          'Yasal yükümlülüklerimizi yerine getirmek',
+                          'Size bilgilendirme e-postaları göndermek (izninizle)',
+                        ],
+                      ),
                       SizedBox(height: 18),
-                      _SectionTitle(icon: Icons.lock_outline, title: 'Bilgi Güvenliği'),
-                      _Paragraph('Kişisel verilerinizin güvenliği için aşağıdaki önlemleri alıyoruz:'),
+                      _SectionTitle(
+                        icon: Icons.lock_outline,
+                        title: 'Bilgi Güvenliği',
+                      ),
+                      _Paragraph(
+                        'Kişisel verilerinizin güvenliği için aşağıdaki önlemleri alıyoruz:',
+                      ),
                       SizedBox(height: 8),
-                      _HighlightBox(items: [
-                        'SSL şifreleme teknolojisi',
-                        'Güvenli veri merkezleri',
-                        'Düzenli güvenlik testleri',
-                        'Sınırlı erişim yetkileri',
-                        'KVKK uyumlu veri işleme',
-                      ]),
+                      _HighlightBox(
+                        items: [
+                          'SSL şifreleme teknolojisi',
+                          'Güvenli veri merkezleri',
+                          'Düzenli güvenlik testleri',
+                          'Sınırlı erişim yetkileri',
+                          'KVKK uyumlu veri işleme',
+                        ],
+                      ),
                       SizedBox(height: 18),
-                      _SectionTitle(icon: Icons.verified_user_outlined, title: 'Üçüncü Taraflarla Paylaşım'),
-                      _Paragraph('Kişisel verilerinizi aşağıdaki durumlar dışında üçüncü taraflarla paylaşmayız:'),
-                      _BulletList(items: [
-                        'Açık izniniz olması durumunda',
-                        'Yasal zorunluluklar gerektiğinde',
-                        'Başvurduğunuz işveren firmalara (sadece başvuru bilgileri)',
-                        'Hizmet sağlayıcılarımıza (gizlilik sözleşmesi kapsamında)',
-                      ]),
+                      _SectionTitle(
+                        icon: Icons.verified_user_outlined,
+                        title: 'Üçüncü Taraflarla Paylaşım',
+                      ),
+                      _Paragraph(
+                        'Kişisel verilerinizi aşağıdaki durumlar dışında üçüncü taraflarla paylaşmayız:',
+                      ),
+                      _BulletList(
+                        items: [
+                          'Açık izniniz olması durumunda',
+                          'Yasal zorunluluklar gerektiğinde',
+                          'Başvurduğunuz işveren firmalara (sadece başvuru bilgileri)',
+                          'Hizmet sağlayıcılarımıza (gizlilik sözleşmesi kapsamında)',
+                        ],
+                      ),
                       SizedBox(height: 18),
                       _SectionTitle(title: 'Çerezler (Cookies)'),
-                      _Paragraph('Platformumuzda kullanıcı deneyimini iyileştirmek için çerezler kullanıyoruz:'),
+                      _Paragraph(
+                        'Platformumuzda kullanıcı deneyimini iyileştirmek için çerezler kullanıyoruz:',
+                      ),
                       SizedBox(height: 8),
-                      _MiniCard(title: 'Zorunlu Çerezler', subtitle: 'Platform işlevselliği için gerekli'),
-                      _MiniCard(title: 'Analitik Çerezler', subtitle: 'Kullanım istatistikleri için'),
-                      _MiniCard(title: 'Tercih Çerezleri', subtitle: 'Kişiselleştirilmiş deneyim için'),
+                      _MiniCard(
+                        title: 'Zorunlu Çerezler',
+                        subtitle: 'Platform işlevselliği için gerekli',
+                      ),
+                      _MiniCard(
+                        title: 'Analitik Çerezler',
+                        subtitle: 'Kullanım istatistikleri için',
+                      ),
+                      _MiniCard(
+                        title: 'Tercih Çerezleri',
+                        subtitle: 'Kişiselleştirilmiş deneyim için',
+                      ),
                       SizedBox(height: 18),
                       _SectionTitle(title: 'Haklarınız'),
-                      _Paragraph('KVKK kapsamında aşağıdaki haklara sahipsiniz:'),
-                      _BulletList(items: [
-                        'Kişisel verilerinizin işlenip işlenmediğini öğrenme',
-                        'İşlenen verileriniz hakkında bilgi talep etme',
-                        'İşleme amacını ve amacına uygun kullanılıp kullanılmadığını öğrenme',
-                        'Yanlış verilerin düzeltilmesini isteme',
-                        'Verilerinizin silinmesini veya yok edilmesini isteme',
-                        'İşlenen verilerin aktarıldığı üçüncü kişileri bilme',
-                      ]),
+                      _Paragraph(
+                        'KVKK kapsamında aşağıdaki haklara sahipsiniz:',
+                      ),
+                      _BulletList(
+                        items: [
+                          'Kişisel verilerinizin işlenip işlenmediğini öğrenme',
+                          'İşlenen verileriniz hakkında bilgi talep etme',
+                          'İşleme amacını ve amacına uygun kullanılıp kullanılmadığını öğrenme',
+                          'Yanlış verilerin düzeltilmesini isteme',
+                          'Verilerinizin silinmesini veya yok edilmesini isteme',
+                          'İşlenen verilerin aktarıldığı üçüncü kişileri bilme',
+                        ],
+                      ),
                       SizedBox(height: 18),
-                      _SectionTitle(icon: Icons.info_outline, title: 'İletişim'),
-                      _Paragraph('Gizlilik politikamız hakkında sorularınız için bizimle iletişime geçebilirsiniz:'),
+                      _SectionTitle(
+                        icon: Icons.info_outline,
+                        title: 'İletişim',
+                      ),
+                      _Paragraph(
+                        'Gizlilik politikamız hakkında sorularınız için bizimle iletişime geçebilirsiniz:',
+                      ),
                       _ContactBox(),
                       SizedBox(height: 18),
                       Divider(),
                       SizedBox(height: 8),
                       Text(
                         'Bu gizlilik politikası zaman zaman güncellenebilir. Önemli değişiklikler olması durumunda size e-posta veya platform üzerinden bildirim yapılacaktır.',
-                        style: TextStyle(color: Color(0xFF6B7280), fontSize: 12),
+                        style: TextStyle(
+                          color: Color(0xFF6B7280),
+                          fontSize: 12,
+                        ),
                       ),
                     ],
                   ),
@@ -138,7 +191,9 @@ class _Hero extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final lastUpdated = DateTime(2026, 2, 2);
-    final dateText = MaterialLocalizations.of(context).formatFullDate(lastUpdated);
+    final dateText = MaterialLocalizations.of(
+      context,
+    ).formatFullDate(lastUpdated);
     return Container(
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
@@ -151,17 +206,30 @@ class _Hero extends StatelessWidget {
           const CircleAvatar(
             radius: 28,
             backgroundColor: Color(0xFFEDE9FE),
-            child: Icon(Icons.shield_outlined, color: Color(0xFF6D28D9), size: 28),
+            child: Icon(
+              Icons.shield_outlined,
+              color: Color(0xFF6D28D9),
+              size: 28,
+            ),
           ),
           const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(l10n.t(AppText.linkPrivacy),
-                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Color(0xFF111827))),
+                Text(
+                  l10n.t(AppText.linkPrivacy),
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w900,
+                    color: Color(0xFF1F2937),
+                  ),
+                ),
                 const SizedBox(height: 4),
-                Text(l10n.legalLastUpdated(dateText), style: const TextStyle(color: Color(0xFF6B7280))),
+                Text(
+                  l10n.legalLastUpdated(dateText),
+                  style: const TextStyle(color: Color(0xFF6B7280)),
+                ),
               ],
             ),
           ),
@@ -191,7 +259,13 @@ class _NoticeCard extends StatelessWidget {
           const Icon(Icons.info_outline, color: Color(0xFFB45309)),
           const SizedBox(width: 10),
           Expanded(
-            child: Text(text, style: const TextStyle(color: Color(0xFF92400E), fontWeight: FontWeight.w600)),
+            child: Text(
+              text,
+              style: const TextStyle(
+                color: Color(0xFF92400E),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
         ],
       ),
@@ -239,7 +313,13 @@ class _Chip extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(999),
       ),
-      child: Text(label, style: const TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF6D28D9))),
+      child: Text(
+        label,
+        style: const TextStyle(
+          fontWeight: FontWeight.w600,
+          color: Color(0xFF6D28D9),
+        ),
+      ),
     );
   }
 }
@@ -277,7 +357,10 @@ class _SectionTitle extends StatelessWidget {
           Icon(icon, color: const Color(0xFF6D28D9)),
           const SizedBox(width: 8),
         ],
-        Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
+        Text(
+          title,
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
+        ),
       ],
     );
   }
@@ -304,7 +387,10 @@ class _Paragraph extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(text, style: const TextStyle(color: Color(0xFF6B7280), height: 1.5));
+    return Text(
+      text,
+      style: const TextStyle(color: Color(0xFF6B7280), height: 1.5),
+    );
   }
 }
 
@@ -324,7 +410,12 @@ class _BulletList extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text('• ', style: TextStyle(color: Color(0xFF6B7280))),
-                  Expanded(child: Text(item, style: const TextStyle(color: Color(0xFF6B7280)))),
+                  Expanded(
+                    child: Text(
+                      item,
+                      style: const TextStyle(color: Color(0xFF6B7280)),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -356,11 +447,20 @@ class _HighlightBox extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.check_circle, size: 16, color: Color(0xFF7C3AED)),
+                  const Icon(
+                    Icons.check_circle,
+                    size: 16,
+                    color: Color(0xFF7C3AED),
+                  ),
                   const SizedBox(width: 6),
                   Expanded(
-                    child: Text(item,
-                        style: const TextStyle(color: Color(0xFF4C1D95), fontWeight: FontWeight.w600)),
+                    child: Text(
+                      item,
+                      style: const TextStyle(
+                        color: Color(0xFF4C1D95),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -391,7 +491,10 @@ class _MiniCard extends StatelessWidget {
         children: [
           Text(title, style: const TextStyle(fontWeight: FontWeight.w800)),
           const SizedBox(height: 4),
-          Text(subtitle, style: const TextStyle(color: Color(0xFF6B7280), fontSize: 12)),
+          Text(
+            subtitle,
+            style: const TextStyle(color: Color(0xFF6B7280), fontSize: 12),
+          ),
         ],
       ),
     );
@@ -414,14 +517,20 @@ class _ContactBox extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('${l10n.t(AppText.contactEmailTitle)}: privacy@ogrenciintelligence.com',
-              style: const TextStyle(color: Color(0xFF374151))),
+          Text(
+            '${l10n.t(AppText.contactEmailTitle)}: privacy@ogrenciintelligence.com',
+            style: const TextStyle(color: Color(0xFF374151)),
+          ),
           const SizedBox(height: 4),
-          Text('${l10n.t(AppText.contactPhoneTitle)}: +90 (212) 345 67 89',
-              style: const TextStyle(color: Color(0xFF374151))),
+          Text(
+            '${l10n.t(AppText.contactPhoneTitle)}: +90 (212) 345 67 89',
+            style: const TextStyle(color: Color(0xFF374151)),
+          ),
           const SizedBox(height: 4),
-          Text('${l10n.t(AppText.contactAddressTitle)}: Teknokent, İnovasyon Cad. No:123, Beşiktaş, İstanbul',
-              style: const TextStyle(color: Color(0xFF374151))),
+          Text(
+            '${l10n.t(AppText.contactAddressTitle)}: Teknokent, İnovasyon Cad. No:123, Beşiktaş, İstanbul',
+            style: const TextStyle(color: Color(0xFF374151)),
+          ),
         ],
       ),
     );

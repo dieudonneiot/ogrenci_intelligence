@@ -4,11 +4,14 @@ import '../../auth/presentation/controllers/auth_controller.dart';
 import '../data/oi_repository.dart';
 import '../domain/oi_models.dart';
 
-final oiRepositoryProvider = Provider<OiRepository>((ref) => const OiRepository());
-
-final myOiProfileProvider = AutoDisposeAsyncNotifierProvider<MyOiProfileController, OiProfile>(
-  MyOiProfileController.new,
+final oiRepositoryProvider = Provider<OiRepository>(
+  (ref) => const OiRepository(),
 );
+
+final myOiProfileProvider =
+    AutoDisposeAsyncNotifierProvider<MyOiProfileController, OiProfile>(
+      MyOiProfileController.new,
+    );
 
 class MyOiProfileController extends AutoDisposeAsyncNotifier<OiProfile> {
   @override
@@ -28,4 +31,3 @@ class MyOiProfileController extends AutoDisposeAsyncNotifier<OiProfile> {
     state = await AsyncValue.guard(build);
   }
 }
-

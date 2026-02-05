@@ -28,9 +28,18 @@ class AboutScreen extends StatelessWidget {
     ];
 
     final stats = <_StatCard>[
-      _StatCard(number: '10.000+', label: l10n.t(AppText.aboutStatActiveStudents)),
-      _StatCard(number: '500+', label: l10n.t(AppText.aboutStatPartnerCompanies)),
-      _StatCard(number: '1.000+', label: l10n.t(AppText.aboutStatInternshipOpportunities)),
+      _StatCard(
+        number: '10.000+',
+        label: l10n.t(AppText.aboutStatActiveStudents),
+      ),
+      _StatCard(
+        number: '500+',
+        label: l10n.t(AppText.aboutStatPartnerCompanies),
+      ),
+      _StatCard(
+        number: '1.000+',
+        label: l10n.t(AppText.aboutStatInternshipOpportunities),
+      ),
       _StatCard(number: '50+', label: l10n.t(AppText.aboutStatOnlineCourses)),
     ];
 
@@ -63,13 +72,17 @@ class AboutScreen extends StatelessWidget {
                 LayoutBuilder(
                   builder: (context, c) {
                     final crossAxis = c.maxWidth < 820 ? 1 : 3;
-                    final width = (c.maxWidth - (crossAxis - 1) * 16) / crossAxis;
+                    final width =
+                        (c.maxWidth - (crossAxis - 1) * 16) / crossAxis;
                     return Wrap(
                       spacing: 16,
                       runSpacing: 16,
                       children: [
                         for (final value in values)
-                          SizedBox(width: width, child: _ValueCardView(card: value)),
+                          SizedBox(
+                            width: width,
+                            child: _ValueCardView(card: value),
+                          ),
                       ],
                     );
                   },
@@ -103,7 +116,11 @@ class _Hero extends StatelessWidget {
         ),
         borderRadius: BorderRadius.circular(24),
         boxShadow: const [
-          BoxShadow(color: Color(0x26000000), blurRadius: 20, offset: Offset(0, 10)),
+          BoxShadow(
+            color: Color(0x26000000),
+            blurRadius: 20,
+            offset: Offset(0, 10),
+          ),
         ],
       ),
       child: Stack(
@@ -111,19 +128,29 @@ class _Hero extends StatelessWidget {
           Positioned(
             right: -40,
             top: -30,
-            child: _GlowCircle(color: Colors.white.withValues(alpha: 0.12), size: 140),
+            child: _GlowCircle(
+              color: Colors.white.withValues(alpha: 0.12),
+              size: 140,
+            ),
           ),
           Positioned(
             left: -30,
             bottom: -30,
-            child: _GlowCircle(color: Colors.white.withValues(alpha: 0.10), size: 120),
+            child: _GlowCircle(
+              color: Colors.white.withValues(alpha: 0.10),
+              size: 120,
+            ),
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 l10n.t(AppText.aboutHeroTitle),
-                style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w900, color: Colors.white),
+                style: const TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.w900,
+                  color: Colors.white,
+                ),
               ),
               const SizedBox(height: 10),
               Text(
@@ -167,7 +194,13 @@ class _StoryCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 16, offset: Offset(0, 8))],
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0A000000),
+            blurRadius: 16,
+            offset: Offset(0, 8),
+          ),
+        ],
       ),
       child: LayoutBuilder(
         builder: (context, c) {
@@ -201,7 +234,10 @@ class _StoryText extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(l10n.t(AppText.aboutStoryTitle), style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900)),
+        Text(
+          l10n.t(AppText.aboutStoryTitle),
+          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900),
+        ),
         const SizedBox(height: 12),
         Text(
           l10n.t(AppText.aboutStoryP1),
@@ -232,7 +268,9 @@ class _StatsPanel extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: [Color(0xFFEDE9FE), Color(0xFFE0E7FF)]),
+        gradient: const LinearGradient(
+          colors: [Color(0xFFEDE9FE), Color(0xFFE0E7FF)],
+        ),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Wrap(
@@ -257,7 +295,14 @@ class _SectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(title, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w900, color: Color(0xFF111827))),
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 26,
+            fontWeight: FontWeight.w900,
+            color: Color(0xFF1F2937),
+          ),
+        ),
         const SizedBox(height: 6),
         Text(subtitle, style: const TextStyle(color: Color(0xFF6B7280))),
       ],
@@ -266,7 +311,11 @@ class _SectionHeader extends StatelessWidget {
 }
 
 class _ValueCard {
-  const _ValueCard({required this.icon, required this.title, required this.description});
+  const _ValueCard({
+    required this.icon,
+    required this.title,
+    required this.description,
+  });
 
   final IconData icon;
   final String title;
@@ -301,8 +350,11 @@ class _ValueCardView extends StatelessWidget {
           const SizedBox(height: 12),
           Text(card.title, style: const TextStyle(fontWeight: FontWeight.w800)),
           const SizedBox(height: 8),
-          Text(card.description, textAlign: TextAlign.center,
-              style: const TextStyle(color: Color(0xFF6B7280), height: 1.4)),
+          Text(
+            card.description,
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: Color(0xFF6B7280), height: 1.4),
+          ),
         ],
       ),
     );
@@ -325,9 +377,19 @@ class _StatCardView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(card.number, style: const TextStyle(fontWeight: FontWeight.w900, color: Color(0xFF6D28D9))),
+        Text(
+          card.number,
+          style: const TextStyle(
+            fontWeight: FontWeight.w900,
+            color: Color(0xFF6D28D9),
+          ),
+        ),
         const SizedBox(height: 4),
-        Text(card.label, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFF374151))),
+        Text(
+          card.label,
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: Color(0xFF374151)),
+        ),
       ],
     );
   }
@@ -349,7 +411,10 @@ class _TeamSection extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Text(l10n.t(AppText.aboutTeamTitle), style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900)),
+          Text(
+            l10n.t(AppText.aboutTeamTitle),
+            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900),
+          ),
           const SizedBox(height: 10),
           Text(
             l10n.t(AppText.aboutTeamSubtitle),
@@ -369,10 +434,22 @@ class _TeamSection extends StatelessWidget {
                     width: width,
                     child: Column(
                       children: [
-                        const CircleAvatar(radius: 38, backgroundColor: Color(0xFFC4B5FD)),
+                        const CircleAvatar(
+                          radius: 38,
+                          backgroundColor: Color(0xFFC4B5FD),
+                        ),
                         const SizedBox(height: 8),
-                        Text(l10n.t(AppText.aboutTeamMember), style: const TextStyle(fontWeight: FontWeight.w700)),
-                        Text(roles[index], style: const TextStyle(color: Color(0xFF6B7280), fontSize: 12)),
+                        Text(
+                          l10n.t(AppText.aboutTeamMember),
+                          style: const TextStyle(fontWeight: FontWeight.w700),
+                        ),
+                        Text(
+                          roles[index],
+                          style: const TextStyle(
+                            color: Color(0xFF6B7280),
+                            fontSize: 12,
+                          ),
+                        ),
                       ],
                     ),
                   );
@@ -401,7 +478,10 @@ class _WhyUsSection extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Text(l10n.t(AppText.aboutWhyTitle), style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900)),
+          Text(
+            l10n.t(AppText.aboutWhyTitle),
+            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900),
+          ),
           const SizedBox(height: 16),
           LayoutBuilder(
             builder: (context, c) {
@@ -454,7 +534,11 @@ class _WhyUsSection extends StatelessWidget {
 }
 
 class _WhyItem extends StatelessWidget {
-  const _WhyItem({required this.icon, required this.title, required this.description});
+  const _WhyItem({
+    required this.icon,
+    required this.title,
+    required this.description,
+  });
 
   final IconData icon;
   final String title;
@@ -473,7 +557,10 @@ class _WhyItem extends StatelessWidget {
             children: [
               Text(title, style: const TextStyle(fontWeight: FontWeight.w800)),
               const SizedBox(height: 6),
-              Text(description, style: const TextStyle(color: Color(0xFF6B7280), height: 1.4)),
+              Text(
+                description,
+                style: const TextStyle(color: Color(0xFF6B7280), height: 1.4),
+              ),
             ],
           ),
         ),

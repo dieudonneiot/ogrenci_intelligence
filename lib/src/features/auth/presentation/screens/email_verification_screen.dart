@@ -21,7 +21,8 @@ class EmailVerificationScreen extends ConsumerStatefulWidget {
       _EmailVerificationScreenState();
 }
 
-class _EmailVerificationScreenState extends ConsumerState<EmailVerificationScreen> {
+class _EmailVerificationScreenState
+    extends ConsumerState<EmailVerificationScreen> {
   Timer? _timer;
   int _countdown = 0;
 
@@ -156,13 +157,17 @@ class _EmailVerificationScreenState extends ConsumerState<EmailVerificationScree
                         width: 84,
                         height: 84,
                         decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.secondaryContainer,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.secondaryContainer,
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
                           Icons.mail_outline,
                           size: 42,
-                          color: Theme.of(context).colorScheme.onSecondaryContainer,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSecondaryContainer,
                         ),
                       ),
                     ),
@@ -170,9 +175,8 @@ class _EmailVerificationScreenState extends ConsumerState<EmailVerificationScree
                     Text(
                       l10n.t(AppText.authEmailVerificationPending),
                       textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                            fontWeight: FontWeight.w700,
-                          ),
+                      style: Theme.of(context).textTheme.headlineSmall
+                          ?.copyWith(fontWeight: FontWeight.w700),
                     ),
                     const SizedBox(height: 8),
                     Text(
@@ -192,8 +196,8 @@ class _EmailVerificationScreenState extends ConsumerState<EmailVerificationScree
                         l10n.authVerificationSentTo(email),
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
 
@@ -235,7 +239,9 @@ class _EmailVerificationScreenState extends ConsumerState<EmailVerificationScree
                     const SizedBox(height: 10),
 
                     OutlinedButton.icon(
-                      onPressed: (_resending || _countdown > 0) ? null : _resend,
+                      onPressed: (_resending || _countdown > 0)
+                          ? null
+                          : _resend,
                       icon: _resending
                           ? const SizedBox(
                               width: 18,
@@ -247,8 +253,8 @@ class _EmailVerificationScreenState extends ConsumerState<EmailVerificationScree
                         _resending
                             ? l10n.t(AppText.commonSending)
                             : _countdown > 0
-                                ? l10n.commonResendCountdown(_countdown)
-                                : l10n.t(AppText.authResendEmail),
+                            ? l10n.commonResendCountdown(_countdown)
+                            : l10n.t(AppText.authResendEmail),
                       ),
                     ),
 
@@ -259,7 +265,9 @@ class _EmailVerificationScreenState extends ConsumerState<EmailVerificationScree
                       decoration: BoxDecoration(
                         color: Colors.amber.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.amber.withValues(alpha: 0.35)),
+                        border: Border.all(
+                          color: Colors.amber.withValues(alpha: 0.35),
+                        ),
                       ),
                       child: Text(
                         l10n.t(AppText.authDidNotReceive),
@@ -326,11 +334,12 @@ class _StepTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title,
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleSmall
-                        ?.copyWith(fontWeight: FontWeight.w700)),
+                Text(
+                  title,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+                ),
                 const SizedBox(height: 2),
                 Text(subtitle, style: Theme.of(context).textTheme.bodySmall),
               ],

@@ -11,10 +11,14 @@ final jobsRepositoryProvider = Provider<JobsRepository>((ref) {
 
 String? _uid(Ref ref) => ref.read(authViewStateProvider).value?.user?.id;
 
-final jobFiltersProvider = StateProvider<JobFilters>((ref) => const JobFilters());
+final jobFiltersProvider = StateProvider<JobFilters>(
+  (ref) => const JobFilters(),
+);
 
 final jobsListProvider =
-    AutoDisposeAsyncNotifierProvider<JobsListController, JobsListVm>(JobsListController.new);
+    AutoDisposeAsyncNotifierProvider<JobsListController, JobsListVm>(
+      JobsListController.new,
+    );
 
 class JobsListController extends AutoDisposeAsyncNotifier<JobsListVm> {
   @override
@@ -27,7 +31,10 @@ class JobsListController extends AutoDisposeAsyncNotifier<JobsListVm> {
     // Load list + favorites in parallel (favorites only if authed)
     final futures = await Future.wait([
       repo.fetchJobs(filters: filters),
-      if (uid != null && uid.isNotEmpty) repo.fetchMyFavoriteJobIds(userId: uid) else Future.value(<String>{}),
+      if (uid != null && uid.isNotEmpty)
+        repo.fetchMyFavoriteJobIds(userId: uid)
+      else
+        Future.value(<String>{}),
     ]);
 
     final items = futures[0] as List<JobSummary>;
@@ -80,11 +87,15 @@ class JobsListController extends AutoDisposeAsyncNotifier<JobsListVm> {
   }
 }
 
-final jobDetailProvider = AutoDisposeAsyncNotifierProviderFamily<JobDetailController, JobDetailVm, String>(
-  JobDetailController.new,
-);
+final jobDetailProvider =
+    AutoDisposeAsyncNotifierProviderFamily<
+      JobDetailController,
+      JobDetailVm,
+      String
+    >(JobDetailController.new);
 
-class JobDetailController extends AutoDisposeFamilyAsyncNotifier<JobDetailVm, String> {
+class JobDetailController
+    extends AutoDisposeFamilyAsyncNotifier<JobDetailVm, String> {
   @override
   Future<JobDetailVm> build(String jobId) async {
     final uid = _uid(ref);
@@ -174,7 +185,9 @@ final jobsFiltersProvider = StateProvider.autoDispose<JobsFilters>((ref) {
 });
 
 final jobsProvider =
-    AutoDisposeAsyncNotifierProvider<JobsController, JobsViewModel>(JobsController.new);
+    AutoDisposeAsyncNotifierProvider<JobsController, JobsViewModel>(
+      JobsController.new,
+    );
 
 class JobsController extends AutoDisposeAsyncNotifier<JobsViewModel> {
   @override
@@ -194,15 +207,15 @@ class JobsController extends AutoDisposeAsyncNotifier<JobsViewModel> {
       repo.fetchMyJobApplicationStatuses(userId: uid),
       // Fit context (best effort; keep jobs usable even if missing tables)
       (() async => await SupabaseService.client
-              .from('profiles')
-              .select('department,year')
-              .eq('id', uid)
-              .maybeSingle())(),
+          .from('profiles')
+          .select('department,year')
+          .eq('id', uid)
+          .maybeSingle())(),
       (() async => await SupabaseService.client
-              .from('oi_scores')
-              .select('oi_score')
-              .eq('user_id', uid)
-              .maybeSingle())(),
+          .from('oi_scores')
+          .select('oi_score')
+          .eq('user_id', uid)
+          .maybeSingle())(),
     ]);
 
     final jobs = futures[0] as List<Job>;
@@ -260,39 +273,45 @@ class JobsController extends AutoDisposeAsyncNotifier<JobsViewModel> {
       return score.clamp(0, 100);
     }
 
-    final scoredJobs = jobs
-        .map((j) => j.copyWith(compatibility: scoreJob(j)))
-        .toList(growable: false)
-      ..sort((a, b) => b.compatibility.compareTo(a.compatibility));
+    final scoredJobs =
+        jobs
+            .map((j) => j.copyWith(compatibility: scoreJob(j)))
+            .toList(growable: false)
+          ..sort((a, b) => b.compatibility.compareTo(a.compatibility));
 
-    final departments = scoredJobs
-        .map((j) => j.department.trim())
-        .where((s) => s.isNotEmpty)
-        .toSet()
-        .toList()
-      ..sort();
+    final departments =
+        scoredJobs
+            .map((j) => j.department.trim())
+            .where((s) => s.isNotEmpty)
+            .toSet()
+            .toList()
+          ..sort();
 
-    final cities = scoredJobs
-        .map((j) => j.location.trim())
-        .where((s) => s.isNotEmpty)
-        .toSet()
-        .toList()
-      ..sort();
+    final cities =
+        scoredJobs
+            .map((j) => j.location.trim())
+            .where((s) => s.isNotEmpty)
+            .toSet()
+            .toList()
+          ..sort();
 
-    final workTypes = scoredJobs
-        .map((j) => j.workType.trim())
-        .where((s) => s.isNotEmpty)
-        .toSet()
-        .toList()
-      ..sort();
+    final workTypes =
+        scoredJobs
+            .map((j) => j.workType.trim())
+            .where((s) => s.isNotEmpty)
+            .toSet()
+            .toList()
+          ..sort();
 
     return JobsViewModel(
       items: scoredJobs
-          .map((j) => JobCardVM(
-                job: j,
-                isFavorite: favs.contains(j.id),
-                applicationStatus: applied[j.id],
-              ))
+          .map(
+            (j) => JobCardVM(
+              job: j,
+              isFavorite: favs.contains(j.id),
+              applicationStatus: applied[j.id],
+            ),
+          )
           .toList(growable: false),
       availableDepartments: departments,
       availableCities: cities,
@@ -350,8 +369,12 @@ class JobsController extends AutoDisposeAsyncNotifier<JobsViewModel> {
   }
 }
 
-final jobDetailViewProvider = AutoDisposeAsyncNotifierProviderFamily<
-    JobDetailViewController, JobDetailViewModel, String>(JobDetailViewController.new);
+final jobDetailViewProvider =
+    AutoDisposeAsyncNotifierProviderFamily<
+      JobDetailViewController,
+      JobDetailViewModel,
+      String
+    >(JobDetailViewController.new);
 
 class JobDetailViewController
     extends AutoDisposeFamilyAsyncNotifier<JobDetailViewModel, String> {
@@ -369,7 +392,10 @@ class JobDetailViewController
     if (job == null) throw Exception('Job not found');
 
     final favs = await repo.fetchMyFavoriteJobIds(userId: uid);
-    final status = await repo.fetchMyJobApplicationStatusForJob(userId: uid, jobId: jobId);
+    final status = await repo.fetchMyJobApplicationStatusForJob(
+      userId: uid,
+      jobId: jobId,
+    );
 
     return JobDetailViewModel(
       job: job,
@@ -394,11 +420,13 @@ class JobDetailViewController
 
     final wasFav = current.isFavorite;
 
-    state = AsyncData(JobDetailViewModel(
-      job: current.job,
-      isFavorite: !wasFav,
-      applicationStatus: current.applicationStatus,
-    ));
+    state = AsyncData(
+      JobDetailViewModel(
+        job: current.job,
+        isFavorite: !wasFav,
+        applicationStatus: current.applicationStatus,
+      ),
+    );
 
     try {
       if (wasFav) {
@@ -421,7 +449,11 @@ class JobDetailViewController
     final current = state.valueOrNull;
     if (current == null) return;
 
-    await repo.applyToJob(userId: uid, jobId: current.job.id, coverLetter: coverLetter);
+    await repo.applyToJob(
+      userId: uid,
+      jobId: current.job.id,
+      coverLetter: coverLetter,
+    );
 
     // After apply, refresh to get status from DB (pending)
     await refresh();
