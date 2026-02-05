@@ -384,6 +384,14 @@ class _CandidateCard extends StatelessWidget {
   const _CandidateCard({required this.item});
   final TalentCandidate item;
 
+  static const _dash = '—';
+
+  String _pct(int num, int den) {
+    if (den <= 0) return _dash;
+    final v = (num / den * 100).clamp(0, 100);
+    return '${v.toStringAsFixed(0)}%';
+  }
+
   @override
   Widget build(BuildContext context) {
     final score = item.oiScore.clamp(0, 100);
@@ -401,6 +409,11 @@ class _CandidateCard extends StatelessWidget {
     final name = item.fullName.trim().isEmpty
         ? item.email
         : item.fullName.trim();
+
+    final focusTotal = item.focusSubmitted + item.focusExpired;
+    final focusRateText = _pct(item.focusSubmitted, focusTotal);
+
+    final quizAccuracyText = _pct(item.nanoQuizCorrect, item.nanoQuizAttempts);
 
     return Container(
       padding: const EdgeInsets.all(14),
@@ -436,7 +449,7 @@ class _CandidateCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${item.department ?? '—'} • Year ${item.year ?? '—'}',
+                      '${item.department ?? _dash} • Year ${item.year ?? _dash}',
                       style: const TextStyle(
                         color: Color(0xFF6B7280),
                         fontWeight: FontWeight.w700,
@@ -462,6 +475,45 @@ class _CandidateCard extends StatelessWidget {
                     color: fg,
                   ),
                 ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              _MetricPill(
+                label: 'Points',
+                value: item.metricsAvailable ? '${item.totalPoints}' : _dash,
+                color: const Color(0xFF2563EB),
+                bg: const Color(0xFFDBEAFE),
+              ),
+              _MetricPill(
+                label: 'Focus',
+                value: item.metricsAvailable && focusTotal > 0
+                    ? '$focusRateText • ${item.focusAvgSecondsToAnswer}s'
+                    : _dash,
+                color: const Color(0xFF16A34A),
+                bg: const Color(0xFFDCFCE7),
+              ),
+              _MetricPill(
+                label: 'Nano',
+                value: item.metricsAvailable && item.nanoQuizAttempts > 0
+                    ? '$quizAccuracyText • +${item.nanoQuizPoints}'
+                    : (item.metricsAvailable && item.nanoCoursesCompleted > 0
+                          ? '${item.nanoCoursesCompleted} done'
+                          : _dash),
+                color: const Color(0xFF6D28D9),
+                bg: const Color(0xFFEDE9FE),
+              ),
+              _MetricPill(
+                label: 'Cases',
+                value: item.metricsAvailable && item.casesSolved > 0
+                    ? '${item.casesSolved}'
+                    : _dash,
+                color: const Color(0xFFB45309),
+                bg: const Color(0xFFFFEDD5),
               ),
             ],
           ),
@@ -546,6 +598,12 @@ class _CandidateCard extends StatelessWidget {
   }
 
   Future<void> _showDetails(BuildContext context) async {
+    final focusTotal = item.focusSubmitted + item.focusExpired;
+    final focusRate = focusTotal == 0 ? null : item.focusSubmitted / focusTotal;
+    final quizAccuracy = item.nanoQuizAttempts == 0
+        ? null
+        : item.nanoQuizCorrect / item.nanoQuizAttempts;
+
     await showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
@@ -554,18 +612,72 @@ class _CandidateCard extends StatelessWidget {
               ? 'Student profile'
               : item.fullName.trim(),
         ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Email: ${item.email.isEmpty ? '—' : item.email}'),
-            const SizedBox(height: 6),
-            Text('Department: ${item.department ?? '—'}'),
-            const SizedBox(height: 6),
-            Text('Year: ${item.year ?? '—'}'),
-            const SizedBox(height: 6),
-            Text('OI Score: ${item.oiScore}'),
-          ],
+        content: SizedBox(
+          width: 520,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Email: ${item.email.isEmpty ? _dash : item.email}'),
+                const SizedBox(height: 6),
+                Text('Department: ${item.department ?? _dash}'),
+                const SizedBox(height: 6),
+                Text('Year: ${item.year ?? _dash}'),
+                const SizedBox(height: 6),
+                Text('OI Score: ${item.oiScore}'),
+                if (!item.metricsAvailable) ...[
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Extended performance metrics are not available in this environment.',
+                    style: TextStyle(
+                      color: Color(0xFF6B7280),
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  const Text(
+                    'Apply the updated SQL in docs/sql/24_talent_mining.sql to enable focus speed, nano-learning knowledge, and case reaction signals.',
+                    style: TextStyle(
+                      color: Color(0xFF6B7280),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ] else ...[
+                  const SizedBox(height: 12),
+                  _DimensionBars(item: item),
+                  const SizedBox(height: 14),
+                  _DetailsRow(
+                    label: 'Total points',
+                    value: '${item.totalPoints}',
+                  ),
+                  const SizedBox(height: 8),
+                  _DetailsRow(
+                    label: 'Case analysis (reactions)',
+                    value: item.casesSolved == 0
+                        ? _dash
+                        : '${item.casesSolved} total • L ${item.casesLeft} / R ${item.casesRight}',
+                  ),
+                  const SizedBox(height: 8),
+                  _DetailsRow(
+                    label: 'Instant focus (speed)',
+                    value: focusTotal == 0
+                        ? _dash
+                        : '${(focusRate! * 100).toStringAsFixed(0)}% on-time • avg ${item.focusAvgSecondsToAnswer}s • ${item.focusSubmitted}/$focusTotal',
+                  ),
+                  const SizedBox(height: 8),
+                  _DetailsRow(
+                    label: 'Nano-learning (knowledge)',
+                    value:
+                        (item.nanoCoursesCompleted == 0 &&
+                            item.nanoQuizAttempts == 0)
+                        ? _dash
+                        : '${item.nanoCoursesCompleted} completed • quiz ${quizAccuracy == null ? _dash : '${(quizAccuracy * 100).toStringAsFixed(0)}%'} • +${item.nanoQuizPoints} pts',
+                  ),
+                ],
+              ],
+            ),
+          ),
         ),
         actions: [
           TextButton(
@@ -574,6 +686,144 @@ class _CandidateCard extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _MetricPill extends StatelessWidget {
+  const _MetricPill({
+    required this.label,
+    required this.value,
+    required this.color,
+    required this.bg,
+  });
+
+  final String label;
+  final String value;
+  final Color color;
+  final Color bg;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: color.withValues(alpha: 0.18)),
+      ),
+      child: Text(
+        '$label: $value',
+        style: TextStyle(
+          fontWeight: FontWeight.w900,
+          fontSize: 12,
+          color: color,
+        ),
+      ),
+    );
+  }
+}
+
+class _DetailsRow extends StatelessWidget {
+  const _DetailsRow({required this.label, required this.value});
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          flex: 4,
+          child: Text(
+            label,
+            style: const TextStyle(
+              fontWeight: FontWeight.w800,
+              color: Color(0xFF4B5563),
+            ),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          flex: 5,
+          child: Text(
+            value,
+            textAlign: TextAlign.right,
+            style: const TextStyle(fontWeight: FontWeight.w900),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _DimensionBars extends StatelessWidget {
+  const _DimensionBars({required this.item});
+  final TalentCandidate item;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Strength profile (OI dimensions)',
+          style: TextStyle(fontWeight: FontWeight.w900),
+        ),
+        const SizedBox(height: 10),
+        _Bar(label: 'Technical', value: item.technical, color: Colors.blue),
+        const SizedBox(height: 8),
+        _Bar(label: 'Social', value: item.social, color: Colors.green),
+        const SizedBox(height: 8),
+        _Bar(label: 'Field fit', value: item.fieldFit, color: Colors.orange),
+        const SizedBox(height: 8),
+        _Bar(
+          label: 'Consistency',
+          value: item.consistency,
+          color: Colors.purple,
+        ),
+      ],
+    );
+  }
+}
+
+class _Bar extends StatelessWidget {
+  const _Bar({required this.label, required this.value, required this.color});
+  final String label;
+  final int value;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                label,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w800,
+                  color: Color(0xFF4B5563),
+                ),
+              ),
+            ),
+            Text('$value', style: const TextStyle(fontWeight: FontWeight.w900)),
+          ],
+        ),
+        const SizedBox(height: 4),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(999),
+          child: LinearProgressIndicator(
+            value: (value.clamp(0, 100)) / 100.0,
+            minHeight: 8,
+            backgroundColor: const Color(0xFFE5E7EB),
+            valueColor: AlwaysStoppedAnimation<Color>(color),
+          ),
+        ),
+      ],
     );
   }
 }

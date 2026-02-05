@@ -51,7 +51,14 @@ class DeepLinkService {
 
     // 1) Let Supabase parse tokens & establish session (recovery/login callback)
     try {
-      await _client.auth.getSessionFromUrl(uri);
+      final code = (uri.queryParameters['code'] ?? '').trim();
+      if (code.isNotEmpty) {
+        // PKCE: exchange the auth code into a session.
+        await _client.auth.exchangeCodeForSession(code);
+      } else {
+        // Implicit flow: parse tokens from the URL.
+        await _client.auth.getSessionFromUrl(uri);
+      }
     } catch (e) {
       if (kDebugMode) debugPrint('getSessionFromUrl error: $e');
     }

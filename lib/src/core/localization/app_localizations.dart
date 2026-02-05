@@ -589,6 +589,8 @@ enum AppText {
   authResetLinkSentTo,
   authCheckSpam,
   authRequestAgainIn,
+  authOpenResetScreen,
+  authResetScreenHint,
   authSendResetLink,
   authTooManyRequests,
   authEmailRequired,
@@ -2038,6 +2040,9 @@ const _values = <String, Map<AppText, String>>{
     AppText.authCheckSpam: 'Görmüyorsan spam/istenmeyen klasörünü kontrol et.',
     AppText.authRequestAgainIn:
         'Yeni bir e-postayı {seconds} saniye sonra isteyebilirsin.',
+    AppText.authOpenResetScreen: 'Şifreyi sıfırla',
+    AppText.authResetScreenHint:
+        'E-postadaki bağlantı otomatik açılmazsa, açılan sayfadaki linki (örn. ?code=...) kopyalayıp bu ekrana yapıştırabilirsiniz.',
     AppText.authSendResetLink: 'Sıfırlama bağlantısı gönder',
     AppText.authTooManyRequests:
         'Çok fazla istek. Lütfen bir dakika bekleyip tekrar deneyin.',
@@ -3183,6 +3188,9 @@ const _values = <String, Map<AppText, String>>{
     AppText.authCheckSpam: 'If you don’t see it, check your spam/junk folder.',
     AppText.authRequestAgainIn:
         'You can request another email in {seconds} seconds.',
+    AppText.authOpenResetScreen: 'Open reset screen',
+    AppText.authResetScreenHint:
+        'If the link doesn’t open in the app automatically, copy the URL you end up on (e.g., with ?code=...) and paste it into the reset screen.',
     AppText.authSendResetLink: 'Send reset link',
     AppText.authTooManyRequests:
         'Too many requests. Please wait a minute and try again.',

@@ -137,6 +137,28 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                         ),
                       ],
                       const SizedBox(height: 14),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 44,
+                        child: OutlinedButton.icon(
+                          onPressed: () => context.go(Routes.resetPassword),
+                          icon: const Icon(Icons.lock_reset_outlined),
+                          label: Text(
+                            l10n.t(AppText.authOpenResetScreen),
+                            style: const TextStyle(fontWeight: FontWeight.w800),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        l10n.t(AppText.authResetScreenHint),
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Color(0xFF6B7280),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
                       TextButton(
                         onPressed: () => context.go(Routes.login),
                         child: Text(l10n.t(AppText.commonBackToLogin)),

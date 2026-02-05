@@ -60,8 +60,8 @@ class _DevelopmentScreenState extends ConsumerState<DevelopmentScreen>
                     labelStyle: const TextStyle(fontWeight: FontWeight.w900),
                     indicatorColor: cs.primary,
                     tabs: const [
-                      Tab(text: 'Case Analysis'),
                       Tab(text: 'Nano-Learning'),
+                      Tab(text: 'Case Analysis'),
                     ],
                   ),
                 ),
@@ -70,8 +70,8 @@ class _DevelopmentScreenState extends ConsumerState<DevelopmentScreen>
                   child: TabBarView(
                     controller: _tabs,
                     children: [
-                      const CaseAnalysisScreen(embedded: true),
                       const NanoLearningFeed(),
+                      const CaseAnalysisScreen(embedded: true),
                     ],
                   ),
                 ),

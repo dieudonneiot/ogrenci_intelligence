@@ -495,6 +495,11 @@ class _MainShellState extends ConsumerState<MainShell> {
   bool _showFooter = false;
   bool _footerUpdateScheduled = false;
   bool? _pendingShowFooter;
+  final ScrollController _primaryScrollController = ScrollController();
+  final GlobalKey _footerKey = GlobalKey();
+  ScrollPosition? _lastScrollPosition;
+  double _measuredFooterHeight = 0;
+  double _lastLayoutWidth = 0;
 
   void _scheduleFooterUpdate(bool showFooter) {
     _pendingShowFooter = showFooter;
@@ -509,14 +514,89 @@ class _MainShellState extends ConsumerState<MainShell> {
       _pendingShowFooter = null;
       if (next == null || next == _showFooter) return;
 
+      final wasShown = _showFooter;
       setState(() => _showFooter = next);
+
+      if (!wasShown && next) {
+        // Showing the footer reduces the scroll viewport height; pin to bottom so it
+        // doesn't immediately "bounce" out of the bottom zone.
+        SchedulerBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          _pinScrollToBottomIfPossible();
+        });
+      }
     });
+  }
+
+  @override
+  void dispose() {
+    _primaryScrollController.dispose();
+    super.dispose();
   }
 
   double _footerHeightForWidth(double width) {
     if (width < 820) return 320;
     if (width < 1100) return 260;
     return 220;
+  }
+
+  double _effectiveFooterHeight(double width) {
+    if (_measuredFooterHeight > 0) return _measuredFooterHeight;
+    return _footerHeightForWidth(width);
+  }
+
+  bool _shouldShowFooter({
+    required double extentAfter,
+    required double footerHeight,
+  }) {
+    const showThreshold = 24.0;
+    // Hysteresis: keep the footer visible until user scrolls meaningfully away
+    // from the bottom. This prevents flicker when padding changes.
+    final hideThreshold = footerHeight + 80.0;
+    return _showFooter
+        ? extentAfter <= hideThreshold
+        : extentAfter <= showThreshold;
+  }
+
+  void _rememberScrollPosition(BuildContext? scrollableContext) {
+    if (scrollableContext == null) return;
+    final scrollable = Scrollable.maybeOf(scrollableContext);
+    if (scrollable == null) return;
+    _lastScrollPosition = scrollable.position;
+  }
+
+  void _pinScrollToBottomIfPossible() {
+    if (_primaryScrollController.hasClients) {
+      final position = _primaryScrollController.position;
+      if (!position.hasContentDimensions) return;
+      final target = position.maxScrollExtent;
+      if ((position.pixels - target).abs() < 1) return;
+      _primaryScrollController.jumpTo(target);
+      return;
+    }
+
+    final position = _lastScrollPosition;
+    if (position == null || !position.hasContentDimensions) return;
+    final target = position.maxScrollExtent;
+    if ((position.pixels - target).abs() < 1) return;
+    position.jumpTo(target);
+  }
+
+  void _scheduleFooterMeasurementIfNeeded(double width) {
+    if ((_lastLayoutWidth - width).abs() < 1 && _measuredFooterHeight > 0) {
+      return;
+    }
+    _lastLayoutWidth = width;
+
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final ctx = _footerKey.currentContext;
+      final box = ctx?.findRenderObject() as RenderBox?;
+      if (box == null || !box.hasSize) return;
+      final nextHeight = box.size.height;
+      if ((nextHeight - _measuredFooterHeight).abs() < 1) return;
+      setState(() => _measuredFooterHeight = nextHeight);
+    });
   }
 
   @override
@@ -528,7 +608,8 @@ class _MainShellState extends ConsumerState<MainShell> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final footerHeight = _footerHeightForWidth(constraints.maxWidth);
+        final footerHeight = _effectiveFooterHeight(constraints.maxWidth);
+        _scheduleFooterMeasurementIfNeeded(constraints.maxWidth);
         final chatBottom = _showFooter ? footerHeight + 18.0 : 18.0;
 
         return Scaffold(
@@ -540,26 +621,33 @@ class _MainShellState extends ConsumerState<MainShell> {
                   children: [
                     const AppNavbar(), // sticky-like top
                     Expanded(
-                      child: NotificationListener<ScrollNotification>(
-                        onNotification: (notification) {
-                          if (notification.metrics.axis != Axis.vertical) {
+                      child: PrimaryScrollController(
+                        controller: _primaryScrollController,
+                        child: NotificationListener<ScrollNotification>(
+                          onNotification: (notification) {
+                            if (notification.metrics.axis != Axis.vertical) {
+                              return false;
+                            }
+                            _rememberScrollPosition(notification.context);
+
+                            final shouldShow = _shouldShowFooter(
+                              extentAfter: notification.metrics.extentAfter,
+                              footerHeight: footerHeight,
+                            );
+                            if (shouldShow != _showFooter) {
+                              // Scroll notifications can fire during layout/paint; avoid setState in-frame.
+                              _scheduleFooterUpdate(shouldShow);
+                            }
                             return false;
-                          }
-                          final atBottom =
-                              notification.metrics.extentAfter <= 24;
-                          if (atBottom != _showFooter) {
-                            // Scroll notifications can fire during layout/paint; avoid setState in-frame.
-                            _scheduleFooterUpdate(atBottom);
-                          }
-                          return false;
-                        },
-                        child: AnimatedPadding(
-                          duration: const Duration(milliseconds: 180),
-                          curve: Curves.easeOut,
-                          padding: EdgeInsets.only(
-                            bottom: _showFooter ? footerHeight : 0,
+                          },
+                          child: AnimatedPadding(
+                            duration: const Duration(milliseconds: 180),
+                            curve: Curves.easeOut,
+                            padding: EdgeInsets.only(
+                              bottom: _showFooter ? footerHeight : 0,
+                            ),
+                            child: widget.child,
                           ),
-                          child: widget.child,
                         ),
                       ),
                     ),
@@ -572,10 +660,22 @@ class _MainShellState extends ConsumerState<MainShell> {
                 bottom: 0,
                 child: IgnorePointer(
                   ignoring: !_showFooter,
-                  child: AnimatedOpacity(
-                    duration: const Duration(milliseconds: 180),
-                    opacity: _showFooter ? 1 : 0,
-                    child: const AppFooter(),
+                  child: AnimatedSlide(
+                    duration: const Duration(milliseconds: 200),
+                    curve: Curves.easeOutCubic,
+                    offset: _showFooter ? Offset.zero : const Offset(0, 0.12),
+                    child: AnimatedOpacity(
+                      duration: const Duration(milliseconds: 180),
+                      curve: Curves.easeOut,
+                      opacity: _showFooter ? 1 : 0,
+                      child: SafeArea(
+                        top: false,
+                        child: RepaintBoundary(
+                          key: _footerKey,
+                          child: const AppFooter(),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),

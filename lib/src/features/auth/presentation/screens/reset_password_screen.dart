@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/supabase/supabase_service.dart';
@@ -43,7 +44,36 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
     }
 
     try {
-      await SupabaseService.client.auth.getSessionFromUrl(uri);
+      final typeParam = (uri.queryParameters['type'] ?? '').trim().toLowerCase();
+      final tokenHash =
+          (uri.queryParameters['token_hash'] ?? uri.queryParameters['token'])
+              ?.trim();
+
+      final code = (uri.queryParameters['code'] ?? '').trim();
+      if (code.isNotEmpty) {
+        await SupabaseService.client.auth.exchangeCodeForSession(code);
+      } else if (tokenHash != null &&
+          tokenHash.isNotEmpty &&
+          (uri.path.endsWith('/verify') || uri.path.endsWith('verify')) &&
+          typeParam.isNotEmpty) {
+        // Support pasting Supabase email links like:
+        //   .../auth/v1/verify?token=...&type=recovery&redirect_to=...
+        // This is especially useful on Windows, where custom URL schemes may not open the app.
+        final OtpType type = switch (typeParam) {
+          'recovery' => OtpType.recovery,
+          'magiclink' => OtpType.magiclink,
+          'signup' => OtpType.signup,
+          'invite' => OtpType.invite,
+          'email_change' || 'emailchange' => OtpType.emailChange,
+          _ => OtpType.recovery,
+        };
+        await SupabaseService.client.auth.verifyOTP(
+          type: type,
+          tokenHash: tokenHash,
+        );
+      } else {
+        await SupabaseService.client.auth.getSessionFromUrl(uri);
+      }
       if (!mounted) return;
       setState(() {
         _linkApplied = true;
@@ -52,7 +82,11 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(l10n.t(AppText.authLinkAccepted))));
-    } catch (e) {
+    } on AuthException catch (e) {
+      setState(() => _linkError = e.message.isEmpty
+          ? l10n.t(AppText.authLinkExpired)
+          : e.message);
+    } catch (_) {
       setState(() => _linkError = l10n.t(AppText.authLinkExpired));
     }
   }
