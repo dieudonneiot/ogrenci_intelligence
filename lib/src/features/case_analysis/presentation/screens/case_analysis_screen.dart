@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/localization/app_localizations.dart';
 import '../../application/case_providers.dart';
 import '../../domain/case_models.dart';
 
@@ -20,6 +21,7 @@ class _CaseAnalysisScreenState extends ConsumerState<CaseAnalysisScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final asyncScenarios = ref.watch(caseScenariosProvider);
 
     final body = asyncScenarios.when(
@@ -41,9 +43,9 @@ class _CaseAnalysisScreenState extends ConsumerState<CaseAnalysisScreen> {
                 color: Color(0xFFEF4444),
               ),
               const SizedBox(height: 12),
-              const Text(
-                'Case Analysis failed to load',
-                style: TextStyle(fontWeight: FontWeight.w900),
+              Text(
+                l10n.t(AppText.caseAnalysisLoadFailedTitle),
+                style: const TextStyle(fontWeight: FontWeight.w900),
               ),
               const SizedBox(height: 8),
               Text(
@@ -57,7 +59,7 @@ class _CaseAnalysisScreenState extends ConsumerState<CaseAnalysisScreen> {
                 child: ElevatedButton(
                   onPressed: () =>
                       ref.read(caseScenariosProvider.notifier).refresh(),
-                  child: const Text('Retry'),
+                  child: Text(l10n.t(AppText.retry)),
                 ),
               ),
             ],
@@ -66,10 +68,10 @@ class _CaseAnalysisScreenState extends ConsumerState<CaseAnalysisScreen> {
       ),
       data: (items) {
         if (items.isEmpty) {
-          return const Center(
+          return Center(
             child: Padding(
               padding: EdgeInsets.all(24),
-              child: Text('No case scenarios yet.'),
+              child: Text(l10n.t(AppText.caseAnalysisEmpty)),
             ),
           );
         }
@@ -90,9 +92,9 @@ class _CaseAnalysisScreenState extends ConsumerState<CaseAnalysisScreen> {
                     children: [
                       const Icon(Icons.swipe, color: Color(0xFF6D28D9)),
                       const SizedBox(width: 10),
-                      const Text(
-                        'Case Analysis',
-                        style: TextStyle(
+                      Text(
+                        l10n.t(AppText.caseAnalysisTitle),
+                        style: const TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.w900,
                         ),
@@ -166,6 +168,7 @@ class _CaseAnalysisScreenState extends ConsumerState<CaseAnalysisScreen> {
   Future<void> _handleChoice(CaseScenario scenario, CaseChoice choice) async {
     if (_submitting) return;
     setState(() => _submitting = true);
+    final l10n = AppLocalizations.of(context);
     try {
       await ref
           .read(caseScenariosProvider.notifier)
@@ -174,14 +177,14 @@ class _CaseAnalysisScreenState extends ConsumerState<CaseAnalysisScreen> {
       setState(() {
         _index = _index + 1;
       });
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Answer saved')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.t(AppText.caseAnalysisAnswerSaved))),
+      );
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Failed: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.commonActionFailed(e.toString()))),
+      );
     } finally {
       if (mounted) setState(() => _submitting = false);
     }

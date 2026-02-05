@@ -1011,6 +1011,17 @@ enum AppText {
   dbDebugTipRlsEnabled,
   dbDebugTipDepartmentHasMatches,
 
+  // Learning - Nano / Focus / Case
+  nanoNoQuizConfigured,
+  nanoFeedLoadFailedTitle,
+  nanoEmptyState,
+  focusCheckTimeUp,
+  focusCheckSubmitted,
+  caseAnalysisTitle,
+  caseAnalysisLoadFailedTitle,
+  caseAnalysisEmpty,
+  caseAnalysisAnswerSaved,
+
   commonComingSoonTitle,
   commonComingSoonSubtitle,
 }
@@ -1035,6 +1046,7 @@ class AppLocalizations {
   final Locale locale;
 
   static const delegate = _AppLocalizationsDelegate();
+  static final Set<String> _missingKeyWarnings = <String>{};
 
   static const languages = <AppLanguage>[
     AppLanguage(
@@ -1108,10 +1120,17 @@ class AppLocalizations {
         ? locale.languageCode
         : 'tr';
     final current = _values[lang];
-    if (current != null && current.containsKey(key)) {
-      return current[key]!;
+    final value = current?[key];
+    if (value != null) return value;
+
+    final fallback = _values['en']?[key] ?? _values['tr']?[key] ?? key.name;
+    if (kDebugMode) {
+      final warningKey = '$lang:${key.name}';
+      if (_missingKeyWarnings.add(warningKey)) {
+        debugPrint('Missing translation for $warningKey');
+      }
     }
-    return _values['tr']?[key] ?? key.name;
+    return fallback;
   }
 
   String _format(AppText key, Map<String, String> args) {
@@ -2201,6 +2220,16 @@ const _values = <String, Map<AppText, String>>{
     AppText.commonBack: 'Geri',
     AppText.commonLoading: 'Yükleniyor...',
     AppText.commonNoData: 'Veri yok',
+    AppText.nanoNoQuizConfigured: 'Henüz sınav ayarlanmadı.',
+    AppText.nanoFeedLoadFailedTitle: 'Akış yüklenemedi',
+    AppText.nanoEmptyState:
+        'Henüz nano-öğrenme videosu yok. Akışı etkinleştirmek için video_url içeren kurslar ekleyin.',
+    AppText.focusCheckTimeUp: 'Süre doldu.',
+    AppText.focusCheckSubmitted: 'Gönderildi.',
+    AppText.caseAnalysisTitle: 'Vaka Analizi',
+    AppText.caseAnalysisLoadFailedTitle: 'Vaka analizi yüklenemedi',
+    AppText.caseAnalysisEmpty: 'Henüz vaka senaryosu yok.',
+    AppText.caseAnalysisAnswerSaved: 'Cevap kaydedildi',
 
     // Settings
     AppText.settingsLoginRequired: 'Ayarları görmek için giriş yapmalısın.',
@@ -3349,6 +3378,16 @@ const _values = <String, Map<AppText, String>>{
     AppText.commonBack: 'Back',
     AppText.commonLoading: 'Loading...',
     AppText.commonNoData: 'No data',
+    AppText.nanoNoQuizConfigured: 'No quiz configured yet.',
+    AppText.nanoFeedLoadFailedTitle: 'Failed to load feed',
+    AppText.nanoEmptyState:
+        'No nano-learning videos yet. Add courses with a video_url to enable the feed.',
+    AppText.focusCheckTimeUp: 'Time is up.',
+    AppText.focusCheckSubmitted: 'Submitted.',
+    AppText.caseAnalysisTitle: 'Case Analysis',
+    AppText.caseAnalysisLoadFailedTitle: 'Failed to load case analysis',
+    AppText.caseAnalysisEmpty: 'No case scenarios yet.',
+    AppText.caseAnalysisAnswerSaved: 'Answer saved',
 
     // Settings
     AppText.settingsLoginRequired: 'Log in to view settings.',

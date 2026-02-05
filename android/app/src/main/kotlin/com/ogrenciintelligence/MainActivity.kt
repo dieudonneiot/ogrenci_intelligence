@@ -1,4 +1,4 @@
-package com.ogrenciintelligence.ogrenci_intelligence
+package com.ogrenciintelligence
 
 import io.flutter.embedding.android.FlutterActivity
 

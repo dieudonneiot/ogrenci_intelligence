@@ -216,11 +216,12 @@ class _NanoVideoPageState extends ConsumerState<_NanoVideoPage> {
     );
     if (!mounted) return;
 
+    final l10n = AppLocalizations.of(context);
     final q = questionAsync;
     if (q == null || q.options.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('No quiz configured yet.')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.t(AppText.nanoNoQuizConfigured))),
+      );
       return;
     }
 
@@ -756,13 +757,14 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    final l10n = AppLocalizations.of(context);
+    return Center(
       child: Padding(
         padding: EdgeInsets.all(18),
         child: Text(
-          'No nano-learning videos yet. Add courses with a video_url to enable the feed.',
+          l10n.t(AppText.nanoEmptyState),
           textAlign: TextAlign.center,
-          style: TextStyle(
+          style: const TextStyle(
             color: Color(0xFF6B7280),
             fontWeight: FontWeight.w700,
           ),
@@ -779,6 +781,7 @@ class _ErrorState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(18),
@@ -787,9 +790,9 @@ class _ErrorState extends StatelessWidget {
           children: [
             const Icon(Icons.error_outline, color: Color(0xFFEF4444), size: 44),
             const SizedBox(height: 10),
-            const Text(
-              'Failed to load feed',
-              style: TextStyle(fontWeight: FontWeight.w900),
+            Text(
+              l10n.t(AppText.nanoFeedLoadFailedTitle),
+              style: const TextStyle(fontWeight: FontWeight.w900),
             ),
             const SizedBox(height: 6),
             Text(
@@ -802,7 +805,7 @@ class _ErrorState extends StatelessWidget {
               height: 44,
               child: ElevatedButton(
                 onPressed: onRetry,
-                child: const Text('Retry'),
+                child: Text(l10n.t(AppText.retry)),
               ),
             ),
           ],

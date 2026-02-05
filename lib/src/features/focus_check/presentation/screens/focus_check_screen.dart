@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/localization/app_localizations.dart';
 import '../../application/focus_providers.dart';
 import '../../domain/focus_models.dart';
 
@@ -198,6 +199,7 @@ class _FocusCheckScreenState extends ConsumerState<FocusCheckScreen> {
   Future<void> _start() async {
     final internship = _selected;
     if (internship == null) return;
+    final l10n = AppLocalizations.of(context);
     setState(() => _starting = true);
     try {
       final session = await ref
@@ -207,9 +209,9 @@ class _FocusCheckScreenState extends ConsumerState<FocusCheckScreen> {
       _startTimer(session);
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Failed to start: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.commonActionFailed(e.toString()))),
+      );
     } finally {
       if (mounted) setState(() => _starting = false);
     }
@@ -234,10 +236,11 @@ class _FocusCheckScreenState extends ConsumerState<FocusCheckScreen> {
   Future<void> _submit() async {
     final session = ref.read(focusSessionProvider);
     if (session == null) return;
+    final l10n = AppLocalizations.of(context);
     if (_secondsLeft <= 0) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Time is up.')));
+      ).showSnackBar(SnackBar(content: Text(l10n.t(AppText.focusCheckTimeUp))));
       return;
     }
     setState(() => _submitting = true);
@@ -248,14 +251,14 @@ class _FocusCheckScreenState extends ConsumerState<FocusCheckScreen> {
       _answerCtrl.clear();
       _timer?.cancel();
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Submitted.')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.t(AppText.focusCheckSubmitted))),
+      );
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Submit failed: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.commonActionFailed(e.toString()))),
+      );
     } finally {
       if (mounted) setState(() => _submitting = false);
     }
