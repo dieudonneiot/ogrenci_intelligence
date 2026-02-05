@@ -22,7 +22,7 @@ Create a Firebase project and enable Cloud Messaging.
 - Download `google-services.json` and place it at:
   - `android/app/google-services.json`
 - Ensure your `applicationId` matches what Firebase expects:
-  - `android/app/build.gradle.kts` -> `applicationId = "com.ogrenciintelligence.ogrenci_intelligence"`
+  - `android/app/build.gradle.kts` -> `applicationId = "com.ogrenciintelligence"`
 
 ### iOS
 

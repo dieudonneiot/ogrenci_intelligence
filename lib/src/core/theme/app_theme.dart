@@ -13,9 +13,7 @@ class AppTheme {
     BorderSide? side,
   }) {
     return ButtonStyle(
-      minimumSize: const WidgetStatePropertyAll(
-        Size.fromHeight(AppSizes.buttonHeight),
-      ),
+      minimumSize: const WidgetStatePropertyAll(Size(0, AppSizes.buttonHeight)),
       padding: const WidgetStatePropertyAll(
         EdgeInsets.symmetric(
           horizontal: AppSpacing.md,
@@ -263,7 +261,7 @@ class AppTheme {
       textButtonTheme: TextButtonThemeData(
         style: ButtonStyle(
           minimumSize: const WidgetStatePropertyAll(
-            Size.fromHeight(AppSizes.buttonHeightSm),
+            Size(0, AppSizes.buttonHeightSm),
           ),
           foregroundColor: WidgetStatePropertyAll(colorScheme.primary),
           iconColor: WidgetStatePropertyAll(colorScheme.primary),
@@ -491,7 +489,7 @@ class AppTheme {
       textButtonTheme: TextButtonThemeData(
         style: ButtonStyle(
           minimumSize: const WidgetStatePropertyAll(
-            Size.fromHeight(AppSizes.buttonHeightSm),
+            Size(0, AppSizes.buttonHeightSm),
           ),
           foregroundColor: WidgetStatePropertyAll(colorScheme.primary),
           iconColor: WidgetStatePropertyAll(colorScheme.primary),
