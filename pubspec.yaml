@@ -41,10 +41,10 @@ dependencies:
   cupertino_icons: ^1.0.8
 
   # Core packages (MOVED HERE from the 'flutter:' section)
-  go_router: ^17.0.0
+  go_router: ^17.1.0
   flutter_riverpod: ^2.6.1
   supabase_flutter: ^2.12.0
-  flutter_dotenv: ^5.2.1
+  flutter_dotenv: ^6.0.0
 
   # UI/UX helpers
   flutter_svg: ^2.0.10+1
@@ -58,8 +58,8 @@ dependencies:
   # Logging
   logger: ^2.5.0
   video_player: ^2.10.1
-  firebase_core: ^3.15.0
-  firebase_messaging: ^15.2.7
+  firebase_core: ^4.4.0
+  firebase_messaging: ^16.1.1
 
 dev_dependencies:
   flutter_test:
@@ -67,10 +67,10 @@ dev_dependencies:
 
   # Code generation & development tools (MOVED HERE)
   build_runner: ^2.4.12
-  freezed: ^3.2.0
+  freezed: ^3.2.5
   freezed_annotation: ^3.1.0
   json_serializable: ^6.8.0
-  json_annotation: ^4.9.0
+  json_annotation: ^4.10.0
 
   # Linting (Note: 'flutter_lints' is a DEV dependency)
   flutter_lints: ^6.0.0
