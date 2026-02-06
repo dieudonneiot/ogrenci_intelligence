@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../../core/supabase/supabase_service.dart';
+import '../../../../shared/widgets/app_footer.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
 import '../widgets/how_it_works_section.dart';
 
@@ -32,112 +33,120 @@ class HomeScreen extends ConsumerWidget {
       child: SafeArea(
         bottom: false,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 1080),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  _Hero(
-                    isLoggedIn: isLoggedIn,
-                    isLoading: isLoading,
-                    onRegister: () => context.go(Routes.register),
-                    onLogin: () => context.go(Routes.login),
-                    onProfile: () => context.go(Routes.profile),
-                    onLogout: () async {
-                      await SupabaseService.client.auth.signOut();
-                      if (context.mounted) context.go(Routes.home);
-                    },
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 24,
+                ),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 1080),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _Hero(
+                          isLoggedIn: isLoggedIn,
+                          isLoading: isLoading,
+                          onRegister: () => context.go(Routes.register),
+                          onLogin: () => context.go(Routes.login),
+                          onProfile: () => context.go(Routes.profile),
+                          onLogout: () async {
+                            await SupabaseService.client.auth.signOut();
+                            if (context.mounted) context.go(Routes.home);
+                          },
+                        ),
+
+                        const SizedBox(height: 36),
+
+                        _SectionGrid(
+                          title: null,
+                          cards: [
+                            _InfoCard(
+                              icon: Icons.school_outlined,
+                              iconColor: cs.primary,
+                              title: l10n.t(AppText.homeCard1Title),
+                              description: l10n.t(AppText.homeCard1Desc),
+                            ),
+                            _InfoCard(
+                              icon: Icons.work_outline,
+                              iconColor: cs.primary,
+                              title: l10n.t(AppText.homeCard2Title),
+                              description: l10n.t(AppText.homeCard2Desc),
+                            ),
+                            _InfoCard(
+                              icon: Icons.assignment_outlined,
+                              iconColor: cs.primary,
+                              title: l10n.t(AppText.homeCard3Title),
+                              description: l10n.t(AppText.homeCard3Desc),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 56),
+
+                        _SectionGrid(
+                          title: l10n.t(AppText.homeStudentBenefitsTitle),
+                          cards: [
+                            _InfoCard(
+                              icon: Icons.track_changes_outlined,
+                              iconColor: cs.primary,
+                              title: l10n.t(AppText.homeStudentCard1Title),
+                              description: l10n.t(AppText.homeStudentCard1Desc),
+                            ),
+                            _InfoCard(
+                              icon: Icons.star_outline,
+                              iconColor: cs.primary,
+                              title: l10n.t(AppText.homeStudentCard2Title),
+                              description: l10n.t(AppText.homeStudentCard2Desc),
+                            ),
+                            _InfoCard(
+                              icon: Icons.bar_chart_outlined,
+                              iconColor: cs.primary,
+                              title: l10n.t(AppText.homeStudentCard3Title),
+                              description: l10n.t(AppText.homeStudentCard3Desc),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 56),
+
+                        _SectionGrid(
+                          title: l10n.t(AppText.homeCompanyBenefitsTitle),
+                          cards: [
+                            _InfoCard(
+                              icon: Icons.people_outline,
+                              iconColor: cs.primary,
+                              title: l10n.t(AppText.homeCompanyCard1Title),
+                              description: l10n.t(AppText.homeCompanyCard1Desc),
+                            ),
+                            _InfoCard(
+                              icon: Icons.handshake_outlined,
+                              iconColor: cs.primary,
+                              title: l10n.t(AppText.homeCompanyCard2Title),
+                              description: l10n.t(AppText.homeCompanyCard2Desc),
+                            ),
+                            _InfoCard(
+                              icon: Icons.query_stats_outlined,
+                              iconColor: cs.primary,
+                              title: l10n.t(AppText.homeCompanyCard3Title),
+                              description: l10n.t(AppText.homeCompanyCard3Desc),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 56),
+
+                        // Keep it here, from widgets/how_it_works_section.dart
+                        const HowItWorksSection(),
+                      ],
+                    ),
                   ),
-
-                  const SizedBox(height: 36),
-
-                  _SectionGrid(
-                    title: null,
-                    cards: [
-                      _InfoCard(
-                        icon: Icons.school_outlined,
-                        iconColor: cs.primary,
-                        title: l10n.t(AppText.homeCard1Title),
-                        description: l10n.t(AppText.homeCard1Desc),
-                      ),
-                      _InfoCard(
-                        icon: Icons.work_outline,
-                        iconColor: cs.primary,
-                        title: l10n.t(AppText.homeCard2Title),
-                        description: l10n.t(AppText.homeCard2Desc),
-                      ),
-                      _InfoCard(
-                        icon: Icons.assignment_outlined,
-                        iconColor: cs.primary,
-                        title: l10n.t(AppText.homeCard3Title),
-                        description: l10n.t(AppText.homeCard3Desc),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 56),
-
-                  _SectionGrid(
-                    title: l10n.t(AppText.homeStudentBenefitsTitle),
-                    cards: [
-                      _InfoCard(
-                        icon: Icons.track_changes_outlined,
-                        iconColor: cs.primary,
-                        title: l10n.t(AppText.homeStudentCard1Title),
-                        description: l10n.t(AppText.homeStudentCard1Desc),
-                      ),
-                      _InfoCard(
-                        icon: Icons.star_outline,
-                        iconColor: cs.primary,
-                        title: l10n.t(AppText.homeStudentCard2Title),
-                        description: l10n.t(AppText.homeStudentCard2Desc),
-                      ),
-                      _InfoCard(
-                        icon: Icons.bar_chart_outlined,
-                        iconColor: cs.primary,
-                        title: l10n.t(AppText.homeStudentCard3Title),
-                        description: l10n.t(AppText.homeStudentCard3Desc),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 56),
-
-                  _SectionGrid(
-                    title: l10n.t(AppText.homeCompanyBenefitsTitle),
-                    cards: [
-                      _InfoCard(
-                        icon: Icons.people_outline,
-                        iconColor: cs.primary,
-                        title: l10n.t(AppText.homeCompanyCard1Title),
-                        description: l10n.t(AppText.homeCompanyCard1Desc),
-                      ),
-                      _InfoCard(
-                        icon: Icons.handshake_outlined,
-                        iconColor: cs.primary,
-                        title: l10n.t(AppText.homeCompanyCard2Title),
-                        description: l10n.t(AppText.homeCompanyCard2Desc),
-                      ),
-                      _InfoCard(
-                        icon: Icons.query_stats_outlined,
-                        iconColor: cs.primary,
-                        title: l10n.t(AppText.homeCompanyCard3Title),
-                        description: l10n.t(AppText.homeCompanyCard3Desc),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 56),
-
-                  // Keep it here, from widgets/how_it_works_section.dart
-                  const HowItWorksSection(),
-
-                  const SizedBox(height: 24),
-                ],
+                ),
               ),
-            ),
+              const SafeArea(top: false, child: AppFooter()),
+            ],
           ),
         ),
       ),

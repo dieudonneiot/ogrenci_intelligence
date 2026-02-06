@@ -37,11 +37,13 @@ Required:
 - `SUPABASE_SERVICE_ROLE_KEY` → service role key (JWT)
 
 AI provider (required unless you only use FAQ mode):
-- `OPENAI_API_KEY` (or `AI_API_KEY`)
+- `AI_PROVIDER` (default: `openai`; supported: `openai`, `gemini`)
+- OpenAI: `OPENAI_API_KEY` (or `AI_API_KEY`)
+- Gemini: set `AI_PROVIDER=gemini` and provide `GEMINI_API_KEY` (or `AI_API_KEY`)
 
 Optional tuning:
-- `AI_MODEL` (default: `gpt-4o-mini`)
-- `AI_BASE_URL` (default: `https://api.openai.com/v1`)
+- `AI_MODEL` (default: `gpt-4o-mini` for OpenAI, `gemini-1.5-flash` for Gemini)
+- `AI_BASE_URL` (default: `https://api.openai.com/v1` for OpenAI, `https://generativelanguage.googleapis.com/v1beta` for Gemini)
 - `AI_TIMEOUT_MS` (default: `20000`)
 
 ### Why keys matter (the “Reference keys” mistake)
@@ -63,7 +65,9 @@ supabase functions deploy chatbot
 Then set/update secrets:
 
 ```bash
-supabase secrets set SUPABASE_URL=... SUPABASE_ANON_KEY=... SUPABASE_SERVICE_ROLE_KEY=... OPENAI_API_KEY=...
+supabase secrets set SUPABASE_URL=... SUPABASE_ANON_KEY=... SUPABASE_SERVICE_ROLE_KEY=... AI_PROVIDER=openai OPENAI_API_KEY=...
+# or (Gemini):
+supabase secrets set SUPABASE_URL=... SUPABASE_ANON_KEY=... SUPABASE_SERVICE_ROLE_KEY=... AI_PROVIDER=gemini GEMINI_API_KEY=...
 ```
 
 ## 5) Verify with a direct request
