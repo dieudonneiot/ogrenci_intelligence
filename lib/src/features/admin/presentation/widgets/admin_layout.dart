@@ -103,7 +103,7 @@ class AdminPageHeader extends StatelessWidget {
                     ],
                   ),
                 ),
-                if (trailing != null) trailing!,
+                ?trailing,
               ],
             ),
           ),

@@ -197,10 +197,18 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
                           controller: _inputCtrl,
                           focusNode: _focusNode,
                           isTyping: state.isTyping,
-                          onSend: () =>
-                              _handleSend(controller, localeCode, l10n),
-                          onSubmit: () =>
-                              _handleSend(controller, localeCode, l10n),
+                          onSend: () => _handleSend(
+                            controller,
+                            auth.session!,
+                            localeCode,
+                            l10n,
+                          ),
+                          onSubmit: () => _handleSend(
+                            controller,
+                            auth.session!,
+                            localeCode,
+                            l10n,
+                          ),
                         ),
                       ],
                     ),
@@ -216,6 +224,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
 
   void _handleSend(
     ChatController controller,
+    Session session,
     String localeCode,
     AppLocalizations l10n,
   ) {
@@ -224,6 +233,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
 
     controller.sendMessage(
       text,
+      session: session,
       locale: localeCode,
       errorReplyMessage: l10n.t(AppText.chatBotUnavailable),
     );

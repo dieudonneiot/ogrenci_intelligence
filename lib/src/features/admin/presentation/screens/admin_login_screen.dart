@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -5,6 +8,8 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../../core/supabase/supabase_service.dart';
+import '../../../auth/domain/auth_models.dart';
+import '../../../auth/presentation/controllers/auth_controller.dart';
 import '../../presentation/controllers/admin_controller.dart';
 
 class AdminLoginScreen extends ConsumerStatefulWidget {
@@ -55,6 +60,7 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
       );
 
       final user = res.user;
+      final session = res.session;
       if (user == null) {
         _error = l10n.t(AppText.commonSomethingWentWrong);
         return;
@@ -66,10 +72,21 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
         return;
       }
 
-      final admin = await ref
+      // Some platforms emit auth state before `currentSession` is hydrated.
+      // Ensure subsequent RPC calls are authenticated.
+      if (session != null &&
+          SupabaseService.client.auth.currentSession == null) {
+        try {
+          await SupabaseService.client.auth.recoverSession(
+            jsonEncode(session.toJson()),
+          );
+        } catch (_) {}
+      }
+
+      final isAdmin = await ref
           .read(adminRepositoryProvider)
-          .getActiveAdminByUserId(user.id);
-      if (admin == null) {
+          .isCurrentUserAdmin();
+      if (!isAdmin) {
         await SupabaseService.client.auth.signOut();
         _error = l10n.t(AppText.adminLoginErrorNotAdmin);
         return;
@@ -79,7 +96,43 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.t(AppText.adminLoginSuccess))),
       );
-      context.go(Routes.adminDashboard);
+
+      // Wait briefly for auth state propagation, then go to admin dashboard.
+      final current = ref.read(authViewStateProvider).valueOrNull;
+      if (current?.isAuthenticated == true &&
+          current?.userType == UserType.admin) {
+        context.go(Routes.adminDashboard);
+        return;
+      }
+
+      final completer = Completer<void>();
+      final sub = ref.listenManual<AsyncValue<AuthViewState>>(
+        authViewStateProvider,
+        (_, next) {
+          final v = next.valueOrNull;
+          if (v?.isAuthenticated == true && v?.userType == UserType.admin) {
+            if (!completer.isCompleted) completer.complete();
+          }
+        },
+      );
+
+      try {
+        await completer.future.timeout(const Duration(seconds: 2));
+      } catch (_) {
+        // ignore
+      } finally {
+        sub.close();
+      }
+
+      if (!mounted) return;
+      final resolved = ref.read(authViewStateProvider).valueOrNull;
+      if (resolved?.isAuthenticated == true &&
+          resolved?.userType == UserType.admin) {
+        context.go(Routes.adminDashboard);
+      } else {
+        // Navigate to a stable location and let the router redirect based on role.
+        context.go(Routes.home);
+      }
     } catch (e) {
       _error = e.toString();
     }

@@ -54,17 +54,23 @@ final authViewStateProvider = StreamProvider<AuthViewState>((ref) {
     final verified = user != null && user.emailConfirmedAt != null;
 
     if (verified) {
+      // On some platforms the auth event arrives before `currentSession` is set.
+      // Hydrate the client session so RPC/select calls run authenticated.
+      if (session != null) {
+        await repo.ensureHydratedSession(session);
+      }
+
       userType = UserType.student; // default if verified
 
-      // Admin check (best-effort, must not break auth stream)
+      // Admin check (best-effort, must not break auth stream).
+      // Use RPC instead of selecting from `admins` to avoid RLS recursion issues.
       try {
-        final admin = await ref.read(activeAdminProvider.future);
-        if (admin != null) {
-          userType = UserType.admin;
-        }
-      } catch (_) {
-        // ignore: treat as not admin
-      }
+        final isAdmin = await repo.isAdmin(
+          sessionOverride: session,
+          userIdOverride: user.id,
+        );
+        if (isAdmin) userType = UserType.admin;
+      } catch (_) {}
 
       // Company membership (best-effort)
       if (userType != UserType.admin) {

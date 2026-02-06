@@ -6,6 +6,35 @@ class AdminRepository {
 
   final SupabaseClient _client;
 
+  Future<bool> isCurrentUserAdmin() async {
+    try {
+      final res = await _client.rpc('is_admin');
+      if (res is bool) return res;
+      if (res is num) return res != 0;
+      if (res is String) {
+        final v = res.trim().toLowerCase();
+        if (v == 'true') return true;
+        if (v == 'false') return false;
+      }
+      return false;
+    } catch (_) {
+      // Fallback if RPC doesn't exist yet (legacy DB): try reading the table.
+      final uid = _client.auth.currentUser?.id;
+      if (uid == null || uid.isEmpty) return false;
+      try {
+        final row = await _client
+            .from('admins')
+            .select('id')
+            .eq('user_id', uid)
+            .eq('is_active', true)
+            .maybeSingle();
+        return row != null;
+      } catch (_) {
+        return false;
+      }
+    }
+  }
+
   Future<AdminData?> getActiveAdminByUserId(String userId) async {
     final row = await _client
         .from('admins')

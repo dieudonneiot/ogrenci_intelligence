@@ -20,22 +20,39 @@ class ChatRepository {
     return DateTime.now().isAfter(expiry.subtract(const Duration(minutes: 2)));
   }
 
-  Future<String> _accessToken({bool forceRefresh = false}) async {
-    final session = _client.auth.currentSession;
+  Future<String> _accessToken({
+    bool forceRefresh = false,
+    Session? sessionOverride,
+  }) async {
+    var session = sessionOverride ?? _client.auth.currentSession;
     if (session == null) {
-      throw const ChatRepositoryException('Missing auth session');
+      // Attempt recovery (e.g., desktop/web session not yet hydrated).
+      try {
+        await _client.auth.refreshSession();
+      } catch (_) {}
+      session = sessionOverride ?? _client.auth.currentSession;
+      if (session == null) {
+        throw const ChatRepositoryException('Missing auth session');
+      }
     }
 
     if (forceRefresh || _shouldRefreshSession(session)) {
       try {
-        await _client.auth.refreshSession();
+        // If a caller supplied a session, prefer refreshing via its refresh_token.
+        final refreshToken = session.refreshToken;
+        if (refreshToken != null && refreshToken.trim().isNotEmpty) {
+          await _client.auth.setSession(refreshToken);
+        } else {
+          await _client.auth.refreshSession();
+        }
       } catch (_) {
         // Ignore: if refresh fails we'll surface the real error below.
       }
     }
 
-    final token = _client.auth.currentSession?.accessToken;
-    if (token == null || token.isEmpty) {
+    final token =
+        _client.auth.currentSession?.accessToken ?? session.accessToken;
+    if (token.isEmpty) {
       throw const ChatRepositoryException('Missing auth token');
     }
 
@@ -181,6 +198,7 @@ class ChatRepository {
     String? sessionId,
     String locale = 'tr',
     bool faqOnly = false,
+    Session? sessionOverride,
   }) async {
     final payload = {
       'message': message,
@@ -190,13 +208,17 @@ class ChatRepository {
     };
 
     try {
-      final token = _client.auth.currentSession?.accessToken;
-      final headers = (token == null || token.isEmpty)
-          ? null
-          : <String, String>{'Authorization': 'Bearer $token'};
+      final token = await _accessToken(sessionOverride: sessionOverride);
+      final headers = <String, String>{
+        'Authorization': 'Bearer $token',
+        'apikey': Env.supabaseAnonKey,
+      };
 
-      final response =
-          await _client.functions.invoke('chatbot', body: payload, headers: headers);
+      final response = await _client.functions.invoke(
+        'chatbot',
+        body: payload,
+        headers: headers,
+      );
       if (response.data == null) {
         throw const ChatRepositoryException('Empty response from AI service');
       }
@@ -230,6 +252,7 @@ class ChatRepository {
     String? sessionId,
     String locale = 'tr',
     bool faqOnly = false,
+    Session? sessionOverride,
   }) async* {
     final url = Uri.parse('${Env.supabaseUrl}/functions/v1/chatbot');
 
@@ -319,7 +342,7 @@ class ChatRepository {
         );
       }
 
-      String token = await _accessToken();
+      String token = await _accessToken(sessionOverride: sessionOverride);
       http.StreamedResponse response = await sendRequest(client, token: token);
 
       // Retry once on Invalid JWT by refreshing the session.
@@ -327,7 +350,10 @@ class ChatRepository {
         final body = await response.stream.bytesToString();
         final lower = body.toLowerCase();
         if (lower.contains('invalid jwt')) {
-          token = await _accessToken(forceRefresh: true);
+          token = await _accessToken(
+            forceRefresh: true,
+            sessionOverride: sessionOverride,
+          );
           response = await sendRequest(client, token: token);
         } else {
           throw fallbackOrThrow(response.statusCode, body);

@@ -2,6 +2,7 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/supabase/supabase_service.dart';
 import '../../data/chat_repository.dart';
@@ -107,6 +108,7 @@ class ChatController extends StateNotifier<ChatState> {
 
   Future<void> sendMessage(
     String text, {
+    required Session session,
     required String locale,
     required String errorReplyMessage,
   }) async {
@@ -131,7 +133,7 @@ class ChatController extends StateNotifier<ChatState> {
     );
 
     try {
-      await _streamResponse(trimmed, locale: locale);
+      await _streamResponse(trimmed, locale: locale, session: session);
     } catch (e) {
       final botMessage = ChatMessage(
         id: 'bot-${DateTime.now().microsecondsSinceEpoch}',
@@ -155,11 +157,16 @@ class ChatController extends StateNotifier<ChatState> {
     state = state.copyWith(suggestions: const []);
   }
 
-  Future<void> _streamResponse(String message, {required String locale}) async {
+  Future<void> _streamResponse(
+    String message, {
+    required String locale,
+    required Session session,
+  }) async {
     final stream = _repo.streamMessage(
       message: message,
       sessionId: _activeSessionId,
       locale: locale,
+      sessionOverride: session,
     );
 
     bool started = false;
