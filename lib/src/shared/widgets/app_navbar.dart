@@ -575,6 +575,30 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
                                     },
                                   ),
                                   const SizedBox(width: 10),
+                                  TextButton.icon(
+                                    onPressed: () {
+                                      _closeMobile();
+                                      context.go(Routes.adminLogin);
+                                    },
+                                    icon: const Icon(Icons.security),
+                                    label: Text(l10n.t(AppText.adminPanelTitle)),
+                                    style: TextButton.styleFrom(
+                                      foregroundColor: const Color(0xFF6D28D9),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 10,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(14),
+                                        side: BorderSide(
+                                          color: cs.outlineVariant.withAlpha(
+                                            180,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
                                   _PrimaryPill(
                                     label: l10n.t(AppText.signUp),
                                     maxWidth: 160,
@@ -593,6 +617,10 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
                                     onCompany: () {
                                       _closeMobile();
                                       context.go(Routes.companyAuth);
+                                    },
+                                    onAdmin: () {
+                                      _closeMobile();
+                                      context.go(Routes.adminLogin);
                                     },
                                     onSignUp: () {
                                       _closeMobile();
@@ -1075,12 +1103,14 @@ class _LoginMenuPill extends StatelessWidget {
     required this.l10n,
     required this.onStudent,
     required this.onCompany,
+    required this.onAdmin,
     required this.onSignUp,
   });
 
   final AppLocalizations l10n;
   final VoidCallback onStudent;
   final VoidCallback onCompany;
+  final VoidCallback onAdmin;
   final VoidCallback onSignUp;
 
   @override
@@ -1096,6 +1126,9 @@ class _LoginMenuPill extends StatelessWidget {
           case _LoginMenuAction.company:
             onCompany();
             break;
+          case _LoginMenuAction.admin:
+            onAdmin();
+            break;
           case _LoginMenuAction.signUp:
             onSignUp();
             break;
@@ -1109,6 +1142,10 @@ class _LoginMenuPill extends StatelessWidget {
         PopupMenuItem<_LoginMenuAction>(
           value: _LoginMenuAction.company,
           child: Text(l10n.t(AppText.companyLogin)),
+        ),
+        PopupMenuItem<_LoginMenuAction>(
+          value: _LoginMenuAction.admin,
+          child: Text(l10n.t(AppText.adminPanelTitle)),
         ),
         const PopupMenuDivider(),
         PopupMenuItem<_LoginMenuAction>(
@@ -1152,7 +1189,7 @@ class _LoginMenuPill extends StatelessWidget {
   }
 }
 
-enum _LoginMenuAction { student, company, signUp }
+enum _LoginMenuAction { student, company, admin, signUp }
 
 class _MenuAction {
   const _MenuAction._({this.path, required this.isLogout});

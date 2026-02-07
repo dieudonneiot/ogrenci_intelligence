@@ -40,6 +40,8 @@ class AuthRepository {
       final v = res.trim().toLowerCase();
       if (v == 'true') return true;
       if (v == 'false') return false;
+      if (v == 't') return true;
+      if (v == 'f') return false;
       final n = num.tryParse(v);
       if (n != null) return n != 0;
     }
@@ -61,8 +63,20 @@ class AuthRepository {
     return false;
   }
 
+  Uri _restUri(String path, {Map<String, String>? queryParameters}) {
+    final base = Uri.parse(Env.supabaseUrl);
+
+    // Avoid double slashes if SUPABASE_URL ends with "/".
+    final basePath = base.path.endsWith('/')
+        ? base.path.substring(0, base.path.length - 1)
+        : base.path;
+
+    final fullPath = '$basePath$path';
+    return base.replace(path: fullPath, queryParameters: queryParameters);
+  }
+
   Future<bool> _isAdminViaHttp(String accessToken) async {
-    final url = Uri.parse('${Env.supabaseUrl}/rest/v1/rpc/is_admin');
+    final url = _restUri('/rest/v1/rpc/is_admin');
 
     final resp = await http.post(
       url,
@@ -70,6 +84,7 @@ class AuthRepository {
         'apikey': Env.supabaseAnonKey,
         'Authorization': 'Bearer $accessToken',
         'Content-Type': 'application/json',
+        'Accept': 'application/json',
       },
       body: '{}',
     );
@@ -84,19 +99,67 @@ class AuthRepository {
     return _boolFromDynamic(jsonDecode(body));
   }
 
+  Future<bool> _isAdminViaHttpTable({
+    required String accessToken,
+    required String userId,
+  }) async {
+    final url = _restUri(
+      '/rest/v1/admins',
+      queryParameters: <String, String>{
+        'select': 'id',
+        'user_id': 'eq.$userId',
+        'is_active': 'eq.true',
+        'limit': '1',
+      },
+    );
+
+    final resp = await http.get(
+      url,
+      headers: <String, String>{
+        'apikey': Env.supabaseAnonKey,
+        'Authorization': 'Bearer $accessToken',
+        'Accept': 'application/json',
+      },
+    );
+
+    if (resp.statusCode < 200 || resp.statusCode >= 300) return false;
+
+    final body = resp.body.trim();
+    if (body.isEmpty) return false;
+
+    final decoded = jsonDecode(body);
+    if (decoded is List) return decoded.isNotEmpty;
+    if (decoded is Map) return decoded.isNotEmpty;
+    return false;
+  }
+
   Future<bool> isAdmin({
     Session? sessionOverride,
     String? userIdOverride,
   }) async {
+    // Prefer using the explicit JWT (doesn't rely on `currentSession` hydration),
+    // but treat a `false` as inconclusive and fall back to client-based checks.
+    //
+    // On some setups, PostgREST HTTP RPC can produce a false-negative (shape /
+    // parsing / transient timing), while the client RPC succeeds.
     try {
       final token = sessionOverride?.accessToken;
       if (token != null && token.trim().isNotEmpty) {
-        // Avoid relying on `currentSession` hydration by using the explicit JWT.
-        return await _isAdminViaHttp(token);
+        final viaHttp = await _isAdminViaHttp(token);
+        if (viaHttp) return true;
+
+        // If the RPC is missing/misconfigured, some setups still allow reading
+        // the user's own `admins` row (depending on RLS). Try as a best-effort.
+        final uid = userIdOverride ?? currentUser?.id;
+        if (uid != null && uid.trim().isNotEmpty) {
+          final viaTable = await _isAdminViaHttpTable(
+            accessToken: token,
+            userId: uid,
+          );
+          if (viaTable) return true;
+        }
       }
-    } catch (_) {
-      // ignore and fall back to client-based calls
-    }
+    } catch (_) {}
 
     try {
       return _boolFromDynamic(await _client.rpc('is_admin'));

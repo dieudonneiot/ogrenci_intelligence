@@ -334,6 +334,28 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ),
                     ),
 
+                    const SizedBox(height: 10),
+                    OutlinedButton.icon(
+                      onPressed: () => context.push(Routes.adminLogin),
+                      icon: const Icon(Icons.security),
+                      label: Text(
+                        l10n.t(AppText.adminPanelTitle),
+                        style: const TextStyle(fontWeight: FontWeight.w800),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed: () => context.push(Routes.adminSetup),
+                        child: Text(l10n.t(AppText.adminSetupTitle)),
+                      ),
+                    ),
+
                     const SizedBox(height: 6),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -344,44 +366,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           child: Text(l10n.t(AppText.authRegisterCta)),
                         ),
                       ],
-                    ),
-
-                    const SizedBox(height: 10),
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.surfaceContainerHighest,
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.security,
-                            size: 18,
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              'Admin panel',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w800,
-                                color: Theme.of(context).colorScheme.onSurface,
-                              ),
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () => context.go(Routes.adminLogin),
-                            child: const Text('Login'),
-                          ),
-                          TextButton(
-                            onPressed: () => context.go(Routes.adminSetup),
-                            child: const Text('Setup'),
-                          ),
-                        ],
-                      ),
                     ),
                   ],
                 ),

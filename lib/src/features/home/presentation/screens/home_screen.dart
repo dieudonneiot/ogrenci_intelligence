@@ -263,6 +263,13 @@ class _Hero extends StatelessWidget {
                         textColor: const Color(0xFF1F2937),
                         onTap: onLogin,
                       ),
+                      _FilledCta(
+                        label: l10n.t(AppText.adminPanelTitle),
+                        color: _yellow400,
+                        textColor: const Color(0xFF1F2937),
+                        icon: Icons.security,
+                        onTap: () => context.go(Routes.adminLogin),
+                      ),
                     ] else ...[
                       _FilledCta(
                         label: l10n.t(AppText.profile),

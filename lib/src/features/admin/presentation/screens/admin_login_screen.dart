@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -10,7 +11,6 @@ import '../../../../core/routing/routes.dart';
 import '../../../../core/supabase/supabase_service.dart';
 import '../../../auth/domain/auth_models.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
-import '../../presentation/controllers/admin_controller.dart';
 
 class AdminLoginScreen extends ConsumerStatefulWidget {
   const AdminLoginScreen({super.key});
@@ -83,12 +83,19 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
         } catch (_) {}
       }
 
-      final isAdmin = await ref
-          .read(adminRepositoryProvider)
-          .isCurrentUserAdmin();
+      // Determine admin using the same robust logic as the global auth state
+      // (uses explicit JWT when available, then falls back).
+      final isAdmin = await ref.read(authRepositoryProvider).isAdmin(
+            sessionOverride: session,
+            userIdOverride: user.id,
+          );
       if (!isAdmin) {
         await SupabaseService.client.auth.signOut();
         _error = l10n.t(AppText.adminLoginErrorNotAdmin);
+        if (kDebugMode) {
+          _error =
+              '$_error\n(DB check failed: ensure `public.is_admin()` exists and is executable - see `docs/sql/00_helpers.sql`.)';
+        }
         return;
       }
 
@@ -97,10 +104,16 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
         SnackBar(content: Text(l10n.t(AppText.adminLoginSuccess))),
       );
 
+      // Trigger auth state listeners to re-evaluate role (helps on some platforms).
+      try {
+        await SupabaseService.client.auth.refreshSession();
+      } catch (_) {}
+
       // Wait briefly for auth state propagation, then go to admin dashboard.
       final current = ref.read(authViewStateProvider).valueOrNull;
       if (current?.isAuthenticated == true &&
           current?.userType == UserType.admin) {
+        if (!mounted) return;
         context.go(Routes.adminDashboard);
         return;
       }
@@ -128,9 +141,11 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
       final resolved = ref.read(authViewStateProvider).valueOrNull;
       if (resolved?.isAuthenticated == true &&
           resolved?.userType == UserType.admin) {
+        if (!mounted) return;
         context.go(Routes.adminDashboard);
       } else {
         // Navigate to a stable location and let the router redirect based on role.
+        if (!mounted) return;
         context.go(Routes.home);
       }
     } catch (e) {
@@ -270,6 +285,29 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+                  Container(height: 1, color: const Color(0xFFE5E7EB)),
+                  const SizedBox(height: 10),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('${l10n.t(AppText.authNoAccount)} '),
+                      TextButton(
+                        onPressed: () => context.go(Routes.adminSetup),
+                        child: Text(l10n.t(AppText.adminSetupCreateButton)),
+                      ),
+                    ],
+                  ),
+                  TextButton.icon(
+                    onPressed: () => context.go(Routes.home),
+                    icon: const Icon(Icons.arrow_back),
+                    label: Text(l10n.t(AppText.commonBack)),
+                    style: TextButton.styleFrom(
+                      foregroundColor: const Color(0xFF6B7280),
                     ),
                   ),
                 ],

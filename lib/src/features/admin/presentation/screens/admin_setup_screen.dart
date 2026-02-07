@@ -196,6 +196,7 @@ class _AdminSetupScreenState extends State<AdminSetupScreen> {
           'name': name,
           'email': email,
           'role': 'super_admin',
+          'is_active': true,
           'permissions': {
             'manage_companies': true,
             'manage_users': true,
@@ -212,6 +213,11 @@ class _AdminSetupScreenState extends State<AdminSetupScreen> {
         } catch (_) {}
         rethrow;
       }
+
+      // Ensure auth state listeners re-evaluate role after the admin row exists.
+      try {
+        await SupabaseService.client.auth.refreshSession();
+      } catch (_) {}
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(

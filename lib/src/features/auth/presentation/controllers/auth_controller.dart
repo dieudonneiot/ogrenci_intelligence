@@ -41,6 +41,7 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
 final authViewStateProvider = StreamProvider<AuthViewState>((ref) {
   final repo = ref.watch(authRepositoryProvider);
   final controller = StreamController<AuthViewState>.broadcast();
+  var roleRecheckSeq = 0;
 
   Future<void> emit(Session? session, {required bool loading}) async {
     final user = session?.user;
@@ -88,16 +89,79 @@ final authViewStateProvider = StreamProvider<AuthViewState>((ref) {
     }
 
     // ALWAYS emit a state (never skip)
-    controller.add(
-      AuthViewState(
-        user: user,
-        session: session,
-        loading: loading,
-        userType: userType,
-        companyId: companyId,
-        companyRole: companyRole,
-      ),
+    final nextState = AuthViewState(
+      user: user,
+      session: session,
+      loading: loading,
+      userType: userType,
+      companyId: companyId,
+      companyRole: companyRole,
     );
+    controller.add(nextState);
+
+    // Role re-check:
+    // Some platforms/project setups can yield a transient false-negative on the
+    // first admin/company check right after login. Re-check shortly after and
+    // emit an updated state if the role resolves.
+    final verifiedUser = verified ? user : null;
+    if (!loading && verifiedUser != null && session != null && userType != UserType.admin) {
+      final seq = ++roleRecheckSeq;
+      final accessToken = session.accessToken;
+      final userId = verifiedUser.id;
+
+      unawaited(() async {
+        await Future.delayed(const Duration(milliseconds: 450));
+        if (seq != roleRecheckSeq) return;
+
+        // Ensure we're still on the same session/user.
+        final current = repo.currentSession;
+        final currentToken = current?.accessToken ?? accessToken;
+        if (currentToken != accessToken) return;
+        if (repo.currentUser?.id != userId) return;
+
+        UserType resolvedType = UserType.student;
+        String? resolvedCompanyId;
+        String? resolvedCompanyRole;
+
+        try {
+          final isAdmin = await repo.isAdmin(
+            sessionOverride: current ?? session,
+            userIdOverride: userId,
+          );
+          if (isAdmin) {
+            resolvedType = UserType.admin;
+          }
+        } catch (_) {}
+
+        if (resolvedType != UserType.admin) {
+          try {
+            final membership = await repo.fetchCompanyMembership(userId);
+            if (membership != null) {
+              resolvedType = UserType.company;
+              resolvedCompanyId = membership.companyId;
+              resolvedCompanyRole = membership.role;
+            }
+          } catch (_) {}
+        }
+
+        if (seq != roleRecheckSeq) return;
+
+        if (resolvedType != nextState.userType ||
+            resolvedCompanyId != nextState.companyId ||
+            resolvedCompanyRole != nextState.companyRole) {
+          controller.add(
+            AuthViewState(
+              user: verifiedUser,
+              session: session,
+              loading: false,
+              userType: resolvedType,
+              companyId: resolvedCompanyId,
+              companyRole: resolvedCompanyRole,
+            ),
+          );
+        }
+      }());
+    }
   }
 
   // initial
