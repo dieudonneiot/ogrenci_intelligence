@@ -205,7 +205,7 @@ class _CompanyExcuseRequestsScreenState
                           child: Text(
                             'No requests.',
                             style: TextStyle(
-                              color: Color(0xFF6B7280),
+                              color: Color(0xFF64748B),
                               fontWeight: FontWeight.w800,
                             ),
                           ),
@@ -251,7 +251,7 @@ class _RequestCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x07000000),
@@ -283,7 +283,7 @@ class _RequestCard extends StatelessWidget {
           Text(
             item.internshipTitle,
             style: const TextStyle(
-              color: Color(0xFF6B7280),
+              color: Color(0xFF64748B),
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -313,12 +313,12 @@ class _RequestCard extends StatelessWidget {
               decoration: BoxDecoration(
                 color: const Color(0xFFF9FAFB),
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: const Color(0xFFE5E7EB)),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
               ),
               child: Text(
                 'Note: ${item.reviewerNote!}',
                 style: const TextStyle(
-                  color: Color(0xFF6B7280),
+                  color: Color(0xFF64748B),
                   fontWeight: FontWeight.w700,
                 ),
               ),

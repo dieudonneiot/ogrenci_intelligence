@@ -80,7 +80,7 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen>
                   Text(
                     l10n.t(AppText.coursesSubtitle),
                     style: const TextStyle(
-                      color: Color(0xFF6B7280),
+                      color: Color(0xFF64748B),
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -275,7 +275,7 @@ class _FiltersCard extends ConsumerWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x0A000000),
@@ -296,11 +296,11 @@ class _FiltersCard extends ConsumerWidget {
               fillColor: const Color(0xFFF9FAFB),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
-                borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
-                borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
               ),
               suffixIcon: (search.isNotEmpty || dept != null || level != null)
                   ? IconButton(
@@ -422,7 +422,7 @@ class _CourseCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x08000000),
@@ -443,7 +443,7 @@ class _CourseCard extends StatelessWidget {
             ),
             child: const Icon(
               Icons.menu_book_outlined,
-              color: Color(0xFF6D28D9),
+              color: Color(0xFF14B8A6),
             ),
           ),
           const SizedBox(width: 12),
@@ -489,7 +489,7 @@ class _CourseCard extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    color: Color(0xFF6B7280),
+                    color: Color(0xFF64748B),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -519,7 +519,7 @@ class _CourseCard extends StatelessWidget {
                     child: LinearProgressIndicator(
                       value: p / 100,
                       minHeight: 8,
-                      backgroundColor: const Color(0xFFE5E7EB),
+                      backgroundColor: const Color(0xFFE2E8F0),
                       valueColor: const AlwaysStoppedAnimation(
                         Color(0xFF2563EB),
                       ),
@@ -529,7 +529,7 @@ class _CourseCard extends StatelessWidget {
                   Text(
                     l10n.dashboardCourseProgress(p),
                     style: const TextStyle(
-                      color: Color(0xFF6B7280),
+                      color: Color(0xFF64748B),
                       fontWeight: FontWeight.w800,
                       fontSize: 12,
                     ),
@@ -542,7 +542,7 @@ class _CourseCard extends StatelessWidget {
           ElevatedButton(
             onPressed: onOpen,
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF6D28D9),
+              backgroundColor: const Color(0xFF14B8A6),
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(14),
@@ -580,7 +580,7 @@ class _EnrolledCourseCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -608,7 +608,7 @@ class _EnrolledCourseCard extends StatelessWidget {
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(
-              color: Color(0xFF6B7280),
+              color: Color(0xFF64748B),
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -618,7 +618,7 @@ class _EnrolledCourseCard extends StatelessWidget {
             child: LinearProgressIndicator(
               value: p / 100,
               minHeight: 10,
-              backgroundColor: const Color(0xFFE5E7EB),
+              backgroundColor: const Color(0xFFE2E8F0),
               valueColor: const AlwaysStoppedAnimation(Color(0xFF2563EB)),
             ),
           ),
@@ -626,7 +626,7 @@ class _EnrolledCourseCard extends StatelessWidget {
           Text(
             l10n.dashboardCourseProgress(p),
             style: const TextStyle(
-              color: Color(0xFF6B7280),
+              color: Color(0xFF64748B),
               fontWeight: FontWeight.w800,
               fontSize: 12,
             ),
@@ -681,7 +681,7 @@ class _SmallPill extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFFF3F4F6),
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -752,7 +752,7 @@ class _EmptyBlock extends StatelessWidget {
                 message,
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                  color: Color(0xFF6B7280),
+                  color: Color(0xFF64748B),
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -806,7 +806,7 @@ class _ErrorBlock extends StatelessWidget {
               Text(
                 message,
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: Color(0xFF6B7280)),
+                style: const TextStyle(color: Color(0xFF64748B)),
               ),
               const SizedBox(height: 10),
               ElevatedButton(

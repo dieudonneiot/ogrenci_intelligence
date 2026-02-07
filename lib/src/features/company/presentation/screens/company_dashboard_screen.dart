@@ -305,7 +305,7 @@ class _CompanyDashboardScreenState
                           _StatCard(
                             title: l10n.t(AppText.companyDashboardActiveJobs),
                             value: _stats.activeJobs.toString(),
-                            color: const Color(0xFF7C3AED),
+                            color: const Color(0xFF6366F1),
                             icon: Icons.work_outline,
                           ),
                           _StatCard(
@@ -365,7 +365,7 @@ class _CompanyDashboardScreenState
                             value: pendingApprovals.toString(),
                             color: pendingApprovals > 0
                                 ? const Color(0xFFDC2626)
-                                : const Color(0xFF6B7280),
+                                : const Color(0xFF64748B),
                             icon: Icons.notifications_active_outlined,
                           ),
                           _StatCard(
@@ -431,7 +431,7 @@ class _Header extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
         gradient: const LinearGradient(
-          colors: [Color(0xFF4F46E5), Color(0xFF7C3AED)],
+          colors: [Color(0xFF6366F1), Color(0xFF6366F1)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -589,7 +589,7 @@ class _StatCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x0A000000),
@@ -619,7 +619,7 @@ class _StatCard extends StatelessWidget {
           Text(
             title,
             style: const TextStyle(
-              color: Color(0xFF6B7280),
+              color: Color(0xFF64748B),
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -722,7 +722,7 @@ class _NotificationFeed extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x07000000),
@@ -771,7 +771,7 @@ class _NotificationFeed extends StatelessWidget {
                   ? Icons.verified_outlined
                   : Icons.event_busy_outlined;
               final color = it.kind == _FeedKind.evidence
-                  ? const Color(0xFF7C3AED)
+                  ? const Color(0xFF6366F1)
                   : const Color(0xFFF59E0B);
               final onTap = it.kind == _FeedKind.evidence
                   ? onOpenEvidence
@@ -784,7 +784,7 @@ class _NotificationFeed extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: const Color(0xFFF9FAFB),
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: const Color(0xFFE5E7EB)),
+                    border: Border.all(color: const Color(0xFFE2E8F0)),
                   ),
                   child: Row(
                     children: [
@@ -836,7 +836,7 @@ class _DepartmentChart extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -868,9 +868,9 @@ class _DepartmentChart extends StatelessWidget {
                     child: LinearProgressIndicator(
                       value: e.value / maxV,
                       minHeight: 10,
-                      backgroundColor: const Color(0xFFE5E7EB),
+                      backgroundColor: const Color(0xFFE2E8F0),
                       valueColor: const AlwaysStoppedAnimation(
-                        Color(0xFF6D28D9),
+                        Color(0xFF14B8A6),
                       ),
                     ),
                   ),
@@ -883,7 +883,7 @@ class _DepartmentChart extends StatelessWidget {
                     textAlign: TextAlign.right,
                     style: const TextStyle(
                       fontWeight: FontWeight.w900,
-                      color: Color(0xFF1F2937),
+                      color: Color(0xFF0F172A),
                     ),
                   ),
                 ),
@@ -916,7 +916,7 @@ class _PerformanceSummary extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x0A000000),
@@ -944,7 +944,7 @@ class _PerformanceSummary extends StatelessWidget {
             label: l10n.t(AppText.companyReportsMetricConversionRate),
             value: '%${report.conversionRate.toStringAsFixed(1)}',
             ratio: conversionRatio,
-            color: const Color(0xFF7C3AED),
+            color: const Color(0xFF6366F1),
           ),
           const SizedBox(height: 10),
           _ProgressRow(
@@ -986,7 +986,7 @@ class _ProgressRow extends StatelessWidget {
                 style: const TextStyle(fontWeight: FontWeight.w700),
               ),
             ),
-            Text(value, style: const TextStyle(color: Color(0xFF6B7280))),
+            Text(value, style: const TextStyle(color: Color(0xFF64748B))),
           ],
         ),
         const SizedBox(height: 6),
@@ -995,7 +995,7 @@ class _ProgressRow extends StatelessWidget {
           child: LinearProgressIndicator(
             value: ratio,
             minHeight: 6,
-            backgroundColor: const Color(0xFFE5E7EB),
+            backgroundColor: const Color(0xFFE2E8F0),
             valueColor: AlwaysStoppedAnimation(color),
           ),
         ),
@@ -1063,7 +1063,7 @@ class _TalentSpotlight extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x12000000),
@@ -1077,7 +1077,7 @@ class _TalentSpotlight extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.people_outline, color: Color(0xFF6D28D9)),
+              const Icon(Icons.people_outline, color: Color(0xFF14B8A6)),
               const SizedBox(width: 10),
               const Expanded(
                 child: Text(
@@ -1391,7 +1391,7 @@ class _CandidateRow extends StatelessWidget {
             children: const [
               Text(
                 'Points',
-                style: TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+                style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
               ),
             ],
           ),
@@ -1427,12 +1427,12 @@ class _ActionCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: const Color(0xFFE5E7EB)),
+          border: Border.all(color: const Color(0xFFE2E8F0)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, color: const Color(0xFF6D28D9)),
+            Icon(icon, color: const Color(0xFF14B8A6)),
             const SizedBox(width: 8),
             Text(label, style: const TextStyle(fontWeight: FontWeight.w700)),
           ],

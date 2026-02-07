@@ -425,7 +425,7 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
                                     const Icon(
                                       Icons.apartment,
                                       size: 34,
-                                      color: Color(0xFF6D28D9),
+                                      color: Color(0xFF14B8A6),
                                     ),
                                     const SizedBox(width: 10),
                                     if (showBrandText)
@@ -434,7 +434,7 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
                                         style: const TextStyle(
                                           fontSize: 20,
                                           fontWeight: FontWeight.w800,
-                                          color: Color(0xFF6D28D9),
+                                          color: Color(0xFF14B8A6),
                                         ),
                                       ),
                                   ] else ...[
@@ -446,7 +446,7 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
                                           const Icon(
                                             Icons.school,
                                             size: 34,
-                                            color: Color(0xFF6D28D9),
+                                            color: Color(0xFF14B8A6),
                                           ),
                                     ),
                                     const SizedBox(width: 10),
@@ -456,7 +456,7 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
                                         style: const TextStyle(
                                           fontSize: 20,
                                           fontWeight: FontWeight.w800,
-                                          color: Color(0xFF6D28D9),
+                                          color: Color(0xFF14B8A6),
                                         ),
                                       ),
                                   ],
@@ -539,7 +539,7 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
                                       },
                                       icon: const Icon(
                                         Icons.add_circle_outline,
-                                        color: Color(0xFF6D28D9),
+                                        color: Color(0xFF14B8A6),
                                       ),
                                     ),
                                   const SizedBox(width: 12),
@@ -585,7 +585,7 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
                                     icon: const Icon(Icons.security),
                                     label: Text(l10n.t(AppText.adminPanelTitle)),
                                     style: TextButton.styleFrom(
-                                      foregroundColor: const Color(0xFF6D28D9),
+                                      foregroundColor: const Color(0xFF14B8A6),
                                       padding: const EdgeInsets.symmetric(
                                         horizontal: 12,
                                         vertical: 10,
@@ -663,7 +663,7 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
                         width: double.infinity,
                         decoration: const BoxDecoration(
                           border: Border(
-                            top: BorderSide(color: Color(0xFFE5E7EB)),
+                            top: BorderSide(color: Color(0xFFE2E8F0)),
                           ),
                         ),
                         padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
@@ -885,8 +885,8 @@ class _PrimaryPill extends StatefulWidget {
 
 class _PrimaryPillState extends State<_PrimaryPill> {
   bool _hover = false;
-  static const _purple = Color(0xFF7C3AED);
-  static const _purpleHover = Color(0xFF6D28D9);
+  static const _purple = Color(0xFF6366F1);
+  static const _purpleHover = Color(0xFF14B8A6);
 
   @override
   Widget build(BuildContext context) {
@@ -954,7 +954,7 @@ class _PointsChip extends StatelessWidget {
         ),
         child: Row(
           children: [
-            const Icon(Icons.emoji_events, size: 16, color: Color(0xFF6D28D9)),
+            const Icon(Icons.emoji_events, size: 16, color: Color(0xFF14B8A6)),
             const SizedBox(width: 6),
             FutureBuilder<int>(
               future: future,
@@ -963,7 +963,7 @@ class _PointsChip extends StatelessWidget {
                 return Text(
                   '$v',
                   style: const TextStyle(
-                    color: Color(0xFF6D28D9),
+                    color: Color(0xFF14B8A6),
                     fontWeight: FontWeight.w800,
                     fontSize: 13,
                   ),
@@ -1056,7 +1056,7 @@ class _ProfileDropdown extends StatelessWidget {
                 child: Text(
                   l10n.t(AppText.companyBadge),
                   style: const TextStyle(
-                    color: Color(0xFF6D28D9),
+                    color: Color(0xFF14B8A6),
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
                   ),
@@ -1065,7 +1065,7 @@ class _ProfileDropdown extends StatelessWidget {
             ],
           ],
           const SizedBox(width: 6),
-          const Icon(Icons.expand_more, size: 18, color: Color(0xFF6B7280)),
+          const Icon(Icons.expand_more, size: 18, color: Color(0xFF64748B)),
         ],
       ),
     );
@@ -1110,7 +1110,7 @@ class _LanguageMenu extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         decoration: BoxDecoration(
-          border: Border.all(color: const Color(0xFFE5E7EB)),
+          border: Border.all(color: const Color(0xFFE2E8F0)),
           borderRadius: BorderRadius.circular(999),
           color: Colors.white,
         ),
@@ -1127,7 +1127,7 @@ class _LanguageMenu extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 4),
-            const Icon(Icons.expand_more, size: 16, color: Color(0xFF6B7280)),
+            const Icon(Icons.expand_more, size: 16, color: Color(0xFF64748B)),
           ],
         ),
       ),
@@ -1193,7 +1193,7 @@ class _LoginMenuPill extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: const Color(0xFF7C3AED),
+          color: const Color(0xFF6366F1),
           borderRadius: BorderRadius.circular(14),
           boxShadow: const [
             BoxShadow(
@@ -1331,7 +1331,7 @@ class _MobileHeader extends StatelessWidget {
             title,
             style: const TextStyle(
               fontWeight: FontWeight.w800,
-              color: Color(0xFF6D28D9),
+              color: Color(0xFF14B8A6),
             ),
           ),
           if (badge != null) ...[
@@ -1345,7 +1345,7 @@ class _MobileHeader extends StatelessWidget {
               child: Text(
                 badge!,
                 style: const TextStyle(
-                  color: Color(0xFF6D28D9),
+                  color: Color(0xFF14B8A6),
                   fontSize: 11,
                   fontWeight: FontWeight.w800,
                 ),
@@ -1365,7 +1365,7 @@ class _SkeletonPill extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: const Color(0xFFE5E7EB),
+        color: const Color(0xFFE2E8F0),
         borderRadius: BorderRadius.circular(12),
       ),
     );
@@ -1380,7 +1380,7 @@ class _SkeletonBlock extends StatelessWidget {
     return Container(
       height: 48,
       decoration: BoxDecoration(
-        color: const Color(0xFFE5E7EB),
+        color: const Color(0xFFE2E8F0),
         borderRadius: BorderRadius.circular(14),
       ),
     );

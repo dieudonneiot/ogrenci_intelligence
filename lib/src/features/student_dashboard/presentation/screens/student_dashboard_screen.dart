@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/routing/routes.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
 import '../../../oi/application/oi_providers.dart';
 import '../../../oi/domain/oi_models.dart';
@@ -99,7 +100,7 @@ class _StudentDashboardScreenState
                 e.toString(),
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                  color: Color(0xFF6B7280),
+                  color: Color(0xFF64748B),
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -120,7 +121,7 @@ class _StudentDashboardScreenState
         final stats = vm.stats;
 
         return Container(
-          color: const Color(0xFFF9FAFB),
+          color: AppColors.bg,
           child: RefreshIndicator(
             onRefresh: () =>
                 ref.read(studentDashboardProvider.notifier).refresh(),
@@ -152,7 +153,7 @@ class _StudentDashboardScreenState
                                   Text(
                                     l10n.t(AppText.dashboardWelcomeSubtitle),
                                     style: const TextStyle(
-                                      color: Color(0xFF6B7280),
+                                      color: Color(0xFF64748B),
                                       fontWeight: FontWeight.w700,
                                     ),
                                   ),
@@ -187,7 +188,7 @@ class _StudentDashboardScreenState
                               _StatCard(
                                 icon: Icons.emoji_events_outlined,
                                 iconBg: const Color(0xFFEDE9FE),
-                                iconColor: const Color(0xFF7C3AED),
+                                iconColor: const Color(0xFF6366F1),
                                 title: l10n.t(AppText.dashboardTotalPoints),
                                 value: '${stats.totalPoints}',
                                 subtitle: stats.departmentRank != null
@@ -361,7 +362,7 @@ class _MiniOiScoreChip extends StatelessWidget {
         child: CircularProgressIndicator(strokeWidth: 2),
       ),
       error: (e, st) =>
-          const Text('—', style: TextStyle(fontWeight: FontWeight.w900)),
+          const Text('N/A', style: TextStyle(fontWeight: FontWeight.w900)),
       data: (profile) {
         final score = profile.oiScore;
         return Column(
@@ -372,7 +373,7 @@ class _MiniOiScoreChip extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w900,
-                color: Color(0xFF1F2937),
+                color: Color(0xFF0F172A),
               ),
             ),
             const Text(
@@ -380,7 +381,7 @@ class _MiniOiScoreChip extends StatelessWidget {
               style: TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.w800,
-                color: Color(0xFF6B7280),
+                color: Color(0xFF64748B),
               ),
             ),
           ],
@@ -401,7 +402,7 @@ class _MiniOiScoreChip extends StatelessWidget {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             gradient: const LinearGradient(
-              colors: [Color(0xFF7C3AED), Color(0xFF4F46E5)],
+              colors: [AppColors.primary, AppColors.secondary],
             ),
             boxShadow: const [
               BoxShadow(
@@ -454,7 +455,7 @@ class _UrgentTaskCard extends StatelessWidget {
     if (tasks.hasAcceptedInternship) {
       return _TaskUi(
         icon: Icons.upload_file,
-        iconColor: const Color(0xFF7C3AED),
+        iconColor: const Color(0xFF6366F1),
         title: 'Upload your internship proof',
         subtitle: 'Submit evidence so your mentor can approve it.',
         actionLabel: 'Upload proof',
@@ -498,7 +499,7 @@ class _UrgentTaskCard extends StatelessWidget {
               : 'No internship yet',
           color: tasks.hasAcceptedInternship
               ? const Color(0xFF16A34A)
-              : const Color(0xFF6B7280),
+              : const Color(0xFF64748B),
         ),
         _TaskChip(
           icon: Icons.verified_outlined,
@@ -507,7 +508,7 @@ class _UrgentTaskCard extends StatelessWidget {
               : 'No pending proof',
           color: tasks.pendingEvidenceCount > 0
               ? const Color(0xFF16A34A)
-              : const Color(0xFF6B7280),
+              : const Color(0xFF64748B),
         ),
         _TaskChip(
           icon: Icons.swipe,
@@ -516,12 +517,12 @@ class _UrgentTaskCard extends StatelessWidget {
               : 'No new cases',
           color: tasks.unansweredCaseCount > 0
               ? const Color(0xFF2563EB)
-              : const Color(0xFF6B7280),
+              : const Color(0xFF64748B),
         ),
         _TaskChip(
           icon: Icons.person_outline,
           label: 'Improve profile',
-          color: const Color(0xFF7C3AED),
+          color: const Color(0xFF6366F1),
           onTap: onProfile,
         ),
       ],
@@ -538,7 +539,7 @@ class _UrgentTaskCard extends StatelessWidget {
         ),
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.white,
-          foregroundColor: const Color(0xFF4F46E5),
+          foregroundColor: const Color(0xFF6366F1),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
           ),
@@ -551,11 +552,11 @@ class _UrgentTaskCard extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
         gradient: const LinearGradient(
-          colors: [Color(0xFFEEF2FF), Color(0xFFF5F3FF)],
+          colors: [Color(0xFFECFEFF), Color(0xFFEEF2FF)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x0A000000),
@@ -590,14 +591,14 @@ class _UrgentTaskCard extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w900,
-                        color: Color(0xFF1F2937),
+                        color: Color(0xFF0F172A),
                       ),
                     ),
                     const SizedBox(height: 6),
                     Text(
                       picked.subtitle,
                       style: const TextStyle(
-                        color: Color(0xFF6B7280),
+                        color: Color(0xFF64748B),
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -683,7 +684,7 @@ class _TaskChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.8),
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: content,
     );
@@ -723,7 +724,7 @@ class _RecommendedCoursesStrip extends StatelessWidget {
       children: [
         const Row(
           children: [
-            Icon(Icons.auto_awesome, color: Color(0xFF7C3AED)),
+            Icon(Icons.auto_awesome, color: Color(0xFF6366F1)),
             SizedBox(width: 8),
             Text(
               'Picked for you',
@@ -773,8 +774,8 @@ class _RecommendedCourseCard extends StatelessWidget {
         (course.videoUrl != null && course.videoUrl!.trim().isNotEmpty);
 
     final bg = isPlaceholder
-        ? const LinearGradient(colors: [Color(0xFFE5E7EB), Color(0xFFF3F4F6)])
-        : const LinearGradient(colors: [Color(0xFF7C3AED), Color(0xFF4F46E5)]);
+        ? const LinearGradient(colors: [Color(0xFFE2E8F0), Color(0xFFF3F4F6)])
+        : const LinearGradient(colors: [Color(0xFF4F46E5), Color(0xFF0F766E)]);
 
     final child = ClipRRect(
       borderRadius: BorderRadius.circular(18),
@@ -817,7 +818,7 @@ class _RecommendedCourseCard extends StatelessWidget {
                   style: const TextStyle(
                     fontWeight: FontWeight.w900,
                     fontSize: 11,
-                    color: Color(0xFF1F2937),
+                    color: Color(0xFF0F172A),
                   ),
                 ),
               ),
@@ -850,7 +851,7 @@ class _RecommendedCourseCard extends StatelessWidget {
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  color: isPlaceholder ? const Color(0xFFE5E7EB) : Colors.white,
+                  color: isPlaceholder ? const Color(0xFFE2E8F0) : Colors.white,
                   fontWeight: FontWeight.w900,
                   fontSize: 14,
                   height: 1.15,
@@ -870,7 +871,7 @@ class _RecommendedCourseCard extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: const Color(0xFFE5E7EB)),
+            border: Border.all(color: const Color(0xFFE2E8F0)),
             boxShadow: const [
               BoxShadow(
                 color: Color(0x07000000),
@@ -909,7 +910,7 @@ class _MvpActionsRow extends StatelessWidget {
             icon: Icons.timer_outlined,
             title: 'Instant Focus Check',
             subtitle: '30s timer challenge',
-            color: const Color(0xFF6D28D9),
+            color: const Color(0xFF14B8A6),
             onTap: onFocusCheck,
           ),
           _ActionCard(
@@ -982,7 +983,7 @@ class _ActionCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: const Color(0xFFE5E7EB)),
+          border: Border.all(color: const Color(0xFFE2E8F0)),
           boxShadow: const [
             BoxShadow(
               color: Color(0x07000000),
@@ -1015,7 +1016,7 @@ class _ActionCard extends StatelessWidget {
                   Text(
                     subtitle,
                     style: const TextStyle(
-                      color: Color(0xFF6B7280),
+                      color: Color(0xFF64748B),
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -1072,7 +1073,7 @@ class _StatCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x0A000000),
@@ -1109,7 +1110,7 @@ class _StatCard extends StatelessWidget {
           Text(
             title,
             style: const TextStyle(
-              color: Color(0xFF6B7280),
+              color: Color(0xFF64748B),
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -1118,7 +1119,7 @@ class _StatCard extends StatelessWidget {
             Text(
               subtitle!,
               style: const TextStyle(
-                color: Color(0xFF7C3AED),
+                color: Color(0xFF6366F1),
                 fontWeight: FontWeight.w800,
                 fontSize: 12,
               ),
@@ -1161,7 +1162,7 @@ class _PointsHero extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
         gradient: const LinearGradient(
-          colors: [Color(0xFF7C3AED), Color(0xFF4F46E5)],
+          colors: [Color(0xFF4F46E5), Color(0xFF0F766E)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -1253,7 +1254,7 @@ class _PointsHero extends StatelessWidget {
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFFBBF24),
-                        foregroundColor: const Color(0xFF1F2937),
+                        foregroundColor: const Color(0xFF0F172A),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
                         ),
@@ -1272,7 +1273,7 @@ class _PointsHero extends StatelessWidget {
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
-                        foregroundColor: const Color(0xFF6D28D9),
+                        foregroundColor: const Color(0xFF14B8A6),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
                         ),
@@ -1367,7 +1368,7 @@ class _ChatAssistantCard extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
         gradient: const LinearGradient(
-          colors: [Color(0xFF8B5CF6), Color(0xFF4F46E5)],
+          colors: [Color(0xFF4F46E5), Color(0xFF0F766E)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -1456,7 +1457,7 @@ class _ChatAssistantCard extends StatelessWidget {
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
-                foregroundColor: const Color(0xFF5B21B6),
+                foregroundColor: const Color(0xFF0F766E),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
                 ),
@@ -1585,7 +1586,7 @@ class _OngoingCoursesCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x0A000000),
@@ -1633,7 +1634,7 @@ class _OngoingCoursesCard extends StatelessWidget {
                     Text(
                       l10n.t(AppText.dashboardNoCourses),
                       style: const TextStyle(
-                        color: Color(0xFF6B7280),
+                        color: Color(0xFF64748B),
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -1672,7 +1673,7 @@ class _EnrolledCourseTile extends StatelessWidget {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1711,7 +1712,7 @@ class _EnrolledCourseTile extends StatelessWidget {
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(
-              color: Color(0xFF6B7280),
+              color: Color(0xFF64748B),
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -1734,7 +1735,7 @@ class _EnrolledCourseTile extends StatelessWidget {
                       child: LinearProgressIndicator(
                         value: p / 100,
                         minHeight: 8,
-                        backgroundColor: const Color(0xFFE5E7EB),
+                        backgroundColor: const Color(0xFFE2E8F0),
                         valueColor: const AlwaysStoppedAnimation(
                           Color(0xFF2563EB),
                         ),
@@ -1744,7 +1745,7 @@ class _EnrolledCourseTile extends StatelessWidget {
                     Text(
                       l10n.dashboardCourseProgress(p),
                       style: const TextStyle(
-                        color: Color(0xFF6B7280),
+                        color: Color(0xFF64748B),
                         fontWeight: FontWeight.w700,
                         fontSize: 12,
                       ),
@@ -1759,7 +1760,7 @@ class _EnrolledCourseTile extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: () => context.go('/courses/${course.courseId}'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF6D28D9),
+                    backgroundColor: const Color(0xFF14B8A6),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -1781,13 +1782,13 @@ class _EnrolledCourseTile extends StatelessWidget {
                   const Icon(
                     Icons.access_time,
                     size: 16,
-                    color: Color(0xFF6B7280),
+                    color: Color(0xFF64748B),
                   ),
                   const SizedBox(width: 6),
                   Text(
                     course.duration,
                     style: const TextStyle(
-                      color: Color(0xFF6B7280),
+                      color: Color(0xFF64748B),
                       fontWeight: FontWeight.w700,
                       fontSize: 12,
                     ),
@@ -1833,7 +1834,7 @@ class _RecentActivitiesCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x0A000000),
@@ -1849,7 +1850,7 @@ class _RecentActivitiesCard extends StatelessWidget {
             children: [
               const Icon(
                 Icons.local_activity_outlined,
-                color: Color(0xFF7C3AED),
+                color: Color(0xFF6366F1),
               ),
               const SizedBox(width: 8),
               Expanded(
@@ -1879,7 +1880,7 @@ class _RecentActivitiesCard extends StatelessWidget {
                     Text(
                       l10n.t(AppText.dashboardNoActivity),
                       style: const TextStyle(
-                        color: Color(0xFF6B7280),
+                        color: Color(0xFF64748B),
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -1941,7 +1942,7 @@ class _ActivityRow extends StatelessWidget {
                     Text(
                       _dateText(context, activity.createdAt),
                       style: const TextStyle(
-                        color: Color(0xFF6B7280),
+                        color: Color(0xFF64748B),
                         fontWeight: FontWeight.w700,
                         fontSize: 12,
                       ),
@@ -1981,7 +1982,7 @@ class _ActivityRow extends StatelessWidget {
       case ActivityCategory.job:
         return const _ActStyle(
           icon: Icons.work_outline,
-          fg: Color(0xFF7C3AED),
+          fg: Color(0xFF6366F1),
           bg: Color(0xFFEDE9FE),
         );
       case ActivityCategory.internship:
@@ -1999,7 +2000,7 @@ class _ActivityRow extends StatelessWidget {
       case ActivityCategory.platform:
         return const _ActStyle(
           icon: Icons.bolt_outlined,
-          fg: Color(0xFF4B5563),
+          fg: AppColors.inkMuted,
           bg: Color(0xFFF3F4F6),
         );
     }

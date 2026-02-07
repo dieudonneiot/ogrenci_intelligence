@@ -51,7 +51,7 @@ class _CaseAnalysisScreenState extends ConsumerState<CaseAnalysisScreen> {
               Text(
                 e.toString(),
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: Color(0xFF6B7280)),
+                style: const TextStyle(color: Color(0xFF64748B)),
               ),
               const SizedBox(height: 14),
               SizedBox(
@@ -90,7 +90,7 @@ class _CaseAnalysisScreenState extends ConsumerState<CaseAnalysisScreen> {
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.swipe, color: Color(0xFF6D28D9)),
+                      const Icon(Icons.swipe, color: Color(0xFF14B8A6)),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
@@ -106,7 +106,7 @@ class _CaseAnalysisScreenState extends ConsumerState<CaseAnalysisScreen> {
                       Text(
                         '${_index + 1}/${items.length}',
                         style: const TextStyle(
-                          color: Color(0xFF6B7280),
+                          color: Color(0xFF64748B),
                           fontWeight: FontWeight.w800,
                         ),
                       ),
@@ -149,7 +149,7 @@ class _CaseAnalysisScreenState extends ConsumerState<CaseAnalysisScreen> {
                             overflow: TextOverflow.ellipsis,
                           ),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF6D28D9),
+                            backgroundColor: const Color(0xFF14B8A6),
                           ),
                         ),
                       ),
@@ -246,7 +246,7 @@ class _SwipeCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: const Color(0xFFE5E7EB)),
+          border: Border.all(color: const Color(0xFFE2E8F0)),
           boxShadow: const [
             BoxShadow(
               color: Color(0x0A000000),
@@ -261,7 +261,7 @@ class _SwipeCard extends StatelessWidget {
             const Text(
               'Scenario',
               style: TextStyle(
-                color: Color(0xFF6B7280),
+                color: Color(0xFF64748B),
                 fontWeight: FontWeight.w800,
               ),
             ),
@@ -275,12 +275,12 @@ class _SwipeCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            Container(height: 1, color: const Color(0xFFE5E7EB)),
+            Container(height: 1, color: const Color(0xFFE2E8F0)),
             const SizedBox(height: 16),
             const Text(
               'Swipe left or right to answer.',
               style: TextStyle(
-                color: Color(0xFF6B7280),
+                color: Color(0xFF64748B),
                 fontWeight: FontWeight.w700,
               ),
             ),

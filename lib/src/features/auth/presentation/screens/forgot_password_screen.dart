@@ -154,7 +154,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                         l10n.t(AppText.authResetScreenHint),
                         textAlign: TextAlign.center,
                         style: const TextStyle(
-                          color: Color(0xFF6B7280),
+                          color: Color(0xFF64748B),
                           fontWeight: FontWeight.w600,
                         ),
                       ),

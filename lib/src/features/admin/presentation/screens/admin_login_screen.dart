@@ -184,7 +184,7 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
                   const Icon(
                     Icons.security,
                     size: 48,
-                    color: Color(0xFF7C3AED),
+                    color: Color(0xFF6366F1),
                   ),
                   const SizedBox(height: 12),
                   Text(
@@ -196,7 +196,7 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
                   Text(
                     l10n.t(AppText.adminLoginSubtitle),
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Color(0xFF6B7280)),
+                    style: TextStyle(color: Color(0xFF64748B)),
                   ),
                   if (_error != null) ...[
                     const SizedBox(height: 16),
@@ -329,7 +329,7 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
                             : l10n.t(AppText.adminLoginButton),
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF7C3AED),
+                        backgroundColor: const Color(0xFF6366F1),
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -339,7 +339,7 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
                   ),
 
                   const SizedBox(height: 16),
-                  Container(height: 1, color: const Color(0xFFE5E7EB)),
+                  Container(height: 1, color: const Color(0xFFE2E8F0)),
                   const SizedBox(height: 10),
 
                   Row(
@@ -357,7 +357,7 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
                     icon: const Icon(Icons.arrow_back),
                     label: Text(l10n.t(AppText.commonBack)),
                     style: TextButton.styleFrom(
-                      foregroundColor: const Color(0xFF6B7280),
+                      foregroundColor: const Color(0xFF64748B),
                     ),
                   ),
                 ],

@@ -340,8 +340,8 @@ class _NanoVideoPageState extends ConsumerState<_NanoVideoPage> {
               icon: Icons.quiz_outlined,
               label: _quizUnlocked ? 'Mini quiz' : 'Mini quiz',
               accent: _quizUnlocked
-                  ? const Color(0xFF7C3AED)
-                  : const Color(0xFF6B7280),
+                  ? const Color(0xFF6366F1)
+                  : const Color(0xFF64748B),
               onTap: _quizUnlocked ? _openQuiz : null,
             ),
             const SizedBox(height: 10),
@@ -489,7 +489,7 @@ class _NanoQuizSheetState extends State<_NanoQuizSheet> {
             child: ElevatedButton(
               onPressed: _submitting || _selected == null ? null : _submit,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF7C3AED),
+                backgroundColor: const Color(0xFF6366F1),
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
@@ -548,7 +548,7 @@ class _OptionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final border = selected ? const Color(0xFF7C3AED) : const Color(0xFFE5E7EB);
+    final border = selected ? const Color(0xFF6366F1) : const Color(0xFFE2E8F0);
     final bg = selected ? const Color(0xFFF5F3FF) : Colors.white;
     return Opacity(
       opacity: enabled ? 1 : 0.65,
@@ -573,7 +573,7 @@ class _OptionTile extends StatelessWidget {
                   shape: BoxShape.circle,
                   border: Border.all(color: border, width: 2),
                   color: selected
-                      ? const Color(0xFF7C3AED)
+                      ? const Color(0xFF6366F1)
                       : Colors.transparent,
                 ),
                 child: selected
@@ -765,7 +765,7 @@ class _EmptyState extends StatelessWidget {
           l10n.t(AppText.nanoEmptyState),
           textAlign: TextAlign.center,
           style: const TextStyle(
-            color: Color(0xFF6B7280),
+            color: Color(0xFF64748B),
             fontWeight: FontWeight.w700,
           ),
         ),
@@ -798,7 +798,7 @@ class _ErrorState extends StatelessWidget {
             Text(
               text,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: Color(0xFF6B7280)),
+              style: const TextStyle(color: Color(0xFF64748B)),
             ),
             const SizedBox(height: 12),
             SizedBox(

@@ -145,7 +145,7 @@ class _AdminCompaniesScreenState extends ConsumerState<AdminCompaniesScreen> {
                                 Text(
                                   company.sector ?? '-',
                                   style: const TextStyle(
-                                    color: Color(0xFF6B7280),
+                                    color: Color(0xFF64748B),
                                   ),
                                 ),
                                 const SizedBox(height: 8),
@@ -198,7 +198,7 @@ class _AdminCompaniesScreenState extends ConsumerState<AdminCompaniesScreen> {
                         const SizedBox(height: 4),
                         Text(
                           company.description!,
-                          style: const TextStyle(color: Color(0xFF6B7280)),
+                          style: const TextStyle(color: Color(0xFF64748B)),
                         ),
                       ],
                       if (company.rejectionReason != null &&
@@ -467,7 +467,7 @@ class _AdminCompaniesScreenState extends ConsumerState<AdminCompaniesScreen> {
         title: l10n.t(AppText.adminCompaniesTitle),
         trailing: Text(
           l10n.adminCompaniesTotalCountWithCount(_companies.length),
-          style: const TextStyle(color: Color(0xFF6B7280)),
+          style: const TextStyle(color: Color(0xFF64748B)),
         ),
       ),
       child: Column(
@@ -521,7 +521,7 @@ class _FiltersBar extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Column(
         children: [
@@ -549,15 +549,15 @@ class _FiltersBar extends StatelessWidget {
                 onPressed: () => onStatusChanged(s),
                 style: OutlinedButton.styleFrom(
                   backgroundColor: active
-                      ? const Color(0xFF7C3AED)
+                      ? const Color(0xFF6366F1)
                       : const Color(0xFFF3F4F6),
                   foregroundColor: active
                       ? Colors.white
                       : const Color(0xFF374151),
                   side: BorderSide(
                     color: active
-                        ? const Color(0xFF7C3AED)
-                        : const Color(0xFFE5E7EB),
+                        ? const Color(0xFF6366F1)
+                        : const Color(0xFFE2E8F0),
                   ),
                 ),
                 child: Text(_statusLabel(l10n, s)),
@@ -599,7 +599,7 @@ class _CompaniesTable extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
@@ -631,7 +631,7 @@ class _CompaniesTable extends StatelessWidget {
                             company.sector ?? '-',
                             style: const TextStyle(
                               fontSize: 12,
-                              color: Color(0xFF6B7280),
+                              color: Color(0xFF64748B),
                             ),
                           ),
                         ],
@@ -653,14 +653,14 @@ class _CompaniesTable extends StatelessWidget {
                           const Icon(
                             Icons.location_on_outlined,
                             size: 12,
-                            color: Color(0xFF6B7280),
+                            color: Color(0xFF64748B),
                           ),
                           const SizedBox(width: 4),
                           Text(
                             company.city ?? '-',
                             style: const TextStyle(
                               fontSize: 12,
-                              color: Color(0xFF6B7280),
+                              color: Color(0xFF64748B),
                             ),
                           ),
                         ],
@@ -673,7 +673,7 @@ class _CompaniesTable extends StatelessWidget {
                   company.activeSubscription == null
                       ? Text(
                           l10n.t(AppText.commonNotSpecified),
-                          style: const TextStyle(color: Color(0xFF6B7280)),
+                          style: const TextStyle(color: Color(0xFF64748B)),
                         )
                       : Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -689,7 +689,7 @@ class _CompaniesTable extends StatelessWidget {
                               company.activeSubscription!.endsAtText,
                               style: const TextStyle(
                                 fontSize: 12,
-                                color: Color(0xFF6B7280),
+                                color: Color(0xFF64748B),
                               ),
                             ),
                           ],
@@ -710,7 +710,7 @@ class _CompaniesTable extends StatelessWidget {
                     onPressed: () => onOpen(company),
                     icon: const Icon(
                       Icons.remove_red_eye_outlined,
-                      color: Color(0xFF7C3AED),
+                      color: Color(0xFF6366F1),
                     ),
                   ),
                 ),
@@ -734,7 +734,7 @@ class _EmptyState extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Column(
         children: [
@@ -773,7 +773,7 @@ class _ErrorState extends StatelessWidget {
             Text(
               text,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: Color(0xFF6B7280)),
+              style: const TextStyle(color: Color(0xFF64748B)),
             ),
             const SizedBox(height: 12),
             ElevatedButton(
@@ -895,10 +895,10 @@ class _CompanyAvatar extends StatelessWidget {
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: const Color(0xFFE5E7EB),
+        color: const Color(0xFFE2E8F0),
         borderRadius: BorderRadius.circular(10),
       ),
-      child: const Icon(Icons.apartment_outlined, color: Color(0xFF6B7280)),
+      child: const Icon(Icons.apartment_outlined, color: Color(0xFF64748B)),
     );
   }
 }
@@ -922,7 +922,7 @@ class _DetailGrid extends StatelessWidget {
                   Text(
                     item.label,
                     style: const TextStyle(
-                      color: Color(0xFF6B7280),
+                      color: Color(0xFF64748B),
                       fontSize: 12,
                     ),
                   ),

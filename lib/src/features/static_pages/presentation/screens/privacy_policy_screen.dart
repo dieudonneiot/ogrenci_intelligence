@@ -168,7 +168,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                       Text(
                         'Bu gizlilik politikası zaman zaman güncellenebilir. Önemli değişiklikler olması durumunda size e-posta veya platform üzerinden bildirim yapılacaktır.',
                         style: TextStyle(
-                          color: Color(0xFF6B7280),
+                          color: Color(0xFF64748B),
                           fontSize: 12,
                         ),
                       ),
@@ -199,7 +199,7 @@ class _Hero extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Row(
         children: [
@@ -208,7 +208,7 @@ class _Hero extends StatelessWidget {
             backgroundColor: Color(0xFFEDE9FE),
             child: Icon(
               Icons.shield_outlined,
-              color: Color(0xFF6D28D9),
+              color: Color(0xFF14B8A6),
               size: 28,
             ),
           ),
@@ -222,13 +222,13 @@ class _Hero extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.w900,
-                    color: Color(0xFF1F2937),
+                    color: Color(0xFF0F172A),
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   l10n.legalLastUpdated(dateText),
-                  style: const TextStyle(color: Color(0xFF6B7280)),
+                  style: const TextStyle(color: Color(0xFF64748B)),
                 ),
               ],
             ),
@@ -317,7 +317,7 @@ class _Chip extends StatelessWidget {
         label,
         style: const TextStyle(
           fontWeight: FontWeight.w600,
-          color: Color(0xFF6D28D9),
+          color: Color(0xFF14B8A6),
         ),
       ),
     );
@@ -336,7 +336,7 @@ class _SectionCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: child,
     );
@@ -354,7 +354,7 @@ class _SectionTitle extends StatelessWidget {
     return Row(
       children: [
         if (icon != null) ...[
-          Icon(icon, color: const Color(0xFF6D28D9)),
+          Icon(icon, color: const Color(0xFF14B8A6)),
           const SizedBox(width: 8),
         ],
         Text(
@@ -389,7 +389,7 @@ class _Paragraph extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: const TextStyle(color: Color(0xFF6B7280), height: 1.5),
+      style: const TextStyle(color: Color(0xFF64748B), height: 1.5),
     );
   }
 }
@@ -409,11 +409,11 @@ class _BulletList extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('• ', style: TextStyle(color: Color(0xFF6B7280))),
+                  const Text('• ', style: TextStyle(color: Color(0xFF64748B))),
                   Expanded(
                     child: Text(
                       item,
-                      style: const TextStyle(color: Color(0xFF6B7280)),
+                      style: const TextStyle(color: Color(0xFF64748B)),
                     ),
                   ),
                 ],
@@ -450,7 +450,7 @@ class _HighlightBox extends StatelessWidget {
                   const Icon(
                     Icons.check_circle,
                     size: 16,
-                    color: Color(0xFF7C3AED),
+                    color: Color(0xFF6366F1),
                   ),
                   const SizedBox(width: 6),
                   Expanded(
@@ -484,7 +484,7 @@ class _MiniCard extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -493,7 +493,7 @@ class _MiniCard extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             subtitle,
-            style: const TextStyle(color: Color(0xFF6B7280), fontSize: 12),
+            style: const TextStyle(color: Color(0xFF64748B), fontSize: 12),
           ),
         ],
       ),
@@ -512,7 +512,7 @@ class _ContactBox extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFFF9FAFB),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

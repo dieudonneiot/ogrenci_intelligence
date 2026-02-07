@@ -70,16 +70,35 @@ class AppTheme {
 
   static ThemeData light() {
     final baseScheme = ColorScheme.fromSeed(
-      seedColor: AppColors.brandPurple,
+      seedColor: AppColors.primary,
       brightness: Brightness.light,
     );
 
     final colorScheme = baseScheme.copyWith(
+      primary: AppColors.primary,
+      onPrimary: Colors.white,
+      primaryContainer: const Color(0xFFCCFBF1),
+      onPrimaryContainer: AppColors.ink,
+      secondary: AppColors.secondary,
+      onSecondary: Colors.white,
+      secondaryContainer: const Color(0xFFE0E7FF),
+      onSecondaryContainer: AppColors.ink,
+      tertiary: AppColors.success,
+      onTertiary: Colors.white,
+      surface: AppColors.surface,
+      surfaceContainerHighest: AppColors.surfaceMuted,
+      outline: AppColors.borderLight,
+      outlineVariant: AppColors.borderLight,
       onSurface: AppColors.ink,
       onSurfaceVariant: AppColors.inkMuted,
+      error: AppColors.danger,
     );
 
     final base = ThemeData(useMaterial3: true, colorScheme: colorScheme);
+    final baseTextTheme = base.textTheme.apply(
+      bodyColor: AppColors.ink,
+      displayColor: AppColors.ink,
+    );
 
     return ThemeData(
       useMaterial3: true,
@@ -87,17 +106,17 @@ class AppTheme {
       scaffoldBackgroundColor: AppColors.bg,
       splashFactory: InkSparkle.splashFactory,
       visualDensity: VisualDensity.standard,
-      textTheme: base.textTheme.copyWith(
-        titleLarge: base.textTheme.titleLarge?.copyWith(
+      textTheme: baseTextTheme.copyWith(
+        titleLarge: baseTextTheme.titleLarge?.copyWith(
           fontWeight: FontWeight.w800,
         ),
-        titleMedium: base.textTheme.titleMedium?.copyWith(
+        titleMedium: baseTextTheme.titleMedium?.copyWith(
           fontWeight: FontWeight.w800,
         ),
-        titleSmall: base.textTheme.titleSmall?.copyWith(
+        titleSmall: baseTextTheme.titleSmall?.copyWith(
           fontWeight: FontWeight.w800,
         ),
-        labelLarge: base.textTheme.labelLarge?.copyWith(
+        labelLarge: baseTextTheme.labelLarge?.copyWith(
           fontWeight: FontWeight.w800,
         ),
       ),
@@ -203,7 +222,7 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: colorScheme.surfaceContainerHighest,
+        fillColor: AppColors.surfaceMuted,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.sm,
           vertical: AppSpacing.sm,
@@ -294,7 +313,7 @@ class AppTheme {
 
   static ThemeData dark() {
     final colorScheme = ColorScheme.fromSeed(
-      seedColor: AppColors.brandPurple,
+      seedColor: AppColors.primary,
       brightness: Brightness.dark,
     );
 

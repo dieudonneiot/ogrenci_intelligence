@@ -39,7 +39,7 @@ class InternshipDetailScreen extends ConsumerWidget {
                 Text(
                   l10n.internshipDetailLoadFailed(e.toString()),
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: Color(0xFF6B7280)),
+                  style: const TextStyle(color: Color(0xFF64748B)),
                 ),
                 const SizedBox(height: 12),
                 SizedBox(
@@ -95,7 +95,7 @@ class _InternshipDetailBody extends ConsumerWidget {
             ),
             color: item.isFavorite
                 ? const Color(0xFFEF4444)
-                : const Color(0xFF6B7280),
+                : const Color(0xFF64748B),
           ),
         ],
       ),
@@ -196,7 +196,7 @@ class _MainDetail extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x0A000000),
@@ -276,7 +276,7 @@ class _MainDetail extends StatelessWidget {
                 ? i.description
                 : l10n.t(AppText.commonNoDescription),
             style: const TextStyle(
-              color: Color(0xFF6B7280),
+              color: Color(0xFF64748B),
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -287,7 +287,7 @@ class _MainDetail extends StatelessWidget {
             Text(
               l10n.t(AppText.internshipsNotSpecified),
               style: const TextStyle(
-                color: Color(0xFF6B7280),
+                color: Color(0xFF64748B),
                 fontWeight: FontWeight.w600,
               ),
             )
@@ -300,7 +300,7 @@ class _MainDetail extends StatelessWidget {
             Text(
               l10n.t(AppText.internshipsNotSpecified),
               style: const TextStyle(
-                color: Color(0xFF6B7280),
+                color: Color(0xFF64748B),
                 fontWeight: FontWeight.w600,
               ),
             )
@@ -350,7 +350,7 @@ class _ApplyCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x0A000000),
@@ -373,7 +373,7 @@ class _ApplyCard extends StatelessWidget {
             Text(
               l10n.t(AppText.internshipDetailAlreadyApplied),
               style: const TextStyle(
-                color: Color(0xFF6B7280),
+                color: Color(0xFF64748B),
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -381,7 +381,7 @@ class _ApplyCard extends StatelessWidget {
             Text(
               l10n.internshipDetailApplyHint(100),
               style: const TextStyle(
-                color: Color(0xFF6B7280),
+                color: Color(0xFF64748B),
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -392,7 +392,7 @@ class _ApplyCard extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: () => _openApplySheet(context),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF6D28D9),
+                  backgroundColor: const Color(0xFF14B8A6),
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
@@ -456,11 +456,11 @@ class _ApplyCard extends StatelessWidget {
                       fillColor: const Color(0xFFF9FAFB),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
-                        borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                        borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
-                        borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                        borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
                       ),
                     ),
                   ),
@@ -487,9 +487,9 @@ class _ApplyCard extends StatelessWidget {
                             }
                           : null,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF6D28D9),
+                        backgroundColor: const Color(0xFF14B8A6),
                         foregroundColor: Colors.white,
-                        disabledBackgroundColor: const Color(0xFFE5E7EB),
+                        disabledBackgroundColor: const Color(0xFFE2E8F0),
                         disabledForegroundColor: const Color(0xFF9CA3AF),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
@@ -571,7 +571,7 @@ class _Bullets extends StatelessWidget {
                     child: Text(
                       t,
                       style: const TextStyle(
-                        color: Color(0xFF6B7280),
+                        color: Color(0xFF64748B),
                         fontWeight: FontWeight.w600,
                       ),
                     ),

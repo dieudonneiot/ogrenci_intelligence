@@ -308,7 +308,7 @@ class _ExcuseRequestScreenState extends ConsumerState<ExcuseRequestScreen> {
                                 ),
                               ),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF6D28D9),
+                                backgroundColor: const Color(0xFF14B8A6),
                                 foregroundColor: Colors.white,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(14),
@@ -337,7 +337,7 @@ class _ExcuseRequestScreenState extends ConsumerState<ExcuseRequestScreen> {
                           const Text(
                             'No requests yet.',
                             style: TextStyle(
-                              color: Color(0xFF6B7280),
+                              color: Color(0xFF64748B),
                               fontWeight: FontWeight.w700,
                             ),
                           )
@@ -375,7 +375,7 @@ class _Card extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x07000000),
@@ -400,7 +400,7 @@ class _MyRequestRow extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFFF9FAFB),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -418,7 +418,7 @@ class _MyRequestRow extends StatelessWidget {
                   Text(
                     item.details!,
                     style: const TextStyle(
-                      color: Color(0xFF6B7280),
+                      color: Color(0xFF64748B),
                       fontWeight: FontWeight.w600,
                     ),
                   ),

@@ -318,7 +318,7 @@ class _CompanyAuthScreenState extends ConsumerState<CompanyAuthScreen> {
                                 gradient: const LinearGradient(
                                   colors: [
                                     Color(0xFF3B82F6),
-                                    Color(0xFF7C3AED),
+                                    Color(0xFF6366F1),
                                   ],
                                 ),
                                 boxShadow: const [
@@ -690,7 +690,7 @@ class _LeftPanel extends StatelessWidget {
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
                               gradient: const LinearGradient(
-                                colors: [Color(0xFF3B82F6), Color(0xFF7C3AED)],
+                                colors: [Color(0xFF3B82F6), Color(0xFF6366F1)],
                               ),
                               borderRadius: BorderRadius.circular(12),
                             ),
@@ -878,7 +878,7 @@ class _GradientButton extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF2563EB), Color(0xFF7C3AED)],
+          colors: [Color(0xFF2563EB), Color(0xFF6366F1)],
         ),
         borderRadius: BorderRadius.circular(14),
         boxShadow: const [

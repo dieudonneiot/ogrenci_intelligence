@@ -89,8 +89,8 @@ class _CompanyStatusCheckState extends ConsumerState<CompanyStatusCheck> {
     if (status == null) {
       return _CenteredCard(
         icon: Icons.apartment_outlined,
-        iconBg: const Color(0xFFE5E7EB),
-        iconFg: const Color(0xFF6B7280),
+        iconBg: const Color(0xFFE2E8F0),
+        iconFg: const Color(0xFF64748B),
         title: l10n.t(AppText.companyStatusNoRegistrationTitle),
         subtitle: l10n.t(AppText.companyStatusNoRegistrationSubtitle),
         actions: [
@@ -179,7 +179,7 @@ class _CompanyStatusCheckState extends ConsumerState<CompanyStatusCheck> {
       return _CenteredCard(
         icon: Icons.credit_card,
         iconBg: const Color(0xFFEDE9FE),
-        iconFg: const Color(0xFF6D28D9),
+        iconFg: const Color(0xFF14B8A6),
         title: l10n.t(AppText.companyStatusSubscriptionRequiredTitle),
         subtitle: l10n.t(AppText.companyStatusSubscriptionRequiredSubtitle),
         actions: [
@@ -195,7 +195,7 @@ class _CompanyStatusCheckState extends ConsumerState<CompanyStatusCheck> {
             icon: const Icon(Icons.credit_card),
             label: Text(l10n.t(AppText.companyStatusViewPlans)),
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF6D28D9),
+              backgroundColor: const Color(0xFF14B8A6),
             ),
           ),
         ],
@@ -268,7 +268,7 @@ class _CenteredCard extends StatelessWidget {
                 Text(
                   subtitle,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: Color(0xFF6B7280)),
+                  style: const TextStyle(color: Color(0xFF64748B)),
                 ),
                 const SizedBox(height: 16),
                 for (final item in actions) item,

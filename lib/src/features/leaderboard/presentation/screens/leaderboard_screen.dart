@@ -65,7 +65,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
               Text(
                 e.toString(),
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: Color(0xFF6B7280)),
+                style: const TextStyle(color: Color(0xFF64748B)),
               ),
               const SizedBox(height: 14),
               SizedBox(
@@ -119,7 +119,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                         Text(
                           l10n.t(AppText.leaderboardSubtitle),
                           style: const TextStyle(
-                            color: Color(0xFF6B7280),
+                            color: Color(0xFF64748B),
                             fontWeight: FontWeight.w700,
                           ),
                         ),
@@ -135,17 +135,17 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(14),
-                            border: Border.all(color: const Color(0xFFE5E7EB)),
+                            border: Border.all(color: const Color(0xFFE2E8F0)),
                           ),
                           child: TabBar(
                             controller: _tabs,
                             isScrollable: true,
-                            labelColor: const Color(0xFF1F2937),
-                            unselectedLabelColor: const Color(0xFF6B7280),
+                            labelColor: const Color(0xFF0F172A),
+                            unselectedLabelColor: const Color(0xFF64748B),
                             labelStyle: const TextStyle(
                               fontWeight: FontWeight.w900,
                             ),
-                            indicatorColor: const Color(0xFF6D28D9),
+                            indicatorColor: const Color(0xFF14B8A6),
                             tabs: [
                               Tab(text: l10n.t(AppText.leaderboardTabOverall)),
                               Tab(
@@ -180,7 +180,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                                       child: Text(
                                         l10n.leaderboardDepartmentLabel(dept),
                                         style: const TextStyle(
-                                          color: Color(0xFF6B7280),
+                                          color: Color(0xFF64748B),
                                           fontWeight: FontWeight.w800,
                                         ),
                                       ),
@@ -239,7 +239,7 @@ class _UserStatsHero extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
         gradient: const LinearGradient(
-          colors: [Color(0xFF7C3AED), Color(0xFF4F46E5)],
+          colors: [Color(0xFF6366F1), Color(0xFF6366F1)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -356,7 +356,7 @@ class _LeaderboardList extends StatelessWidget {
           child: Text(
             emptyText,
             style: const TextStyle(
-              color: Color(0xFF6B7280),
+              color: Color(0xFF64748B),
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -377,7 +377,7 @@ class _LeaderboardList extends StatelessWidget {
           decoration: BoxDecoration(
             color: isMe ? const Color(0xFFF3E8FF) : Colors.white,
             borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: const Color(0xFFE5E7EB)),
+            border: Border.all(color: const Color(0xFFE2E8F0)),
             boxShadow: const [
               BoxShadow(
                 color: Color(0x07000000),
@@ -424,7 +424,7 @@ class _LeaderboardList extends StatelessWidget {
                                     vertical: 5,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFF7C3AED),
+                                    color: const Color(0xFF6366F1),
                                     borderRadius: BorderRadius.circular(999),
                                   ),
                                   child: Text(
@@ -449,7 +449,7 @@ class _LeaderboardList extends StatelessWidget {
                             ? e.department!
                             : l10n.t(AppText.commonNotSpecified),
                         style: const TextStyle(
-                          color: Color(0xFF6B7280),
+                          color: Color(0xFF64748B),
                           fontWeight: FontWeight.w700,
                           fontSize: 12,
                         ),
@@ -469,7 +469,7 @@ class _LeaderboardList extends StatelessWidget {
                     style: const TextStyle(
                       fontWeight: FontWeight.w900,
                       fontSize: 18,
-                      color: Color(0xFF6D28D9),
+                      color: Color(0xFF14B8A6),
                     ),
                   ),
                   const SizedBox(height: 6),
@@ -499,7 +499,7 @@ class _RankBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -511,8 +511,8 @@ class _RankBadge extends StatelessWidget {
             style: TextStyle(
               fontWeight: FontWeight.w900,
               color: (rank <= 3)
-                  ? const Color(0xFF1F2937)
-                  : const Color(0xFF6B7280),
+                  ? const Color(0xFF0F172A)
+                  : const Color(0xFF64748B),
             ),
           ),
         ],
@@ -531,7 +531,7 @@ class _RankBadge extends StatelessWidget {
     if (r == 1) return const Color(0xFFF59E0B);
     if (r == 2) return const Color(0xFF9CA3AF);
     if (r == 3) return const Color(0xFFD97706);
-    return const Color(0xFF6B7280);
+    return const Color(0xFF64748B);
   }
 }
 
@@ -547,14 +547,14 @@ class _Avatar extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFFEDE9FE),
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       alignment: Alignment.center,
       child: Text(
         letter,
         style: const TextStyle(
           fontWeight: FontWeight.w900,
-          color: Color(0xFF6D28D9),
+          color: Color(0xFF14B8A6),
         ),
       ),
     );
@@ -613,7 +613,7 @@ class _InfoCard extends StatelessWidget {
         children: [
           const Icon(
             Icons.tips_and_updates,
-            color: Color(0xFF6D28D9),
+            color: Color(0xFF14B8A6),
             size: 28,
           ),
           const SizedBox(width: 12),

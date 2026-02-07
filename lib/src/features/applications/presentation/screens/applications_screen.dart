@@ -135,7 +135,7 @@ class _ApplicationsScreenState extends ConsumerState<ApplicationsScreen>
                           children: [
                             const Icon(
                               Icons.assignment_turned_in_outlined,
-                              color: Color(0xFF6D28D9),
+                              color: Color(0xFF14B8A6),
                               size: 30,
                             ),
                             const SizedBox(width: 10),
@@ -152,7 +152,7 @@ class _ApplicationsScreenState extends ConsumerState<ApplicationsScreen>
                         Text(
                           l10n.t(AppText.applicationsSubtitle),
                           style: const TextStyle(
-                            color: Color(0xFF6B7280),
+                            color: Color(0xFF64748B),
                             fontWeight: FontWeight.w700,
                           ),
                         ),
@@ -410,7 +410,7 @@ class _Guest extends StatelessWidget {
               const Icon(
                 Icons.lock_outline,
                 size: 44,
-                color: Color(0xFF6B7280),
+                color: Color(0xFF64748B),
               ),
               const SizedBox(height: 10),
               Text(
@@ -449,7 +449,7 @@ class _ErrorState extends StatelessWidget {
               text,
               textAlign: TextAlign.center,
               style: const TextStyle(
-                color: Color(0xFF6B7280),
+                color: Color(0xFF64748B),
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -485,7 +485,7 @@ class _StatTile extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x0A000000),
@@ -503,7 +503,7 @@ class _StatTile extends StatelessWidget {
               color: const Color(0xFFEDE9FE),
               borderRadius: BorderRadius.circular(14),
             ),
-            child: Icon(icon, color: const Color(0xFF6D28D9)),
+            child: Icon(icon, color: const Color(0xFF14B8A6)),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -513,7 +513,7 @@ class _StatTile extends StatelessWidget {
                 Text(
                   title,
                   style: const TextStyle(
-                    color: Color(0xFF6B7280),
+                    color: Color(0xFF64748B),
                     fontWeight: FontWeight.w800,
                   ),
                 ),
@@ -564,11 +564,11 @@ class _FiltersBar extends StatelessWidget {
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
         ),
       ),
     );
@@ -587,11 +587,11 @@ class _FiltersBar extends StatelessWidget {
               ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
-                borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
-                borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
               ),
             ),
             items: [
@@ -679,7 +679,7 @@ class _ListViewTab extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: const Color(0xFFE5E7EB)),
+              border: Border.all(color: const Color(0xFFE2E8F0)),
               boxShadow: const [
                 BoxShadow(
                   color: Color(0x0A000000),
@@ -701,7 +701,7 @@ class _ListViewTab extends StatelessWidget {
                   emptyText,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                    color: Color(0xFF6B7280),
+                    color: Color(0xFF64748B),
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -787,7 +787,7 @@ class _ApplicationCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x07000000),
@@ -812,7 +812,7 @@ class _ApplicationCard extends StatelessWidget {
                   : item.kind == ApplicationKind.course
                   ? Icons.menu_book_outlined
                   : Icons.work_outline,
-              color: const Color(0xFF6D28D9),
+              color: const Color(0xFF14B8A6),
             ),
           ),
           const SizedBox(width: 12),
@@ -856,7 +856,7 @@ class _ApplicationCard extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      color: Color(0xFF6B7280),
+                      color: Color(0xFF64748B),
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -891,7 +891,7 @@ class _ApplicationCard extends StatelessWidget {
                       child: ElevatedButton(
                         onPressed: () => onOpen(context, item),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF6D28D9),
+                          backgroundColor: const Color(0xFF14B8A6),
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -913,7 +913,7 @@ class _ApplicationCard extends StatelessWidget {
                           Text(
                             dateText,
                             style: const TextStyle(
-                              color: Color(0xFF6B7280),
+                              color: Color(0xFF64748B),
                               fontWeight: FontWeight.w800,
                               fontSize: 12,
                             ),
@@ -939,7 +939,7 @@ class _ApplicationCard extends StatelessWidget {
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(
-                                    color: Color(0xFF6B7280),
+                                    color: Color(0xFF64748B),
                                     fontWeight: FontWeight.w800,
                                     fontSize: 12,
                                   ),
@@ -964,7 +964,7 @@ class _ApplicationCard extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
-                            color: Color(0xFF6B7280),
+                            color: Color(0xFF64748B),
                             fontWeight: FontWeight.w700,
                           ),
                         ),
@@ -985,9 +985,9 @@ class _ApplicationCard extends StatelessWidget {
                     child: LinearProgressIndicator(
                       value: (item.progress ?? 0) / 100,
                       minHeight: 6,
-                      backgroundColor: const Color(0xFFE5E7EB),
+                      backgroundColor: const Color(0xFFE2E8F0),
                       valueColor: const AlwaysStoppedAnimation(
-                        Color(0xFF6D28D9),
+                        Color(0xFF14B8A6),
                       ),
                     ),
                   ),
@@ -1055,7 +1055,7 @@ class _EmptyCta extends StatelessWidget {
       child: Text(
         label,
         style: const TextStyle(
-          color: Color(0xFF6D28D9),
+          color: Color(0xFF14B8A6),
           fontWeight: FontWeight.w800,
         ),
       ),
@@ -1087,7 +1087,7 @@ class _TabLabel extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w800,
-                color: Color(0xFF6B7280),
+                color: Color(0xFF64748B),
               ),
             ),
           ),

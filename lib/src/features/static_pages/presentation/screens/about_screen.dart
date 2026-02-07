@@ -110,7 +110,7 @@ class _Hero extends StatelessWidget {
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF7C3AED), Color(0xFF4F46E5), Color(0xFF1D4ED8)],
+          colors: [Color(0xFF6366F1), Color(0xFF6366F1), Color(0xFF1D4ED8)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -193,7 +193,7 @@ class _StoryCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x0A000000),
@@ -241,17 +241,17 @@ class _StoryText extends StatelessWidget {
         const SizedBox(height: 12),
         Text(
           l10n.t(AppText.aboutStoryP1),
-          style: const TextStyle(color: Color(0xFF6B7280), height: 1.5),
+          style: const TextStyle(color: Color(0xFF64748B), height: 1.5),
         ),
         const SizedBox(height: 10),
         Text(
           l10n.t(AppText.aboutStoryP2),
-          style: const TextStyle(color: Color(0xFF6B7280), height: 1.5),
+          style: const TextStyle(color: Color(0xFF64748B), height: 1.5),
         ),
         const SizedBox(height: 10),
         Text(
           l10n.t(AppText.aboutStoryP3),
-          style: const TextStyle(color: Color(0xFF6B7280), height: 1.5),
+          style: const TextStyle(color: Color(0xFF64748B), height: 1.5),
         ),
       ],
     );
@@ -300,11 +300,11 @@ class _SectionHeader extends StatelessWidget {
           style: const TextStyle(
             fontSize: 26,
             fontWeight: FontWeight.w900,
-            color: Color(0xFF1F2937),
+            color: Color(0xFF0F172A),
           ),
         ),
         const SizedBox(height: 6),
-        Text(subtitle, style: const TextStyle(color: Color(0xFF6B7280))),
+        Text(subtitle, style: const TextStyle(color: Color(0xFF64748B))),
       ],
     );
   }
@@ -334,7 +334,7 @@ class _ValueCardView extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Column(
         children: [
@@ -345,7 +345,7 @@ class _ValueCardView extends StatelessWidget {
               color: const Color(0xFFEDE9FE),
               borderRadius: BorderRadius.circular(999),
             ),
-            child: Icon(card.icon, color: const Color(0xFF6D28D9), size: 30),
+            child: Icon(card.icon, color: const Color(0xFF14B8A6), size: 30),
           ),
           const SizedBox(height: 12),
           Text(card.title, style: const TextStyle(fontWeight: FontWeight.w800)),
@@ -353,7 +353,7 @@ class _ValueCardView extends StatelessWidget {
           Text(
             card.description,
             textAlign: TextAlign.center,
-            style: const TextStyle(color: Color(0xFF6B7280), height: 1.4),
+            style: const TextStyle(color: Color(0xFF64748B), height: 1.4),
           ),
         ],
       ),
@@ -381,7 +381,7 @@ class _StatCardView extends StatelessWidget {
           card.number,
           style: const TextStyle(
             fontWeight: FontWeight.w900,
-            color: Color(0xFF6D28D9),
+            color: Color(0xFF14B8A6),
           ),
         ),
         const SizedBox(height: 4),
@@ -419,7 +419,7 @@ class _TeamSection extends StatelessWidget {
           Text(
             l10n.t(AppText.aboutTeamSubtitle),
             textAlign: TextAlign.center,
-            style: const TextStyle(color: Color(0xFF6B7280)),
+            style: const TextStyle(color: Color(0xFF64748B)),
           ),
           const SizedBox(height: 16),
           LayoutBuilder(
@@ -446,7 +446,7 @@ class _TeamSection extends StatelessWidget {
                         Text(
                           roles[index],
                           style: const TextStyle(
-                            color: Color(0xFF6B7280),
+                            color: Color(0xFF64748B),
                             fontSize: 12,
                           ),
                         ),
@@ -474,7 +474,7 @@ class _WhyUsSection extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Column(
         children: [
@@ -549,7 +549,7 @@ class _WhyItem extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, color: const Color(0xFF6D28D9), size: 28),
+        Icon(icon, color: const Color(0xFF14B8A6), size: 28),
         const SizedBox(width: 12),
         Expanded(
           child: Column(
@@ -559,7 +559,7 @@ class _WhyItem extends StatelessWidget {
               const SizedBox(height: 6),
               Text(
                 description,
-                style: const TextStyle(color: Color(0xFF6B7280), height: 1.4),
+                style: const TextStyle(color: Color(0xFF64748B), height: 1.4),
               ),
             ],
           ),

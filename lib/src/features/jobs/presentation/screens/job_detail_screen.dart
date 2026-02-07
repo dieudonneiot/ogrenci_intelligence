@@ -47,7 +47,7 @@ class JobDetailScreen extends ConsumerWidget {
                 Text(
                   e.toString(),
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: Color(0xFF6B7280)),
+                  style: const TextStyle(color: Color(0xFF64748B)),
                 ),
                 const SizedBox(height: 14),
                 SizedBox(
@@ -83,7 +83,7 @@ class _Body extends ConsumerWidget {
       backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
         backgroundColor: Colors.white,
-        foregroundColor: const Color(0xFF1F2937),
+        foregroundColor: const Color(0xFF0F172A),
         elevation: 0,
         title: Text(
           l10n.t(AppText.jobDetailTitle),
@@ -126,7 +126,7 @@ class _Body extends ConsumerWidget {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(18),
-                      border: Border.all(color: const Color(0xFFE5E7EB)),
+                      border: Border.all(color: const Color(0xFFE2E8F0)),
                       boxShadow: const [
                         BoxShadow(
                           color: Color(0x07000000),
@@ -158,7 +158,7 @@ class _Body extends ConsumerWidget {
                         Text(
                           '${j.companyName} - ${j.location}',
                           style: const TextStyle(
-                            color: Color(0xFF6B7280),
+                            color: Color(0xFF64748B),
                             fontWeight: FontWeight.w700,
                           ),
                         ),
@@ -170,7 +170,7 @@ class _Body extends ConsumerWidget {
                             _Chip(
                               text: j.department,
                               bg: const Color(0xFFEDE9FE),
-                              fg: const Color(0xFF6D28D9),
+                              fg: const Color(0xFF14B8A6),
                             ),
                             _Chip(
                               text: j.workType,
@@ -232,7 +232,7 @@ class _Body extends ConsumerWidget {
                           style: const TextStyle(fontWeight: FontWeight.w900),
                         ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF6D28D9),
+                          backgroundColor: const Color(0xFF14B8A6),
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14),
@@ -253,7 +253,7 @@ class _Body extends ConsumerWidget {
                         children: [
                           const Icon(
                             Icons.verified_outlined,
-                            color: Color(0xFF6D28D9),
+                            color: Color(0xFF14B8A6),
                           ),
                           const SizedBox(width: 10),
                           Expanded(
@@ -351,7 +351,7 @@ class _Body extends ConsumerWidget {
               Text(
                 l10n.t(AppText.jobDetailApplySheetSubtitle),
                 style: const TextStyle(
-                  color: Color(0xFF6B7280),
+                  color: Color(0xFF64748B),
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -395,7 +395,7 @@ class _Body extends ConsumerWidget {
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF6D28D9),
+                    backgroundColor: const Color(0xFF14B8A6),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
@@ -429,7 +429,7 @@ class _Section extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x07000000),

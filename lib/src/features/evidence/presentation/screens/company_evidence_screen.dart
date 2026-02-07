@@ -64,7 +64,7 @@ class CompanyEvidenceScreen extends ConsumerWidget {
                 const Text(
                   'Review student uploads and approve or reject.',
                   style: TextStyle(
-                    color: Color(0xFF6B7280),
+                    color: Color(0xFF64748B),
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -121,7 +121,7 @@ class _PendingEvidenceCardState extends ConsumerState<_PendingEvidenceCard> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x07000000),
@@ -175,7 +175,7 @@ class _PendingEvidenceCardState extends ConsumerState<_PendingEvidenceCard> {
             Text(
               item.description!,
               style: const TextStyle(
-                color: Color(0xFF6B7280),
+                color: Color(0xFF64748B),
                 fontWeight: FontWeight.w600,
               ),
             ),

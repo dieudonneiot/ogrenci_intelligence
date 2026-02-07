@@ -545,7 +545,7 @@ class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
                             : l10n.t(AppText.commonSave),
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF6D28D9),
+                        backgroundColor: const Color(0xFF14B8A6),
                       ),
                     ),
                   ),
@@ -634,7 +634,7 @@ class _BrandAssetsCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x0A000000),
@@ -685,7 +685,7 @@ class _BrandAssetsCard extends StatelessWidget {
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(999),
                             border: Border.all(
-                              color: const Color(0xFFE5E7EB),
+                              color: const Color(0xFFE2E8F0),
                               width: 2,
                             ),
                           ),
@@ -697,7 +697,7 @@ class _BrandAssetsCard extends StatelessWidget {
                                 : const Icon(
                                     Icons.apartment_outlined,
                                     size: 34,
-                                    color: Color(0xFF6D28D9),
+                                    color: Color(0xFF14B8A6),
                                   ),
                           ),
                         ),
@@ -812,7 +812,7 @@ class _IconFab extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(999),
-            border: Border.all(color: const Color(0xFFE5E7EB)),
+            border: Border.all(color: const Color(0xFFE2E8F0)),
             boxShadow: const [
               BoxShadow(
                 color: Color(0x22000000),
@@ -821,7 +821,7 @@ class _IconFab extends StatelessWidget {
               ),
             ],
           ),
-          child: Icon(icon, size: 16, color: const Color(0xFF4F46E5)),
+          child: Icon(icon, size: 16, color: const Color(0xFF6366F1)),
         ),
       ),
     );
@@ -840,7 +840,7 @@ class _SectionCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x0A000000),

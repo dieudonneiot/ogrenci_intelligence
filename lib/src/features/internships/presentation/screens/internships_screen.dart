@@ -86,7 +86,7 @@ class _InternshipsScreenState extends ConsumerState<InternshipsScreen> {
               Text(
                 e.toString(),
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: Color(0xFF6B7280)),
+                style: const TextStyle(color: Color(0xFF64748B)),
               ),
               const SizedBox(height: 12),
               SizedBox(
@@ -127,7 +127,7 @@ class _InternshipsScreenState extends ConsumerState<InternshipsScreen> {
                         Text(
                           l10n.t(AppText.internshipsSubtitle),
                           style: const TextStyle(
-                            color: Color(0xFF6B7280),
+                            color: Color(0xFF64748B),
                             fontWeight: FontWeight.w700,
                           ),
                         ),
@@ -140,7 +140,7 @@ class _InternshipsScreenState extends ConsumerState<InternshipsScreen> {
                               children: [
                                 const Icon(
                                   Icons.info_outline,
-                                  color: Color(0xFF6D28D9),
+                                  color: Color(0xFF14B8A6),
                                 ),
                                 const SizedBox(width: 10),
                                 Expanded(
@@ -175,13 +175,13 @@ class _InternshipsScreenState extends ConsumerState<InternshipsScreen> {
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(14),
                                     borderSide: const BorderSide(
-                                      color: Color(0xFFE5E7EB),
+                                      color: Color(0xFFE2E8F0),
                                     ),
                                   ),
                                   enabledBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(14),
                                     borderSide: const BorderSide(
-                                      color: Color(0xFFE5E7EB),
+                                      color: Color(0xFFE2E8F0),
                                     ),
                                   ),
                                 ),
@@ -296,7 +296,7 @@ class _InternshipsScreenState extends ConsumerState<InternshipsScreen> {
                                 ),
                                 value: '${vm.activeCount}',
                                 icon: Icons.work_outline,
-                                iconColor: const Color(0xFF7C3AED),
+                                iconColor: const Color(0xFF6366F1),
                                 iconBg: const Color(0xFFEDE9FE),
                               ),
                               _StatSmall(
@@ -310,7 +310,7 @@ class _InternshipsScreenState extends ConsumerState<InternshipsScreen> {
                                 title: l10n.t(AppText.internshipsAvgDuration),
                                 value: l10n.t(AppText.internshipsDuration3_6),
                                 icon: Icons.schedule,
-                                iconColor: const Color(0xFF6B7280),
+                                iconColor: const Color(0xFF64748B),
                                 iconBg: const Color(0xFFF3F4F6),
                               ),
                               _StatSmall(
@@ -354,7 +354,7 @@ class _InternshipsScreenState extends ConsumerState<InternshipsScreen> {
                               child: Text(
                                 l10n.t(AppText.internshipsNoResults),
                                 style: const TextStyle(
-                                  color: Color(0xFF6B7280),
+                                  color: Color(0xFF64748B),
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
@@ -440,7 +440,7 @@ class _Card extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x0A000000),
@@ -476,7 +476,7 @@ class _Drop extends StatelessWidget {
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
         ),
       ),
       items: items
@@ -520,7 +520,7 @@ class _StatSmall extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Row(
         children: [
@@ -541,7 +541,7 @@ class _StatSmall extends StatelessWidget {
                 Text(
                   title,
                   style: const TextStyle(
-                    color: Color(0xFF6B7280),
+                    color: Color(0xFF64748B),
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -584,7 +584,7 @@ class _InternshipCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x07000000),
@@ -635,7 +635,7 @@ class _InternshipCard extends StatelessWidget {
           const SizedBox(height: 6),
           Row(
             children: [
-              const Icon(Icons.apartment, size: 16, color: Color(0xFF6B7280)),
+              const Icon(Icons.apartment, size: 16, color: Color(0xFF64748B)),
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
@@ -655,7 +655,7 @@ class _InternshipCard extends StatelessWidget {
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(
-              color: Color(0xFF6B7280),
+              color: Color(0xFF64748B),
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -695,7 +695,7 @@ class _InternshipCard extends StatelessWidget {
             child: ElevatedButton(
               onPressed: onOpen,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF6D28D9),
+                backgroundColor: const Color(0xFF14B8A6),
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
@@ -854,7 +854,7 @@ class _InfoCard extends StatelessWidget {
         children: [
           const Icon(
             Icons.tips_and_updates,
-            color: Color(0xFF6D28D9),
+            color: Color(0xFF14B8A6),
             size: 28,
           ),
           const SizedBox(width: 12),

@@ -183,7 +183,7 @@ class _CourseDetailBody extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: const Color(0xFFE5E7EB)),
+            border: Border.all(color: const Color(0xFFE2E8F0)),
             boxShadow: const [
               BoxShadow(
                 color: Color(0x0A000000),
@@ -233,12 +233,12 @@ class _CourseDetailBody extends StatelessWidget {
                 const SizedBox(height: 6),
                 SelectableText(
                   course.videoUrl!,
-                  style: const TextStyle(color: Color(0xFF6D28D9)),
+                  style: const TextStyle(color: Color(0xFF14B8A6)),
                 ),
                 const SizedBox(height: 12),
               ],
 
-              Container(height: 1, color: const Color(0xFFE5E7EB)),
+              Container(height: 1, color: const Color(0xFFE2E8F0)),
               const SizedBox(height: 12),
 
               if (!enrolled) ...[
@@ -256,7 +256,7 @@ class _CourseDetailBody extends StatelessWidget {
                       style: const TextStyle(fontWeight: FontWeight.w900),
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF6D28D9),
+                      backgroundColor: const Color(0xFF14B8A6),
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
@@ -282,7 +282,7 @@ class _CourseDetailBody extends StatelessWidget {
                             child: LinearProgressIndicator(
                               value: progress / 100,
                               minHeight: 10,
-                              backgroundColor: const Color(0xFFE5E7EB),
+                              backgroundColor: const Color(0xFFE2E8F0),
                               valueColor: const AlwaysStoppedAnimation(
                                 Color(0xFF2563EB),
                               ),
@@ -292,7 +292,7 @@ class _CourseDetailBody extends StatelessWidget {
                           Text(
                             l10n.dashboardCourseProgress(progress),
                             style: const TextStyle(
-                              color: Color(0xFF6B7280),
+                              color: Color(0xFF64748B),
                               fontWeight: FontWeight.w800,
                             ),
                           ),
@@ -391,7 +391,7 @@ class _DetailError extends StatelessWidget {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: Color(0xFF6B7280)),
+              style: const TextStyle(color: Color(0xFF64748B)),
             ),
             const SizedBox(height: 10),
             ElevatedButton(

@@ -3,19 +3,29 @@ import 'package:flutter/material.dart';
 class AppColors {
   const AppColors._();
 
-  static const brandPurple = Color(0xFF6D28D9);
-  static const brandIndigo = Color(0xFF4F46E5);
+  // Brand
+  static const primary = Color(0xFF14B8A6);
+  static const secondary = Color(0xFF6366F1);
+  static const primaryHover = Color(0xFF0F9E8F);
 
-  // Light surfaces (used sparingly; prefer Theme.of(context).colorScheme)
-  static const bg = Color(0xFFF9FAFB);
+  // Surfaces
+  static const bg = Color(0xFFFAFAFA);
   static const surface = Color(0xFFFFFFFF);
+  static const surfaceMuted = Color(0xFFF8FAFC);
 
-  // Text (avoid pure black for a softer look)
-  static const ink = Color(0xFF1F2937); // gray-800
-  static const inkMuted = Color(0xFF4B5563); // gray-600
+  // Text
+  static const ink = Color(0xFF0F172A);
+  static const inkMuted = Color(0xFF64748B);
+
+  // Borders
+  static const borderLight = Color(0xFFE2E8F0);
 
   // Semantic accents
-  static const success = Color(0xFF16A34A);
+  static const success = Color(0xFF10B981);
   static const warning = Color(0xFFF59E0B);
   static const danger = Color(0xFFEF4444);
+
+  // Backward-compatible aliases for existing usage.
+  static const brandPurple = primary;
+  static const brandIndigo = secondary;
 }

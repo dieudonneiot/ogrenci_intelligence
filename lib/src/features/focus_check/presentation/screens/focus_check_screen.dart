@@ -89,7 +89,7 @@ class _FocusCheckScreenState extends ConsumerState<FocusCheckScreen> {
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.timer_outlined, color: Color(0xFF6D28D9)),
+                    const Icon(Icons.timer_outlined, color: Color(0xFF14B8A6)),
                     const SizedBox(width: 10),
                     const Expanded(
                       child: Text(
@@ -172,7 +172,7 @@ class _FocusCheckScreenState extends ConsumerState<FocusCheckScreen> {
                       icon: const Icon(Icons.play_arrow),
                       label: Text(_starting ? 'Starting...' : 'Start (30s)'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF6D28D9),
+                        backgroundColor: const Color(0xFF14B8A6),
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
@@ -286,7 +286,7 @@ class _InternshipPicker extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<AcceptedInternshipApplication>(
@@ -336,7 +336,7 @@ class _SessionCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x0A000000),
@@ -372,7 +372,7 @@ class _SessionCard extends StatelessWidget {
                    maxLines: 2,
                    overflow: TextOverflow.ellipsis,
                    textAlign: TextAlign.right,
-                   style: TextStyle(color: Color(0xFF6B7280)),
+                   style: TextStyle(color: Color(0xFF64748B)),
                  ),
                ),
              ],
@@ -401,7 +401,7 @@ class _SessionCard extends StatelessWidget {
               icon: const Icon(Icons.send_outlined),
               label: Text(submitting ? 'Submitting...' : 'Submit'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF6D28D9),
+                backgroundColor: const Color(0xFF14B8A6),
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),

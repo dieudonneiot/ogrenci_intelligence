@@ -183,7 +183,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
               Text(
                 _error!,
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: Color(0xFF6B7280)),
+                style: const TextStyle(color: Color(0xFF64748B)),
               ),
               const SizedBox(height: 14),
               ElevatedButton(
@@ -212,7 +212,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                 ? l10n.t(AppText.adminRoleSuper)
                 : l10n.t(AppText.adminRoleAdmin),
             style: const TextStyle(
-              color: Color(0xFF6D28D9),
+              color: Color(0xFF14B8A6),
               fontWeight: FontWeight.w800,
             ),
           ),
@@ -337,7 +337,7 @@ class _StatsGrid extends StatelessWidget {
         ),
         subtitleColor: const Color(0xFFF97316),
         icon: Icons.apartment_outlined,
-        iconColor: const Color(0xFF7C3AED),
+        iconColor: const Color(0xFF6366F1),
       ),
       _StatCard(
         title: l10n.t(AppText.adminStatActiveListingsTitle),
@@ -346,7 +346,7 @@ class _StatsGrid extends StatelessWidget {
           jobs: stats.totalJobs,
           internships: stats.totalInternships,
         ),
-        subtitleColor: const Color(0xFF6B7280),
+        subtitleColor: const Color(0xFF64748B),
         icon: Icons.work_outline,
         iconColor: const Color(0xFF16A34A),
       ),
@@ -414,7 +414,7 @@ class _StatCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x0A000000),
@@ -432,7 +432,7 @@ class _StatCard extends StatelessWidget {
                 Text(
                   title,
                   style: const TextStyle(
-                    color: Color(0xFF6B7280),
+                    color: Color(0xFF64748B),
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -476,7 +476,7 @@ class _PendingCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -507,7 +507,7 @@ class _PendingCard extends StatelessWidget {
             const SizedBox(height: 6),
             Text(
               l10n.t(AppText.adminCompanyApprovalsSubtitle),
-              style: const TextStyle(color: Color(0xFF6B7280)),
+              style: const TextStyle(color: Color(0xFF64748B)),
             ),
             const SizedBox(height: 12),
             ElevatedButton.icon(
@@ -521,7 +521,7 @@ class _PendingCard extends StatelessWidget {
           ] else
             Text(
               l10n.t(AppText.adminCompanyApprovalsEmpty),
-              style: const TextStyle(color: Color(0xFF6B7280)),
+              style: const TextStyle(color: Color(0xFF64748B)),
             ),
         ],
       ),
@@ -540,7 +540,7 @@ class _QuickLinks extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -557,7 +557,7 @@ class _QuickLinks extends StatelessWidget {
               _QuickLinkTile(
                 icon: Icons.apartment_outlined,
                 label: l10n.t(AppText.adminNavCompanies),
-                color: const Color(0xFF7C3AED),
+                color: const Color(0xFF6366F1),
                 onTap: () => context.go(Routes.adminCompanies),
               ),
               _QuickLinkTile(
@@ -648,14 +648,14 @@ class _RecentActivities extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(Icons.access_time, color: Color(0xFF6B7280)),
+              const Icon(Icons.access_time, color: Color(0xFF64748B)),
               const SizedBox(width: 8),
               Text(
                 l10n.t(AppText.adminRecentActivitiesTitle),
@@ -670,7 +670,7 @@ class _RecentActivities extends StatelessWidget {
           if (activities.isEmpty)
             Text(
               l10n.t(AppText.adminRecentActivitiesEmpty),
-              style: const TextStyle(color: Color(0xFF6B7280)),
+              style: const TextStyle(color: Color(0xFF64748B)),
             )
           else
             Column(
@@ -701,7 +701,7 @@ class _RecentActivities extends StatelessWidget {
                                 Text(
                                   '${a.adminName} • ${_formatTimeAgo(l10n, ml10n, a.createdAt)}',
                                   style: const TextStyle(
-                                    color: Color(0xFF6B7280),
+                                    color: Color(0xFF64748B),
                                     fontSize: 12,
                                   ),
                                 ),
@@ -740,7 +740,7 @@ class _ActivityIcon extends StatelessWidget {
         break;
       case 'job_delete':
         icon = Icons.work_outline;
-        color = const Color(0xFF6B7280);
+        color = const Color(0xFF64748B);
         break;
       default:
         break;

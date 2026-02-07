@@ -478,7 +478,7 @@ class _ProfileHeader extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
         gradient: const LinearGradient(
-          colors: [Color(0xFF7C3AED), Color(0xFF4F46E5)],
+          colors: [Color(0xFF6366F1), Color(0xFF6366F1)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -519,7 +519,7 @@ class _ProfileHeader extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(999),
-                      border: Border.all(color: const Color(0xFFE5E7EB)),
+                      border: Border.all(color: const Color(0xFFE2E8F0)),
                       boxShadow: const [
                         BoxShadow(
                           color: Color(0x22000000),
@@ -533,7 +533,7 @@ class _ProfileHeader extends StatelessWidget {
                       size: 16,
                       color: onChangeAvatar == null
                           ? const Color(0xFF9CA3AF)
-                          : const Color(0xFF4F46E5),
+                          : const Color(0xFF6366F1),
                     ),
                   ),
                 ),
@@ -610,7 +610,7 @@ class _ProfileInfoCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x0A000000),
@@ -624,7 +624,7 @@ class _ProfileInfoCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.school_outlined, color: Color(0xFF6D28D9)),
+              const Icon(Icons.school_outlined, color: Color(0xFF14B8A6)),
               const SizedBox(width: 8),
               Text(
                 l10n.t(AppText.profileInfoTitle),
@@ -680,13 +680,13 @@ class _ProfileInfoCard extends StatelessWidget {
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: const BorderSide(
-                                color: Color(0xFFE5E7EB),
+                                color: Color(0xFFE2E8F0),
                               ),
                             ),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: const BorderSide(
-                                color: Color(0xFFE5E7EB),
+                                color: Color(0xFFE2E8F0),
                               ),
                             ),
                           ),
@@ -722,7 +722,7 @@ class _ProfileInfoCard extends StatelessWidget {
                       ),
                       IconButton(
                         onPressed: onCancel,
-                        icon: const Icon(Icons.close, color: Color(0xFF6B7280)),
+                        icon: const Icon(Icons.close, color: Color(0xFF64748B)),
                       ),
                     ],
                   )
@@ -748,7 +748,7 @@ class _ProfileInfoCard extends StatelessWidget {
                       ),
                       IconButton(
                         onPressed: onEdit,
-                        icon: const Icon(Icons.edit, color: Color(0xFF6D28D9)),
+                        icon: const Icon(Icons.edit, color: Color(0xFF14B8A6)),
                       ),
                     ],
                   ),
@@ -771,7 +771,7 @@ class _BadgesCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x0A000000),
@@ -800,7 +800,7 @@ class _BadgesCard extends StatelessWidget {
           if (badges.isEmpty)
             Text(
               l10n.t(AppText.profileNoBadges),
-              style: const TextStyle(color: Color(0xFF6B7280)),
+              style: const TextStyle(color: Color(0xFF64748B)),
             )
           else
             LayoutBuilder(
@@ -828,7 +828,7 @@ class _BadgesCard extends StatelessWidget {
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontSize: 11,
-                            color: Color(0xFF6B7280),
+                            color: Color(0xFF64748B),
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -864,7 +864,7 @@ class _CompletedCoursesCard extends StatelessWidget {
       children: [
         Row(
           children: [
-            const Icon(Icons.school, color: Color(0xFF6D28D9)),
+            const Icon(Icons.school, color: Color(0xFF14B8A6)),
             const SizedBox(width: 8),
             Text(
               count == 0
@@ -881,7 +881,7 @@ class _CompletedCoursesCard extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: const Color(0xFFE5E7EB)),
+              border: Border.all(color: const Color(0xFFE2E8F0)),
             ),
             child: Column(
               children: [
@@ -894,7 +894,7 @@ class _CompletedCoursesCard extends StatelessWidget {
                 Text(
                   l10n.t(AppText.profileNoCompletedCoursesTitle),
                   style: const TextStyle(
-                    color: Color(0xFF6B7280),
+                    color: Color(0xFF64748B),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -933,7 +933,7 @@ class _CompletedCoursesCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: const Color(0xFFE5E7EB)),
+                      border: Border.all(color: const Color(0xFFE2E8F0)),
                       boxShadow: const [
                         BoxShadow(
                           color: Color(0x08000000),
@@ -956,7 +956,7 @@ class _CompletedCoursesCard extends StatelessWidget {
                               ),
                               child: const Icon(
                                 Icons.menu_book_outlined,
-                                color: Color(0xFF6D28D9),
+                                color: Color(0xFF14B8A6),
                               ),
                             ),
                             const Spacer(),
@@ -994,7 +994,7 @@ class _CompletedCoursesCard extends StatelessWidget {
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
-                            color: Color(0xFF6B7280),
+                            color: Color(0xFF64748B),
                             fontWeight: FontWeight.w600,
                             fontSize: 12,
                           ),
@@ -1005,13 +1005,13 @@ class _CompletedCoursesCard extends StatelessWidget {
                             const Icon(
                               Icons.calendar_month,
                               size: 14,
-                              color: Color(0xFF6B7280),
+                              color: Color(0xFF64748B),
                             ),
                             const SizedBox(width: 6),
                             Text(
                               _fmtDate(context, item.completedAt),
                               style: const TextStyle(
-                                color: Color(0xFF6B7280),
+                                color: Color(0xFF64748B),
                                 fontSize: 12,
                               ),
                             ),
@@ -1047,7 +1047,7 @@ class _EvidenceShowcaseCard extends ConsumerWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x0A000000),
@@ -1061,7 +1061,7 @@ class _EvidenceShowcaseCard extends ConsumerWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.verified_outlined, color: Color(0xFF6D28D9)),
+              const Icon(Icons.verified_outlined, color: Color(0xFF14B8A6)),
               const SizedBox(width: 8),
               const Expanded(
                 child: Text(
@@ -1079,7 +1079,7 @@ class _EvidenceShowcaseCard extends ConsumerWidget {
                     style: TextStyle(fontWeight: FontWeight.w900),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF7C3AED),
+                    backgroundColor: const Color(0xFF6366F1),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -1104,7 +1104,7 @@ class _EvidenceShowcaseCard extends ConsumerWidget {
                 Expanded(
                   child: Text(
                     e.toString(),
-                    style: const TextStyle(color: Color(0xFF6B7280)),
+                    style: const TextStyle(color: Color(0xFF64748B)),
                   ),
                 ),
                 TextButton(
@@ -1119,7 +1119,7 @@ class _EvidenceShowcaseCard extends ConsumerWidget {
                 return const Text(
                   'Upload project screenshots, certificates, or documents to verify your profile.',
                   style: TextStyle(
-                    color: Color(0xFF6B7280),
+                    color: Color(0xFF64748B),
                     fontWeight: FontWeight.w600,
                   ),
                 );
@@ -1193,7 +1193,7 @@ class _EvidenceMiniCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: const Color(0xFFF9FAFB),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFFE5E7EB)),
+          border: Border.all(color: const Color(0xFFE2E8F0)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1206,11 +1206,11 @@ class _EvidenceMiniCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: const Color(0xFFE5E7EB)),
+                    border: Border.all(color: const Color(0xFFE2E8F0)),
                   ),
                   child: Icon(
                     _iconFor(item.mimeType),
-                    color: const Color(0xFF1F2937),
+                    color: const Color(0xFF0F172A),
                   ),
                 ),
                 const Spacer(),
@@ -1245,7 +1245,7 @@ class _EvidenceMiniCard extends StatelessWidget {
             const Text(
               'Tap to view',
               style: TextStyle(
-                color: Color(0xFF6B7280),
+                color: Color(0xFF64748B),
                 fontWeight: FontWeight.w700,
                 fontSize: 12,
               ),
@@ -1290,7 +1290,7 @@ class _BadgeCircle extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFFF3F4F6),
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       alignment: Alignment.center,
       child: child,
@@ -1311,7 +1311,7 @@ class _LabeledRow extends StatelessWidget {
         Text(
           label,
           style: const TextStyle(
-            color: Color(0xFF6B7280),
+            color: Color(0xFF64748B),
             fontWeight: FontWeight.w700,
           ),
         ),
@@ -1339,7 +1339,7 @@ class _GuestView extends StatelessWidget {
               const Icon(
                 Icons.lock_outline,
                 size: 46,
-                color: Color(0xFF6B7280),
+                color: Color(0xFF64748B),
               ),
               const SizedBox(height: 10),
               Text(

@@ -81,7 +81,7 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
               Text(
                 e.toString(),
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: Color(0xFF6B7280)),
+                style: const TextStyle(color: Color(0xFF64748B)),
               ),
               const SizedBox(height: 14),
               SizedBox(
@@ -121,7 +121,7 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
                         Text(
                           l10n.t(AppText.jobsSubtitle),
                           style: const TextStyle(
-                            color: Color(0xFF6B7280),
+                            color: Color(0xFF64748B),
                             fontWeight: FontWeight.w700,
                           ),
                         ),
@@ -133,7 +133,7 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: const Color(0xFFE5E7EB)),
+                            border: Border.all(color: const Color(0xFFE2E8F0)),
                             boxShadow: const [
                               BoxShadow(
                                 color: Color(0x07000000),
@@ -146,7 +146,7 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
                             children: [
                               const Icon(
                                 Icons.search,
-                                color: Color(0xFF6B7280),
+                                color: Color(0xFF64748B),
                               ),
                               const SizedBox(width: 8),
                               Expanded(
@@ -233,7 +233,7 @@ class _FiltersRow extends StatelessWidget {
           onSelected: (v) => onChange(filters.copyWith(remoteOnly: v)),
           label: Text(AppLocalizations.of(context).t(AppText.remote)),
           selectedColor: const Color(0xFFEDE9FE),
-          checkmarkColor: const Color(0xFF6D28D9),
+          checkmarkColor: const Color(0xFF14B8A6),
         ),
         _DropdownFilter(
           label: AppLocalizations.of(context).t(AppText.filterDepartment),
@@ -285,7 +285,7 @@ class _DropdownFilter extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -294,7 +294,7 @@ class _DropdownFilter extends StatelessWidget {
             label,
             style: const TextStyle(
               fontWeight: FontWeight.w800,
-              color: Color(0xFF6B7280),
+              color: Color(0xFF64748B),
             ),
           ),
           const SizedBox(width: 8),
@@ -340,7 +340,7 @@ class _JobCard extends ConsumerWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: const Color(0xFFE5E7EB)),
+          border: Border.all(color: const Color(0xFFE2E8F0)),
           boxShadow: const [
             BoxShadow(
               color: Color(0x07000000),
@@ -386,7 +386,7 @@ class _JobCard extends ConsumerWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      color: Color(0xFF6B7280),
+                      color: Color(0xFF64748B),
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -398,7 +398,7 @@ class _JobCard extends ConsumerWidget {
                       _Chip(
                         text: j.department,
                         bg: const Color(0xFFEDE9FE),
-                        fg: const Color(0xFF6D28D9),
+                        fg: const Color(0xFF14B8A6),
                       ),
                       _Chip(
                         text: j.workType,
@@ -567,7 +567,7 @@ class _Empty extends StatelessWidget {
         child: Text(
           text,
           style: const TextStyle(
-            color: Color(0xFF6B7280),
+            color: Color(0xFF64748B),
             fontWeight: FontWeight.w800,
           ),
         ),

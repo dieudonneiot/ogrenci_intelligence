@@ -189,7 +189,7 @@ class _CompanyReportsScreenState extends ConsumerState<CompanyReportsScreen> {
                         children: [
                           const Icon(
                             Icons.bar_chart_outlined,
-                            color: Color(0xFF6D28D9),
+                            color: Color(0xFF14B8A6),
                           ),
                           const SizedBox(width: 8),
                           Text(
@@ -256,7 +256,7 @@ class _CompanyReportsScreenState extends ConsumerState<CompanyReportsScreen> {
                               l10n.t(AppText.companyReportsExportCsv),
                             ),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF6D28D9),
+                              backgroundColor: const Color(0xFF14B8A6),
                             ),
                           ),
                         ],
@@ -322,7 +322,7 @@ class _CompanyReportsScreenState extends ConsumerState<CompanyReportsScreen> {
                               ),
                               value: _summary.totalApplications.toString(),
                               icon: Icons.assignment_turned_in_outlined,
-                              color: const Color(0xFF7C3AED),
+                              color: const Color(0xFF6366F1),
                             ),
                             _MetricCard(
                               title: l10n.t(
@@ -367,7 +367,7 @@ class _CompanyReportsScreenState extends ConsumerState<CompanyReportsScreen> {
                                 _summary.activeInternships,
                               ),
                               icon: Icons.work_outline,
-                              color: const Color(0xFF1F2937),
+                              color: const Color(0xFF0F172A),
                             ),
                           ],
                         );
@@ -405,7 +405,7 @@ class _CompanyReportsScreenState extends ConsumerState<CompanyReportsScreen> {
                                 AppText.companyReportsChartApplicationsTrend,
                               ),
                               points: _trends.applications,
-                              color: const Color(0xFF7C3AED),
+                              color: const Color(0xFF6366F1),
                             ),
                           ],
                         );
@@ -472,7 +472,7 @@ class _MetricCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x0A000000),
@@ -502,7 +502,7 @@ class _MetricCard extends StatelessWidget {
           Text(
             title,
             style: const TextStyle(
-              color: Color(0xFF6B7280),
+              color: Color(0xFF64748B),
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -530,7 +530,7 @@ class _TrendCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x0A000000),
@@ -585,7 +585,7 @@ class _LineChart extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontSize: 11,
-                    color: Color(0xFF6B7280),
+                    color: Color(0xFF64748B),
                   ),
                 ),
               ),
@@ -611,7 +611,7 @@ class _LineChartPainter extends CustomPainter {
     final dx = size.width / math.max(1, values.length - 1);
 
     final gridPaint = Paint()
-      ..color = const Color(0xFFE5E7EB)
+      ..color = const Color(0xFFE2E8F0)
       ..strokeWidth = 1;
     for (int i = 1; i <= 2; i++) {
       final y = size.height * (i / 3);
@@ -666,7 +666,7 @@ class _DistributionCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x0A000000),
@@ -718,7 +718,7 @@ class _DistributionCard extends StatelessWidget {
                           ),
                           Text(
                             entry.value.toString(),
-                            style: const TextStyle(color: Color(0xFF6B7280)),
+                            style: const TextStyle(color: Color(0xFF64748B)),
                           ),
                         ],
                       ),
@@ -728,9 +728,9 @@ class _DistributionCard extends StatelessWidget {
                         child: LinearProgressIndicator(
                           value: ratio,
                           minHeight: 6,
-                          backgroundColor: const Color(0xFFE5E7EB),
+                          backgroundColor: const Color(0xFFE2E8F0),
                           valueColor: const AlwaysStoppedAnimation(
-                            Color(0xFF6D28D9),
+                            Color(0xFF14B8A6),
                           ),
                         ),
                       ),
@@ -758,7 +758,7 @@ class _FunnelCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x0A000000),
@@ -833,7 +833,7 @@ class _FunnelRow extends StatelessWidget {
             ),
             Text(
               value.toString(),
-              style: const TextStyle(color: Color(0xFF6B7280)),
+              style: const TextStyle(color: Color(0xFF64748B)),
             ),
           ],
         ),
@@ -843,7 +843,7 @@ class _FunnelRow extends StatelessWidget {
           child: LinearProgressIndicator(
             value: ratio,
             minHeight: 8,
-            backgroundColor: const Color(0xFFE5E7EB),
+            backgroundColor: const Color(0xFFE2E8F0),
             valueColor: const AlwaysStoppedAnimation(Color(0xFF3B82F6)),
           ),
         ),

@@ -109,7 +109,7 @@ class _CompanyJobsScreenState extends ConsumerState<CompanyJobsScreen> {
                         children: [
                           const Icon(
                             Icons.work_outline,
-                            color: Color(0xFF6D28D9),
+                            color: Color(0xFF14B8A6),
                           ),
                           const SizedBox(width: 8),
                           Expanded(
@@ -133,7 +133,7 @@ class _CompanyJobsScreenState extends ConsumerState<CompanyJobsScreen> {
                           icon: const Icon(Icons.add),
                           label: Text(l10n.t(AppText.newListing)),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF6D28D9),
+                            backgroundColor: const Color(0xFF14B8A6),
                           ),
                         ),
                       );
@@ -251,7 +251,7 @@ class _FiltersBar extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Wrap(
         spacing: 12,
@@ -313,7 +313,7 @@ class _FilterChip extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: active ? const Color(0xFF6D28D9) : const Color(0xFFF3F4F6),
+          color: active ? const Color(0xFF14B8A6) : const Color(0xFFF3F4F6),
           borderRadius: BorderRadius.circular(999),
         ),
         child: Text(
@@ -341,7 +341,7 @@ class _MiniStat extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -354,7 +354,7 @@ class _MiniStat extends StatelessWidget {
           Text(
             label,
             style: const TextStyle(
-              color: Color(0xFF6B7280),
+              color: Color(0xFF64748B),
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -390,7 +390,7 @@ class _JobCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x08000000),
@@ -413,7 +413,7 @@ class _JobCard extends StatelessWidget {
               Switch(
                 value: job.isActive,
                 onChanged: onToggle,
-                activeThumbColor: const Color(0xFF6D28D9),
+                activeThumbColor: const Color(0xFF14B8A6),
               ),
             ],
           ),
@@ -421,7 +421,7 @@ class _JobCard extends StatelessWidget {
           Text(
             '${job.department ?? '—'} • ${job.location ?? '—'}',
             style: const TextStyle(
-              color: Color(0xFF6B7280),
+              color: Color(0xFF64748B),
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -481,11 +481,11 @@ class _InfoChip extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 14, color: const Color(0xFF6B7280)),
+        Icon(icon, size: 14, color: const Color(0xFF64748B)),
         const SizedBox(width: 4),
         Text(
           text,
-          style: const TextStyle(color: Color(0xFF6B7280), fontSize: 12),
+          style: const TextStyle(color: Color(0xFF64748B), fontSize: 12),
         ),
       ],
     );
@@ -506,7 +506,7 @@ class _EmptyState extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Column(
         children: [
@@ -518,7 +518,7 @@ class _EmptyState extends StatelessWidget {
                 : l10n.t(AppText.companyJobsEmptyNoListings),
             style: const TextStyle(
               fontWeight: FontWeight.w700,
-              color: Color(0xFF6B7280),
+              color: Color(0xFF64748B),
             ),
           ),
           const SizedBox(height: 10),
@@ -528,7 +528,7 @@ class _EmptyState extends StatelessWidget {
               icon: const Icon(Icons.add),
               label: Text(l10n.t(AppText.newListing)),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF6D28D9),
+                backgroundColor: const Color(0xFF14B8A6),
               ),
             ),
         ],

@@ -27,7 +27,7 @@ class OiScoreCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x07000000),
@@ -47,15 +47,15 @@ class OiScoreCard extends StatelessWidget {
                 CircularProgressIndicator(
                   value: value,
                   strokeWidth: 9,
-                  backgroundColor: const Color(0xFFE5E7EB),
-                  valueColor: const AlwaysStoppedAnimation(Color(0xFF6D28D9)),
+                  backgroundColor: const Color(0xFFE2E8F0),
+                  valueColor: const AlwaysStoppedAnimation(Color(0xFF14B8A6)),
                 ),
                 Text(
                   '$score',
                   style: const TextStyle(
                     fontWeight: FontWeight.w900,
                     fontSize: 20,
-                    color: Color(0xFF1F2937),
+                    color: Color(0xFF0F172A),
                   ),
                 ),
               ],
@@ -74,7 +74,7 @@ class OiScoreCard extends StatelessWidget {
                 const Text(
                   'Your score is computed from 4 dimensions (0–100).',
                   style: TextStyle(
-                    color: Color(0xFF6B7280),
+                    color: Color(0xFF64748B),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -115,7 +115,7 @@ class OiRadarCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -174,7 +174,7 @@ class _DeltaRow extends StatelessWidget {
       fg = const Color(0xFFDC2626);
       icon = Icons.trending_down;
     } else {
-      fg = const Color(0xFF6B7280);
+      fg = const Color(0xFF64748B);
       icon = Icons.trending_flat;
     }
 
@@ -237,11 +237,11 @@ class _SparklinePainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.5
       ..strokeCap = StrokeCap.round
-      ..color = const Color(0xFF6D28D9);
+      ..color = const Color(0xFF14B8A6);
 
     final fill = Paint()
       ..style = PaintingStyle.fill
-      ..color = const Color(0xFF6D28D9).withValues(alpha: 0.12);
+      ..color = const Color(0xFF14B8A6).withValues(alpha: 0.12);
 
     final fillPath = Path.from(path)
       ..lineTo(size.width, size.height)
@@ -308,7 +308,7 @@ class _RadarPainter extends CustomPainter {
     final gridPaint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1
-      ..color = const Color(0xFFE5E7EB);
+      ..color = const Color(0xFFE2E8F0);
 
     final axisPaint = Paint()
       ..style = PaintingStyle.stroke
@@ -317,12 +317,12 @@ class _RadarPainter extends CustomPainter {
 
     final fillPaint = Paint()
       ..style = PaintingStyle.fill
-      ..color = const Color(0xFF6D28D9).withValues(alpha: 0.20);
+      ..color = const Color(0xFF14B8A6).withValues(alpha: 0.20);
 
     final strokePaint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2
-      ..color = const Color(0xFF6D28D9);
+      ..color = const Color(0xFF14B8A6);
 
     // 4 axes: top, right, bottom, left
     final angles = <double>[-pi / 2, 0, pi / 2, pi];

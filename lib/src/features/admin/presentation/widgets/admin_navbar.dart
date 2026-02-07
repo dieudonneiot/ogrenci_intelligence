@@ -219,7 +219,7 @@ class _AdminNavbarState extends ConsumerState<AdminNavbar> {
                     ? Container(
                         width: double.infinity,
                         decoration: const BoxDecoration(
-                          color: Color(0xFF1F2937),
+                          color: Color(0xFF0F172A),
                           border: Border(
                             top: BorderSide(color: Color(0xFF374151)),
                           ),
@@ -370,7 +370,7 @@ class _NavLink extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           decoration: BoxDecoration(
-            color: isActive ? const Color(0xFF1F2937) : Colors.transparent,
+            color: isActive ? const Color(0xFF0F172A) : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
           ),
           child: Row(
@@ -487,7 +487,7 @@ class _ProfileMenu extends StatelessWidget {
       width: 34,
       height: 34,
       decoration: BoxDecoration(
-        color: const Color(0xFF7C3AED),
+        color: const Color(0xFF6366F1),
         borderRadius: BorderRadius.circular(999),
       ),
       child: const Icon(Icons.person, size: 18, color: Colors.white),
@@ -524,7 +524,7 @@ class _ProfileMenu extends StatelessWidget {
                   email!,
                   style: const TextStyle(
                     fontSize: 12,
-                    color: Color(0xFF6B7280),
+                    color: Color(0xFF64748B),
                   ),
                 ),
             ],

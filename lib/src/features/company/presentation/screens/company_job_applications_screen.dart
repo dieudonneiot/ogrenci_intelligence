@@ -252,7 +252,7 @@ class _FiltersBar extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Wrap(
         spacing: 12,
@@ -319,7 +319,7 @@ class _FilterChip extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: active ? const Color(0xFF6D28D9) : const Color(0xFFF3F4F6),
+          color: active ? const Color(0xFF14B8A6) : const Color(0xFFF3F4F6),
           borderRadius: BorderRadius.circular(999),
         ),
         child: Text(
@@ -347,7 +347,7 @@ class _MiniStat extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -360,7 +360,7 @@ class _MiniStat extends StatelessWidget {
           Text(
             label,
             style: const TextStyle(
-              color: Color(0xFF6B7280),
+              color: Color(0xFF64748B),
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -397,7 +397,7 @@ class _ApplicationCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x08000000),
@@ -516,11 +516,11 @@ class _InfoLine extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 14, color: const Color(0xFF6B7280)),
+        Icon(icon, size: 14, color: const Color(0xFF64748B)),
         const SizedBox(width: 4),
         Text(
           text,
-          style: const TextStyle(color: Color(0xFF6B7280), fontSize: 12),
+          style: const TextStyle(color: Color(0xFF64748B), fontSize: 12),
         ),
       ],
     );
@@ -592,7 +592,7 @@ class _ExpandableText extends StatelessWidget {
           decoration: BoxDecoration(
             color: const Color(0xFFF9FAFB),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFFE5E7EB)),
+            border: Border.all(color: const Color(0xFFE2E8F0)),
           ),
           child: Text(text, style: const TextStyle(color: Color(0xFF374151))),
         ),
@@ -612,7 +612,7 @@ class _EmptyState extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Column(
         children: [
@@ -622,7 +622,7 @@ class _EmptyState extends StatelessWidget {
             l10n.t(AppText.companyApplicationsEmpty),
             style: const TextStyle(
               fontWeight: FontWeight.w700,
-              color: Color(0xFF6B7280),
+              color: Color(0xFF64748B),
             ),
           ),
         ],

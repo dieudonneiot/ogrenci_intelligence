@@ -50,7 +50,7 @@ class _EvidenceScreenState extends ConsumerState<EvidenceScreen> {
                       children: const [
                         Icon(
                           Icons.verified_outlined,
-                          color: Color(0xFF6D28D9),
+                          color: Color(0xFF14B8A6),
                         ),
                         SizedBox(width: 10),
                         Expanded(
@@ -84,7 +84,7 @@ class _EvidenceScreenState extends ConsumerState<EvidenceScreen> {
                             icon: const Icon(Icons.upload_file),
                             label: Text(_uploading ? 'Uploading...' : 'Upload'),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF6D28D9),
+                              backgroundColor: const Color(0xFF14B8A6),
                             ),
                           ),
                         ),
@@ -114,7 +114,7 @@ class _EvidenceScreenState extends ConsumerState<EvidenceScreen> {
                 const Text(
                   'Upload proof of your work. Your company will approve or reject it.',
                   style: TextStyle(
-                    color: Color(0xFF6B7280),
+                    color: Color(0xFF64748B),
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -233,7 +233,7 @@ class _EvidenceCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x07000000),
@@ -254,7 +254,7 @@ class _EvidenceCard extends StatelessWidget {
             ),
             child: const Icon(
               Icons.insert_drive_file_outlined,
-              color: Color(0xFF6D28D9),
+              color: Color(0xFF14B8A6),
             ),
           ),
           const SizedBox(width: 12),
@@ -299,7 +299,7 @@ class _EvidenceCard extends StatelessWidget {
                   Text(
                     item.description!,
                     style: const TextStyle(
-                      color: Color(0xFF6B7280),
+                      color: Color(0xFF64748B),
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -374,7 +374,7 @@ class _UploadSheetState extends State<_UploadSheet> {
           const SizedBox(height: 10),
           const Text(
             'Select your internship and choose a file.',
-            style: TextStyle(color: Color(0xFF6B7280)),
+            style: TextStyle(color: Color(0xFF64748B)),
           ),
           const SizedBox(height: 14),
           Container(
@@ -382,7 +382,7 @@ class _UploadSheetState extends State<_UploadSheet> {
             decoration: BoxDecoration(
               color: const Color(0xFFF9FAFB),
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: const Color(0xFFE5E7EB)),
+              border: Border.all(color: const Color(0xFFE2E8F0)),
             ),
             child: DropdownButtonHideUnderline(
               child: DropdownButton<AcceptedInternshipApplication>(
@@ -437,7 +437,7 @@ class _UploadSheetState extends State<_UploadSheet> {
               icon: const Icon(Icons.attach_file),
               label: const Text('Pick File & Upload'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF6D28D9),
+                backgroundColor: const Color(0xFF14B8A6),
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),

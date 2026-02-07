@@ -67,7 +67,7 @@ class AdminPageHeader extends StatelessWidget {
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
-        border: Border(bottom: BorderSide(color: Color(0xFFE5E7EB))),
+        border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
       ),
       padding: const EdgeInsets.symmetric(vertical: 18),
       child: Center(
@@ -77,7 +77,7 @@ class AdminPageHeader extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
               children: [
-                Icon(icon, size: 28, color: const Color(0xFF7C3AED)),
+                Icon(icon, size: 28, color: const Color(0xFF6366F1)),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -95,7 +95,7 @@ class AdminPageHeader extends StatelessWidget {
                         Text(
                           subtitle!,
                           style: const TextStyle(
-                            color: Color(0xFF6B7280),
+                            color: Color(0xFF64748B),
                             fontWeight: FontWeight.w700,
                           ),
                         ),
@@ -132,7 +132,7 @@ class AdminPlaceholderCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x0A000000),
@@ -154,7 +154,7 @@ class AdminPlaceholderCard extends StatelessWidget {
             subtitle,
             textAlign: TextAlign.center,
             style: const TextStyle(
-              color: Color(0xFF6B7280),
+              color: Color(0xFF64748B),
               fontWeight: FontWeight.w600,
             ),
           ),

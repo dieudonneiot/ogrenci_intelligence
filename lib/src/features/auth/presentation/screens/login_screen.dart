@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/routing/routes.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../controllers/auth_controller.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -138,11 +139,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final busy = ref.watch(authActionLoadingProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FAFB),
+      backgroundColor: AppColors.bg,
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFF4C1D95), Color(0xFF5B21B6), Color(0xFF1E3A8A)],
+            colors: [Color(0xFF115E59), Color(0xFF0F766E), Color(0xFF4338CA)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -173,13 +174,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         width: 74,
                         height: 74,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFEDE9FE),
+                          color: const Color(0xFFE0E7FF),
                           borderRadius: BorderRadius.circular(22),
                         ),
                         child: const Icon(
                           Icons.school_outlined,
                           size: 38,
-                          color: Color(0xFF7C3AED),
+                          color: Color(0xFF6366F1),
                         ),
                       ),
                     ),
@@ -196,8 +197,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     Text(
                       l10n.t(AppText.authStudentLoginSubtitle),
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Color(0xFF6B7280),
+                        style: const TextStyle(
+                        color: AppColors.inkMuted,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -356,7 +357,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           style: const TextStyle(fontWeight: FontWeight.w900),
                         ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF7C3AED),
+                          backgroundColor: AppColors.primary,
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14),
@@ -366,7 +367,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
 
                     const SizedBox(height: 16),
-                    Container(height: 1, color: const Color(0xFFE5E7EB)),
+                    Container(height: 1, color: const Color(0xFFE2E8F0)),
                     const SizedBox(height: 12),
 
                     OutlinedButton.icon(

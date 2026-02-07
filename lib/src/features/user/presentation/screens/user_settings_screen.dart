@@ -367,7 +367,7 @@ class _HeaderCard extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
         gradient: const LinearGradient(
-          colors: [Color(0xFF7C3AED), Color(0xFF4F46E5)],
+          colors: [Color(0xFF6366F1), Color(0xFF6366F1)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -411,7 +411,7 @@ class _SettingsSidebar extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Column(
         children: [
@@ -480,7 +480,7 @@ class _TabTile extends StatelessWidget {
             Icon(
               icon,
               size: 18,
-              color: active ? const Color(0xFF6D28D9) : const Color(0xFF6B7280),
+              color: active ? const Color(0xFF14B8A6) : const Color(0xFF64748B),
             ),
             const SizedBox(width: 8),
             Text(
@@ -488,7 +488,7 @@ class _TabTile extends StatelessWidget {
               style: TextStyle(
                 fontWeight: FontWeight.w700,
                 color: active
-                    ? const Color(0xFF6D28D9)
+                    ? const Color(0xFF14B8A6)
                     : const Color(0xFF374151),
               ),
             ),
@@ -550,7 +550,7 @@ class _SettingsContent extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x0A000000),
@@ -600,7 +600,7 @@ class _SettingsContent extends StatelessWidget {
                     : l10n.t(AppText.settingsSaveChanges),
               ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF6D28D9),
+                backgroundColor: const Color(0xFF14B8A6),
               ),
             ),
           ],
@@ -640,7 +640,7 @@ class _SettingsContent extends StatelessWidget {
                     : l10n.t(AppText.settingsUpdatePassword),
               ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF6D28D9),
+                backgroundColor: const Color(0xFF14B8A6),
               ),
             ),
           ],
@@ -775,7 +775,7 @@ class _PrefTile extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFFF9FAFB),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Row(
         children: [
@@ -791,7 +791,7 @@ class _PrefTile extends StatelessWidget {
                 Text(
                   subtitle,
                   style: const TextStyle(
-                    color: Color(0xFF6B7280),
+                    color: Color(0xFF64748B),
                     fontSize: 12,
                   ),
                 ),
@@ -801,7 +801,7 @@ class _PrefTile extends StatelessWidget {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeThumbColor: const Color(0xFF6D28D9),
+            activeThumbColor: const Color(0xFF14B8A6),
           ),
         ],
       ),
@@ -827,11 +827,11 @@ class _InfoBox extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFFF9FAFB),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Row(
         children: [
-          const Icon(Icons.shield_outlined, color: Color(0xFF6D28D9)),
+          const Icon(Icons.shield_outlined, color: Color(0xFF14B8A6)),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
@@ -845,7 +845,7 @@ class _InfoBox extends StatelessWidget {
                 Text(
                   subtitle,
                   style: const TextStyle(
-                    color: Color(0xFF6B7280),
+                    color: Color(0xFF64748B),
                     fontSize: 12,
                   ),
                 ),
@@ -853,7 +853,7 @@ class _InfoBox extends StatelessWidget {
                 Text(
                   actionLabel,
                   style: const TextStyle(
-                    color: Color(0xFF6D28D9),
+                    color: Color(0xFF14B8A6),
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -875,7 +875,7 @@ class _VisibilityBox extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFFF9FAFB),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -915,10 +915,10 @@ class _RadioRow extends StatelessWidget {
         Icon(
           value ? Icons.radio_button_checked : Icons.radio_button_unchecked,
           size: 16,
-          color: const Color(0xFF6D28D9),
+          color: const Color(0xFF14B8A6),
         ),
         const SizedBox(width: 8),
-        Text(label, style: const TextStyle(color: Color(0xFF6B7280))),
+        Text(label, style: const TextStyle(color: Color(0xFF64748B))),
       ],
     );
   }
@@ -951,7 +951,7 @@ class _DangerRow extends StatelessWidget {
         border: Border.all(
           color: actionColor == const Color(0xFFEF4444)
               ? const Color(0xFFFECACA)
-              : const Color(0xFFE5E7EB),
+              : const Color(0xFFE2E8F0),
         ),
       ),
       child: Row(
@@ -968,7 +968,7 @@ class _DangerRow extends StatelessWidget {
                 Text(
                   subtitle,
                   style: const TextStyle(
-                    color: Color(0xFF6B7280),
+                    color: Color(0xFF64748B),
                     fontSize: 12,
                   ),
                 ),
@@ -1003,7 +1003,7 @@ class _GuestView extends StatelessWidget {
               const Icon(
                 Icons.lock_outline,
                 size: 46,
-                color: Color(0xFF6B7280),
+                color: Color(0xFF64748B),
               ),
               const SizedBox(height: 10),
               Text(

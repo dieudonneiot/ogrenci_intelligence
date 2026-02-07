@@ -306,7 +306,7 @@ class _AdminSetupScreenState extends State<AdminSetupScreen> {
                       child: Icon(
                         Icons.security,
                         size: 36,
-                        color: Color(0xFF7C3AED),
+                        color: Color(0xFF6366F1),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -322,7 +322,7 @@ class _AdminSetupScreenState extends State<AdminSetupScreen> {
                     Text(
                       l10n.t(AppText.adminSetupSubtitle),
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: Color(0xFF6B7280)),
+                      style: TextStyle(color: Color(0xFF64748B)),
                     ),
                     const SizedBox(height: 16),
                     Container(
@@ -421,7 +421,7 @@ class _AdminSetupScreenState extends State<AdminSetupScreen> {
                               : l10n.t(AppText.adminSetupCreateButton),
                         ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF7C3AED),
+                          backgroundColor: const Color(0xFF6366F1),
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -435,7 +435,7 @@ class _AdminSetupScreenState extends State<AdminSetupScreen> {
                         'Please wait ${_cooldownSeconds}s before retrying.',
                         textAlign: TextAlign.center,
                         style: const TextStyle(
-                          color: Color(0xFF6B7280),
+                          color: Color(0xFF64748B),
                           fontWeight: FontWeight.w700,
                         ),
                       ),

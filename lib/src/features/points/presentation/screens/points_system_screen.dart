@@ -51,7 +51,7 @@ class _GuestPointsView extends StatelessWidget {
         Text(
           l10n.t(AppText.pointsSystemGuestSubtitle),
           style: const TextStyle(
-            color: Color(0xFF6B7280),
+            color: Color(0xFF64748B),
             fontWeight: FontWeight.w700,
           ),
         ),
@@ -67,7 +67,7 @@ class _GuestPointsView extends StatelessWidget {
               Text(
                 l10n.t(AppText.pointsSystemGuestSignInHint),
                 style: const TextStyle(
-                  color: Color(0xFF6B7280),
+                  color: Color(0xFF64748B),
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -101,7 +101,7 @@ class _AuthedPointsView extends ConsumerWidget {
         Text(
           l10n.t(AppText.pointsSystemAuthedSubtitle),
           style: const TextStyle(
-            color: Color(0xFF6B7280),
+            color: Color(0xFF64748B),
             fontWeight: FontWeight.w700,
           ),
         ),
@@ -137,14 +137,14 @@ class _AuthedPointsView extends ConsumerWidget {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: const Color(0xFFE5E7EB)),
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
                 ),
                 child: TabBar(
                   isScrollable: true,
-                  labelColor: const Color(0xFF1F2937),
-                  unselectedLabelColor: const Color(0xFF6B7280),
+                  labelColor: const Color(0xFF0F172A),
+                  unselectedLabelColor: const Color(0xFF64748B),
                   labelStyle: const TextStyle(fontWeight: FontWeight.w900),
-                  indicatorColor: const Color(0xFF6D28D9),
+                  indicatorColor: const Color(0xFF14B8A6),
                   tabs: [
                     Tab(text: l10n.t(AppText.pointsSystemTabHistory)),
                     Tab(text: l10n.t(AppText.pointsSystemTabRewards)),
@@ -253,7 +253,7 @@ class _Card extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x0A000000),
@@ -291,7 +291,7 @@ class _Summary extends StatelessWidget {
           ),
           child: const Icon(
             Icons.track_changes_outlined,
-            color: Color(0xFF6D28D9),
+            color: Color(0xFF14B8A6),
           ),
         ),
         const SizedBox(width: 12),
@@ -319,7 +319,7 @@ class _Summary extends StatelessWidget {
                     points: next!.requiredPoints,
                   ),
                   style: const TextStyle(
-                    color: Color(0xFF6B7280),
+                    color: Color(0xFF64748B),
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -329,7 +329,7 @@ class _Summary extends StatelessWidget {
                   child: LinearProgressIndicator(
                     value: progress,
                     minHeight: 10,
-                    backgroundColor: const Color(0xFFE5E7EB),
+                    backgroundColor: const Color(0xFFE2E8F0),
                     valueColor: const AlwaysStoppedAnimation(Color(0xFF2563EB)),
                   ),
                 ),
@@ -337,7 +337,7 @@ class _Summary extends StatelessWidget {
                 Text(
                   l10n.t(AppText.pointsSystemAllRewardsUnlocked),
                   style: const TextStyle(
-                    color: Color(0xFF6B7280),
+                    color: Color(0xFF64748B),
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -363,7 +363,7 @@ class _PointRow extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Row(
         children: [
@@ -396,7 +396,7 @@ class _PointRow extends StatelessWidget {
                 Text(
                   '${p.source} • ${_fmt(p.createdAt)}',
                   style: const TextStyle(
-                    color: Color(0xFF6B7280),
+                    color: Color(0xFF64748B),
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -439,7 +439,7 @@ class _RewardCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Row(
         children: [
@@ -456,7 +456,7 @@ class _RewardCard extends StatelessWidget {
               unlocked ? Icons.lock_open_outlined : Icons.lock_outline,
               color: unlocked
                   ? const Color(0xFF16A34A)
-                  : const Color(0xFF6D28D9),
+                  : const Color(0xFF14B8A6),
             ),
           ),
           const SizedBox(width: 12),
@@ -492,7 +492,7 @@ class _RewardCard extends StatelessWidget {
                           fontSize: 12,
                           color: unlocked
                               ? const Color(0xFF16A34A)
-                              : const Color(0xFF6B7280),
+                              : const Color(0xFF64748B),
                         ),
                       ),
                     ),
@@ -504,7 +504,7 @@ class _RewardCard extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    color: Color(0xFF6B7280),
+                    color: Color(0xFF64748B),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -537,7 +537,7 @@ class _BadgeCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Row(
         children: [
@@ -566,7 +566,7 @@ class _BadgeCard extends StatelessWidget {
                 Text(
                   (b.badgeDescription ?? b.badgeType),
                   style: const TextStyle(
-                    color: Color(0xFF6B7280),
+                    color: Color(0xFF64748B),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -574,7 +574,7 @@ class _BadgeCard extends StatelessWidget {
                 Text(
                   '+${b.pointsAwarded} • $dateText',
                   style: const TextStyle(
-                    color: Color(0xFF6B7280),
+                    color: Color(0xFF64748B),
                     fontWeight: FontWeight.w800,
                     fontSize: 12,
                   ),
@@ -627,7 +627,7 @@ class _Empty extends StatelessWidget {
       child: Text(
         text,
         style: const TextStyle(
-          color: Color(0xFF6B7280),
+          color: Color(0xFF64748B),
           fontWeight: FontWeight.w700,
         ),
       ),

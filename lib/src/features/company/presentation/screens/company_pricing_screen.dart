@@ -19,7 +19,7 @@ class CompanyPricingScreen extends StatelessWidget {
           l10n.t(AppText.companyPricingStarterFeature3),
           l10n.t(AppText.companyPricingStarterFeature4),
         ],
-        accent: Color(0xFF6D28D9),
+        accent: Color(0xFF14B8A6),
       ),
       _Package(
         name: l10n.t(AppText.companyPricingProName),
@@ -46,7 +46,7 @@ class CompanyPricingScreen extends StatelessWidget {
           l10n.t(AppText.companyPricingEnterpriseFeature4),
           l10n.t(AppText.companyPricingEnterpriseFeature5),
         ],
-        accent: const Color(0xFF1F2937),
+        accent: const Color(0xFF0F172A),
       ),
     ];
 
@@ -72,7 +72,7 @@ class CompanyPricingScreen extends StatelessWidget {
                   Text(
                     l10n.t(AppText.companyPricingSubtitle),
                     style: const TextStyle(
-                      color: Color(0xFF6B7280),
+                      color: Color(0xFF64748B),
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -139,7 +139,7 @@ class _PackageCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: pkg.highlighted ? pkg.accent : const Color(0xFFE5E7EB),
+          color: pkg.highlighted ? pkg.accent : const Color(0xFFE2E8F0),
           width: 1.5,
         ),
         boxShadow: const [
@@ -161,7 +161,7 @@ class _PackageCard extends StatelessWidget {
           Text(
             pkg.description,
             style: const TextStyle(
-              color: Color(0xFF6B7280),
+              color: Color(0xFF64748B),
               fontWeight: FontWeight.w600,
             ),
           ),

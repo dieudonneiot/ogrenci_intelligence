@@ -30,7 +30,7 @@ class HowItWorksSection extends ConsumerWidget {
         title: l10n.t(AppText.howItWorksStep1Title),
         description: l10n.t(AppText.howItWorksStep1Desc),
         icon: Icons.menu_book_outlined,
-        iconColor: Color(0xFF4F46E5), // indigo-600
+        iconColor: Color(0xFF6366F1), // indigo-600
         bgColor: Color(0xFFEFF6FF), // indigo-50 vibe
         borderColor: Color(0xFFC7D2FE), // indigo-200
       ),
@@ -39,7 +39,7 @@ class HowItWorksSection extends ConsumerWidget {
         title: l10n.t(AppText.howItWorksStep2Title),
         description: l10n.t(AppText.howItWorksStep2Desc),
         icon: Icons.business_center_outlined,
-        iconColor: Color(0xFF7C3AED), // purple-600
+        iconColor: Color(0xFF6366F1), // purple-600
         bgColor: Color(0xFFF3E8FF), // purple-50
         borderColor: Color(0xFFD8B4FE), // purple-200
       ),
@@ -212,7 +212,7 @@ class _HowStepCardState extends State<_HowStepCard> {
                   widget.step.title,
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w800,
-                    color: const Color(0xFF1F2937),
+                    color: const Color(0xFF0F172A),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -282,8 +282,8 @@ class _CtaButton extends StatefulWidget {
 
 class _CtaButtonState extends State<_CtaButton> {
   bool _hover = false;
-  static const _purple = Color(0xFF7C3AED);
-  static const _purpleHover = Color(0xFF6D28D9);
+  static const _purple = Color(0xFF6366F1);
+  static const _purpleHover = Color(0xFF14B8A6);
 
   @override
   Widget build(BuildContext context) {

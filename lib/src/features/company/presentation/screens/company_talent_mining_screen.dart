@@ -152,7 +152,7 @@ class _CompanyTalentMiningScreenState
                             style: const TextStyle(fontWeight: FontWeight.w900),
                           ),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF6D28D9),
+                            backgroundColor: const Color(0xFF14B8A6),
                             foregroundColor: Colors.white,
                           ),
                         ),
@@ -253,7 +253,7 @@ class _FiltersCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x07000000),
@@ -331,7 +331,7 @@ class _FiltersCard extends StatelessWidget {
                     selected: selectedBadges.contains(b),
                     onSelected: (_) => onToggleBadge(b),
                     selectedColor: const Color(0xFFEDE9FE),
-                    checkmarkColor: const Color(0xFF6D28D9),
+                    checkmarkColor: const Color(0xFF14B8A6),
                   ),
               ],
             ),
@@ -348,7 +348,7 @@ class _FiltersCard extends StatelessWidget {
                 style: TextStyle(fontWeight: FontWeight.w900),
               ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF6D28D9),
+                backgroundColor: const Color(0xFF14B8A6),
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
@@ -373,7 +373,7 @@ class _Results extends StatelessWidget {
         child: Text(
           'No results.',
           style: TextStyle(
-            color: Color(0xFF6B7280),
+            color: Color(0xFF64748B),
             fontWeight: FontWeight.w800,
           ),
         ),
@@ -428,7 +428,7 @@ class _CandidateCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x07000000),
@@ -459,7 +459,7 @@ class _CandidateCard extends StatelessWidget {
                     Text(
                       '${item.department ?? _dash} • Year ${item.year ?? _dash}',
                       style: const TextStyle(
-                        color: Color(0xFF6B7280),
+                        color: Color(0xFF64748B),
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -512,7 +512,7 @@ class _CandidateCard extends StatelessWidget {
                     : (item.metricsAvailable && item.nanoCoursesCompleted > 0
                           ? '${item.nanoCoursesCompleted} done'
                           : _dash),
-                color: const Color(0xFF6D28D9),
+                color: const Color(0xFF14B8A6),
                 bg: const Color(0xFFEDE9FE),
               ),
               _MetricPill(
@@ -585,7 +585,7 @@ class _CandidateCard extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: () => _showDetails(context),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF6D28D9),
+                    backgroundColor: const Color(0xFF14B8A6),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
@@ -639,7 +639,7 @@ class _CandidateCard extends StatelessWidget {
                   const Text(
                     'Extended performance metrics are not available in this environment.',
                     style: TextStyle(
-                      color: Color(0xFF6B7280),
+                      color: Color(0xFF64748B),
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -647,7 +647,7 @@ class _CandidateCard extends StatelessWidget {
                   const Text(
                     'Apply the updated SQL in docs/sql/24_talent_mining.sql to enable focus speed, nano-learning knowledge, and case reaction signals.',
                     style: TextStyle(
-                      color: Color(0xFF6B7280),
+                      color: Color(0xFF64748B),
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -827,7 +827,7 @@ class _Bar extends StatelessWidget {
           child: LinearProgressIndicator(
             value: (value.clamp(0, 100)) / 100.0,
             minHeight: 8,
-            backgroundColor: const Color(0xFFE5E7EB),
+            backgroundColor: const Color(0xFFE2E8F0),
             valueColor: AlwaysStoppedAnimation<Color>(color),
           ),
         ),
@@ -874,7 +874,7 @@ class _Avatar extends StatelessWidget {
         t,
         style: const TextStyle(
           fontWeight: FontWeight.w900,
-          color: Color(0xFF6D28D9),
+          color: Color(0xFF14B8A6),
         ),
       ),
     );

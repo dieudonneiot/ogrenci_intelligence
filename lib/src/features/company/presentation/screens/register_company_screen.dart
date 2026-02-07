@@ -156,7 +156,7 @@ class _RegisterCompanyScreenState extends ConsumerState<RegisterCompanyScreen> {
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.apartment, color: Color(0xFF6D28D9)),
+                    const Icon(Icons.apartment, color: Color(0xFF14B8A6)),
                     const SizedBox(width: 8),
                     Text(
                       l10n.t(AppText.companyRegisterTitle),
@@ -173,7 +173,7 @@ class _RegisterCompanyScreenState extends ConsumerState<RegisterCompanyScreen> {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(18),
-                    border: Border.all(color: const Color(0xFFE5E7EB)),
+                    border: Border.all(color: const Color(0xFFE2E8F0)),
                   ),
                   child: Column(
                     children: [
@@ -221,7 +221,7 @@ class _RegisterCompanyScreenState extends ConsumerState<RegisterCompanyScreen> {
                                 : l10n.t(AppText.companyRegisterSubmit),
                           ),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF6D28D9),
+                            backgroundColor: const Color(0xFF14B8A6),
                           ),
                         ),
                       ),

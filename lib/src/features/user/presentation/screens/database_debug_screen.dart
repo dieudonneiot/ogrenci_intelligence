@@ -190,7 +190,7 @@ class _DatabaseDebugScreenState extends ConsumerState<DatabaseDebugScreen> {
                   children: [
                     const Icon(
                       Icons.storage_outlined,
-                      color: Color(0xFF6D28D9),
+                      color: Color(0xFF14B8A6),
                       size: 28,
                     ),
                     const SizedBox(width: 10),
@@ -206,7 +206,7 @@ class _DatabaseDebugScreenState extends ConsumerState<DatabaseDebugScreen> {
                 const SizedBox(height: 6),
                 Text(
                   l10n.t(AppText.dbDebugSubtitle),
-                  style: const TextStyle(color: Color(0xFF6B7280)),
+                  style: const TextStyle(color: Color(0xFF64748B)),
                 ),
                 const SizedBox(height: 16),
                 _UserCard(user: user, profile: _profile),
@@ -239,14 +239,14 @@ class _UserCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(Icons.table_chart_outlined, color: Color(0xFF6B7280)),
+              const Icon(Icons.table_chart_outlined, color: Color(0xFF64748B)),
               const SizedBox(width: 8),
               Text(
                 l10n.t(AppText.dbDebugUserInfoTitle),
@@ -297,7 +297,7 @@ class _InfoLine extends StatelessWidget {
       children: [
         Text(
           label,
-          style: const TextStyle(color: Color(0xFF6B7280), fontSize: 12),
+          style: const TextStyle(color: Color(0xFF64748B), fontSize: 12),
         ),
         const SizedBox(height: 2),
         Text(value, style: const TextStyle(fontWeight: FontWeight.w700)),
@@ -365,14 +365,14 @@ class _TableCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(Icons.table_chart_outlined, color: Color(0xFF6B7280)),
+              const Icon(Icons.table_chart_outlined, color: Color(0xFF64748B)),
               const SizedBox(width: 8),
               Text(
                 l10n.dbDebugTableTitle(name),
@@ -439,7 +439,7 @@ class _TableCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: const Color(0xFFF9FAFB),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0xFFE5E7EB)),
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
                 ),
                 child: Text(
                   const JsonEncoder.withIndent('  ').convert(result.sample),

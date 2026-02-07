@@ -82,7 +82,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                   Text(
                     l10n.t(AppText.favoritesSubtitle),
                     style: const TextStyle(
-                      color: Color(0xFF6B7280),
+                      color: Color(0xFF64748B),
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -299,7 +299,7 @@ class _FiltersBar extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x0A000000),
@@ -319,8 +319,8 @@ class _FiltersBar extends StatelessWidget {
                     onPressed: () => onTab(t.id),
                     style: TextButton.styleFrom(
                       foregroundColor: activeTab == t.id
-                          ? const Color(0xFF6D28D9)
-                          : const Color(0xFF6B7280),
+                          ? const Color(0xFF14B8A6)
+                          : const Color(0xFF64748B),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -357,14 +357,14 @@ class _FiltersBar extends StatelessWidget {
             onPressed: () => onView(_ViewMode.grid),
             icon: const Icon(Icons.grid_view),
             color: viewMode == _ViewMode.grid
-                ? const Color(0xFF6D28D9)
+                ? const Color(0xFF14B8A6)
                 : const Color(0xFF9CA3AF),
           ),
           IconButton(
             onPressed: () => onView(_ViewMode.list),
             icon: const Icon(Icons.view_list),
             color: viewMode == _ViewMode.list
-                ? const Color(0xFF6D28D9)
+                ? const Color(0xFF14B8A6)
                 : const Color(0xFF9CA3AF),
           ),
         ],
@@ -468,7 +468,7 @@ class _FavoriteCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x08000000),
@@ -543,7 +543,7 @@ class _FavoriteListRow extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x08000000),
@@ -583,7 +583,7 @@ class _FavoriteListRow extends StatelessWidget {
           ElevatedButton(
             onPressed: onOpen,
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF6D28D9),
+              backgroundColor: const Color(0xFF14B8A6),
             ),
             child: Text(
               AppLocalizations.of(context).t(AppText.commonViewDetails),
@@ -648,7 +648,7 @@ class _DetailsInline extends StatelessWidget {
     return Text(
       meta,
       style: const TextStyle(
-        color: Color(0xFF6B7280),
+        color: Color(0xFF64748B),
         fontSize: 12,
         fontWeight: FontWeight.w600,
       ),
@@ -671,7 +671,7 @@ class _DetailRow extends StatelessWidget {
           child: Text(
             text,
             style: const TextStyle(
-              color: Color(0xFF6B7280),
+              color: Color(0xFF64748B),
               fontSize: 12,
               fontWeight: FontWeight.w600,
             ),
@@ -693,7 +693,7 @@ class _TypeIcon extends StatelessWidget {
     switch (type) {
       case 'course':
         icon = Icons.menu_book_outlined;
-        color = const Color(0xFF6D28D9);
+        color = const Color(0xFF14B8A6);
         break;
       case 'job':
         icon = Icons.work_outline;
@@ -705,7 +705,7 @@ class _TypeIcon extends StatelessWidget {
         break;
       default:
         icon = Icons.favorite_border;
-        color = const Color(0xFF6B7280);
+        color = const Color(0xFF64748B);
     }
 
     return Container(
@@ -734,7 +734,7 @@ class _TypePill extends StatelessWidget {
       case 'course':
         label = l10n.t(AppText.navCourses);
         bg = const Color(0xFFEDE9FE);
-        fg = const Color(0xFF6D28D9);
+        fg = const Color(0xFF14B8A6);
         break;
       case 'job':
         label = l10n.t(AppText.navJobs);
@@ -749,7 +749,7 @@ class _TypePill extends StatelessWidget {
       default:
         label = l10n.t(AppText.navFavorites);
         bg = const Color(0xFFF3F4F6);
-        fg = const Color(0xFF6B7280);
+        fg = const Color(0xFF64748B);
     }
 
     return Container(
@@ -785,7 +785,7 @@ class _EmptyFavorites extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Column(
         children: [
@@ -794,7 +794,7 @@ class _EmptyFavorites extends StatelessWidget {
           Text(
             l10n.t(AppText.favoritesEmptyTitle),
             style: const TextStyle(
-              color: Color(0xFF6B7280),
+              color: Color(0xFF64748B),
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -839,7 +839,7 @@ class _GuestView extends StatelessWidget {
               const Icon(
                 Icons.lock_outline,
                 size: 46,
-                color: Color(0xFF6B7280),
+                color: Color(0xFF64748B),
               ),
               const SizedBox(height: 10),
               Text(

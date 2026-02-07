@@ -82,7 +82,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                         children: [
                           const Icon(
                             Icons.notifications,
-                            color: Color(0xFF6D28D9),
+                            color: Color(0xFF14B8A6),
                             size: 28,
                           ),
                           Text(
@@ -139,13 +139,13 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                         children: [
                           const Icon(
                             Icons.notifications_active,
-                            color: Color(0xFF6D28D9),
+                            color: Color(0xFF14B8A6),
                           ),
                           Text(
                             l10n.notificationsUnreadCount(unreadCount),
                             style: const TextStyle(
                               fontWeight: FontWeight.w800,
-                              color: Color(0xFF6D28D9),
+                              color: Color(0xFF14B8A6),
                             ),
                           ),
                         ],
@@ -390,7 +390,7 @@ class _FilterTabs extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Wrap(
         spacing: 6,
@@ -434,8 +434,8 @@ class _TabButton extends StatelessWidget {
       onPressed: onTap,
       style: TextButton.styleFrom(
         foregroundColor: active
-            ? const Color(0xFF6D28D9)
-            : const Color(0xFF6B7280),
+            ? const Color(0xFF14B8A6)
+            : const Color(0xFF64748B),
       ),
       child: Text(label, style: const TextStyle(fontWeight: FontWeight.w800)),
     );
@@ -474,7 +474,7 @@ class _NotificationCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: item.isRead
-              ? const Color(0xFFE5E7EB)
+              ? const Color(0xFFE2E8F0)
               : const Color(0xFFD8B4FE),
         ),
         boxShadow: const [
@@ -501,7 +501,7 @@ class _NotificationCard extends StatelessWidget {
                 const SizedBox(height: 6),
                 Text(
                   item.message,
-                  style: const TextStyle(color: Color(0xFF6B7280)),
+                  style: const TextStyle(color: Color(0xFF64748B)),
                 ),
                 const SizedBox(height: 8),
                 Wrap(
@@ -596,7 +596,7 @@ class _EmptyState extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Column(
         children: [
@@ -606,7 +606,7 @@ class _EmptyState extends StatelessWidget {
             color: Color(0xFFD1D5DB),
           ),
           const SizedBox(height: 8),
-          Text(text, style: const TextStyle(color: Color(0xFF6B7280))),
+          Text(text, style: const TextStyle(color: Color(0xFF64748B))),
         ],
       ),
     );
@@ -630,7 +630,7 @@ class _GuestView extends StatelessWidget {
               const Icon(
                 Icons.lock_outline,
                 size: 46,
-                color: Color(0xFF6B7280),
+                color: Color(0xFF64748B),
               ),
               const SizedBox(height: 10),
               Text(
@@ -731,17 +731,17 @@ class _NotificationItem {
       case 'course_completed':
         return const Color(0xFF2563EB);
       case 'application_accepted':
-        return const Color(0xFF7C3AED);
+        return const Color(0xFF6366F1);
       case 'application_rejected':
         return const Color(0xFFDC2626);
       case 'new_course':
-        return const Color(0xFF4F46E5);
+        return const Color(0xFF6366F1);
       case 'reminder':
         return const Color(0xFFD97706);
       case 'achievement':
         return const Color(0xFFF97316);
       default:
-        return const Color(0xFF6B7280);
+        return const Color(0xFF64748B);
     }
   }
 }

@@ -6,6 +6,7 @@ import '../../../../core/config/env.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../../core/supabase/supabase_service.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../controllers/auth_controller.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
@@ -150,11 +151,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final busy = ref.watch(authActionLoadingProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FAFB),
+      backgroundColor: AppColors.bg,
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFF4C1D95), Color(0xFF5B21B6), Color(0xFF1E3A8A)],
+            colors: [Color(0xFF115E59), Color(0xFF0F766E), Color(0xFF4338CA)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -185,13 +186,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         width: 72,
                         height: 72,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFEDE9FE),
+                          color: const Color(0xFFE0E7FF),
                           borderRadius: BorderRadius.circular(22),
                         ),
                         child: const Icon(
                           Icons.person_add_alt_1,
                           size: 38,
-                          color: Color(0xFF7C3AED),
+                          color: Color(0xFF6366F1),
                         ),
                       ),
                     ),
@@ -209,7 +210,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       l10n.t(AppText.authStudentRegisterSubtitle),
                       textAlign: TextAlign.center,
                       style: const TextStyle(
-                        color: Color(0xFF6B7280),
+                        color: AppColors.inkMuted,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -391,6 +392,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
                     ElevatedButton(
                       onPressed: busy ? null : _submit,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                      ),
                       child: busy
                           ? const SizedBox(
                               width: 18,

@@ -213,7 +213,7 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
         title: l10n.t(AppText.adminUsersTitle),
         trailing: Text(
           l10n.adminUsersTotalCountWithCount(_users.length),
-          style: const TextStyle(color: Color(0xFF6B7280)),
+          style: const TextStyle(color: Color(0xFF64748B)),
         ),
       ),
       child: Column(
@@ -224,7 +224,7 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: const Color(0xFFE5E7EB)),
+              border: Border.all(color: const Color(0xFFE2E8F0)),
             ),
             child: TextField(
               controller: _searchCtrl,
@@ -286,7 +286,7 @@ class _UsersTable extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
@@ -317,7 +317,7 @@ class _UsersTable extends StatelessWidget {
                         user.email ?? '-',
                         style: const TextStyle(
                           fontSize: 12,
-                          color: Color(0xFF6B7280),
+                          color: Color(0xFF64748B),
                         ),
                       ),
                     ],
@@ -335,7 +335,7 @@ class _UsersTable extends StatelessWidget {
                         user.department ?? '-',
                         style: const TextStyle(
                           fontSize: 12,
-                          color: Color(0xFF6B7280),
+                          color: Color(0xFF64748B),
                         ),
                       ),
                     ],
@@ -360,7 +360,7 @@ class _UsersTable extends StatelessWidget {
                         onPressed: () => onOpen(user),
                         icon: const Icon(
                           Icons.remove_red_eye_outlined,
-                          color: Color(0xFF7C3AED),
+                          color: Color(0xFF6366F1),
                         ),
                       ),
                       if (user.isBanned)
@@ -402,7 +402,7 @@ class _EmptyState extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Column(
         children: [
@@ -437,7 +437,7 @@ class _ErrorState extends StatelessWidget {
             Text(
               text,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: Color(0xFF6B7280)),
+              style: const TextStyle(color: Color(0xFF64748B)),
             ),
             const SizedBox(height: 12),
             ElevatedButton(
@@ -465,7 +465,7 @@ class _DetailRow extends StatelessWidget {
         children: [
           Text(
             label,
-            style: const TextStyle(color: Color(0xFF6B7280), fontSize: 12),
+            style: const TextStyle(color: Color(0xFF64748B), fontSize: 12),
           ),
           const SizedBox(height: 2),
           Text(value, style: const TextStyle(fontWeight: FontWeight.w700)),

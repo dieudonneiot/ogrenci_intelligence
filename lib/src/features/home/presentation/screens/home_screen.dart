@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../../core/supabase/supabase_service.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/widgets/app_footer.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
 import '../widgets/how_it_works_section.dart';
@@ -171,9 +172,9 @@ class _Hero extends StatelessWidget {
   final VoidCallback onProfile;
   final Future<void> Function() onLogout;
 
-  static const _purple700 = Color(0xFF7E22CE);
-  static const _indigo700 = Color(0xFF4338CA);
-  static const _blue800 = Color(0xFF1E40AF);
+  static const _teal900 = Color(0xFF115E59);
+  static const _teal700 = Color(0xFF0F766E);
+  static const _indigo800 = Color(0xFF4338CA);
   static const _yellow400 = Color(0xFFFACC15);
   static const _green400 = Color(0xFF4ADE80);
   static const _red400 = Color(0xFFF87171);
@@ -188,7 +189,7 @@ class _Hero extends StatelessWidget {
     );
 
     final subtitleStyle = Theme.of(context).textTheme.titleMedium?.copyWith(
-      color: const Color(0xFFC7D2FE), // indigo-200 vibe
+      color: const Color(0xE6FFFFFF),
       height: 1.5,
     );
 
@@ -208,7 +209,7 @@ class _Hero extends StatelessWidget {
           gradient: const LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [_purple700, _indigo700, _blue800],
+            colors: [_teal900, _teal700, _indigo800],
           ),
           borderRadius: BorderRadius.circular(28),
           boxShadow: const [
@@ -254,19 +255,19 @@ class _Hero extends StatelessWidget {
                       _FilledCta(
                         label: l10n.t(AppText.signUp),
                         color: _yellow400,
-                        textColor: const Color(0xFF1F2937),
+                        textColor: const Color(0xFF0F172A),
                         onTap: onRegister,
                       ),
                       _FilledCta(
                         label: l10n.t(AppText.login),
                         color: _yellow400,
-                        textColor: const Color(0xFF1F2937),
+                        textColor: const Color(0xFF0F172A),
                         onTap: onLogin,
                       ),
                       _FilledCta(
                         label: l10n.t(AppText.adminPanelTitle),
                         color: _yellow400,
-                        textColor: const Color(0xFF1F2937),
+                        textColor: const Color(0xFF0F172A),
                         icon: Icons.security,
                         onTap: () => context.go(Routes.adminLogin),
                       ),
@@ -274,7 +275,7 @@ class _Hero extends StatelessWidget {
                       _FilledCta(
                         label: l10n.t(AppText.profile),
                         color: _green400,
-                        textColor: const Color(0xFF1F2937),
+                        textColor: const Color(0xFF0F172A),
                         icon: Icons.person_outline,
                         onTap: onProfile,
                       ),
@@ -370,7 +371,7 @@ class _SectionGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final headerStyle = Theme.of(context).textTheme.headlineSmall?.copyWith(
       fontWeight: FontWeight.w800,
-      color: const Color(0xFF3B0764), // deep purple
+      color: AppColors.ink,
     );
 
     return Column(
