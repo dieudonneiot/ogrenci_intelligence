@@ -38,6 +38,11 @@ class _AdminNavbarState extends ConsumerState<AdminNavbar> {
         Icons.home_outlined,
       ),
       _AdminNavItem(
+        l10n.t(AppText.navChat),
+        Routes.adminChat,
+        Icons.smart_toy_outlined,
+      ),
+      _AdminNavItem(
         l10n.t(AppText.adminNavCompanies),
         Routes.adminCompanies,
         Icons.apartment_outlined,

@@ -63,6 +63,7 @@ class Routes {
   static const companyEvidence = '/company/evidence';
   static const companyTalent = '/company/talent';
   static const companyExcuses = '/company/excuses';
+  static const companyChat = '/company/chat';
 
   // Admin (protected)
   static const adminDashboard = '/admin/dashboard';
@@ -74,4 +75,5 @@ class Routes {
   static const adminSettings = '/admin/settings';
   static const adminLogs = '/admin/logs';
   static const adminProfile = '/admin/profile';
+  static const adminChat = '/admin/chat';
 }

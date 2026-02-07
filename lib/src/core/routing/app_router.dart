@@ -178,6 +178,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             builder: (context, _) => const AdminDashboardScreen(),
           ),
           GoRoute(
+            path: Routes.adminChat,
+            builder: (context, _) => const ChatScreen(),
+          ),
+          GoRoute(
             path: Routes.adminCompanies,
             builder: (context, _) => const AdminCompaniesScreen(),
           ),
@@ -449,6 +453,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: Routes.companyExcuses,
             builder: (context, _) => const CompanyExcuseRequestsScreen(),
+          ),
+          GoRoute(
+            path: Routes.companyChat,
+            builder: (context, _) => const ChatScreen(),
           ),
         ],
       ),

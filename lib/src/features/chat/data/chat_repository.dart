@@ -193,6 +193,79 @@ class ChatRepository {
     return rows.map(ChatMessage.fromMap).toList();
   }
 
+  Future<List<ChatSessionSummary>> fetchSessions(
+    String userId, {
+    int limit = 25,
+  }) async {
+    final res = await _client
+        .from('chat_sessions')
+        .select('id, started_at, ended_at, message_count')
+        .eq('user_id', userId)
+        .order('started_at', ascending: false)
+        .limit(limit);
+
+    final rows = (res as List<dynamic>).cast<Map<String, dynamic>>();
+    final sessions = rows.map(ChatSessionSummary.fromMap).toList();
+
+    final ids = sessions.map((e) => e.id).where((e) => e.isNotEmpty).toList();
+    if (ids.isEmpty) return sessions;
+
+    // Load last message previews in one query and attach on the client.
+    // (PostgREST doesn't support "distinct on" easily in a single call.)
+    try {
+      final msgRes = await _client
+          .from('chat_messages')
+          .select('session_id, message, created_at')
+          .eq('user_id', userId)
+          .inFilter('session_id', ids)
+          .order('created_at', ascending: false)
+          .limit(500);
+
+      final msgRows = (msgRes as List<dynamic>).cast<Map<String, dynamic>>();
+      final latestBySession = <String, Map<String, dynamic>>{};
+      for (final r in msgRows) {
+        final sid = (r['session_id'] ?? '').toString();
+        if (sid.isEmpty) continue;
+        latestBySession.putIfAbsent(sid, () => r);
+      }
+
+      return [
+        for (final s in sessions)
+          latestBySession.containsKey(s.id)
+              ? s.copyWith(
+                  lastMessage: (latestBySession[s.id]?['message'] ?? '')
+                      .toString()
+                      .trim(),
+                  lastMessageAt: latestBySession[s.id]?['created_at'] is String
+                      ? DateTime.tryParse(
+                          latestBySession[s.id]!['created_at'] as String,
+                        )
+                      : null,
+                )
+              : s,
+      ];
+    } catch (_) {
+      return sessions;
+    }
+  }
+
+  Future<List<ChatMessage>> fetchSessionMessages({
+    required String userId,
+    required String sessionId,
+    int limit = 200,
+  }) async {
+    final res = await _client
+        .from('chat_messages')
+        .select('id, message, type, created_at, session_id')
+        .eq('user_id', userId)
+        .eq('session_id', sessionId)
+        .order('created_at', ascending: true)
+        .limit(limit);
+
+    final rows = (res as List<dynamic>).cast<Map<String, dynamic>>();
+    return rows.map(ChatMessage.fromMap).toList();
+  }
+
   Future<ChatAiResponse> sendMessage({
     required String message,
     String? sessionId,

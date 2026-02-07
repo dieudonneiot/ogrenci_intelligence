@@ -13,6 +13,8 @@ import '../../../evidence/data/evidence_repository.dart';
 import '../../../evidence/domain/evidence_models.dart';
 import '../../../excuse/data/excuse_repository.dart';
 import '../../../excuse/domain/excuse_models.dart';
+import '../../data/talent_mining_repository.dart';
+import '../../domain/talent_models.dart';
 
 class CompanyDashboardScreen extends ConsumerStatefulWidget {
   const CompanyDashboardScreen({super.key});
@@ -34,6 +36,10 @@ class _CompanyDashboardScreenState
   int _avgOiScore = 0;
   Map<String, int> _departmentDistribution = const {};
   List<_CompanyFeedItem> _feed = const [];
+  List<TalentCandidate> _talentPool = const [];
+  String? _talentError;
+  String? _talentDepartment;
+  bool _matchSector = true;
 
   @override
   void didChangeDependencies() {
@@ -50,6 +56,7 @@ class _CompanyDashboardScreenState
       final repo = ref.read(companyRepositoryProvider);
       final evidenceRepo = const EvidenceRepository();
       final excuseRepo = const ExcuseRepository();
+      final talentRepo = const TalentMiningRepository();
 
       final results = await Future.wait([
         repo.getCompanyById(companyId),
@@ -65,6 +72,7 @@ class _CompanyDashboardScreenState
           limit: 6,
         ),
         _loadActiveInterns(companyId),
+        _loadTalentPool(talentRepo, companyId),
       ]);
 
       final company = results[0] as Map<String, dynamic>?;
@@ -73,6 +81,7 @@ class _CompanyDashboardScreenState
       final pendingEvidenceItems = results[3] as List<EvidenceItem>;
       final pendingExcuses = results[4] as List<CompanyExcuseRequest>;
       final internBundle = results[5] as _InternBundle;
+      final talentBundle = results[6] as _TalentBundle;
 
       final evidenceUserIds = pendingEvidenceItems
           .map((e) => e.userId)
@@ -118,10 +127,39 @@ class _CompanyDashboardScreenState
         _avgOiScore = internBundle.avgOiScore;
         _departmentDistribution = internBundle.departmentDistribution;
         _feed = feed.take(6).toList(growable: false);
+        _talentPool = talentBundle.items;
+        _talentError = talentBundle.error;
       });
     } finally {
       if (mounted) setState(() => _loading = false);
     }
+  }
+
+  Future<_TalentBundle> _loadTalentPool(
+    TalentMiningRepository repo,
+    String companyId,
+  ) async {
+    try {
+      final items = await repo.listTalentPool(
+        companyId: companyId,
+        department: null,
+        minScore: 0,
+        maxScore: 100,
+        limit: 80,
+        offset: 0,
+      );
+      return _TalentBundle(items: items, error: null);
+    } catch (e) {
+      return _TalentBundle(items: const [], error: e.toString());
+    }
+  }
+
+  bool _matchesSector(TalentCandidate c, String sector) {
+    final s = sector.trim().toLowerCase();
+    if (s.isEmpty) return false;
+    final d = (c.department ?? '').trim().toLowerCase();
+    if (d.isEmpty) return false;
+    return d.contains(s) || s.contains(d);
   }
 
   Future<_InternBundle> _loadActiveInterns(String companyId) async {
@@ -342,6 +380,22 @@ class _CompanyDashboardScreenState
                   ),
                   const SizedBox(height: 18),
                   _QuickActions(),
+                  const SizedBox(height: 14),
+                  _TalentSpotlight(
+                    sector: (_company?['sector'] ?? '').toString(),
+                    candidates: _talentPool,
+                    error: _talentError,
+                    selectedDepartment: _talentDepartment,
+                    matchSector: _matchSector,
+                    onChangeFilters: (nextDepartment, matchSector) {
+                      setState(() {
+                        _talentDepartment = nextDepartment;
+                        _matchSector = matchSector;
+                      });
+                    },
+                    onSeeAll: () => context.go(Routes.companyTalent),
+                    matchesSector: _matchesSector,
+                  ),
                   const SizedBox(height: 14),
                   _NotificationFeed(
                     items: _feed,
@@ -946,6 +1000,363 @@ class _ProgressRow extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _TalentBundle {
+  const _TalentBundle({required this.items, required this.error});
+
+  final List<TalentCandidate> items;
+  final String? error;
+}
+
+class _TalentSpotlight extends StatelessWidget {
+  const _TalentSpotlight({
+    required this.sector,
+    required this.candidates,
+    required this.error,
+    required this.selectedDepartment,
+    required this.matchSector,
+    required this.onChangeFilters,
+    required this.onSeeAll,
+    required this.matchesSector,
+  });
+
+  final String sector;
+  final List<TalentCandidate> candidates;
+  final String? error;
+  final String? selectedDepartment;
+  final bool matchSector;
+  final void Function(String? department, bool matchSector) onChangeFilters;
+  final VoidCallback onSeeAll;
+  final bool Function(TalentCandidate c, String sector) matchesSector;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final sectorTrimmed = sector.trim();
+    final effectiveMatchSector = matchSector && sectorTrimmed.isNotEmpty;
+
+    final departments = candidates
+        .map((e) => (e.department ?? '').trim())
+        .where((e) => e.isNotEmpty)
+        .toSet()
+        .toList(growable: false)
+      ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+
+    Iterable<TalentCandidate> filtered = candidates;
+    final dep = (selectedDepartment ?? '').trim();
+    if (dep.isNotEmpty) {
+      filtered = filtered.where((c) => (c.department ?? '').trim() == dep);
+    }
+    if (effectiveMatchSector) {
+      filtered = filtered.where((c) => matchesSector(c, sectorTrimmed));
+    }
+
+    final list = filtered.toList(growable: false)
+      ..sort((a, b) => b.totalPoints.compareTo(a.totalPoints));
+    final top = list.take(10).toList(growable: false);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x12000000),
+            blurRadius: 16,
+            offset: Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.people_outline, color: Color(0xFF6D28D9)),
+              const SizedBox(width: 10),
+              const Expanded(
+                child: Text(
+                  'Top Students',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
+                ),
+              ),
+              TextButton.icon(
+                onPressed: () => _openFilterSheet(
+                  context,
+                  departments: departments,
+                  sector: sectorTrimmed,
+                ),
+                icon: const Icon(Icons.filter_list),
+                label: const Text('Filter'),
+              ),
+              const SizedBox(width: 8),
+              TextButton(
+                onPressed: onSeeAll,
+                child: const Text('See all'),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              if (dep.isNotEmpty)
+                _Chip(
+                  icon: Icons.school_outlined,
+                  label: dep,
+                  onClear: () => onChangeFilters(null, matchSector),
+                ),
+              if (effectiveMatchSector)
+                _Chip(
+                  icon: Icons.business_outlined,
+                  label: 'Match sector: $sectorTrimmed',
+                  onClear: () => onChangeFilters(selectedDepartment, false),
+                ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          if ((error ?? '').trim().isNotEmpty && candidates.isEmpty)
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFEF3C7),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: const Color(0xFFFDE68A)),
+              ),
+              child: const Text(
+                'Talent pool is not available yet for this project. Apply `docs/sql/24_talent_mining.sql` in Supabase and try again.',
+                style: TextStyle(fontWeight: FontWeight.w700),
+              ),
+            )
+          else if (top.isEmpty)
+            Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: cs.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Text(
+                effectiveMatchSector
+                    ? 'No students match your company sector yet. Try turning off “Match sector” or choose a department filter.'
+                    : 'No students found.',
+                style: TextStyle(
+                  color: cs.onSurface.withAlpha(180),
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            )
+          else
+            Column(
+              children: [
+                for (final c in top) ...[
+                  _CandidateRow(c: c),
+                  if (c != top.last) const SizedBox(height: 10),
+                ],
+              ],
+            ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _openFilterSheet(
+    BuildContext context, {
+    required List<String> departments,
+    required String sector,
+  }) async {
+    final hasSector = sector.trim().isNotEmpty;
+    String? nextDept = selectedDepartment;
+    bool nextMatch = matchSector;
+
+    await showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      isScrollControlled: true,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return SafeArea(
+              top: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 18),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const Text(
+                      'Filter students',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
+                    ),
+                    const SizedBox(height: 12),
+                    if (hasSector)
+                      SwitchListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: Text('Match my company sector ($sector)'),
+                        value: nextMatch,
+                        onChanged: (v) => setModalState(() => nextMatch = v),
+                      ),
+                    DropdownButtonFormField<String>(
+                      initialValue:
+                          (nextDept ?? '').trim().isEmpty ? null : nextDept,
+                      items: [
+                        for (final d in departments)
+                          DropdownMenuItem(value: d, child: Text(d)),
+                      ],
+                      onChanged: (v) => setModalState(() => nextDept = v),
+                      decoration: const InputDecoration(
+                        labelText: 'Department',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        TextButton(
+                          onPressed: () => setModalState(() {
+                            nextDept = null;
+                            nextMatch = hasSector;
+                          }),
+                          child: const Text('Clear'),
+                        ),
+                        const Spacer(),
+                        TextButton(
+                          onPressed: () => Navigator.of(ctx).pop(),
+                          child: Text(
+                            AppLocalizations.of(ctx).t(AppText.commonCancel),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        ElevatedButton(
+                          onPressed: () {
+                            onChangeFilters(nextDept, nextMatch);
+                            Navigator.of(ctx).pop();
+                          },
+                          child: Text(
+                            AppLocalizations.of(ctx).t(AppText.commonConfirm),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
+class _Chip extends StatelessWidget {
+  const _Chip({required this.icon, required this.label, required this.onClear});
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onClear;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: cs.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: cs.onSurface.withAlpha(170)),
+          const SizedBox(width: 6),
+          Text(label, style: const TextStyle(fontWeight: FontWeight.w700)),
+          const SizedBox(width: 6),
+          InkWell(
+            onTap: onClear,
+            child: const Icon(Icons.close, size: 18),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CandidateRow extends StatelessWidget {
+  const _CandidateRow({required this.c});
+
+  final TalentCandidate c;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final name = c.fullName.trim().isEmpty ? 'Student' : c.fullName.trim();
+    final dept = (c.department ?? '').trim();
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: cs.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: cs.outlineVariant.withAlpha(160)),
+      ),
+      child: Row(
+        children: [
+          CircleAvatar(
+            backgroundColor: cs.primary.withAlpha(18),
+            child: Text(
+              name.isNotEmpty ? name[0].toUpperCase() : 'S',
+              style: TextStyle(color: cs.primary, fontWeight: FontWeight.w900),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontWeight: FontWeight.w900),
+                ),
+                if (dept.isNotEmpty) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    dept,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: cs.onSurface.withAlpha(170),
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: const [
+              Text(
+                'Points',
+                style: TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+              ),
+            ],
+          ),
+          const SizedBox(width: 8),
+          Text(
+            '${c.totalPoints}',
+            style: const TextStyle(fontWeight: FontWeight.w900),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -10,6 +10,7 @@ import '../../domain/chat_models.dart';
 
 class ChatState {
   const ChatState({
+    required this.sessions,
     required this.messages,
     required this.isLoading,
     required this.isTyping,
@@ -18,6 +19,7 @@ class ChatState {
     this.error,
   });
 
+  final List<ChatSessionSummary> sessions;
   final List<ChatMessage> messages;
   final bool isLoading;
   final bool isTyping;
@@ -27,6 +29,7 @@ class ChatState {
 
   factory ChatState.initial() {
     return const ChatState(
+      sessions: [],
       messages: [],
       isLoading: false,
       isTyping: false,
@@ -36,6 +39,7 @@ class ChatState {
   }
 
   ChatState copyWith({
+    List<ChatSessionSummary>? sessions,
     List<ChatMessage>? messages,
     bool? isLoading,
     bool? isTyping,
@@ -44,6 +48,7 @@ class ChatState {
     String? error,
   }) {
     return ChatState(
+      sessions: sessions ?? this.sessions,
       messages: messages ?? this.messages,
       isLoading: isLoading ?? this.isLoading,
       isTyping: isTyping ?? this.isTyping,
@@ -85,24 +90,97 @@ class ChatController extends StateNotifier<ChatState> {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final history = await _repo.fetchHistory(_userId);
-      if (history.isEmpty) {
+      final sessions = await _repo.fetchSessions(_userId, limit: 25);
+      if (sessions.isEmpty) {
         state = state.copyWith(
+          sessions: const [],
           messages: [_makeLocalBotMessage(greetingMessage)],
           suggestions: suggestions,
         );
       } else {
-        _activeSessionId = history.last.sessionId;
-        state = state.copyWith(messages: history);
+        final active = sessions.first.id;
+        _activeSessionId = active;
+        final messages = await _repo.fetchSessionMessages(
+          userId: _userId,
+          sessionId: active,
+          limit: 200,
+        );
+        state = state.copyWith(
+          sessions: sessions,
+          messages: messages.isEmpty
+              ? [_makeLocalBotMessage(greetingMessage)]
+              : messages,
+          sessionId: active,
+        );
       }
     } catch (e) {
-      state = state.copyWith(
-        error: 'history|${e.toString()}',
-        messages: [_makeLocalBotMessage(greetingMessage)],
-        suggestions: suggestions,
-      );
+      // Backward/partial migration safety: if sessions aren't available, fall
+      // back to the older message-only history view.
+      try {
+        final history = await _repo.fetchHistory(_userId);
+        if (history.isEmpty) {
+          state = state.copyWith(
+            error: 'history|${e.toString()}',
+            sessions: const [],
+            messages: [_makeLocalBotMessage(greetingMessage)],
+            suggestions: suggestions,
+          );
+        } else {
+          _activeSessionId = history.last.sessionId;
+          state = state.copyWith(
+            error: 'history|${e.toString()}',
+            sessions: const [],
+            messages: history,
+            sessionId: _activeSessionId,
+          );
+        }
+      } catch (e2) {
+        state = state.copyWith(
+          error: 'history|${e.toString()}|${e2.toString()}',
+          sessions: const [],
+          messages: [_makeLocalBotMessage(greetingMessage)],
+          suggestions: suggestions,
+        );
+      }
     } finally {
       state = state.copyWith(isLoading: false);
+    }
+  }
+
+  Future<void> loadSession({
+    required String sessionId,
+    required String greetingMessage,
+  }) async {
+    final sid = sessionId.trim();
+    if (sid.isEmpty) return;
+
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      final messages = await _repo.fetchSessionMessages(
+        userId: _userId,
+        sessionId: sid,
+        limit: 250,
+      );
+      _activeSessionId = sid;
+      state = state.copyWith(
+        messages: messages.isEmpty
+            ? [_makeLocalBotMessage(greetingMessage)]
+            : messages,
+        sessionId: sid,
+      );
+    } catch (e) {
+      state = state.copyWith(error: 'session|${e.toString()}');
+    } finally {
+      state = state.copyWith(isLoading: false);
+    }
+  }
+
+  Future<void> refreshSessions() async {
+    try {
+      final sessions = await _repo.fetchSessions(_userId, limit: 25);
+      state = state.copyWith(sessions: sessions);
+    } catch (_) {
+      // ignore
     }
   }
 
@@ -134,6 +212,7 @@ class ChatController extends StateNotifier<ChatState> {
 
     try {
       await _streamResponse(trimmed, locale: locale, session: session);
+      unawaited(refreshSessions());
     } catch (e) {
       final botMessage = ChatMessage(
         id: 'bot-${DateTime.now().microsecondsSinceEpoch}',
@@ -249,12 +328,20 @@ class ChatController extends StateNotifier<ChatState> {
     required String greetingMessage,
     required List<String> suggestions,
   }) async {
+    final toEnd = _activeSessionId;
+    if (toEnd != null && toEnd.trim().isNotEmpty) {
+      try {
+        await _repo.endSession(toEnd);
+      } catch (_) {}
+    }
     _activeSessionId = null;
     state = state.copyWith(
       messages: [_makeLocalBotMessage(greetingMessage)],
       suggestions: suggestions,
       error: null,
+      sessionId: null,
     );
+    unawaited(refreshSessions());
   }
 
   void close() {

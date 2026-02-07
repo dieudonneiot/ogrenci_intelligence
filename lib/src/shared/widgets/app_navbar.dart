@@ -106,6 +106,7 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
         Routes.companyInternships,
       ),
       _NavItem('Talent Mining', Routes.companyTalent),
+      _NavItem(l10n.t(AppText.navChat), Routes.companyChat),
       _NavItem(
         l10n.t(AppText.navCompanyApplications),
         Routes.companyApplications,
@@ -132,6 +133,7 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
       _NavItem(l10n.t(AppText.navCompanyProfile), Routes.companyProfile),
       _NavItem(l10n.t(AppText.navDashboard), Routes.companyDashboard),
       _NavItem('Talent Mining', Routes.companyTalent),
+      _NavItem(l10n.t(AppText.navChat), Routes.companyChat),
       _NavItem('Excuse Requests', Routes.companyExcuses),
       _NavItem('Evidence Approvals', Routes.companyEvidence),
       _NavItem(l10n.t(AppText.navPlansPricing), Routes.companyPricing),

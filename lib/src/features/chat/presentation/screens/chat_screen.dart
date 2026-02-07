@@ -109,6 +109,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
             child: Column(
               children: [
                 _ChatHeader(
+                  onHistory: () => _openHistorySheet(
+                    context,
+                    userId: userId,
+                    greeting: greeting,
+                    suggestions: suggestions,
+                  ),
                   onReset: () => controller.resetChat(
                     greetingMessage: greeting,
                     suggestions: suggestions,
@@ -250,6 +256,238 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
     );
   }
 
+  Future<void> _openHistorySheet(
+    BuildContext context, {
+    required String userId,
+    required String greeting,
+    required List<String> suggestions,
+  }) async {
+    final l10n = AppLocalizations.of(context);
+
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (sheetContext) {
+        return Consumer(
+          builder: (context, ref, _) {
+            final state = ref.watch(chatControllerProvider(userId));
+            final controller = ref.read(chatControllerProvider(userId).notifier);
+            final cs = Theme.of(context).colorScheme;
+
+            final sessions = state.sessions;
+
+            return SafeArea(
+              top: false,
+              child: DraggableScrollableSheet(
+                initialChildSize: 0.72,
+                minChildSize: 0.45,
+                maxChildSize: 0.92,
+                expand: false,
+                builder: (context, scrollController) {
+                  return Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 6, 16, 18),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                l10n.t(AppText.chatHistoryTitle),
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              tooltip: l10n.t(AppText.retry),
+                              onPressed: () => controller.refreshSessions(),
+                              icon: const Icon(Icons.refresh),
+                            ),
+                            const SizedBox(width: 6),
+                            TextButton.icon(
+                              onPressed: state.isTyping
+                                  ? null
+                                  : () async {
+                                      await controller.resetChat(
+                                        greetingMessage: greeting,
+                                        suggestions: suggestions,
+                                      );
+                                      if (sheetContext.mounted) {
+                                        Navigator.of(sheetContext).pop();
+                                      }
+                                    },
+                              icon: const Icon(Icons.add),
+                              label: Text(l10n.t(AppText.chatNewChat)),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        Expanded(
+                          child: sessions.isEmpty
+                              ? Center(
+                                  child: PlaceholderView(
+                                    title: l10n.t(
+                                      AppText.chatHistoryEmptyTitle,
+                                    ),
+                                    subtitle: l10n.t(
+                                      AppText.chatHistoryEmptySubtitle,
+                                    ),
+                                    icon: Icons.history,
+                                  ),
+                                )
+                              : ListView.separated(
+                                  controller: scrollController,
+                                  itemCount: sessions.length,
+                                  separatorBuilder: (context, index) =>
+                                      const SizedBox(height: 10),
+                                  itemBuilder: (context, index) {
+                                    final s = sessions[index];
+                                    final isActive = s.id == state.sessionId;
+                                    final started = DateFormat.yMMMd(
+                                      Localizations.localeOf(context).toString(),
+                                    ).add_Hm().format(s.startedAt.toLocal());
+                                    final preview = (s.lastMessage ?? '').trim();
+
+                                    return InkWell(
+                                      borderRadius: BorderRadius.circular(16),
+                                      onTap: () async {
+                                        await controller.loadSession(
+                                          sessionId: s.id,
+                                          greetingMessage: greeting,
+                                        );
+                                        if (sheetContext.mounted) {
+                                          Navigator.of(sheetContext).pop();
+                                        }
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.all(14),
+                                        decoration: BoxDecoration(
+                                          color: isActive
+                                              ? cs.primaryContainer.withAlpha(
+                                                  90,
+                                                )
+                                              : cs.surface,
+                                          borderRadius:
+                                              BorderRadius.circular(16),
+                                          border: Border.all(
+                                            color: isActive
+                                                ? cs.primary.withAlpha(140)
+                                                : cs.outlineVariant.withAlpha(
+                                                    160,
+                                                  ),
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: cs.primary.withAlpha(10),
+                                              blurRadius: 18,
+                                              offset: const Offset(0, 10),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Container(
+                                              width: 36,
+                                              height: 36,
+                                              decoration: BoxDecoration(
+                                                color: cs.primary.withAlpha(18),
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                              ),
+                                              child: Icon(
+                                                isActive
+                                                    ? Icons.chat_bubble
+                                                    : Icons.chat_bubble_outline,
+                                                color: cs.primary,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 12),
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      Expanded(
+                                                        child: Text(
+                                                          started,
+                                                          style:
+                                                              const TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.w900,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Container(
+                                                        padding:
+                                                            const EdgeInsets.symmetric(
+                                                          horizontal: 10,
+                                                          vertical: 4,
+                                                        ),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: cs
+                                                              .surfaceContainerHighest,
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                            999,
+                                                          ),
+                                                        ),
+                                                        child: Text(
+                                                          '${s.messageCount}',
+                                                          style:
+                                                              const TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.w800,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  if (preview.isNotEmpty) ...[
+                                                    const SizedBox(height: 6),
+                                                    Text(
+                                                      preview,
+                                                      maxLines: 2,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      style: TextStyle(
+                                                        color: cs.onSurface
+                                                            .withAlpha(170),
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   bool _shouldShowTyping(ChatState state) {
     if (!state.isTyping) return false;
     if (state.messages.isEmpty) return true;
@@ -273,9 +511,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
 }
 
 class _ChatHeader extends StatelessWidget {
-  const _ChatHeader({required this.onReset});
+  const _ChatHeader({required this.onReset, required this.onHistory});
 
   final VoidCallback onReset;
+  final VoidCallback onHistory;
 
   @override
   Widget build(BuildContext context) {
@@ -337,6 +576,21 @@ class _ChatHeader extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 10),
+          Tooltip(
+            message: AppLocalizations.of(context).t(AppText.chatHistoryTitle),
+            child: IconButton(
+              onPressed: onHistory,
+              icon: const Icon(Icons.history),
+              style: IconButton.styleFrom(
+                backgroundColor: cs.surface,
+                foregroundColor: cs.primary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
           LayoutBuilder(
             builder: (context, c) {
               final l10n = AppLocalizations.of(context);
