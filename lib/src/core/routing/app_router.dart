@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -145,12 +146,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         return Routes.dashboard;
       }
 
-      // 4) Optional: redirect "/" for admin/company (students can see home)
-      if (location == Routes.home) {
-        if (auth.userType == UserType.admin) return Routes.adminDashboard;
-        if (auth.userType == UserType.company) return Routes.companyDashboard;
-      }
-
       return null;
     },
 
@@ -160,11 +155,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       // -----------------------------
       GoRoute(
         path: Routes.adminLogin,
-        builder: (context, _) => const AdminLoginScreen(),
+        builder: (context, _) =>
+            const _RootBackScope(child: AdminLoginScreen()),
       ),
       GoRoute(
         path: Routes.adminSetup,
-        builder: (context, _) => const AdminSetupScreen(),
+        builder: (context, _) =>
+            const _RootBackScope(child: AdminSetupScreen()),
       ),
 
       // -------------
@@ -499,25 +496,33 @@ class MainShell extends ConsumerWidget {
     final isStudent =
         auth?.isAuthenticated == true && auth?.userType == UserType.student;
 
-    return Scaffold(
-      // No AppBar (we reproduce React navbar)
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: Column(
-              children: [
-                const AppNavbar(), // sticky-like top
-                Expanded(child: child),
-              ],
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop || kIsWeb) return;
+
+        _handleBack(context: context, fallbackRoute: Routes.home);
+      },
+      child: Scaffold(
+        // No AppBar (we reproduce React navbar)
+        body: Stack(
+          children: [
+            Positioned.fill(
+              child: Column(
+                children: [
+                  const AppNavbar(), // sticky-like top
+                  Expanded(child: child),
+                ],
+              ),
             ),
-          ),
-          if (isStudent)
-            Positioned(
-              right: 18,
-              bottom: 18,
-              child: _ChatFab(onTap: () => context.go(Routes.chat)),
-            ),
-        ],
+            if (isStudent)
+              Positioned(
+                right: 18,
+                bottom: 18,
+                child: _ChatFab(onTap: () => context.go(Routes.chat)),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -582,9 +587,50 @@ class AdminShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: AdminLayout(child: child),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop || kIsWeb) return;
+        _handleBack(context: context, fallbackRoute: Routes.home);
+      },
+      child: Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        body: AdminLayout(child: child),
+      ),
     );
   }
+}
+
+class _RootBackScope extends StatelessWidget {
+  const _RootBackScope({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop || kIsWeb) return;
+        _handleBack(context: context, fallbackRoute: Routes.home);
+      },
+      child: child,
+    );
+  }
+}
+
+void _handleBack({required BuildContext context, required String fallbackRoute}) {
+  final router = GoRouter.of(context);
+  if (router.canPop()) {
+    router.pop();
+    return;
+  }
+
+  final currentPath = GoRouterState.of(context).uri.path;
+  if (currentPath != fallbackRoute) {
+    context.go(fallbackRoute);
+    return;
+  }
+
+  SystemNavigator.pop();
 }
