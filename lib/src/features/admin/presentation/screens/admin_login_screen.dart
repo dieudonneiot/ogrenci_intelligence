@@ -240,23 +240,73 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
                     obscure: true,
                   ),
                   const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Checkbox(
-                        value: _remember,
-                        onChanged: (v) =>
-                            setState(() => _remember = v ?? false),
-                      ),
-                      Text(
-                        l10n.t(AppText.adminLoginRememberMe),
-                        style: const TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                      const Spacer(),
-                      TextButton(
-                        onPressed: () => context.go(Routes.forgotPassword),
-                        child: Text(l10n.t(AppText.adminLoginForgotPassword)),
-                      ),
-                    ],
+                  LayoutBuilder(
+                    builder: (context, c) {
+                      final narrow = c.maxWidth < 360;
+                      if (narrow) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Row(
+                              children: [
+                                Checkbox(
+                                  value: _remember,
+                                  onChanged: (v) => setState(
+                                    () => _remember = v ?? false,
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Text(
+                                    l10n.t(AppText.adminLoginRememberMe),
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: TextButton(
+                                onPressed: () =>
+                                    context.go(Routes.forgotPassword),
+                                child: Text(
+                                  l10n.t(AppText.adminLoginForgotPassword),
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      }
+
+                      return Row(
+                        children: [
+                          Checkbox(
+                            value: _remember,
+                            onChanged: (v) =>
+                                setState(() => _remember = v ?? false),
+                          ),
+                          Expanded(
+                            child: Text(
+                              l10n.t(AppText.adminLoginRememberMe),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () => context.go(Routes.forgotPassword),
+                            child: Text(
+                              l10n.t(AppText.adminLoginForgotPassword),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
                   ),
                   const SizedBox(height: 12),
                   SizedBox(

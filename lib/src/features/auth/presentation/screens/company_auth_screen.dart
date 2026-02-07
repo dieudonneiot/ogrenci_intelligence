@@ -826,13 +826,19 @@ class _DarkDropdown extends StatelessWidget {
   Widget build(BuildContext context) {
     return DropdownButtonFormField<String>(
       initialValue: value,
+      isExpanded: true,
       dropdownColor: const Color(0xFF2E1065),
       style: const TextStyle(color: Colors.white),
       items: items
           .map(
             (v) => DropdownMenuItem<String>(
               value: v,
-              child: Text(v, style: const TextStyle(color: Colors.white)),
+              child: Text(
+                v,
+                style: const TextStyle(color: Colors.white),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
             ),
           )
           .toList(),

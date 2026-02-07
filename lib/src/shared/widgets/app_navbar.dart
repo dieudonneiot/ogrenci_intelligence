@@ -667,107 +667,142 @@ class _AppNavbarState extends ConsumerState<AppNavbar> {
                           ),
                         ),
                         padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
-                        child: Center(
-                          child: ConstrainedBox(
-                            constraints: const BoxConstraints(maxWidth: 520),
-                            child: Column(
-                              children: [
-                                for (final item in menuItems)
-                                  _MobileTile(
-                                    label: item.label,
-                                    onTap: () {
-                                      _closeMobile();
-                                      context.go(item.path);
-                                    },
-                                  ),
+                        child: LayoutBuilder(
+                          builder: (context, _) {
+                            final media = MediaQuery.of(context);
+                            const outerVerticalPadding = 10 + 16;
+                            final topBarApproxHeight =
+                                kToolbarHeight + 24; // padding + breathing room
+                            final maxMenuHeight = (media.size.height -
+                                    media.padding.top -
+                                    media.padding.bottom -
+                                    topBarApproxHeight -
+                                    outerVerticalPadding)
+                                .clamp(240.0, double.infinity);
 
-                                const SizedBox(height: 8),
-                                Center(child: languageMenuMobile),
-                                const SizedBox(height: 8),
-
-                                if (!isLoggedIn)
-                                  _MobilePrimary(
-                                    label: l10n.t(AppText.companyLogin),
-                                    onTap: () {
-                                      _closeMobile();
-                                      context.go(Routes.companyAuth);
-                                    },
-                                  ),
-
-                                if (isLoading) ...[
-                                  const SizedBox(height: 12),
-                                  const _SkeletonBlock(),
-                                ] else if (isLoggedIn) ...[
-                                  const SizedBox(height: 10),
-
-                                  if (isStudent)
-                                    _MobileTile(
-                                      label: l10n.t(AppText.pointsSystem),
-                                      leading: const Icon(
-                                        Icons.emoji_events,
-                                        size: 18,
+                            return Center(
+                              child: ConstrainedBox(
+                                constraints: const BoxConstraints(maxWidth: 520),
+                                child: SizedBox(
+                                  height: maxMenuHeight,
+                                  child: Scrollbar(
+                                    child: SingleChildScrollView(
+                                      padding: EdgeInsets.only(
+                                        bottom: media.padding.bottom,
                                       ),
-                                      onTap: () {
-                                        _closeMobile();
-                                        context.go(Routes.pointsSystem);
-                                      },
+                                      child: Column(
+                                        children: [
+                                          for (final item in menuItems)
+                                            _MobileTile(
+                                              label: item.label,
+                                              onTap: () {
+                                                _closeMobile();
+                                                context.go(item.path);
+                                              },
+                                            ),
+
+                                          const SizedBox(height: 8),
+                                          Center(child: languageMenuMobile),
+                                          const SizedBox(height: 8),
+
+                                          if (!isLoggedIn)
+                                            _MobilePrimary(
+                                              label:
+                                                  l10n.t(AppText.companyLogin),
+                                              onTap: () {
+                                                _closeMobile();
+                                                context.go(Routes.companyAuth);
+                                              },
+                                            ),
+
+                                          if (isLoading) ...[
+                                            const SizedBox(height: 12),
+                                            const _SkeletonBlock(),
+                                          ] else if (isLoggedIn) ...[
+                                            const SizedBox(height: 10),
+
+                                            if (isStudent)
+                                              _MobileTile(
+                                                label:
+                                                    l10n.t(AppText.pointsSystem),
+                                                leading: const Icon(
+                                                  Icons.emoji_events,
+                                                  size: 18,
+                                                ),
+                                                onTap: () {
+                                                  _closeMobile();
+                                                  context.go(
+                                                    Routes.pointsSystem,
+                                                  );
+                                                },
+                                              ),
+
+                                            if (isCompany) ...[
+                                              const SizedBox(height: 6),
+                                              _MobilePrimary(
+                                                label:
+                                                    l10n.t(AppText.newListing),
+                                                onTap: () {
+                                                  _closeMobile();
+                                                  context.go(
+                                                    Routes.companyJobsCreate,
+                                                  );
+                                                },
+                                              ),
+                                            ],
+
+                                            const Divider(height: 22),
+
+                                            _MobileHeader(
+                                              title: userName,
+                                              badge: isCompany
+                                                  ? l10n.t(
+                                                      AppText.companyBadge,
+                                                    )
+                                                  : null,
+                                            ),
+
+                                            for (final it in dropdownItems)
+                                              _MobileTile(
+                                                label: it.label,
+                                                onTap: () {
+                                                  _closeMobile();
+                                                  context.go(it.path);
+                                                },
+                                              ),
+
+                                            const SizedBox(height: 8),
+                                            _MobileDanger(
+                                              label: l10n.t(AppText.signOut),
+                                              onTap: () => _logout(context),
+                                            ),
+                                          ] else ...[
+                                            const SizedBox(height: 10),
+                                            _MobilePrimary(
+                                              label:
+                                                  l10n.t(AppText.studentLogin),
+                                              onTap: () {
+                                                _closeMobile();
+                                                context.go(Routes.login);
+                                              },
+                                            ),
+                                            const SizedBox(height: 8),
+                                            _MobilePrimary(
+                                              label: l10n.t(AppText.signUp),
+                                              onTap: () {
+                                                _closeMobile();
+                                                context.go(Routes.register);
+                                              },
+                                            ),
+                                          ],
+                                        ],
+                                      ),
                                     ),
-
-                                  if (isCompany) ...[
-                                    const SizedBox(height: 6),
-                                    _MobilePrimary(
-                                      label: l10n.t(AppText.newListing),
-                                      onTap: () {
-                                        _closeMobile();
-                                        context.go(Routes.companyJobsCreate);
-                                      },
-                                    ),
-                                  ],
-
-                                  const Divider(height: 22),
-
-                                  _MobileHeader(
-                                    title: userName,
-                                    badge: isCompany
-                                        ? l10n.t(AppText.companyBadge)
-                                        : null,
                                   ),
-
-                                  for (final it in dropdownItems)
-                                    _MobileTile(
-                                      label: it.label,
-                                      onTap: () {
-                                        _closeMobile();
-                                        context.go(it.path);
-                                      },
-                                    ),
-
-                                  const SizedBox(height: 8),
-                                  _MobileDanger(
-                                    label: l10n.t(AppText.signOut),
-                                    onTap: () => _logout(context),
-                                  ),
-                                ] else ...[
-                                  const SizedBox(height: 10),
-                                  _MobilePrimary(
-                                    label: l10n.t(AppText.studentLogin),
-                                    onTap: () {
-                                      _closeMobile();
-                                      context.go(Routes.login);
-                                    },
-                                  ),
-                                  const SizedBox(height: 8),
-                                  _MobilePrimary(
-                                    label: l10n.t(AppText.signUp),
-                                    onTap: () {
-                                      _closeMobile();
-                                      context.go(Routes.register);
-                                    },
-                                  ),
-                                ],
-                              ],
-                            ),
-                          ),
+                                ),
+                              ),
+                            );
+                          },
                         ),
                       )
                     : const SizedBox.shrink(),

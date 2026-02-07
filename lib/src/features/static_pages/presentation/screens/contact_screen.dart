@@ -399,27 +399,48 @@ class _FormCard extends StatelessWidget {
           const SizedBox(height: 12),
           DropdownButtonFormField<String>(
             initialValue: subject.isEmpty ? null : subject,
+            isExpanded: true,
             onChanged: onSubjectChanged,
             items: [
               DropdownMenuItem(
                 value: 'general',
-                child: Text(l10n.t(AppText.contactSubjectGeneral)),
+                child: Text(
+                  l10n.t(AppText.contactSubjectGeneral),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
               ),
               DropdownMenuItem(
                 value: 'support',
-                child: Text(l10n.t(AppText.contactSubjectSupport)),
+                child: Text(
+                  l10n.t(AppText.contactSubjectSupport),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
               ),
               DropdownMenuItem(
                 value: 'partnership',
-                child: Text(l10n.t(AppText.contactSubjectPartnership)),
+                child: Text(
+                  l10n.t(AppText.contactSubjectPartnership),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
               ),
               DropdownMenuItem(
                 value: 'feedback',
-                child: Text(l10n.t(AppText.contactSubjectFeedback)),
+                child: Text(
+                  l10n.t(AppText.contactSubjectFeedback),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
               ),
               DropdownMenuItem(
                 value: 'other',
-                child: Text(l10n.t(AppText.contactSubjectOther)),
+                child: Text(
+                  l10n.t(AppText.contactSubjectOther),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
               ),
             ],
             decoration: InputDecoration(
@@ -439,11 +460,13 @@ class _FormCard extends StatelessWidget {
           const SizedBox(height: 12),
           Row(
             children: [
-              Text(
-                l10n.t(AppText.contactRequiredNote),
-                style: const TextStyle(color: Color(0xFF6B7280)),
+              Expanded(
+                child: Text(
+                  l10n.t(AppText.contactRequiredNote),
+                  style: const TextStyle(color: Color(0xFF6B7280)),
+                ),
               ),
-              const Spacer(),
+              const SizedBox(width: 12),
               ElevatedButton.icon(
                 onPressed: sending ? null : onSend,
                 icon: sending

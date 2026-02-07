@@ -480,12 +480,19 @@ class _FavoriteCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              _TypeIcon(type: item.type),
-              const SizedBox(width: 8),
-              _TypePill(type: item.type),
-              const Spacer(),
+           Row(
+             children: [
+              Expanded(
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 6,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    _TypeIcon(type: item.type),
+                    _TypePill(type: item.type),
+                  ],
+                ),
+              ),
               IconButton(
                 onPressed: removing ? null : onRemove,
                 icon: const Icon(Icons.delete_outline),

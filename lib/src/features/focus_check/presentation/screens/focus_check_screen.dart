@@ -91,14 +91,17 @@ class _FocusCheckScreenState extends ConsumerState<FocusCheckScreen> {
                   children: [
                     const Icon(Icons.timer_outlined, color: Color(0xFF6D28D9)),
                     const SizedBox(width: 10),
-                    const Text(
-                      'Instant Focus Check',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w900,
+                    const Expanded(
+                      child: Text(
+                        'Instant Focus Check',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w900,
+                        ),
                       ),
                     ),
-                    const Spacer(),
                     IconButton(
                       onPressed: () => ref
                           .read(acceptedInternshipsProvider.notifier)
@@ -345,30 +348,35 @@ class _SessionCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.10),
-                  borderRadius: BorderRadius.circular(999),
-                  border: Border.all(color: color.withValues(alpha: 0.25)),
-                ),
-                child: Text(
-                  '$secondsLeft s',
-                  style: TextStyle(color: color, fontWeight: FontWeight.w900),
-                ),
-              ),
-              const Spacer(),
-              const Text(
-                'Answer before time runs out.',
-                style: TextStyle(color: Color(0xFF6B7280)),
-              ),
-            ],
-          ),
+           Row(
+             children: [
+               Container(
+                 padding: const EdgeInsets.symmetric(
+                   horizontal: 10,
+                   vertical: 6,
+                 ),
+                 decoration: BoxDecoration(
+                   color: color.withValues(alpha: 0.10),
+                   borderRadius: BorderRadius.circular(999),
+                   border: Border.all(color: color.withValues(alpha: 0.25)),
+                 ),
+                 child: Text(
+                   '$secondsLeft s',
+                   style: TextStyle(color: color, fontWeight: FontWeight.w900),
+                 ),
+               ),
+               const SizedBox(width: 10),
+               const Expanded(
+                 child: Text(
+                   'Answer before time runs out.',
+                   maxLines: 2,
+                   overflow: TextOverflow.ellipsis,
+                   textAlign: TextAlign.right,
+                   style: TextStyle(color: Color(0xFF6B7280)),
+                 ),
+               ),
+             ],
+           ),
           const SizedBox(height: 14),
           Text(
             session.question,

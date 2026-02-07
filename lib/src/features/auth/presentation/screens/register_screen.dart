@@ -242,9 +242,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
                     DropdownButtonFormField<String>(
                       initialValue: _department,
+                      isExpanded: true,
                       items: departments
                           .map(
-                            (d) => DropdownMenuItem(value: d, child: Text(d)),
+                            (d) => DropdownMenuItem(
+                              value: d,
+                              child: Text(d, overflow: TextOverflow.ellipsis),
+                            ),
                           )
                           .toList(),
                       onChanged: (v) => setState(() => _department = v),
@@ -260,6 +264,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
                     DropdownButtonFormField<int>(
                       initialValue: _year,
+                      isExpanded: true,
                       items: const [1, 2, 3, 4, 5]
                           .map(
                             (y) => DropdownMenuItem(

@@ -101,33 +101,37 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
           end: Alignment.bottomCenter,
         ),
       ),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 980),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 20, 16, 28),
-            child: Column(
-              children: [
-                _ChatHeader(
-                  onHistory: () => _openHistorySheet(
-                    context,
-                    userId: userId,
-                    greeting: greeting,
-                    suggestions: suggestions,
+      child: AnimatedPadding(
+        duration: const Duration(milliseconds: 180),
+        curve: Curves.easeOut,
+        padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 980),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 20, 16, 28),
+              child: Column(
+                children: [
+                  _ChatHeader(
+                    onHistory: () => _openHistorySheet(
+                      context,
+                      userId: userId,
+                      greeting: greeting,
+                      suggestions: suggestions,
+                    ),
+                    onReset: () => controller.resetChat(
+                      greetingMessage: greeting,
+                      suggestions: suggestions,
+                    ),
                   ),
-                  onReset: () => controller.resetChat(
-                    greetingMessage: greeting,
-                    suggestions: suggestions,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: cs.surface,
-                      borderRadius: BorderRadius.circular(18),
-                      border: Border.all(
-                        color: cs.outlineVariant.withAlpha(160),
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: cs.surface,
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(
+                          color: cs.outlineVariant.withAlpha(160),
                       ),
                       boxShadow: [
                         BoxShadow(
@@ -137,90 +141,98 @@ class _ChatScreenState extends ConsumerState<ChatScreen>
                         ),
                       ],
                     ),
-                    child: Column(
-                      children: [
-                        Expanded(
-                          child: ListView.builder(
-                            controller: _scrollCtrl,
-                            padding: const EdgeInsets.fromLTRB(16, 18, 16, 12),
-                            itemCount:
-                                state.messages.length +
-                                (_shouldShowTyping(state) ? 1 : 0),
-                            itemBuilder: (context, index) {
-                              if (_shouldShowTyping(state) &&
-                                  index == state.messages.length) {
-                                return const _TypingBubble();
-                              }
+                      child: Column(
+                        children: [
+                          Expanded(
+                            child: ListView.builder(
+                              controller: _scrollCtrl,
+                              padding: const EdgeInsets.fromLTRB(
+                                16,
+                                18,
+                                16,
+                                12,
+                              ),
+                              itemCount:
+                                  state.messages.length +
+                                  (_shouldShowTyping(state) ? 1 : 0),
+                              itemBuilder: (context, index) {
+                                if (_shouldShowTyping(state) &&
+                                    index == state.messages.length) {
+                                  return const _TypingBubble();
+                                }
 
-                              final message = state.messages[index];
-                              final isLast = index == state.messages.length - 1;
-                              final showStreaming =
-                                  isLast && !message.isUser && state.isTyping;
-                              return _MessageBubble(
-                                message: message,
-                                showStreaming: showStreaming,
-                              );
-                            },
+                                final message = state.messages[index];
+                                final isLast =
+                                    index == state.messages.length - 1;
+                                final showStreaming = isLast &&
+                                    !message.isUser &&
+                                    state.isTyping;
+                                return _MessageBubble(
+                                  message: message,
+                                  showStreaming: showStreaming,
+                                );
+                              },
+                            ),
                           ),
-                        ),
-                        if (state.suggestions.isNotEmpty)
-                          _SuggestionChips(
-                            suggestions: state.suggestions,
-                            onTap: (value) {
-                              _inputCtrl.text = value;
-                              _focusNode.requestFocus();
-                            },
-                          ),
-                        if (state.error != null)
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
-                            child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(
-                                () {
-                                  final raw = state.error ?? '';
-                                  if (raw.startsWith('history|')) {
-                                    return l10n.chatHistoryLoadFailed(
-                                      raw.substring('history|'.length),
-                                    );
-                                  }
-                                  if (raw.startsWith('reply|')) {
-                                    return l10n.chatReplyFailed(
-                                      raw.substring('reply|'.length),
-                                    );
-                                  }
-                                  return raw;
-                                }(),
-                                style: TextStyle(
-                                  color: cs.error,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w700,
+                          if (state.suggestions.isNotEmpty)
+                            _SuggestionChips(
+                              suggestions: state.suggestions,
+                              onTap: (value) {
+                                _inputCtrl.text = value;
+                                _focusNode.requestFocus();
+                              },
+                            ),
+                          if (state.error != null)
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  () {
+                                    final raw = state.error ?? '';
+                                    if (raw.startsWith('history|')) {
+                                      return l10n.chatHistoryLoadFailed(
+                                        raw.substring('history|'.length),
+                                      );
+                                    }
+                                    if (raw.startsWith('reply|')) {
+                                      return l10n.chatReplyFailed(
+                                        raw.substring('reply|'.length),
+                                      );
+                                    }
+                                    return raw;
+                                  }(),
+                                  style: TextStyle(
+                                    color: cs.error,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                  ),
                                 ),
                               ),
                             ),
+                          _InputBar(
+                            controller: _inputCtrl,
+                            focusNode: _focusNode,
+                            isTyping: state.isTyping,
+                            onSend: () => _handleSend(
+                              controller,
+                              auth.session!,
+                              localeCode,
+                              l10n,
+                            ),
+                            onSubmit: () => _handleSend(
+                              controller,
+                              auth.session!,
+                              localeCode,
+                              l10n,
+                            ),
                           ),
-                        _InputBar(
-                          controller: _inputCtrl,
-                          focusNode: _focusNode,
-                          isTyping: state.isTyping,
-                          onSend: () => _handleSend(
-                            controller,
-                            auth.session!,
-                            localeCode,
-                            l10n,
-                          ),
-                          onSubmit: () => _handleSend(
-                            controller,
-                            auth.session!,
-                            localeCode,
-                            l10n,
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -519,122 +531,127 @@ class _ChatHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(18),
-        gradient: LinearGradient(
-          colors: [cs.primary, cs.secondary],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: cs.primary.withAlpha(24),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
+
+    return LayoutBuilder(
+      builder: (context, c) {
+        final l10n = AppLocalizations.of(context);
+        final isCompact = c.maxWidth < 420;
+        final showSubtitle = c.maxWidth >= 360;
+
+        final actionBtnStyle = IconButton.styleFrom(
+          backgroundColor: cs.surface,
+          foregroundColor: cs.primary,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
           ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: Colors.white.withAlpha((0.18 * 255).round()),
-              borderRadius: BorderRadius.circular(14),
+        );
+
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18),
+            gradient: LinearGradient(
+              colors: [cs.primary, cs.secondary],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
-            child: const Icon(
-              Icons.smart_toy_outlined,
-              color: Colors.white,
-              size: 28,
-            ),
+            boxShadow: [
+              BoxShadow(
+                color: cs.primary.withAlpha(24),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
           ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  AppLocalizations.of(context).t(AppText.chatHeaderTitle),
-                  style: TextStyle(
-                    color: cs.onPrimary,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w900,
-                  ),
+          child: Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: Colors.white.withAlpha((0.18 * 255).round()),
+                  borderRadius: BorderRadius.circular(14),
                 ),
-                SizedBox(height: 4),
-                Text(
-                  AppLocalizations.of(context).t(AppText.chatHeaderSubtitle),
-                  style: TextStyle(
-                    color: cs.onPrimary.withAlpha(220),
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 10),
-          Tooltip(
-            message: AppLocalizations.of(context).t(AppText.chatHistoryTitle),
-            child: IconButton(
-              onPressed: onHistory,
-              icon: const Icon(Icons.history),
-              style: IconButton.styleFrom(
-                backgroundColor: cs.surface,
-                foregroundColor: cs.primary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                child: const Icon(
+                  Icons.smart_toy_outlined,
+                  color: Colors.white,
+                  size: 28,
                 ),
               ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          LayoutBuilder(
-            builder: (context, c) {
-              final l10n = AppLocalizations.of(context);
-              final isNarrow = c.maxWidth < 140;
-              if (isNarrow) {
-                return Tooltip(
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      l10n.t(AppText.chatHeaderTitle),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: cs.onPrimary,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    if (showSubtitle) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        l10n.t(AppText.chatHeaderSubtitle),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: cs.onPrimary.withAlpha(220),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              const SizedBox(width: 10),
+              Tooltip(
+                message: l10n.t(AppText.chatHistoryTitle),
+                child: IconButton(
+                  onPressed: onHistory,
+                  icon: const Icon(Icons.history),
+                  style: actionBtnStyle,
+                ),
+              ),
+              const SizedBox(width: 8),
+              if (isCompact)
+                Tooltip(
                   message: l10n.t(AppText.chatNewChat),
                   child: IconButton(
                     onPressed: onReset,
                     icon: const Icon(Icons.restart_alt),
-                    style: IconButton.styleFrom(
+                    style: actionBtnStyle,
+                  ),
+                )
+              else
+                SizedBox(
+                  height: 40,
+                  child: ElevatedButton.icon(
+                    onPressed: onReset,
+                    icon: const Icon(Icons.restart_alt, size: 18),
+                    label: Text(
+                      l10n.t(AppText.chatNewChat),
+                      style: const TextStyle(fontWeight: FontWeight.w800),
+                    ),
+                    style: ElevatedButton.styleFrom(
                       backgroundColor: cs.surface,
                       foregroundColor: cs.primary,
+                      elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
                   ),
-                );
-              }
-
-              return SizedBox(
-                height: 40,
-                child: ElevatedButton.icon(
-                  onPressed: onReset,
-                  icon: const Icon(Icons.restart_alt, size: 18),
-                  label: Text(
-                    l10n.t(AppText.chatNewChat),
-                    style: const TextStyle(fontWeight: FontWeight.w800),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: cs.surface,
-                    foregroundColor: cs.primary,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
                 ),
-              );
-            },
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

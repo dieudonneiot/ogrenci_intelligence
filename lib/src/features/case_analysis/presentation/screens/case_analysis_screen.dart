@@ -92,14 +92,17 @@ class _CaseAnalysisScreenState extends ConsumerState<CaseAnalysisScreen> {
                     children: [
                       const Icon(Icons.swipe, color: Color(0xFF6D28D9)),
                       const SizedBox(width: 10),
-                      Text(
-                        l10n.t(AppText.caseAnalysisTitle),
-                        style: const TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w900,
+                      Expanded(
+                        child: Text(
+                          l10n.t(AppText.caseAnalysisTitle),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w900,
+                          ),
                         ),
                       ),
-                      const Spacer(),
                       Text(
                         '${_index + 1}/${items.length}',
                         style: const TextStyle(

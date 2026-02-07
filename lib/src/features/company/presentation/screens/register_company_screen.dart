@@ -277,8 +277,14 @@ class _DropdownField extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 12),
       child: DropdownButtonFormField<String>(
         initialValue: value,
+        isExpanded: true,
         items: items
-            .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+            .map(
+              (e) => DropdownMenuItem(
+                value: e,
+                child: Text(e, overflow: TextOverflow.ellipsis, maxLines: 1),
+              ),
+            )
             .toList(),
         onChanged: onChanged,
         decoration: InputDecoration(

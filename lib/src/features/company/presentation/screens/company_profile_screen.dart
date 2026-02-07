@@ -940,18 +940,24 @@ class _DropdownField extends StatelessWidget {
       }
     }
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: DropdownButtonFormField<String>(
-        initialValue: safeValue,
-        items: uniqueItems
-            .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-            .toList(),
-        onChanged: onChanged,
-        decoration: InputDecoration(
-          labelText: label,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        ),
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: DropdownButtonFormField<String>(
+          initialValue: safeValue,
+          isExpanded: true,
+          items: uniqueItems
+              .map(
+                (e) => DropdownMenuItem(
+                  value: e,
+                  child: Text(e, overflow: TextOverflow.ellipsis, maxLines: 1),
+                ),
+              )
+              .toList(),
+          onChanged: onChanged,
+          decoration: InputDecoration(
+            labelText: label,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          ),
       ),
     );
   }

@@ -504,7 +504,10 @@ class _NotificationCard extends StatelessWidget {
                   style: const TextStyle(color: Color(0xFF6B7280)),
                 ),
                 const SizedBox(height: 8),
-                Row(
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 6,
+                  crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     Text(
                       '$dateText $timeText',
@@ -514,12 +517,10 @@ class _NotificationCard extends StatelessWidget {
                       ),
                     ),
                     if (item.actionUrl != null) ...[
-                      const SizedBox(width: 8),
                       const Text(
                         '•',
                         style: TextStyle(color: Color(0xFF9CA3AF)),
                       ),
-                      const SizedBox(width: 8),
                       TextButton(
                         onPressed: onOpen,
                         child: Text(

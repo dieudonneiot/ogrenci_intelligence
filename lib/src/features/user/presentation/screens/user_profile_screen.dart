@@ -646,9 +646,13 @@ class _ProfileInfoCard extends StatelessWidget {
                   color: Color(0xFF9CA3AF),
                 ),
                 const SizedBox(width: 8),
-                Text(
-                  profile.email,
-                  style: const TextStyle(color: Color(0xFF4B5563)),
+                Expanded(
+                  child: Text(
+                    profile.email,
+                    style: const TextStyle(color: Color(0xFF4B5563)),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
                 ),
               ],
             ),
@@ -664,6 +668,7 @@ class _ProfileInfoCard extends StatelessWidget {
                           initialValue: tempDepartment.isEmpty
                               ? null
                               : tempDepartment,
+                          isExpanded: true,
                           decoration: InputDecoration(
                             hintText: l10n.t(
                               AppText.profileSelectDepartmentHint,
@@ -690,12 +695,18 @@ class _ProfileInfoCard extends StatelessWidget {
                               value: '',
                               child: Text(
                                 l10n.t(AppText.profileSelectDepartmentHint),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
                               ),
                             ),
                             for (final dept in _departmentOptions)
                               DropdownMenuItem<String>(
                                 value: dept,
-                                child: Text(dept),
+                                child: Text(
+                                  dept,
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                ),
                               ),
                           ],
                           onChanged: (v) => onDepartmentChanged(v ?? ''),

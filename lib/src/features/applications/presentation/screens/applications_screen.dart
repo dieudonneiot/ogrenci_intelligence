@@ -577,6 +577,7 @@ class _FiltersBar extends StatelessWidget {
         ? const SizedBox.shrink()
         : DropdownButtonFormField<ApplicationStatus?>(
             initialValue: status,
+            isExpanded: true,
             decoration: InputDecoration(
               filled: true,
               fillColor: Colors.white,
@@ -598,12 +599,18 @@ class _FiltersBar extends StatelessWidget {
                 value: null,
                 child: Text(
                   l10n.t(AppText.companyApplicationsFilterAllStatuses),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
                 ),
               ),
               for (final s in statusOptions)
                 DropdownMenuItem<ApplicationStatus?>(
                   value: s,
-                  child: Text(_statusLabel(l10n, s)),
+                  child: Text(
+                    _statusLabel(l10n, s),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
                 ),
             ],
             onChanged: onStatusChanged,
@@ -856,9 +863,10 @@ class _ApplicationCard extends StatelessWidget {
                   const SizedBox(height: 10),
                 ] else
                   const SizedBox(height: 4),
-                Row(
-                  children: [
-                    Container(
+                LayoutBuilder(
+                  builder: (context, c) {
+                    final isNarrow = c.maxWidth < 520;
+                    final kindChip = Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 10,
                         vertical: 6,
@@ -875,19 +883,11 @@ class _ApplicationCard extends StatelessWidget {
                           color: Color(0xFF374151),
                         ),
                       ),
-                    ),
-                    const Spacer(),
-                    Text(
-                      dateText,
-                      style: const TextStyle(
-                        color: Color(0xFF6B7280),
-                        fontWeight: FontWeight.w800,
-                        fontSize: 12,
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    SizedBox(
-                      height: 36,
+                    );
+
+                    final detailsButton = SizedBox(
+                      height: 40,
+                      width: isNarrow ? double.infinity : null,
                       child: ElevatedButton(
                         onPressed: () => onOpen(context, item),
                         style: ElevatedButton.styleFrom(
@@ -903,21 +903,73 @@ class _ApplicationCard extends StatelessWidget {
                           style: const TextStyle(fontWeight: FontWeight.w900),
                         ),
                       ),
-                    ),
-                  ],
+                    );
+
+                    if (!isNarrow) {
+                      return Row(
+                        children: [
+                          kindChip,
+                          const Spacer(),
+                          Text(
+                            dateText,
+                            style: const TextStyle(
+                              color: Color(0xFF6B7280),
+                              fontWeight: FontWeight.w800,
+                              fontSize: 12,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          detailsButton,
+                        ],
+                      );
+                    }
+
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            kindChip,
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Align(
+                                alignment: Alignment.centerRight,
+                                child: Text(
+                                  dateText,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: Color(0xFF6B7280),
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        detailsButton,
+                      ],
+                    );
+                  },
                 ),
                 if (item.progress != null) ...[
                   const SizedBox(height: 10),
                   Row(
                     children: [
-                      Text(
-                        l10n.t(AppText.courseDetailProgress),
-                        style: const TextStyle(
-                          color: Color(0xFF6B7280),
-                          fontWeight: FontWeight.w700,
+                      Expanded(
+                        child: Text(
+                          l10n.t(AppText.courseDetailProgress),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Color(0xFF6B7280),
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
-                      const Spacer(),
+                      const SizedBox(width: 10),
                       Text(
                         '%${item.progress}',
                         style: TextStyle(

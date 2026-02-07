@@ -273,6 +273,7 @@ class _FiltersCard extends StatelessWidget {
           DropdownButtonFormField<String?>(
             key: ValueKey<String?>('dept:$selectedDepartment'),
             initialValue: selectedDepartment,
+            isExpanded: true,
             decoration: InputDecoration(
               labelText: 'Department',
               border: OutlineInputBorder(
@@ -285,7 +286,14 @@ class _FiltersCard extends StatelessWidget {
                 child: Text('All departments'),
               ),
               ...departments.map(
-                (d) => DropdownMenuItem(value: d, child: Text(d)),
+                (d) => DropdownMenuItem(
+                  value: d,
+                  child: Text(
+                    d,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                ),
               ),
             ],
             onChanged: onDepartmentChanged,

@@ -42,39 +42,73 @@ class _EvidenceScreenState extends ConsumerState<EvidenceScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.verified_outlined,
-                      color: Color(0xFF6D28D9),
-                    ),
-                    const SizedBox(width: 10),
-                    const Text(
-                      'Evidence',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                    const Spacer(),
-                    IconButton(
-                      onPressed: () =>
-                          ref.read(myEvidenceProvider.notifier).refresh(),
-                      icon: const Icon(Icons.refresh),
-                    ),
-                    const SizedBox(width: 6),
-                    SizedBox(
-                      height: 44,
-                      child: ElevatedButton.icon(
-                        onPressed: _uploading ? null : () => _openUpload(uid),
-                        icon: const Icon(Icons.upload_file),
-                        label: Text(_uploading ? 'Uploading...' : 'Upload'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF6D28D9),
+                LayoutBuilder(
+                  builder: (context, c) {
+                    final isNarrow = c.maxWidth < 520;
+
+                    final titleRow = Row(
+                      children: const [
+                        Icon(
+                          Icons.verified_outlined,
+                          color: Color(0xFF6D28D9),
                         ),
-                      ),
-                    ),
-                  ],
+                        SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            'Evidence',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+
+                    final actions = Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        IconButton(
+                          onPressed: () =>
+                              ref.read(myEvidenceProvider.notifier).refresh(),
+                          icon: const Icon(Icons.refresh),
+                        ),
+                        SizedBox(
+                          height: 44,
+                          child: ElevatedButton.icon(
+                            onPressed: _uploading ? null : () => _openUpload(uid),
+                            icon: const Icon(Icons.upload_file),
+                            label: Text(_uploading ? 'Uploading...' : 'Upload'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF6D28D9),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+
+                    if (isNarrow) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          titleRow,
+                          const SizedBox(height: 10),
+                          actions,
+                        ],
+                      );
+                    }
+
+                    return Row(
+                      children: [
+                        Expanded(child: titleRow),
+                        actions,
+                      ],
+                    );
+                  },
                 ),
                 const SizedBox(height: 12),
                 const Text(

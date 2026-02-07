@@ -107,31 +107,62 @@ class _CompanyInternshipsScreenState
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.school_outlined,
-                        color: Color(0xFF6D28D9),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        l10n.t(AppText.companyInternshipsTitle),
-                        style: const TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w900,
+                  LayoutBuilder(
+                    builder: (context, c) {
+                      final isNarrow = c.maxWidth < 520;
+                      final titleRow = Row(
+                        children: [
+                          const Icon(
+                            Icons.school_outlined,
+                            color: Color(0xFF6D28D9),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              l10n.t(AppText.companyInternshipsTitle),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+
+                      final action = SizedBox(
+                        width: isNarrow ? double.infinity : null,
+                        child: ElevatedButton.icon(
+                          onPressed: () =>
+                              context.go(Routes.companyInternshipsCreate),
+                          icon: const Icon(Icons.add),
+                          label: Text(l10n.t(AppText.newListing)),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF6D28D9),
+                          ),
                         ),
-                      ),
-                      const Spacer(),
-                      ElevatedButton.icon(
-                        onPressed: () =>
-                            context.go(Routes.companyInternshipsCreate),
-                        icon: const Icon(Icons.add),
-                        label: Text(l10n.t(AppText.newListing)),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF6D28D9),
-                        ),
-                      ),
-                    ],
+                      );
+
+                      if (isNarrow) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            titleRow,
+                            const SizedBox(height: 10),
+                            action,
+                          ],
+                        );
+                      }
+
+                      return Row(
+                        children: [
+                          Expanded(child: titleRow),
+                          const SizedBox(width: 12),
+                          action,
+                        ],
+                      );
+                    },
                   ),
                   const SizedBox(height: 16),
                   Wrap(

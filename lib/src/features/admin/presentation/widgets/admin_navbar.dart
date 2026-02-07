@@ -29,6 +29,7 @@ class _AdminNavbarState extends ConsumerState<AdminNavbar> {
 
     final w = MediaQuery.of(context).size.width;
     final isDesktop = w >= 900;
+    final isNarrow = w < 420;
     final currentPath = GoRouterState.of(context).uri.path;
 
     final navItems = <_AdminNavItem>[
@@ -69,6 +70,59 @@ class _AdminNavbarState extends ConsumerState<AdminNavbar> {
       ),
     ];
 
+    final brand = InkWell(
+      onTap: () => context.go(Routes.adminDashboard),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(
+            Icons.security,
+            color: Color(0xFFA78BFA),
+            size: 28,
+          ),
+          if (!isNarrow) ...[
+            const SizedBox(width: 10),
+            ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: isDesktop ? 260 : double.infinity,
+              ),
+              child: Text(
+                l10n.t(AppText.adminPanelTitle),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: fg,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+            if (isSuper) ...[
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 3,
+                ),
+                decoration: BoxDecoration(
+                  color: fg.withAlpha(28),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Text(
+                  l10n.t(AppText.adminSuperBadge),
+                  style: TextStyle(
+                    color: fg,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ],
+      ),
+    );
+
     return DecoratedBox(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -93,48 +147,7 @@ class _AdminNavbarState extends ConsumerState<AdminNavbar> {
                     ),
                     child: Row(
                       children: [
-                        InkWell(
-                          onTap: () => context.go(Routes.adminDashboard),
-                          child: Row(
-                            children: [
-                              const Icon(
-                                Icons.security,
-                                color: Color(0xFFA78BFA),
-                                size: 28,
-                              ),
-                              const SizedBox(width: 10),
-                              Text(
-                                l10n.t(AppText.adminPanelTitle),
-                                style: TextStyle(
-                                  color: fg,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                              ),
-                              if (isSuper) ...[
-                                const SizedBox(width: 8),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 3,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: fg.withAlpha(28),
-                                    borderRadius: BorderRadius.circular(999),
-                                  ),
-                                  child: Text(
-                                    l10n.t(AppText.adminSuperBadge),
-                                    style: TextStyle(
-                                      color: fg,
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w800,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ],
-                          ),
-                        ),
+                        isDesktop ? brand : Expanded(child: brand),
                         if (isDesktop) ...[
                           const SizedBox(width: 24),
                           Expanded(
@@ -157,15 +170,17 @@ class _AdminNavbarState extends ConsumerState<AdminNavbar> {
                             ),
                           ),
                         ] else
-                          const Spacer(),
-                        _AdminLanguageMenu(
-                          l10n: l10n,
-                          currentLocale: locale,
-                          onSelected: (next) => ref
-                              .read(appLocaleProvider.notifier)
-                              .setLocale(next),
-                        ),
-                        const SizedBox(width: 10),
+                          const SizedBox(width: 10),
+                        if (isDesktop || !isNarrow) ...[
+                          _AdminLanguageMenu(
+                            l10n: l10n,
+                            currentLocale: locale,
+                            onSelected: (next) => ref
+                                .read(appLocaleProvider.notifier)
+                                .setLocale(next),
+                          ),
+                          const SizedBox(width: 10),
+                        ],
                         _NotificationsButton(),
                         const SizedBox(width: 12),
                         _ProfileMenu(
@@ -174,6 +189,7 @@ class _AdminNavbarState extends ConsumerState<AdminNavbar> {
                               ? admin!.name
                               : l10n.t(AppText.adminRoleAdmin),
                           email: admin?.email,
+                          compact: !isDesktop,
                           onNavigate: (path) => context.go(path),
                           onLogout: () => _handleLogout(context),
                         ),
@@ -453,6 +469,7 @@ class _ProfileMenu extends StatelessWidget {
     required this.l10n,
     required this.name,
     required this.email,
+    this.compact = false,
     required this.onNavigate,
     required this.onLogout,
   });
@@ -460,11 +477,22 @@ class _ProfileMenu extends StatelessWidget {
   final AppLocalizations l10n;
   final String name;
   final String? email;
+  final bool compact;
   final void Function(String path) onNavigate;
   final Future<void> Function() onLogout;
 
   @override
   Widget build(BuildContext context) {
+    final avatar = Container(
+      width: 34,
+      height: 34,
+      decoration: BoxDecoration(
+        color: const Color(0xFF7C3AED),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: const Icon(Icons.person, size: 18, color: Colors.white),
+    );
+
     return PopupMenuButton<_ProfileAction>(
       tooltip: l10n.t(AppText.profileMenu),
       offset: const Offset(0, 12),
@@ -534,29 +562,28 @@ class _ProfileMenu extends StatelessWidget {
           ),
         ),
       ],
-      child: Row(
-        children: [
-          Container(
-            width: 34,
-            height: 34,
-            decoration: BoxDecoration(
-              color: const Color(0xFF7C3AED),
-              borderRadius: BorderRadius.circular(999),
+      child: compact
+          ? avatar
+          : Row(
+              children: [
+                avatar,
+                const SizedBox(width: 8),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 160),
+                  child: Text(
+                    name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 4),
+                const Icon(Icons.expand_more, color: Color(0xFFD1D5DB)),
+              ],
             ),
-            child: const Icon(Icons.person, size: 18, color: Colors.white),
-          ),
-          const SizedBox(width: 8),
-          Text(
-            name,
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(width: 4),
-          const Icon(Icons.expand_more, color: Color(0xFFD1D5DB)),
-        ],
-      ),
     );
   }
 }

@@ -213,6 +213,7 @@ class _ExcuseRequestScreenState extends ConsumerState<ExcuseRequestScreen> {
                               'app:$_selectedApplicationId',
                             ),
                             initialValue: _selectedApplicationId,
+                            isExpanded: true,
                             decoration: InputDecoration(
                               labelText: 'Internship',
                               border: OutlineInputBorder(
@@ -225,6 +226,8 @@ class _ExcuseRequestScreenState extends ConsumerState<ExcuseRequestScreen> {
                                     value: e.applicationId,
                                     child: Text(
                                       '${e.internshipTitle} — ${e.companyName}',
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
                                     ),
                                   ),
                                 )
@@ -239,6 +242,7 @@ class _ExcuseRequestScreenState extends ConsumerState<ExcuseRequestScreen> {
                           DropdownButtonFormField<String>(
                             key: ValueKey<String>('reason:$_reason'),
                             initialValue: _reason,
+                            isExpanded: true,
                             decoration: InputDecoration(
                               labelText: 'Reason',
                               border: OutlineInputBorder(
@@ -248,15 +252,27 @@ class _ExcuseRequestScreenState extends ConsumerState<ExcuseRequestScreen> {
                             items: const [
                               DropdownMenuItem(
                                 value: 'illness',
-                                child: Text('Illness'),
+                                child: Text(
+                                  'Illness',
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                ),
                               ),
                               DropdownMenuItem(
                                 value: 'family_emergency',
-                                child: Text('Family emergency'),
+                                child: Text(
+                                  'Family emergency',
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                ),
                               ),
                               DropdownMenuItem(
                                 value: 'other',
-                                child: Text('Other'),
+                                child: Text(
+                                  'Other',
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                ),
                               ),
                             ],
                             onChanged: _submitting

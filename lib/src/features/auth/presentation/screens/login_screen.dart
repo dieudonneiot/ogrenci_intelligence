@@ -238,23 +238,72 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
 
                     const SizedBox(height: 10),
-                    Row(
-                      children: [
-                        Checkbox(
-                          value: _rememberMe,
-                          onChanged: (v) =>
-                              setState(() => _rememberMe = v ?? false),
-                        ),
-                        Text(
-                          l10n.t(AppText.commonRememberMe),
-                          style: const TextStyle(fontWeight: FontWeight.w600),
-                        ),
-                        const Spacer(),
-                        TextButton(
-                          onPressed: () => context.push(Routes.forgotPassword),
-                          child: Text(l10n.t(AppText.commonForgotPassword)),
-                        ),
-                      ],
+                    LayoutBuilder(
+                      builder: (context, c) {
+                        final narrow = c.maxWidth < 360;
+                        if (narrow) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Row(
+                                children: [
+                                  Checkbox(
+                                    value: _rememberMe,
+                                    onChanged: (v) => setState(
+                                      () => _rememberMe = v ?? false,
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Text(
+                                      l10n.t(AppText.commonRememberMe),
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: TextButton(
+                                  onPressed: () =>
+                                      context.push(Routes.forgotPassword),
+                                  child: Text(
+                                    l10n.t(AppText.commonForgotPassword),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        }
+
+                        return Row(
+                          children: [
+                            Checkbox(
+                              value: _rememberMe,
+                              onChanged: (v) =>
+                                  setState(() => _rememberMe = v ?? false),
+                            ),
+                            Expanded(
+                              child: Text(
+                                l10n.t(AppText.commonRememberMe),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () =>
+                                  context.push(Routes.forgotPassword),
+                              child: Text(l10n.t(AppText.commonForgotPassword)),
+                            ),
+                          ],
+                        );
+                      },
                     ),
 
                     if (_error != null) ...[

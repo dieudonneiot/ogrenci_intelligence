@@ -469,6 +469,7 @@ class _Drop extends StatelessWidget {
   Widget build(BuildContext context) {
     return DropdownButtonFormField<String>(
       initialValue: value,
+      isExpanded: true,
       decoration: InputDecoration(
         filled: true,
         fillColor: const Color(0xFFF9FAFB),
@@ -480,8 +481,14 @@ class _Drop extends StatelessWidget {
       ),
       items: items
           .map(
-            (m) =>
-                DropdownMenuItem(value: m['value']!, child: Text(m['label']!)),
+            (m) => DropdownMenuItem(
+              value: m['value']!,
+              child: Text(
+                m['label']!,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+            ),
           )
           .toList(),
       onChanged: (v) {

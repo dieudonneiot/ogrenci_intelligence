@@ -1204,9 +1204,17 @@ class _TalentSpotlight extends StatelessWidget {
                     DropdownButtonFormField<String>(
                       initialValue:
                           (nextDept ?? '').trim().isEmpty ? null : nextDept,
+                      isExpanded: true,
                       items: [
                         for (final d in departments)
-                          DropdownMenuItem(value: d, child: Text(d)),
+                          DropdownMenuItem(
+                            value: d,
+                            child: Text(
+                              d,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                          ),
                       ],
                       onChanged: (v) => setModalState(() => nextDept = v),
                       decoration: const InputDecoration(
@@ -1215,33 +1223,70 @@ class _TalentSpotlight extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        TextButton(
+                    LayoutBuilder(
+                      builder: (_, c) {
+                        final isNarrow = c.maxWidth < 360;
+
+                        final clearButton = TextButton(
                           onPressed: () => setModalState(() {
                             nextDept = null;
                             nextMatch = hasSector;
                           }),
                           child: const Text('Clear'),
-                        ),
-                        const Spacer(),
-                        TextButton(
-                          onPressed: () => Navigator.of(ctx).pop(),
-                          child: Text(
-                            AppLocalizations.of(ctx).t(AppText.commonCancel),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        ElevatedButton(
-                          onPressed: () {
-                            onChangeFilters(nextDept, nextMatch);
-                            Navigator.of(ctx).pop();
-                          },
-                          child: Text(
-                            AppLocalizations.of(ctx).t(AppText.commonConfirm),
-                          ),
-                        ),
-                      ],
+                        );
+
+                        final trailing = Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            TextButton(
+                              onPressed: () => Navigator.of(ctx).pop(),
+                              child: Text(
+                                AppLocalizations.of(ctx).t(AppText.commonCancel),
+                              ),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {
+                                onChangeFilters(nextDept, nextMatch);
+                                Navigator.of(ctx).pop();
+                              },
+                              child: Text(
+                                AppLocalizations.of(ctx).t(AppText.commonConfirm),
+                              ),
+                            ),
+                          ],
+                        );
+
+                        if (isNarrow) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: clearButton,
+                              ),
+                              const SizedBox(height: 8),
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: trailing,
+                              ),
+                            ],
+                          );
+                        }
+
+                        return Row(
+                          children: [
+                            clearButton,
+                            const Spacer(),
+                            Flexible(
+                              child: Align(
+                                alignment: Alignment.centerRight,
+                                child: trailing,
+                              ),
+                            ),
+                          ],
+                        );
+                      },
                     ),
                   ],
                 ),

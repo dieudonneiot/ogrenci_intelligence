@@ -41,14 +41,17 @@ class CompanyEvidenceScreen extends ConsumerWidget {
                       color: Color(0xFF2563EB),
                     ),
                     const SizedBox(width: 10),
-                    const Text(
-                      'Evidence Approvals',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w900,
+                    const Expanded(
+                      child: Text(
+                        'Evidence Approvals',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w900,
+                        ),
                       ),
                     ),
-                    const Spacer(),
                     IconButton(
                       onPressed: () => ref
                           .read(companyPendingEvidenceProvider.notifier)
